@@ -12,7 +12,7 @@ _includes:_
   - Continual learning ability & gaining experience.
   - Other entrepreneurial skills: product management, knowing/understanding/identifying end-user/stakeholders requirements, adaptation to changing & different markets, revenue-cost control, etc.
 
-_[Approaches/paths to get into the field:](https://en.wikipedia.org/wiki/Top-down_and_bottom-up_design#Software_development)_
+_Approaches/paths to get into the field: [(top-down and bottom-up approaches)](https://en.wikipedia.org/wiki/Top-down_and_bottom-up_design#Software_development)_
 - Theoretical approach: aquiring theoretical knowledge in computer science & mathematics first, followed by subsequent practicing and transcribing conceptual solutions into code. **- defenitely a better approach.**
 - Practical approach: studying programming (learning to code) & gaining hands-on experience, developing more theoretical knowledge usually when required (bottom-up approch). 
 
