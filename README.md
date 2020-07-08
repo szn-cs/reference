@@ -36,7 +36,7 @@ Some tools useful for studying:
 - Microsoft OneNote as a note taking electronic notebook - Summerizing the information of different topics, and listing resources & tools in each field. The reason that OneNote is superior to other solutions is because it allows to store all the files and data locally (i.e. not locked & dependent on an online service).
 &nbsp;&nbsp;[Example](https://1drv.ms/u/s!Aj6AhOSNgvUOqWiQ3YOKkSBHOIsd)
 - Miro as fields orientation & tech stack classification - i.e. it allows to create graphs to organize the different study fields in CS and Math for example, or classify the different tools used in software development for each of the fields.
-&nbsp;&nbsp;[Example](https://miro.com/app/board/o9J_kuMxGbo=/?moveToWidget=3074457348747821245&cot=13)
+&nbsp;&nbsp;[Example](https://miro.com/app/board/o9J_kuMxGbo=/)
 - Drawing tablet (e.g. Wacom Intous Pro) with Microsoft OneNote & Microsoft Whiteboard: for complete electronic note taking and practicing during studying CS or Math.
 - Git repositories for practicing exercises or documenting software related tools and local environment setup.
 etc.
