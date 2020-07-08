@@ -1,5 +1,5 @@
 # computerScience-exercise
-Interview theoretical &amp; coding problems, CS coursework / assignments [mainly UW-Madison]
+Interview theoretical &amp; coding problems, CS coursework / assignments [mainly of UW-Madison CS department]
 
 Software Engineering field:
 _includes:_
