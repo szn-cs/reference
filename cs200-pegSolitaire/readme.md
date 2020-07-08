@@ -1,0 +1,2 @@
+[Notes](https://1drv.ms/u/s!Aj6AhOSNgvUOqWiQ3YOKkSBHOIsd?wd=target%28Computer%20Science%5EJ%20Theoretical.one%7CE72B7EAA-E2E1-4C99-904B-F14F0975C311%2FCS%20200%7CC0E1D854-3FCD-4316-A08B-3C6A49122515%2F%29
+onenote:https://d.docs.live.net/0ef5828de484803e/Documents/CS%20and%20Full-stack/Computer%20Science%5eJ%20Theoretical.one#CS%20200&section-id={E72B7EAA-E2E1-4C99-904B-F14F0975C311}&page-id={C0E1D854-3FCD-4316-A08B-3C6A49122515}&end)
