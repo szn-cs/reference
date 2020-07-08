@@ -1,7 +1,8 @@
 # computerScience-exercise
 Interview theoretical &amp; coding problems, CS coursework / assignments [mainly of UW-Madison CS department]
 
-Software Engineering field:
+## Software Engineering field:
+
 _includes:_
   - Theoretical knowledge in computer science, including mathematics (Reasoning with abstraction, logic, & patterns) .
   - Software developemnt - usage of tools & programming/coding solutions optimally & maintenably. 
@@ -15,7 +16,9 @@ _[Approaches/paths to get into the field:](https://en.wikipedia.org/wiki/Top-dow
 - Theoretical approach: aquiring theoretical knowledge in computer science & mathematics first, followed by subsequent practicing and transcribing conceptual solutions into code. **- defenitely a better approach.**
 - Practical approach: studying programming (learning to code) & gaining hands-on experience, developing more theoretical knowledge usually when required (bottom-up approch). 
 
-Self-studing: in this day and age, studying CS deeply in advanced level is easier than ever. All material from courses, books, articles, career mentorship & advices, examples & exercises, etc. is available electronically. 
+## Self-studing:
+In this day and age, studying CS deeply in an advanced level is easier than ever. All the material needed from courses, books, articles, career mentorship & advices, examples & exercises, etc. is available electronically. 
+
 The only issue with that approach is that it will take you some time to become oriented regarding:
 - Understanding the classification of CS & Math fields and how each relate to the other (e.g. the different areas tought in university level courses).
 - Finding and filtering the right resources/books/courses, taking into consideration the benifit gain in relation to the time cost _(cost-benifit analysis ?)_.
