@@ -1,4 +1,6 @@
 // Simple quick implementation of array sorting.
+//Write a method to sort an array of integers from smallest to largest.
+
 import java.util.*;
 
 public class Main {
