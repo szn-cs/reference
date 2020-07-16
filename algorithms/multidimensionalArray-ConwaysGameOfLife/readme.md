@@ -8,3 +8,4 @@ _A simulation in multidimenstional 2D array._
 ### Resources: 
 - [An Introduction to Conway's The Game of Life](https://www.youtube.com/watch?v=ouipbDkwHWA)
 - Implementation example - https://www.algosome.com/articles/conway-game-of-life-2d.html
+- https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
