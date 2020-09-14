@@ -18,10 +18,11 @@ int main() {
   
   // Terminate the string
   int len = strlen(str);
+  printf(fgets (str, 50, stdin));
   
-  if (str[len - 1] == '\n') {
+  if (str[len - 1] == '\n') 
     str[len - 1] = '\0';
-  }
+  
   
   // Print out the CS login
   printf("Your login: %s\n", str);
