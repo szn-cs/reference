@@ -1,20 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 //// Main File:        decode.c
-<<<<<<< HEAD
-//// This File:        decode.c
-//// Other Files:      
-//// Semester:         CS 354 Fall 2020
-//// Instructor:       deppeler
-//// 
-//// Discussion Group: 631
-=======
 //// This File:        decode.c 
 //// Other Files:       
 //// Semester:         CS 354 Fall 2020
 //// Instructor:       deppeler
 //// 
 //// Discussion Group: 631 
->>>>>>> refs/remotes/origin/master
 //// Author:           Safi Nassar
 //// Email:            nassar2@wisc.edu
 //// CS Login:         safi@cs.wisc.edu
