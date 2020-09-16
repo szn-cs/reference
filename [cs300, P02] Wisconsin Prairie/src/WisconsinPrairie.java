@@ -26,7 +26,7 @@ import processing.core.PImage;
  * display window using the mouse.
  * 
  * @see Cow class - defined in the p2core library as part of the default package.
- * @author Safi Nassar
+ * @author Safi
  *
  */
 public class WisconsinPrairie {
@@ -37,7 +37,10 @@ public class WisconsinPrairie {
   private static Random randGen; // Generator of random numbers
 
   /**
-   * @param args
+   * Starts up the application implemented in accompanied `p2core.jar` library, which in turn uses
+   * the callback methods implemented in this class.
+   * 
+   * @param args input arguments if any
    */
   public static void main(String[] args) {
     /*
@@ -73,41 +76,12 @@ public class WisconsinPrairie {
     randGen = new Random();
     // initialize the processing field to the one passed into the input argument parameter.
     processing = processingObj;
-    // Dimensions of the display window when program initially loaded (width & height respectively).
-    final int WINDOW_WIDTH = processing.width, WINDOW_HEIGHT = processing.height;
 
     // initialize and load the image of the background.
     backgroundImage =
         processing.loadImage(String.join(PATH_SEPARATOR, IMG_FOLDER_PATH, BG_IMAGE_FILENAME));
     // initialize cows array, setting the number of Cow objects that can be present on screen.
     cows = new Cow[NUMBER_OF_COWS];
-
-    // Generate first cow at a random position.
-    // {
-    // // generates a random x and y positions of type float within the width & height of the
-    // display
-    // // window, respectively.
-    // float pX = (float) randGen.nextInt(WINDOW_WIDTH);
-    // float pY = (float) randGen.nextInt(WINDOW_HEIGHT);
-    // // create a cow object placing it on a random position in the display window.
-    // cows[0] = new Cow(processing, pX, pY);
-    // }
-
-    // Generate additional cows at the center.
-    // {
-    // // create additional cows objects in the center of the screen
-    // for (int i = 0; i < cows.length; i++) {
-    // // skip for occupied positions with a defined object.
-    // if (cows[i] != null)
-    // continue;
-    // // x-position & y-position coordinates for the center of the display window.
-    // float pX = (float) WINDOW_WIDTH / 2;
-    // float pY = (float) WINDOW_HEIGHT / 2;
-    // // create a cow object placing it on the center of the screen.
-    // cows[i] = new Cow(processing, pX, pY);
-    // }
-    // }
-
   }
 
   /**
@@ -119,9 +93,8 @@ public class WisconsinPrairie {
    */
   public static void draw() {
     // Dimensions of the display window when program initially loaded (width & height respectively).
-    final int WINDOW_WIDTH = processing.width, WINDOW_HEIGHT = processing.height;
-    // Current coordinate positions of the mouse pointer on the window area
-    final float mouseX = processing.mouseX, mouseY = processing.mouseY;
+    final int WINDOW_WIDTH = processing.width;
+    final int WINDOW_HEIGHT = processing.height;
 
     // Draw the background image at the center of the screen (display window)
     processing.image(backgroundImage, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
@@ -135,11 +108,11 @@ public class WisconsinPrairie {
    */
   private static void drawCows() {
     // iterate over the cows objects redrawing them to screen
-    for (int i = 0; i < cows.length; i++) {
+    for (Cow currentCow : cows) {
       // skip empty positions with no elements
-      if (cows[i] == null)
+      if (currentCow == null)
         continue;
-      cows[i].draw(); // draw cow image to screen
+      currentCow.draw(); // draw cow image to screen
     }
   }
 
@@ -152,22 +125,25 @@ public class WisconsinPrairie {
    */
   public static boolean isMouseOver(Cow cow) {
     boolean isMouseOver = false; // whether mouse is over the cow image
-    // Current coordinate positions of the mouse pointer on the window area
-    final float mouseX = processing.mouseX, mouseY = processing.mouseY;
+    // get image PImage instance
+    PImage image = cow.getImage();
     // retrieve the dimensions of the cow image (cow.png: 149/114 pixels)
-    PImage image = cow.getImage(); // get image PImage instance
-    final short IMAGE_WIDTH = (short) image.width, IMAGE_HEIGHT = (short) image.height;
+    final short IMAGE_WIDTH = (short) image.width;
+    final short IMAGE_HEIGHT = (short) image.height;
     // retrieve coordinate positions of cow object
-    final float cowX = cow.getPositionX(), cowY = cow.getPositionY();
+    final float COW_X = cow.getPositionX(), COW_Y = cow.getPositionY();
+    // Current coordinate positions of the mouse pointer on the window area
+    final float MOUSE_X = processing.mouseX;
+    final float MOUSE_Y = processing.mouseY;
 
     // shift coordinates of cow and mouse positions for relative comparison to zero, where the cow
     // center is now positioned on the x-axis & y-axis intersection.
-    float mouseShiftX = mouseX - cowX, mouseShiftY = mouseY - cowY;
+    float mouseShiftX = MOUSE_X - COW_X, mouseShiftY = MOUSE_Y - COW_Y;
     // check if mouse is between boundaries from all sides by comparing the distance from center of
     // cow coordinates matching the width and height on all sides
-    if (Math.abs(mouseShiftX) <= IMAGE_WIDTH / 2 && Math.abs(mouseShiftY) <= IMAGE_HEIGHT)
+    if (Math.abs(mouseShiftX) <= (float) IMAGE_WIDTH / 2
+        && Math.abs(mouseShiftY) <= (float) IMAGE_HEIGHT / 2)
       isMouseOver = true;
-
     return isMouseOver;
   }
 
@@ -176,11 +152,9 @@ public class WisconsinPrairie {
    */
   public static void mousePressed() {
     Cow targetCow = null; // The cow object the mouse should drag
-
     // check if the mouse is over one of the cow objects stored in the cows array.
     for (Cow currentCow : cows) {
       // skip empty positions with no elements
-      // Note: I'm not sure if the "for in" loop in Java includes skips null values
       if (currentCow == null)
         continue;
       // check if current cow is under the mouse pointer
@@ -191,8 +165,7 @@ public class WisconsinPrairie {
         break;
       }
     }
-
-    // if a cow was match
+    // if a cow was matched
     if (targetCow != null)
       targetCow.setDragging(true); // start dragging the cow image
   }
@@ -202,13 +175,13 @@ public class WisconsinPrairie {
    */
   public static void mouseReleased() {
     // iterate over all cow objects and toggle their dragging property to false
-    for (int i = 0; i < cows.length; i++) {
+    for (Cow currentCow : cows) {
       // skip empty positions with no elements
-      if (cows[i] == null)
+      if (currentCow == null)
         continue;
       // Set dragging to false for every cow object No cow must be dragged when the mouse is
       // released.
-      cows[i].setDragging(false);
+      currentCow.setDragging(false);
     }
   }
 
@@ -217,23 +190,24 @@ public class WisconsinPrairie {
    */
   public static void keyPressed() {
     char keyPressed = processing.key; // retrieve user pressed key
-
-    // Add cows to prairie on pressing 'c' or 'C'
-    if (keyPressed == 'c' || keyPressed == 'C') {
-      addCow(); // add new cow to the prairie (if the limit is not exceeded)
+    switch (keyPressed) {
+      // Add cows to prairie on pressing 'c' or 'C'
+      case 'c':
+      case 'C':
+        addCowRandom(); // add new cow to the prairie (if the limit is not exceeded)
+        break;
+      // Remove cow prairie under the mouse if any on pressing 'D' or 'd'
+      case 'd':
+      case 'D':
+        removeCowUnderMouse(); // remove a single cow from prairie
+        break;
     }
-
-    // Remove cow prairie under the mouse if any on pressing 'D' or 'd'
-    if (keyPressed == 'd' || keyPressed == 'D') {
-      removeCow(); // remove a single cow from prairie
-    }
-
   }
 
   /**
    * Adds a new cow object with a random position coordinates to the list of cows objects.
    */
-  private static void addCow() {
+  private static void addCowRandom() {
     // Dimensions of the display window when program initially loaded (width & height respectively).
     final int WINDOW_WIDTH = processing.width, WINDOW_HEIGHT = processing.height;
 
@@ -247,12 +221,8 @@ public class WisconsinPrairie {
       // display window, respectively.
       float pX = (float) randGen.nextInt(WINDOW_WIDTH);
       float pY = (float) randGen.nextInt(WINDOW_HEIGHT);
-      // if found an empty space in the array replace the first (lowest index) null reference with a
-      // new Cow object located at a random position of the display window.
+      // create a cow object placing it on a random position in the display window.
       cows[i] = new Cow(processing, pX, pY);
-      // place cow into random positions on the screen.
-      // cows[0].setPositionX(pX);
-      // cows[0].setPositionY(pY);
 
       break; // (or return) Stop after adding a single cow object.
     }
@@ -261,7 +231,7 @@ public class WisconsinPrairie {
   /**
    * Remove a single cow from the prairie if any present (with the lowest index stored in the array)
    */
-  private static void removeCow() {
+  private static void removeCowUnderMouse() {
     // search through the cows array for a cow object that is under the mouse to remove it
     for (int i = 0; i < cows.length; i++) {
       // skip empty array positions
@@ -270,10 +240,10 @@ public class WisconsinPrairie {
       // skip cows that are not under the mouse
       if (!isMouseOver(cows[i]))
         continue;
-
       // remove the cow element found from the array
       cows[i] = null;
       break; // (or return) Stop after removing a single cow object.
     }
   }
+
 }
