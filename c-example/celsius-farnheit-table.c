@@ -2,9 +2,13 @@
 
 #include <stdio.h> 
 
+#define LOWER 0   // lower limit of table
+#define UPPER 200 // upper limit
+#define STEP 20   // step size
+
 void celsiusToFarenheit() {
   float celsius, farenheit; 
-  int lower = 0, upper = 300, step = 20; // ranges of values with mathematical range: [lower, upper]
+  int lower = LOWER, upper = UPPER, step = STEP; // ranges of values with mathematical range: [lower, upper]
  
   for(celsius = lower; celsius <= upper; celsius += step) {
     farenheit = (9.0/5.0 * celsius) + 32.0;// formula conversion mathematically: F = 9/5 x C + 32
@@ -14,7 +18,7 @@ void celsiusToFarenheit() {
 
 void farenheitToCelsius() {
   float celsius, farenheit; 
-  int lower = 0, upper = 300, step = 20; // ranges of values with mathematical range: [lower, upper]
+  int lower = LOWER, upper = UPPER, step = STEP; // ranges of values with mathematical range: [lower, upper]
 
   for(farenheit = lower; farenheit <= upper; farenheit += step) {
     celsius = 5.0 / 9.0 * (farenheit - 32);// formula conversion mathematically: C = 5/9 * (F - 32)
