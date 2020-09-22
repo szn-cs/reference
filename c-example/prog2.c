@@ -1,5 +1,34 @@
 #include <stdio.h> 
 
+// function prototype declarations
+void printStreamOfChar(void);
+void countInputChar(void);
+void countBlankTabNewline(void);
+void removeRecurreningBlankStream(void);
+void countWord(void);
+void countDigitWhiteSpaceAndOther(void);
+int exponentiation(int base, int exponent);
+/* Initial outline: 
+  while (line input exist)  
+    check if it is longer the preious longest
+      save it 
+      save its length
+  print longest line
+*/
+void printLongestline(void);
+
+int main() {
+  /* uncomment a function to execute */
+  // printStreamOfChar();
+  // countInputChar();
+  // countBlankTabNewline();
+  // removeRecurreningBlankStream();
+  // countWord();
+  // countDigitWhiteSpaceAndOther();
+  // printf("%d^%d = %i", 2, 5, exponentiation(2, 5));
+  // printLongestline(); 
+}
+
 /* redirect input to output: usage of streams and EOF value (Ctrl+D) */
 void printStreamOfChar() { 
   int c; // use int to allow EOF character used by stdio library to be saved (which is larger than char 1 byte)
@@ -102,13 +131,61 @@ void countDigitWhiteSpaceAndOther() {
   printf(", White-space: %d, Other characters: %d\n", cWhitespace, cOther);
 }
 
-int main() {
-  /* uncomment a function to execute */
-  // printStreamOfChar();
-  // countInputChar();
-  // countBlankTabNewline();
-  // removeRecurreningBlankStream();
-  // countWord();
-  countDigitWhiteSpaceAndOther();
+/* Raising a base number to the n-th power; n >= 0 */
+int exponentiation(int base, int exponent) {
+  int power; // result of exponentiation
+  for(power = 1; exponent > 0; exponent--)
+    power *= base; 
+  return power;
 }
 
+/* print the longest line and its length */
+#define MAXIMUM_LINE_SIZE 1000
+void printLongestline() {
+  /*
+    initial outline: 
+    while(character input exist & not newline or EOF and not exeeding limit) 
+      write to array line
+      track length line
+    return length
+
+  */
+  int getLine(char lineArray[], int limitInputSize); 
+  /* outline: 
+    interate over `from` array
+      copy each character to `to` array assuming there is enough room
+  */
+  void copyArray(char from[], char to[]);
+
+  char currentLine[MAXIMUM_LINE_SIZE]; 
+  int currentLineLength;
+  char longest[MAXIMUM_LINE_SIZE]; 
+  int longestLength = 0; 
+
+  while( (currentLineLength = getLine(currentLine, MAXIMUM_LINE_SIZE)) > 0) {
+    if(currentLineLength > longestLength) {
+      copyArray(currentLine, longest); 
+      longestLength = currentLineLength; 
+    }
+  }
+
+  printf("Longest line of length %i is: %s", longestLength, longest);
+}
+int getLine(char line[], int limit) {
+  int length = 0;
+  char c;
+  int i; 
+  for(i = 0; (c = getchar()) != EOF && c != '\n' && i < limit; i++)
+    line[i] = c; 
+  if(c == '\n') { // count newline character as part of line
+    i++;
+    line[i] = c;
+  }
+  line[i+1] = '\0'; // add terminating character
+  length = i; 
+  return length;
+}
+void copyArray(char from[], char to[]) {
+  // assuming there is space
+  for(int i = 0; (to[i] = from[i]) != '\0'; i++);
+} 
