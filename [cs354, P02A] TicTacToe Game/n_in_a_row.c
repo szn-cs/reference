@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h> 
+#include <stdbool.h> 
      
 char *DELIM = ",";  // string containing the delimiter characters
 extern int errno; // error number from errno.h library
@@ -39,14 +40,15 @@ enum STATE {
 // tokens representing the possible values the in game board. 
 enum MARK { 
     EMPTY = 0 /*unmarked space*/, 
-    x = 1, 
-    o = 2 
+    X = 1, 
+    O = 2 
 };  
 // define error codes. Strarting from 132 which won't conflict with errno.h library defined error codes
 enum ERROR_CODE { 
     E_SIZE, 
     E_ARGUMENT_MISSING, 
     E_ARGUMENT_MULTIPLE, 
+    E_INVALID_MARK
 };
 
 /**
@@ -68,6 +70,9 @@ const char* getErrorMessage(enum ERROR_CODE e) {
         case E_ARGUMENT_MULTIPLE: 
             m = "Only a single filename argument must be provided";
         break; 
+        case E_INVALID_MARK: 
+            m = "Invalid mark parsed, the file contains invalid values";
+        break;
         default: 
             m = "Unknown error code thrown";
     }
@@ -95,19 +100,8 @@ void* freeNestedArrays(int **array, int row);
 void throw(const char *m1, const char *m2);
 
 /* 
- * This program processes a file containing the current game state, represented as a 2D grid of Xs and Os. 
- * It prints Valid if the input file contains a game board with either 1 or no winners (draw); 
- * and where there is at most 1 more X than O (#X = #O or #X = #O+1). 
- * 
- * Specification: 
-        The program should print either "valid" or "invalid" followed by a newline (only these two outputs in lowercase will be accepted)
-        Print valid only if the input file contains a valid board configuration, otherwise print invalid. To determine if the input board configuration is valid, you may also need to determine if there is a winner. You'll need to iterate over the board to check for winning lines, that is, n of the same marks in a row, column, or diagonal. 
-        A valid board has:
-        - an odd size; even size boards are invalid
-        - either the same number Xs as Os, or 1 more X than O since we're assuming X always moves first
-        - either no winner or one winner; X and O cannot both be winners
-        - either one winning line (i.e., row, column, or diagonal), or two winning lines that intersect on one mark; two parallel winning lines are invalid
- * 
+ * This program processes a file containing the current game state, represented as a 2D grid board of Xs and Os. 
+ * And checks if the game state conforms to the rules of the Tic-Tac-Toe game. 
  * 
  * argc: command-line argument count
  * argv: command-line argument value
@@ -152,10 +146,10 @@ int main(int argc, char *argv[]) {
     // debug board
     print2DArray(board, &size, &size, DELIM); 
 
-    // 
+    // check validity of board state
     state = n_in_a_row(board, size); 
 
-    // print game board validation message
+    // print game board validation message - i.e. Print valid only if the input file contains a valid board configuration, otherwise print invalid.
     switch(state) {
         case VALID: 
             printf("valid\n");
@@ -165,10 +159,10 @@ int main(int argc, char *argv[]) {
             printf("invalid\n");
     }
 
-    // Free up dynamically allocated memory.
+    // free up dynamically allocated memory.
     board = freeNestedArrays(board, size); // free associated arrays & return NULL
 
-    //Close the file.
+    // close the file.
     if (fclose(fp) != 0) throw(strerror(errno /*EBADF or other*/), "Error while closing the file");     
 
     return 0;       
@@ -214,24 +208,75 @@ void getMarks(FILE *fp, int **board, int size) {
         token = strtok(line, DELIM);
         // store user marks in the board array
         for (int j = 0; j < size; j++) {
-            *(*(board + i) + j) = atoi(token); //! Note: atoi() function doesn't detect errors.
+            //! Note: atoi() function doesn't detect errors.
+            int mark = atoi(token); // integer of parsed mark
+            if(mark != EMPTY && mark != X && mark != O) throw(getErrorMessage(E_INVALID_MARK), "");
+            *(*(board + i) + j) = mark; // fill element in respective position
             token = strtok(NULL, DELIM); // continue scanning string from the previous successful call
         }
     }
 }
 
 /* 
- * Returns 1 if and only if the board is in a valid state, otherwise returns 0 (These values correspond to the enum STATE).
+ * Checks if current board state is valid.
+ * <p> 
+ * A valid game board has:
+ *  ✔ an odd size; even size boards are invalid
+ *  ✔ either the same number Xs as Os, or 1 more X than O (at most 1 more X than O), since we're assuming X always moves first.
+ *  ✔ either no winner or one winner (draw); X and O cannot both be winners
+ *  ✔ either one winning line (i.e., row, column, or diagonal), or two winning lines that intersect on one mark; two parallel winning lines are invalid. 
  * 
  * board: heap allocated 2D board
  * size: number of rows and columns; 
+ * Returns 1 if and only if the board is in a valid state, otherwise returns 0 (values corresponding to STATE enum).
  */
 int n_in_a_row(int **board, int size) {
+    // even size boards are invalid
+    if(size % 2 == 0) return IN_VALID;
 
+    // either the same number Xs as Os, or at most 1 more X than O
+    int countX = 0; 
+    int countO = 0; 
+    for(int r = 0; r < size; r++)
+        for(int c = 0; c < size; c++) {
+            int element = *(*(board + r) + c);
+            switch(element) {
+                case X: 
+                    countX++;
+                break;
+                case O: 
+                    countO++;
+                break;
+                case EMPTY: 
+                default: 
+                    continue; // skip
+            }
+        }
+    if(countX != countO && (countX - countO) != 1)
+        return IN_VALID;
+    
+    // A winning line is `size` number of the same marks in a row, column, or diagonal.
+    bool winnerX = false; // did X user win
+    bool winnerO = false; // did O user win
+    int winningLines = 0; // number of winning lines 
+    // Iterate over board and determine if there is a winner
+    for(int r = 1; r < size - 1; r++) { // TODO:
+        int inRow = 0; // # of consecutive reccurrences of same mark in a row.
+        for(int c = 1; c < size - 1; c++) {
+            int prevCol = *(*(board + r - 1) + c - 1); // previous element column
+            int curCol = *(*(board + r - 1) + c);
+            inRow = (prevCol == curCol) ? inRow + 1 : inRow = 0;
+        }
+    }
 
-    return IN_VALID;
+    // X and O cannot both be winners
+    if(winnerX && winnerO) 
+        return IN_VALID;
 
-
+    // either one winning line, or two winning lines that intersect on one mark; two parallel winning lines are invalid.
+    if(winningLines > 2 || (winningLines == 2 && winningLines /*TODO: are parallel */)) 
+        return IN_VALID; 
+    
     return VALID;   
 } 
 
@@ -290,7 +335,7 @@ void* freeNestedArrays(int **array, int row) {
  */
 void throw(const char *m1, const char *m2) {
     // print messages
-    printf("%s: %s;\n", m1, m2);
+    printf("%s. %s\n", m1, m2);
     exit(1);
 }
 
