@@ -39,10 +39,11 @@ char *DELIM = ",";  // commas ',' are a common delimiter character for data stri
 
 */
 
-void get_dimenstions(FILE *fp, int *size);
+void get_dimensions(FILE *fp, int *size);
 int n_in_a_row(int **board, int size);  
-  
- 
+void clear2DArray(int **array, int rows, int columns); 
+void print2DArray(int **array, int rows, int columns);
+
 
 /* ❌
  * This program processes a file containing the current game state, represented as a 2D grid of Xs and Os. 
@@ -60,17 +61,19 @@ int n_in_a_row(int **board, int size);
  * 
  *  // TODO: program must check the return values for errors of the library functions, malloc(), fopen(), and fclose(). Handle errors by displaying an appropriate error message and then calling exit(1).
  * 
- * argc: CLA count
- * argv: CLA value
+ * argc: command-line argument count
+ * argv: command-line argument value
  */
 int main(int argc, char *argv[]) {              
      
-    //TODO: Check if number of command-line arguments is correct.
-    printf("Ok?");
+    // Verify number of input arguments
+    if(argc != 2) {
+        char *str = (argc < 2) ? "Missing filename argument." : "Only a single filename argument must be provided."; 
+        printf("%s \n[Number of filename arguments provided: %d]\n", str, argc - 1); 
+        exit(1);
+    }
+    
 
-    exit(0);
-
-/*
     //Open the file and check if it opened successfully.
     FILE *fp = fopen(*(argv + 1), "r");
     if (fp == NULL) {
@@ -84,9 +87,16 @@ int main(int argc, char *argv[]) {
     //retrieve the board size.
     get_dimensions(fp, &size);
 
-    //TODO: Dynamically/Heap allocate a 2D array of dimensions retrieved above.
+    // Create board with the matching dimesions, represnted by 2D heap allocated array.
+    int **board = malloc(sizeof(int *) * size); 
+    for(int i = 0; i < size; i++)
+        *(board + i) = malloc(sizeof(int) * size); 
+    // initialize 2D array with zeros.
+    clear2DArray(board, size, size); 
 
+    print2DArray(board, size, size);
 
+    /*
     //Read the file line by line. Assuming there are `size` lines where each line has `size` numbers (columns) separated by commas.
     //Tokenize each line wrt the delimiter character to store the values in your 2D array.
     char *line = NULL;
@@ -162,5 +172,35 @@ int n_in_a_row(int **board, int size) {
 
     return 0;   
 } 
+
+/**
+ * Set all elements of 2D array to zero. 
+ * 
+ * array: input 2-dimensional array of array. 
+ * rows: # of array rows. 
+ * columns: # of array columns
+ */ 
+void clear2DArray(int **array, int rows, int columns) {
+    for(int r = 0; r < rows; r++) 
+        for(int c = 0; c < columns; c++) 
+            *(*(array + r) + c) = 0;
+}
+
+/**
+ * print all elements in the 2D array, each row in a new line. 
+ * 
+ * array: input 2-dimensional array of array. 
+ * rows: # of array rows. 
+ * columns: # of array columns
+ */ 
+void print2DArray(int **array, int rows, int columns) {
+    for(int r = 0; r < rows; r++) {
+        for(int c = 0; c < columns; c++) {
+            printf("%i", *(*(array + r) + c) );
+        }
+        printf("\n");
+    }
+}
+
 
                                         // FIN
