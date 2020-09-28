@@ -98,6 +98,11 @@ void clear2DArray(int **array, int row, int column);
 void print2DArray(int **array, int *rows, int *columns, char *delimiter);
 void* freeNestedArrays(int **array, int row); 
 void throw(const char *m1, const char *m2);
+bool isWinningLineHorizontal(int **board, int *size, int *line, int *middle, int *polarPairs);
+bool isWinningLineVertical(int **board, int *size, int *line, int *middle, int *polarPairs);
+int isWinningLineDiagonal(int **board, int *size, int *middle, int *polarPairs);
+void toggleWinnerUser(int **board, int row, int column, bool *stateX, bool *stateO);
+void countUserMark(int** board, int *size, int *countX, int *countO);
 
 /* 
  * This program processes a file containing the current game state, represented as a 2D grid board of Xs and Os. 
@@ -224,7 +229,9 @@ void getMarks(FILE *fp, int **board, int size) {
  *  ✔ an odd size; even size boards are invalid
  *  ✔ either the same number Xs as Os, or 1 more X than O (at most 1 more X than O), since we're assuming X always moves first.
  *  ✔ either no winner or one winner (draw); X and O cannot both be winners
- *  ✔ either one winning line (i.e., row, column, or diagonal), or two winning lines that intersect on one mark; two parallel winning lines are invalid. 
+ *  ✔ either one winning line (i.e., row, column, or diagonal), or two winning lines that intersect on one mark; two parallel winning lines are invalid.
+ * Where a winning line is `size` number of the same marks in a row, column, or diagonal. 
+ * [For reference] Assuminh: Maximum number of line permustations possible = 2 x 99 + 2 = 200
  * 
  * board: heap allocated 2D board
  * size: number of rows and columns; 
@@ -235,50 +242,195 @@ int n_in_a_row(int **board, int size) {
     if(size % 2 == 0) return IN_VALID;
 
     // either the same number Xs as Os, or at most 1 more X than O
-    int countX = 0; 
-    int countO = 0; 
-    for(int r = 0; r < size; r++)
-        for(int c = 0; c < size; c++) {
+    int countX = 0, countO = 0; 
+    countUserMark(board, &size, &countX, &countO);
+    if(countX != countO && (countX - countO) != 1)
+        return IN_VALID;    
+
+    int polarPairs = (size - 1) / 2; // number of polar sides (element pair of opposite side), excluding the middle element. 
+    int middleIndex = ((size + 1) / 2) - 1; // middle index used for middle of row, or column, or center of element for diagonal. The middle positions are taken as reference values for determining if there is a winning line.
+    // number of wins for each line configuration
+    int nRowWin, nColumnWin, nDiagonalWin; 
+    nRowWin = nColumnWin = nDiagonalWin = 0;
+    // user winning state
+    bool winnerX = false, winnerO = false;
+
+    // row and column check for winning lines
+    for(int l = 0; l < size; l++) {
+        // Row line check
+        if(isWinningLineHorizontal(board, &size, &l, &middleIndex, &polarPairs)) {
+            nRowWin++; 
+            // associate win to X and O users
+            toggleWinnerUser(board, l, 0, &winnerX, &winnerO); 
+        }
+        // Column line check
+        if(isWinningLineVertical(board, &size, &l, &middleIndex, &polarPairs)) {
+            nColumnWin++;    
+            // associate win to X and O users
+            toggleWinnerUser(board, 0, l, &winnerX, &winnerO); 
+        }
+    }
+
+    // diagonal check for winning lines
+    nDiagonalWin = isWinningLineDiagonal(board, &size, &middleIndex, &polarPairs); 
+    // associate win to X and O users
+    if(nDiagonalWin > 0)
+        toggleWinnerUser(board, middleIndex, middleIndex, &winnerX, &winnerO); 
+
+    // Whenever an additional win of the same type is detected return invalid. Based on the fact that there cannot be two wins of the same type (row, column, diagonal). as two parallel winning lines are invalid.
+    if(nRowWin > 1 || nColumnWin > 1 || nDiagonalWin > 1) return IN_VALID;
+
+    // X and O cannot both be winners
+    if(winnerX && winnerO) return IN_VALID;
+
+    // either one winning line, or two winning lines that intersect on one mark; 
+    if((nRowWin + nColumnWin + nDiagonalWin) > 2) return IN_VALID; 
+
+    // either no winner or one winner.
+    return VALID;   
+}
+
+/**
+ * Update user counter states to match the occurrences of each user's mark
+ * 
+ * board: heap allocated 2D board
+ * size: number of elements in a line;
+ * countX: X user counter state 
+ * countO: O user counter state
+ */
+void countUserMark(int** board, int *size, int *countX, int *countO) {
+    for(int r = 0; r < *size; r++)
+        for(int c = 0; c < *size; c++) {
             int element = *(*(board + r) + c);
             switch(element) {
                 case X: 
-                    countX++;
+                    *countX = *countX + 1;
                 break;
                 case O: 
-                    countO++;
+                    *countO = *countO + 1;
                 break;
                 case EMPTY: 
                 default: 
                     continue; // skip
             }
         }
-    if(countX != countO && (countX - countO) != 1)
-        return IN_VALID;
-    
-    // A winning line is `size` number of the same marks in a row, column, or diagonal.
-    bool winnerX = false; // did X user win
-    bool winnerO = false; // did O user win
-    int winningLines = 0; // number of winning lines 
-    // Iterate over board and determine if there is a winner
-    for(int r = 1; r < size - 1; r++) { // TODO:
-        int inRow = 0; // # of consecutive reccurrences of same mark in a row.
-        for(int c = 1; c < size - 1; c++) {
-            int prevCol = *(*(board + r - 1) + c - 1); // previous element column
-            int curCol = *(*(board + r - 1) + c);
-            inRow = (prevCol == curCol) ? inRow + 1 : inRow = 0;
+}
+
+/**
+ *  Set winner user of specified winning line
+ * 
+ * board: heap allocated 2D array representing the game board
+ * row: index of row
+ * column: index of column
+ * stateX: boolean winning state of X
+ * stateO: boolean winning state of O
+ * alter the winning state of the user associated with the specified position
+ */
+void toggleWinnerUser(int **board, int row, int column, bool *stateX, bool *stateO) {
+    switch(board[row][column]) { 
+        case X: 
+            *stateX = true;
+        break;
+        case O: 
+            *stateO = true;
+        break; 
+    }
+}
+
+/**
+ *  Check if horizontal line (row) is a winning line
+ * 
+ * board: heap allocated 2D board
+ * size: number of elements in a line;
+ * line: index of line in the board
+ * middle: index of middle element in the line
+ * polarPairs: number of polar/opposite corresponding pairs in a line
+ * validation of a line conforming to a winning state
+ */
+bool isWinningLineHorizontal(int **board, int *size, int *line, int *middle, int *polarPairs) {
+    int common = board[*line][*middle]; // use middle line value as reference, as a common element.
+    // skip / short-circuit for empty positions
+    if(common == EMPTY)
+        return false; 
+    // check opposite pairs on each iteration and verify they are equal to the previous elements
+    for (int i = 0; i < *polarPairs; i++) {
+        int *current = &board[*line][i]; // current element
+        int *opposite = &board[*line][*size - 1 - i]; // corresponding polar/opposite element in the line
+        // compare current element to common element, and current element to it's corresponding opposite element
+        if(*current != common || *current != *opposite) 
+            return false;
+    }
+    return true;
+}
+
+/**
+ *  Check if vertical line (column) is a winning line
+ * 
+ *  board: heap allocated 2D board
+ *  size: number of elements in a line;
+ *  line: index of line in the board
+ *  middle: index of middle element in the line
+ *  polarPairs: number of polar/opposite corresponding pairs in a line
+ *  validation of a line conforming to a winning state
+ */
+bool isWinningLineVertical(int **board, int *size, int *line, int *middle, int *polarPairs) {
+    int common = board[*middle][*line]; // use middle line value as reference, as a common element.
+    // skip / short-circuit for empty positions
+    if(common == EMPTY)
+        return false; 
+    // check opposite pairs on each iteration and verify they are equal to the previous elements
+    for (int i = 0; i < *polarPairs; i++) {
+        int *current = &board[i][*line]; // current element
+        int *opposite = &board[*size - 1 - i][*line]; // corresponding polar/opposite element in the line
+        // compare current element to common element, and current element to it's corresponding opposite element
+        if(*current != common || *current != *opposite) 
+            return false;
+    }
+    return true;
+}
+
+/**
+ *  Check if diagonal lines are winning lines
+ * 
+ *  board: heap allocated 2D board
+ *  size: number of elements in a line;
+ *  middle: index of middle element in the line
+ *  polarPairs: number of polar/opposite corresponding pairs in a line
+ *  number of winning diagonal lines (0, 1, or 2)
+ */
+int isWinningLineDiagonal(int **board, int *size, int *middle, int *polarPairs) {
+    int common = board[*middle][*middle]; // use center value as reference, i.e. a common element for comparison.
+    // skip / short-circuit for empty positions
+    if(common == EMPTY)
+        return false; 
+    // check the two diagonal permutation wins
+    int ddWin = true, daWin = true; 
+    for (int i = 0; (i < *polarPairs) && !(ddWin == false && daWin == false); i++) {
+        if(ddWin) {
+            // diagonal descending (R-to-L)
+            int current = board[i][i]; // current element
+            // corresponding polar/opposite element in the line
+            int o = *size - 1 - i; // opposite index
+            int opposite = board[o][o]; 
+            // compare current element to common element, and current element to it's corresponding opposite element
+            if(current != common || current != opposite) 
+                ddWin = false;
+        }
+        if(daWin) {
+            // diagonal ascending (R-to-L)
+            int flipped = *size - 1 - i; // flipped index in comparison to the opposite diagonal line
+            int current = board[flipped][i]; // current element
+            // corresponding polar/opposite element in the line
+            int opposite = board[i][flipped]; 
+            // compare current element to common element, and current element to it's corresponding opposite element
+            if(current != common || current != opposite) 
+                daWin = false;
         }
     }
+    // return number of diagonal winning lines.
+    return ddWin + daWin;
+}
 
-    // X and O cannot both be winners
-    if(winnerX && winnerO) 
-        return IN_VALID;
-
-    // either one winning line, or two winning lines that intersect on one mark; two parallel winning lines are invalid.
-    if(winningLines > 2 || (winningLines == 2 && winningLines /*TODO: are parallel */)) 
-        return IN_VALID; 
-    
-    return VALID;   
-} 
 
 /**
  * Set all elements of 2D array to zero. 
