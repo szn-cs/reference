@@ -342,7 +342,7 @@ void countUserMark(int** board, int *size, int *countX, int *countO) {
  * alter the winning state of the user associated with the specified position
  */
 void toggleWinnerUser(int **board, int row, int column, bool *stateX, bool *stateO) {
-    switch(board[row][column]) { 
+    switch(*(*(board + row) + column)) {
         case X: 
             *stateX = true;
         break;
@@ -364,14 +364,14 @@ void toggleWinnerUser(int **board, int row, int column, bool *stateX, bool *stat
  */
 bool isWinHorizontal(int **board, int *size, int *line, int *middle, int *polarPairs) {
     // use middle line value as reference, as a common element.
-    int common = board[*line][*middle]; 
+    int common = *(*(board + *line) + *middle); 
     // skip / short-circuit for empty positions
     if(common == EMPTY) return false; 
     /* check opposite pairs on each iteration & verify equality to previous elements */
     for (int i = 0; i < *polarPairs; i++) {
-        int *current = &board[*line][i]; // current element
+        int *current = &*(*(board + *line) + i); // current element
         // corresponding polar/opposite element in the line
-        int *opposite = &board[*line][*size - 1 - i]; 
+        int *opposite = &*(*(board + *line)+ (*size - 1 - i)); 
         /* compare current pair to previous, & current element to it's corresponding 
            opposite element */
         if(*current != common || *current != *opposite) return false;
@@ -391,13 +391,14 @@ bool isWinHorizontal(int **board, int *size, int *line, int *middle, int *polarP
  */
 bool isWinVertical(int **board, int *size, int *line, int *middle, int *polarPairs) {
     // use middle line value as reference for comparison, as a common element.
-    int common = board[*middle][*line]; 
+    int common = *(*(board + *middle) + *line); 
     // skip / short-circuit for empty positions
     if(common == EMPTY) return false; 
     /* check opposite pairs on each iteration & verify equality to previous elements */
     for (int i = 0; i < *polarPairs; i++) {
-        int *current = &board[i][*line]; // current element
-        int *opposite = &board[*size - 1 - i][*line]; // corresponding opposite element
+        int *current = &*(*(board + i) + *line); // current element
+        // corresponding opposite element
+        int *opposite = &*(*(board + (*size - 1 - i)) + *line); 
         /* compare current pair to previous, & current element to it's corresponding 
            opposite element */
         if(*current != common || *current != *opposite) return false;
@@ -416,7 +417,7 @@ bool isWinVertical(int **board, int *size, int *line, int *middle, int *polarPai
  */
 int isWinDiagonal(int **board, int *size, int *middle, int *polarPairs) {
     // use center value as reference, i.e. a common element for comparison.
-    int common = board[*middle][*middle];
+    int common = *(*(board + *middle) + *middle);
     // skip / short-circuit for empty positions
     if(common == EMPTY) return false; 
     // the two diagonal permutation wins possible
@@ -425,10 +426,10 @@ int isWinDiagonal(int **board, int *size, int *middle, int *polarPairs) {
     for (int i = 0; (i < *polarPairs) && !(ddWin == false && daWin == false); i++) {
         if(ddWin) {
             // diagonal descending (R-to-L)
-            int current = board[i][i]; // current element
+            int current = *(*(board + i) + i); // current element
             // corresponding polar/opposite element in the line
             int o = *size - 1 - i; // opposite index
-            int opposite = board[o][o]; 
+            int opposite = *(*(board + o) + o); 
             /* compare current pair to previous, & current element to it's corresponding 
                opposite element */
             if(current != common || current != opposite) ddWin = false;
@@ -436,9 +437,9 @@ int isWinDiagonal(int **board, int *size, int *middle, int *polarPairs) {
         if(daWin) {
             // diagonal ascending (R-to-L)
             int flipped = *size - 1 - i; // flipped index in comparison to the opposite diagonal line
-            int current = board[flipped][i]; // current element
+            int current = *(*(board + flipped) + i); // current element
             // corresponding polar/opposite element in the line
-            int opposite = board[i][flipped]; 
+            int opposite = *(*(board + i) + flipped); 
             /* compare current pair to previous, & current element to it's corresponding 
                opposite element */
             if(current != common || current != opposite) daWin = false;
@@ -492,8 +493,8 @@ void print2DArray(int **array, int *rows, int *columns, char *delimiter) {
 void* freeNestedArrays(int **array, int row) {
     // freeup memory of nested arrays
     while(row-- > 0) {
-        free(array[row]); 
-        array[row] = NULL; 
+        free(*(array + row)); 
+        *(array + row) = NULL; 
     }
     free(array); // free main/parent array
     return NULL; // to be assigned to pointer identifier scoped in caller function.
