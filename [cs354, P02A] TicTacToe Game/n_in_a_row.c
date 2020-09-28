@@ -291,8 +291,9 @@ int n_in_a_row(int **board, int size) {
         toggleWinnerUser(board, middleIndex, middleIndex, &winnerX, &winnerO); 
 
     /* validate number of same type win (row, column, diagonal): single win for each type. 
-       as two parallel winning lines are invalid, neither cross lines. */
-    if(nRowWin > 1 || nColumnWin > 1 || nDiagonalWin > 1) return IN_VALID;
+       as two parallel winning lines are invalid, neither cross lines. Diagonal cannot be
+       parallel. */
+    if(nRowWin > 1 || nColumnWin > 1) return IN_VALID;
 
     // validate winner user: X and O cannot both be winners.
     if(winnerX && winnerO) return IN_VALID;
@@ -436,7 +437,7 @@ int isWinDiagonal(int **board, int *size, int *middle, int *polarPairs) {
         }
         if(daWin) {
             // diagonal ascending (R-to-L)
-            int flipped = *size - 1 - i; // flipped index in comparison to the opposite diagonal line
+            int flipped = *size - 1 - i; // index in comparison to inverse diagonal line
             int current = *(*(board + flipped) + i); // current element
             // corresponding polar/opposite element in the line
             int opposite = *(*(board + i) + flipped); 
