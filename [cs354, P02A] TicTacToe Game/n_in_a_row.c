@@ -22,28 +22,40 @@
 //                   Error handling in C https://www.geeksforgeeks.org/error-handling-c-programs/
 //                   Error codes reference https://www.thegeekstuff.com/2010/10/linux-error-codes/
 ////////////////////////////////////////////////////////////////////////////////
-   
+
+/**
+ * Tic-Tac-Toe Game - Usually a 3x3 grid board, allowing players to mark (either X or O) 
+ * on the game board, until one player wins or there are no spaces available to mark. 
+ * Winners should get 3 of their marks "in a row" either horizontally, vertically, 
+ * or diagonally. 
+ * 
+ * usage: $`./n_in_a_row <input_filename>` 
+ *        where input-filename - data representing the tic-tac-toe board.
+ * 
+ * compilation: `gcc -Wall -m32 -std=gnu99`
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h> 
 #include <stdbool.h> 
-     
-char *DELIM = ",";  // string containing the delimiter characters
-extern int errno; // error number from errno.h library
 
+#define DEBUG false // debug flag
+extern int errno; // error number of `errno.h` library
+char *DELIM = ",";  // delimiter characters of parsed data
 // numerals representing board state validity
 enum STATE { 
     IN_VALID = 0, 
     VALID = 1 
 };
-// tokens representing the possible values the in game board. 
+// tokens representing the possible values the in game board
 enum MARK { 
-    EMPTY = 0 /*unmarked space*/, 
-    X = 1, 
-    O = 2 
-};  
-// define error codes. Strarting from 132 which won't conflict with errno.h library defined error codes
+    EMPTY = 0, // unmarked space
+    X = 1, // X's user mark
+    O = 2 // O's user mark
+};
+// define custom error codes
 enum ERROR_CODE { 
     E_SIZE, 
     E_ARGUMENT_MISSING, 
@@ -54,11 +66,10 @@ enum ERROR_CODE {
 /**
  * Retreive appropriate error message
  * 
- * e: code integral matching the enum ERROR_CODE definitions
- * error message string.
+ * e: code integral matching the enum ERROR_CODE definitions of error message strings.
  */
 const char* getErrorMessage(enum ERROR_CODE e) {
-    char *m = NULL; // message that should be allocated on the heap to be returned as a pointer
+    char *m = NULL; // error message string
     //! Note: order of case values must match enum declaration declaration order.
     switch(e) {
         case E_SIZE: 
@@ -79,30 +90,19 @@ const char* getErrorMessage(enum ERROR_CODE e) {
     return m;
 }
 
-/**
- * Tic-Tac-Toe Game - Usually a 3x3 grid board, allowing players to mark (either X or O) on the game board, until one player wins or there are no spaces available to mark. Winners should get 3 of their marks "in a row" either horizontally, vertically, or diagonally. 
- * 
- * usage: $`./n_in_a_row <input_filename>` where input-filename - data representing the tic-tac-toe board.
- * compilation: `gcc -Wall -m32 -std=gnu99`
- * 
- * Assignment requirements: 
-    - Must follow style guidelines: https://canvas.wisc.edu/courses/205087/pages/programming-style-guide
-    - must compile without warning errors.
-
-*/
-
+// function prototype declarations:
 int get_dimensions(FILE *fp);
 void getMarks(FILE *fp, int **board, int size);
-int n_in_a_row(int **board, int size);  
+int n_in_a_row(int **board, int size); 
+void countUserMark(int **board, int *size, int *countX, int *countO);
+void toggleWinnerUser(int **board, int row, int column, bool *stateX, bool *stateO);
+bool isWinHorizontal(int **board, int *size, int *line, int *middle, int *oppPairs);
+bool isWinningLineVertical(int **board, int *size, int *line, int *middle, int *oppPairs);
+int isWinningLineDiagonal(int **board, int *size, int *middle, int *oppPairs);
 void clear2DArray(int **array, int row, int column); 
 void print2DArray(int **array, int *rows, int *columns, char *delimiter);
 void* freeNestedArrays(int **array, int row); 
 void throw(const char *m1, const char *m2);
-bool isWinningLineHorizontal(int **board, int *size, int *line, int *middle, int *polarPairs);
-bool isWinningLineVertical(int **board, int *size, int *line, int *middle, int *polarPairs);
-int isWinningLineDiagonal(int **board, int *size, int *middle, int *polarPairs);
-void toggleWinnerUser(int **board, int row, int column, bool *stateX, bool *stateO);
-void countUserMark(int** board, int *size, int *countX, int *countO);
 
 /* 
  * This program processes a file containing the current game state, represented as a 2D grid board of Xs and Os. 
@@ -114,47 +114,47 @@ void countUserMark(int** board, int *size, int *countX, int *countO);
 int main(int argc, char *argv[]) {              
     // Verify number of input arguments
     if(argc != 2) {
-        char *m = "Invalid number of filename arguments"; 
-        (argc < 2) ? throw(getErrorMessage(E_ARGUMENT_MISSING), m) : throw(getErrorMessage(E_ARGUMENT_MULTIPLE), m); 
+        const char *m = (argc < 2) ? 
+                getErrorMessage(E_ARGUMENT_MISSING) : 
+                getErrorMessage(E_ARGUMENT_MULTIPLE);
+        throw(m, "Invalid number of filename arguments"); 
     }
     
-    //Open the file and check if it opened successfully.
-    char *filename = *(argv + 1); // get filename from input argument
+    // open file stream
+    char *filename = *(argv + 1); // filename argument
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) throw(strerror(errno /*ENOENT*/), "Can't open file for reading");
 
-    // game board dimensions (rows & columns), where total number of marks on the board will be in the range of 0 to size*size; 
-    int size = 0;   
-    // current board state validity
-    enum STATE state = IN_VALID;  
+    int **board = NULL; // 2D heap allocated array representing the game board
+    int size = 0; /* game board dimensions (rows & columns), total number of marks on 
+                     the board will be in the range of 0 to size x size */ 
+    enum STATE state = IN_VALID; // current board state validity
 
-    //retrieve the board size.
-    size = get_dimensions(fp);
-    // validate input size value, range mathematically:  [3, 99]
-    if(size < 3 || size > 99)
-        throw(getErrorMessage(E_SIZE), "");
+    size = get_dimensions(fp); // retrieve the board size.
+    // validate input size value, fullfilling mathematical range:  [3, 99]
+    if(size < 3 || size > 99) throw(getErrorMessage(E_SIZE), "");
 
-    // Create board with the matching dimesions, represnted by 2D heap allocated array.
-    int **board = malloc(sizeof(int *) * size); 
+    // create board with the matching dimesions (array of array)
+    board = malloc(sizeof(int *) * size); 
     if(board == NULL) throw(strerror(errno /*ENOMEM*/), "Failed to allocated memory.");
     // create nested arrays
     for(int i = 0; i < size; i++) {
         *(board + i) = malloc(sizeof(int) * size); 
-        if(*(board + i) == NULL) throw(strerror(errno /*ENOMEM*/), "Failed to allocated memory.");
+        if(*(board + i) == NULL) 
+            throw(strerror(errno /*ENOMEM*/), "Failed to allocated memory.");
     }
     // initialize 2D array with zeros.
     clear2DArray(board, size, size); 
 
     // fill in-memory board with values from the file representation of the board marks
     getMarks(fp, board, size);     
-
-    // debug board
-    print2DArray(board, &size, &size, DELIM); 
-
+    // print board
+    if(DEBUG == true) print2DArray(board, &size, &size, DELIM);
     // check validity of board state
     state = n_in_a_row(board, size); 
 
-    // print game board validation message - i.e. Print valid only if the input file contains a valid board configuration, otherwise print invalid.
+    /* print game board validation message - i.e. Print valid only if the input file 
+       contains a valid board configuration, otherwise print invalid. */
     switch(state) {
         case VALID: 
             printf("valid\n");
@@ -168,29 +168,27 @@ int main(int argc, char *argv[]) {
     board = freeNestedArrays(board, size); // free associated arrays & return NULL
 
     // close the file.
-    if (fclose(fp) != 0) throw(strerror(errno /*EBADF or other*/), "Error while closing the file");     
+    if (fclose(fp) != 0)
+        throw(strerror(errno /*EBADF or other*/), "Error while closing the file");     
 
     return 0;       
-}       
+}
 
-
-/* 
- * Retrieves from the first line of the input file,
- * the size of the board (number of rows and columns).
+/**
+ * Retrieves the size of the board from input file
  * 
  * fp: file pointer for input file
- * extracted size of board game
+ * parsed size of board game
  */
 int get_dimensions(FILE *fp) {      
     char *line = NULL;
     size_t len = 0;
-    if (getline(&line, &len, fp) == -1) {
-        printf("Error in reading the file.\n");
-        exit(1);
-    }
+    if (getline(&line, &len, fp) == -1)
+        throw(strerror(errno /*EINVAL or ENOMEM*/), "Error in reading the file");
 
     char *token = NULL;
     token = strtok(line, DELIM);
+    free(line); line = NULL; // freeing buffer
     return atoi(token);
 }
 
@@ -203,23 +201,31 @@ int get_dimensions(FILE *fp) {
  * size: number of rows and columns
  */
 void getMarks(FILE *fp, int **board, int size) {
-    char *line = NULL; // address of buffer containing the line text // TODO: buffer should be free up manually
+    char *line = NULL; // address of buffer containing the line text
     size_t len = 0; // buffer size
     char *token = NULL; // string of parsed portion
     
     for (int i = 0; i < size; i++) {
-        if (getline(&line, &len, fp) == -1) throw("Error while reading the file", "");
-        // Tokenize line wrt the delimiter character
+        // parse next line
+        if (getline(&line, &len, fp) == -1) 
+            throw(strerror(errno /*EINVAL or ENOMEM*/), "Error while reading the file");
+        // Tokenize line using the delimiter character
         token = strtok(line, DELIM);
         // store user marks in the board array
         for (int j = 0; j < size; j++) {
             //! Note: atoi() function doesn't detect errors.
             int mark = atoi(token); // integer of parsed mark
-            if(mark != EMPTY && mark != X && mark != O) throw(getErrorMessage(E_INVALID_MARK), "");
-            *(*(board + i) + j) = mark; // fill element in respective position
-            token = strtok(NULL, DELIM); // continue scanning string from the previous successful call
+            // validate parsed marks
+            if(mark != EMPTY && mark != X && mark != O)
+                throw(getErrorMessage(E_INVALID_MARK), "");
+            // fill element in respective position
+            *(*(board + i) + j) = mark;
+            // continue scanning from previous successful call
+            token = strtok(NULL, DELIM); 
         }
     }
+
+    free(line); line = NULL; // free up buffer
 }
 
 /* 
@@ -227,38 +233,47 @@ void getMarks(FILE *fp, int **board, int size) {
  * <p> 
  * A valid game board has:
  *  ✔ an odd size; even size boards are invalid
- *  ✔ either the same number Xs as Os, or 1 more X than O (at most 1 more X than O), since we're assuming X always moves first.
+ *  ✔ either the same number Xs as Os, or 1 more X than O (at most 1 more X than O), 
+ *          since we're assuming X always moves first.
  *  ✔ either no winner or one winner (draw); X and O cannot both be winners
- *  ✔ either one winning line (i.e., row, column, or diagonal), or two winning lines that intersect on one mark; two parallel winning lines are invalid.
+ *  ✔ either one winning line (i.e., row, column, or diagonal), or two winning lines 
+ *          that intersect on one mark; two parallel winning lines are invalid.
+ * <p>
  * Where a winning line is `size` number of the same marks in a row, column, or diagonal. 
- * [For reference] Assuminh: Maximum number of line permustations possible = 2 x 99 + 2 = 200
+ * [spec] Assumming: Maximum # of line permustations possible = 2 x 99 + 2 = 200
  * 
  * board: heap allocated 2D board
  * size: number of rows and columns; 
- * Returns 1 if and only if the board is in a valid state, otherwise returns 0 (values corresponding to STATE enum).
+ * Returns 1 if and only if the board is in a valid state, 
+ *      otherwise returns 0 (values corresponding to STATE enum).
  */
 int n_in_a_row(int **board, int size) {
-    // even size boards are invalid
+    // validate board size: must be odd
     if(size % 2 == 0) return IN_VALID;
 
-    // either the same number Xs as Os, or at most 1 more X than O
-    int countX = 0, countO = 0; 
-    countUserMark(board, &size, &countX, &countO);
-    if(countX != countO && (countX - countO) != 1)
-        return IN_VALID;    
-
-    int polarPairs = (size - 1) / 2; // number of polar sides (element pair of opposite side), excluding the middle element. 
-    int middleIndex = ((size + 1) / 2) - 1; // middle index used for middle of row, or column, or center of element for diagonal. The middle positions are taken as reference values for determining if there is a winning line.
+    int countX = 0, countO = 0;  // count users marks
+    // number of polar sides (element pairs of opposite side), excluding middle element. 
+    int polarPairs = (size - 1) / 2; 
+    /* middle index of lines. The middle positions are taken as reference values for 
+       determining if there is a winning line. */
+    int middleIndex = ((size + 1) / 2) - 1; 
     // number of wins for each line configuration
     int nRowWin, nColumnWin, nDiagonalWin; 
-    nRowWin = nColumnWin = nDiagonalWin = 0;
+    nRowWin = nColumnWin = nDiagonalWin = 0; // initialize
     // user winning state
     bool winnerX = false, winnerO = false;
 
-    // row and column check for winning lines
+    // count users marks on board
+    countUserMark(board, &size, &countX, &countO);
+    // validate proportion of marks: same number Xs as Os, or at most 1 more X than O
+    if(countX != countO && (countX - countO) != 1)
+        return IN_VALID;    
+
+    /* Search for winning lines */
+    // row & column lines check
     for(int l = 0; l < size; l++) {
         // Row line check
-        if(isWinningLineHorizontal(board, &size, &l, &middleIndex, &polarPairs)) {
+        if(isWinHorizontal(board, &size, &l, &middleIndex, &polarPairs)) {
             nRowWin++; 
             // associate win to X and O users
             toggleWinnerUser(board, l, 0, &winnerX, &winnerO); 
@@ -270,23 +285,24 @@ int n_in_a_row(int **board, int size) {
             toggleWinnerUser(board, 0, l, &winnerX, &winnerO); 
         }
     }
-
-    // diagonal check for winning lines
+    // diagonal lines check
     nDiagonalWin = isWinningLineDiagonal(board, &size, &middleIndex, &polarPairs); 
     // associate win to X and O users
     if(nDiagonalWin > 0)
         toggleWinnerUser(board, middleIndex, middleIndex, &winnerX, &winnerO); 
 
-    // Whenever an additional win of the same type is detected return invalid. Based on the fact that there cannot be two wins of the same type (row, column, diagonal). as two parallel winning lines are invalid.
+    /* validate number of same type win (row, column, diagonal): single win for each type. 
+       as two parallel winning lines are invalid, neither cross lines. */
     if(nRowWin > 1 || nColumnWin > 1 || nDiagonalWin > 1) return IN_VALID;
 
-    // X and O cannot both be winners
+    // validate winner user: X and O cannot both be winners.
     if(winnerX && winnerO) return IN_VALID;
 
-    // either one winning line, or two winning lines that intersect on one mark; 
+    /* validate # of winning lines: either one winning line, or two winning lines 
+       that intersect on one mark. */
     if((nRowWin + nColumnWin + nDiagonalWin) > 2) return IN_VALID; 
 
-    // either no winner or one winner.
+    // fallback: either no winner or one winner, with rules applied. 
     return VALID;   
 }
 
@@ -338,27 +354,28 @@ void toggleWinnerUser(int **board, int row, int column, bool *stateX, bool *stat
 }
 
 /**
- *  Check if horizontal line (row) is a winning line
+ * Check if horizontal line (row) is a winning line
  * 
  * board: heap allocated 2D board
  * size: number of elements in a line;
  * line: index of line in the board
  * middle: index of middle element in the line
- * polarPairs: number of polar/opposite corresponding pairs in a line
+ * polarPairs: number of polar/opposite corresponding element pairs in a line
  * validation of a line conforming to a winning state
  */
-bool isWinningLineHorizontal(int **board, int *size, int *line, int *middle, int *polarPairs) {
-    int common = board[*line][*middle]; // use middle line value as reference, as a common element.
+bool isWinHorizontal(int **board, int *size, int *line, int *middle, int *polarPairs) {
+    // use middle line value as reference, as a common element.
+    int common = board[*line][*middle]; 
     // skip / short-circuit for empty positions
-    if(common == EMPTY)
-        return false; 
-    // check opposite pairs on each iteration and verify they are equal to the previous elements
+    if(common == EMPTY) return false; 
+    /* check opposite pairs on each iteration & verify equality to previous elements */
     for (int i = 0; i < *polarPairs; i++) {
         int *current = &board[*line][i]; // current element
-        int *opposite = &board[*line][*size - 1 - i]; // corresponding polar/opposite element in the line
-        // compare current element to common element, and current element to it's corresponding opposite element
-        if(*current != common || *current != *opposite) 
-            return false;
+        // corresponding polar/opposite element in the line
+        int *opposite = &board[*line][*size - 1 - i]; 
+        /* compare current pair to previous, & current element to it's corresponding 
+           opposite element */
+        if(*current != common || *current != *opposite) return false;
     }
     return true;
 }
@@ -374,17 +391,17 @@ bool isWinningLineHorizontal(int **board, int *size, int *line, int *middle, int
  *  validation of a line conforming to a winning state
  */
 bool isWinningLineVertical(int **board, int *size, int *line, int *middle, int *polarPairs) {
-    int common = board[*middle][*line]; // use middle line value as reference, as a common element.
+    // use middle line value as reference for comparison, as a common element.
+    int common = board[*middle][*line]; 
     // skip / short-circuit for empty positions
-    if(common == EMPTY)
-        return false; 
-    // check opposite pairs on each iteration and verify they are equal to the previous elements
+    if(common == EMPTY) return false; 
+    /* check opposite pairs on each iteration & verify equality to previous elements */
     for (int i = 0; i < *polarPairs; i++) {
         int *current = &board[i][*line]; // current element
-        int *opposite = &board[*size - 1 - i][*line]; // corresponding polar/opposite element in the line
-        // compare current element to common element, and current element to it's corresponding opposite element
-        if(*current != common || *current != *opposite) 
-            return false;
+        int *opposite = &board[*size - 1 - i][*line]; // corresponding opposite element
+        /* compare current pair to previous, & current element to it's corresponding 
+           opposite element */
+        if(*current != common || *current != *opposite) return false;
     }
     return true;
 }
@@ -399,12 +416,13 @@ bool isWinningLineVertical(int **board, int *size, int *line, int *middle, int *
  *  number of winning diagonal lines (0, 1, or 2)
  */
 int isWinningLineDiagonal(int **board, int *size, int *middle, int *polarPairs) {
-    int common = board[*middle][*middle]; // use center value as reference, i.e. a common element for comparison.
+    // use center value as reference, i.e. a common element for comparison.
+    int common = board[*middle][*middle];
     // skip / short-circuit for empty positions
-    if(common == EMPTY)
-        return false; 
-    // check the two diagonal permutation wins
+    if(common == EMPTY) return false; 
+    // the two diagonal permutation wins possible
     int ddWin = true, daWin = true; 
+    // check diagonal wins
     for (int i = 0; (i < *polarPairs) && !(ddWin == false && daWin == false); i++) {
         if(ddWin) {
             // diagonal descending (R-to-L)
@@ -412,9 +430,9 @@ int isWinningLineDiagonal(int **board, int *size, int *middle, int *polarPairs) 
             // corresponding polar/opposite element in the line
             int o = *size - 1 - i; // opposite index
             int opposite = board[o][o]; 
-            // compare current element to common element, and current element to it's corresponding opposite element
-            if(current != common || current != opposite) 
-                ddWin = false;
+            /* compare current pair to previous, & current element to it's corresponding 
+               opposite element */
+            if(current != common || current != opposite) ddWin = false;
         }
         if(daWin) {
             // diagonal ascending (R-to-L)
@@ -422,15 +440,15 @@ int isWinningLineDiagonal(int **board, int *size, int *middle, int *polarPairs) 
             int current = board[flipped][i]; // current element
             // corresponding polar/opposite element in the line
             int opposite = board[i][flipped]; 
-            // compare current element to common element, and current element to it's corresponding opposite element
-            if(current != common || current != opposite) 
-                daWin = false;
+            /* compare current pair to previous, & current element to it's corresponding 
+               opposite element */
+            if(current != common || current != opposite) daWin = false;
         }
     }
+
     // return number of diagonal winning lines.
     return ddWin + daWin;
 }
-
 
 /**
  * Set all elements of 2D array to zero. 
@@ -446,7 +464,8 @@ void clear2DArray(int **array, int row, int column) {
 }
 
 /**
- * print all elements in the 2D array, each row in a separate line, and each column separated by a delimiter. 
+ * print all elements in the 2D array, each row in a separate line, 
+ * and each column separated by a delimiter. 
  * 
  * array: input 2-dimensional array of array. 
  * row: # of array rows. 
@@ -469,21 +488,21 @@ void print2DArray(int **array, int *rows, int *columns, char *delimiter) {
  * 
  * array: input 2-dimensional array of array. 
  * row: # of rows in the array.
- * NULL to bea assigned to the array pointer.
+ * NULL to be assigned to the array pointer (as chaining api)
  */
 void* freeNestedArrays(int **array, int row) {
-    while(row-- > 0) {
-        free(array[row]); array[row] = NULL; // freeup memory of nested arrays
-    };
+    // freeup memory of nested arrays
+    while(row-- > 0) 
+        free(array[row]); array[row] = NULL; 
     free(array); // free main/parent array
-    return NULL; // to be assigned to the pointer identifier scoped to the caller function.
+    return NULL; // to be assigned to pointer identifier scoped in caller function.
 }
 
 /**
  * Print supplied error messages and exit program with fail code 1
  * 
  * m1: Main code error message
- * m2: Additional custom message (string) to be printed out along with the code error message.
+ * m2: Additional custom message to be printed out along with the code error message.
  */
 void throw(const char *m1, const char *m2) {
     // print messages
