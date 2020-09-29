@@ -36,30 +36,30 @@
 extern int errno; // error number of `errno.h` library
 char *DELIM = ",";  // delimiter characters of parsed data
 // numerals representing board state validity
-enum STATE { 
+typedef enum { 
     IN_VALID = 0, 
     VALID = 1 
-};
+} State;
 // tokens representing the possible values the in game board
-enum MARK { 
+typedef enum { 
     EMPTY = 0, // unmarked space
     X = 1, // X's user mark
     O = 2 // O's user mark
-};
+} Mark;
 // define custom error codes
-enum ERROR_CODE { 
+typedef enum { 
     E_SIZE, 
     E_ARGUMENT_MISSING, 
     E_ARGUMENT_MULTIPLE, 
     E_INVALID_MARK
-};
+} ErrorCode;
 
 /**
  * Retreive appropriate error message
  * 
- * e: code integral matching the enum ERROR_CODE definitions of error message strings.
+ * e: code integral matching the enum ErrorCode definitions of error message strings.
  */
-const char* getErrorMessage(enum ERROR_CODE e) {
+const char* getErrorMessage(ErrorCode e) {
     char *m = NULL; // error message string
     //! Note: order of case values must match enum declaration declaration order.
     switch(e) {
@@ -96,8 +96,9 @@ void* freeNestedArrays(int **array, int row);
 void throw(const char *m1, const char *m2);
 
 /**
- * This program processes a file containing the current game state, represented as a 2D grid board of Xs and Os. 
- * And checks if the game state conforms to the rules of the Tic-Tac-Toe game.
+ * This program processes a file containing the current game state, represented as a 2D 
+ * grid board of Xs and Os. And checks if the game state conforms to the rules of 
+ * the Tic-Tac-Toe game.
  *      usage: $`./n_in_a_row <input_filename>`
  *             where input-filename - data representing the tic-tac-toe board.
  *      compilation: `gcc -Wall -m32 -std=gnu99`
@@ -127,7 +128,7 @@ int main(int argc, char *argv[]) {
     int **board = NULL; // 2D heap allocated array representing the game board
     int size = 0; /* game board dimensions (rows & columns), total number of marks on 
                      the board will be in the range of 0 to size x size */ 
-    enum STATE state = IN_VALID; // current board state validity
+    State state = IN_VALID; // current board state validity
 
     size = get_dimensions(fp); // retrieve the board size.
     // validate input size value, fullfilling mathematical range:  [3, 99]
@@ -213,7 +214,7 @@ void getMarks(FILE *fp, int **board, int size) {
         // store user marks in the board array
         for (int j = 0; j < size; j++) {
             //! Note: atoi() function doesn't detect errors.
-            int mark = atoi(token); // integer of parsed mark
+            Mark mark = atoi(token); // integer of parsed mark
             // validate parsed marks
             if(mark != EMPTY && mark != X && mark != O)
                 throw(getErrorMessage(E_INVALID_MARK), "");
@@ -244,7 +245,7 @@ void getMarks(FILE *fp, int **board, int size) {
  * board: heap allocated 2D board
  * size: number of rows and columns; 
  * Returns 1 if and only if the board is in a valid state, 
- *      otherwise returns 0 (values corresponding to STATE enum).
+ *      otherwise returns 0 (values corresponding to State enum).
  */
 int n_in_a_row(int **board, int size) {
     // validate board size: must be odd
@@ -317,7 +318,7 @@ int n_in_a_row(int **board, int size) {
 void countUserMark(int** board, int *size, int *countX, int *countO) {
     for(int r = 0; r < *size; r++)
         for(int c = 0; c < *size; c++) {
-            int element = *(*(board + r) + c);
+            Mark element = *(*(board + r) + c);
             switch(element) {
                 case X: 
                     *countX = *countX + 1;
@@ -343,13 +344,15 @@ void countUserMark(int** board, int *size, int *countX, int *countO) {
  * alter the winning state of the user associated with the specified position
  */
 void toggleWinnerUser(int **board, int row, int column, bool *stateX, bool *stateO) {
-    switch(*(*(board + row) + column)) {
+    Mark mark = *(*(board + row) + column); 
+    switch(mark) {
         case X: 
             *stateX = true;
         break;
         case O: 
             *stateO = true;
         break; 
+        default: ; // Skip
     }
 }
 
