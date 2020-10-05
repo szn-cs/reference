@@ -1,0 +1,7 @@
+Dimensions: 
+3, 7, 11, 13, 17, 19
+
+small dimension. e.g. $`./myMagicSquare magicSquare1.txt < input.txt` input = "1"
+
+even dimention. e.g. $`./myMagicSquare magicSquare2.txt < input.txt` inpu = "2"
+
