@@ -26,7 +26,14 @@
 #include <string.h>
 #include <err.h> 
 #include <errno.h>
+#include <stdbool.h> 
 
+// function prototype declarations:
+void clear2DArray(int **array, int row, int column); 
+void print2DArray(int **array, int *rows, int *columns, char *delimiter);
+void* freeNestedArrays(int **array, int row); 
+
+const char *DELIMITER = ","; // columns delimiter
 // Structure that represents a magic square
 typedef struct {
     int size; // dimension of magic square (# of rows & columns each)
@@ -68,14 +75,32 @@ int getSize() {
     free(line); line = NULL; // clean up buffer
     return size;   
 } 
-   
+
+/*
+ * Square matrix traversal following the Alternate Siamese algorithm. The function 
+ * alters the values of row & column to position of the next cell traversal in the right 
+ * cells' order that should be filled incrementally.
+ * 
+ * size: dimension of a square matrix
+ * r: index value of current row position
+ * c: index value of current column position
+ */ 
+void nextTraversal(int size, int *r, int *c) {
+    // TODO: implement algorithm traversal rules.
+    if(*c == size - 1) {
+        *r = *r + 1;
+        *c = 0;
+    } else 
+        *c = *c + 1;
+}
+
 /* 
  * Makes a magic square of size n using alternate Siamese algorithm.
  * <p>
  * Magic square possible generation algorithms: 
  *      1. Siamese method
  *      2. Alternate Siamese method
- * Every number in the matrix will be unique. // TODO:
+ * Every number in the matrix will be unique.
  * 
  * n: the number of rows and columns
  * completed MagicSquare struct
@@ -85,14 +110,16 @@ MagicSquare* generateMagicSquare(int n) {
     // allocate rows
     int **matrix = malloc(sizeof(int) * n);
     if(matrix == NULL) {
-        fprintf(stderr, "Failed to allocated memory; %s\n", strerror(errno /*ENOMEM*/));
+        fprintf(stderr, "Failed to allocated memory; %s\n", strerror(errno));
         exit(1);
     }
     // allocate columns
     for(int r = 0; r < n; r++)  {
         *(matrix + r) = malloc(sizeof(int) * n); 
-        if(*(matrix + r) == NULL) fprintf(stderr, "Failed to allocated memory; %s\n", strerror(errno /*ENOMEM*/));
-        exit(1);
+        if(*(matrix + r) == NULL) {
+            fprintf(stderr, "Failed to allocated memory; %s\n", strerror(errno));
+            exit(1);
+        }
     }
     // initialize 2D array with zeros.
     clear2DArray(matrix, n, n); 
@@ -100,7 +127,7 @@ MagicSquare* generateMagicSquare(int n) {
     // allocate magic square's structure on heap
     MagicSquare* ms = malloc(sizeof(MagicSquare));
     if(ms == NULL) {
-        fprintf(stderr, "Failed to allocated memory; %s\n", strerror(errno /*ENOMEM*/));
+        fprintf(stderr, "Failed to allocated memory; %s\n", strerror(errno));
         exit(1);
     } 
     // initialize members
@@ -108,13 +135,21 @@ MagicSquare* generateMagicSquare(int n) {
     ms->magic_square = matrix;
 
     // Generate numbers using Alternate Siamese method
-    // TODO:
+    int cellsNumber = n*n; // total matrix size
+    int r = 0, c = 0; // current starting cell position
+    for(int value = 1; value <= cellsNumber; value++) {
+        // set the incremental value of current cell following the method rules 
+        *(*(matrix + r) + c) = value;
+        // get next cell position according to algorithm used
+        nextTraversal(ms->size, &r, &c);
+    } 
 
     return ms;    
 } 
 
 /*  
- * Opens a new file (or overwrites the existing file) and writes the square in the specified format.
+ * Opens a new file (or overwrites the existing file) and writes the square in the 
+ * specified format.
  * <p>
  * Format of output file: 
  *      • 1st line: size of the matrix (positive integer).
@@ -123,19 +158,78 @@ MagicSquare* generateMagicSquare(int n) {
  * magicSquare: the magic square to write to a file filename the name of the output file
  */
 void fileOutputMagicSquare(MagicSquare *magicSquare, char *filename) {
-    const static char *DELIMITER = ","; 
     // open file descriptor
-
-    // write size to first line
-
-    // write matrix's rows line-by-line. 
-    for() { 
-        // delimit columns
-        // fprintf("%s%s", DELIMITER, col)
-        
+    FILE *fileStream = fopen(filename, "w");
+    if (fileStream == NULL) {
+        fprintf(stderr, "Can't open file for writing; %s\n", strerror(errno /*ENOENT*/));
+        exit(1);
+    }
+    
+    // write size value to file on first line
+    if(fprintf(fileStream, "%i\n", magicSquare->size) < 0) {
+        fprintf(stderr, "Error writing to file; %s\n", strerror(errno));
+        exit(1);
     }
 
+    // write matrix's rows line-by-line. 
+    int **m = magicSquare->magic_square; // pointer to the 2D array 
+    int *size = &(magicSquare->size); // pointer to size value
+    for(int r = 0; r < *size; r++) {
+        bool lastR = (r == *size - 1) ? true : false; // is last row
+        for(int c = 0; c < *size; c++) {
+            bool lastC = (c ==  *size - 1) ? true : false; // is last column
+            // column ending or line ending
+            const char *postfix = lastC ? lastR ? "" : "\n" : DELIMITER;
+            // write current column to stream buffer
+            if(fprintf(fileStream, "%i%s", *(*(m + r) + c), postfix) < 0) {
+                fprintf(stderr, "Error writing to file; %s\n", strerror(errno));
+                exit(1);
+            }
+        }
+    }
+
+    // close the file.
+    if (fclose(fileStream) != 0) {
+        fprintf(stderr, "Error while closing the file; %s\n", strerror(errno));
+        exit(1);
+    }
 }
+
+/* 
+ * Generates a normal magic square of the user specified size and output the square to 
+ * the output filename. 
+ * <p>
+ * A magic square is a matrix of size n x n with positive numbers from 1 … n2 arranged 
+ * such that the numbers in any line (horizontal, vertical, and both main diagonals) 
+ * sum to the same values. Where, constant sum: "magic constant", & integer n = "order"
+ * of the magic square.
+ * 
+ * argc: command-line argument count
+ * argv: command-line argument value
+ */
+int main(int argc, char *argv[]) {
+    // validate argument presence: must pass filename program argument
+    if(argc < 2) {
+        char* executableName = (*argv) != NULL ? (*argv) : "./myMagicSquare";
+        fprintf(stderr, "Usage: %s <output_filename>\n", executableName);
+        exit(1);
+    }
+    
+    char* filename = *(argv + 1); // Get output filename from input argument
+    int size = getSize(); // retrieve size dimension of magic square from the user.
+    
+    // Generate the magic square
+    MagicSquare *magicSquare = generateMagicSquare(size);
+    // Output the magic square
+    fileOutputMagicSquare(magicSquare, filename);
+
+    // free struct and associated arrays
+    magicSquare->magic_square = freeNestedArrays(magicSquare->magic_square, size);
+    free(magicSquare); magicSquare = NULL;
+
+    return 0;
+} 
+
 
 /**
  * Set all elements of 2D array to zero. 
@@ -166,42 +260,6 @@ void* freeNestedArrays(int **array, int row) {
     free(array); // free main/parent array
     return NULL; // to be assigned to pointer identifier scoped in caller function.
 }
-
-/* 
- * Generates a normal magic square of the user specified size and output the square to 
- * the output filename. 
- * <p>
- * A magic square is a matrix of size n x n with positive numbers from 1 … n2 arranged 
- * such that the numbers in any line (horizontal, vertical, and both main diagonals) 
- * sum to the same values. Where, constant sum: "magic constant", & integer n = "order"
- * of the magic square.
- * 
- * argc: command-line argument count
- * argv: command-line argument value
- */
-int main(int argc, char *argv[]) {
-    // validate argument presence: must pass filename program argument
-    if(argc < 2) {
-        char* executableName = (*argv) != NULL ? (*argv) : "./myMagicSquare";
-        fprintf(stderr, "Usage: %s <output_filename>\n", executableName);
-        exit(1);
-    }
-    
-    const char* filename = *(argv + 1); // Get output filename from input argument
-    int size = getSize(); // retrieve size dimension of magic square from the user.
-    
-    // Generate the magic square
-    MagicSquare *magicSquare = generateMagicSquare(size);
-    // Output the magic square
-    fileOutputMagicSquare(magicSquare, filename);
-
-    // memory management
-    // free matrix, free magic square struct.
-    // matrix = freeNestedArrays(matrix, size); // free associated arrays & return NULL
-
-    return 0;
-} 
-
 
                                                          
 //				myMagicSquare.c      
