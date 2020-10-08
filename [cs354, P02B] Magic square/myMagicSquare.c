@@ -135,9 +135,9 @@ MagicSquare* generateMagicSquare(int n) {
 } 
 
 /*
- * Square matrix traversal following the Siamese algorithm. The function 
- * alters the values of row & column to position of the next cell traversal in the 
- * right cells' order that should be filled incrementally.
+ * Square matrix traversal following the Siamese algorithm. The function alters 
+ * the values of row & column to position of the next cell traversal in the right
+ * cells' order that should be filled incrementally.
  * 
  * matrix: 2D square array (magic square)
  * size: dimension of a square matrix
@@ -185,7 +185,8 @@ void nextTraversal(int **matrix, int size, int *r, int *c) {
  *      • 1st line: size of the matrix (positive integer).
  *      • following lines: martix's rows, where columns will be delimited.
  *
- * magicSquare: the magic square to write to a file filename the name of the output file
+ * magicSquare: the magic square to write to a file 
+ * filename: the name of the output file
  */
 void fileOutputMagicSquare(MagicSquare *magicSquare, char *filename) {
     FILE *fileStream = fopen(filename, "w"); // open file descriptor
@@ -260,7 +261,7 @@ int getSize() {
     return size;   
 } 
 
-/**
+/*
  * Set all elements of 2D array to zero. 
  * 
  * array: input 2-dimensional array of array. 
@@ -273,7 +274,7 @@ void clear2DArray(int **array, int row, int column) {
             *(*(array + row) + column) = 0;
 }
 
-/**
+/*
  * Freeup nested arrays & parent array for a heap-allocated array of arrays.
  * 
  * array: input 2-dimensional array of array. 
@@ -290,4 +291,4 @@ void* freeNestedArrays(int **array, int row) {
     return NULL; // to be assigned to pointer identifier scoped in caller function.
 }
                                              
-//				myMagicSquare.c      
+//                myMagicSquare.c      
