@@ -60,6 +60,8 @@ public class Grades {
       if (grades[i] >= threshold)
         thresholdGradeNumber++;
 
+    if (thresholdGradeNumber == 0 || size == 0)
+      return 0.0;
     // calculate rate of threshold grades to total grades recorded
     rate = (double) thresholdGradeNumber / size;
 
