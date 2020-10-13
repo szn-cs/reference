@@ -157,15 +157,7 @@ public class test {
    * @param args - input arguments if any
    */
   public static void main(String[] args) {
-    // System.out.println("testSuccessfulGradeInsertion(): " + testSuccessfulGradeInsertion());
-    // System.out.println("testInsertInvalidGrade(): " + testInsertInvalidGrade());
-    // System.out.println("testSpecificGradesPortion(): " + testSpecificGradesPortion());
-    //
-    // double[] grades = new double[] {};
-    // int size = 0;
-    // double threshold = 90.0;
-    // double portion = getSpecificGradesPortion(grades, size, threshold);
-    // System.out.println(portion);
+    System.out.println("testSuccessfulGradeInsertion(): " + testSuccessfulGradeInsertion());
 
 
 
