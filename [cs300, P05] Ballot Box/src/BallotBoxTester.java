@@ -258,45 +258,85 @@ public class BallotBoxTester {
    */
   public static boolean testBallotBox() {
     try {
-      // prepare data of related instances
-      Party p1 = new Party("P1"), p2 = new Party("P2");
-      for (int i = 0; i < Candidate.OFFICE.length; i++) {
-        p1.addCandidate(new Candidate("P1C" + i, Candidate.OFFICE[i]));
-        p2.addCandidate(new Candidate("P2C" + i, Candidate.OFFICE[i]));
+
+      // multiple ballots for single office
+      {
+        // prepare data of related instances
+        final String office = Candidate.OFFICE[0];
+        Party p1 = new Party("P1"), p2 = new Party("P2");
+        for (int i = 0; i < Candidate.OFFICE.length - 1; i++) { // excluding 4th office
+          p1.addCandidate(new Candidate("P1C" + i, Candidate.OFFICE[i]));
+          p2.addCandidate(new Candidate("P2C" + i, Candidate.OFFICE[i]));
+        }
+        Ballot.addParty(p1);
+        Ballot.addParty(p2);
+        // Ballots: 2x"P1C0" versus 1x"P2C0"
+        Ballot b1 = new Ballot();
+        b1.vote(p1.getCandidate(office));
+        Ballot b2 = new Ballot();
+        b2.vote(p1.getCandidate(office));
+        Ballot b3 = new Ballot();
+        b3.vote(p2.getCandidate(office));
+        // expected winner name
+        final String expectedWinner = "P1C0";
+
+        BallotBox box = new BallotBox();
+        // add ballots
+        box.submit(b1);
+        box.submit(b2);
+        box.submit(b3);
+        // add duplicates
+        box.submit(b1);
+        box.submit(b1);
+        box.submit(b3);
+
+        // # of ballots
+        if (box.getNumBallots() != 3) {
+          System.out.println("# of ballots (with duplicates) doesn't match expected value.");
+          return false;
+        }
+
+        // check winner
+        String actualWinner = box.getWinner(office).getName();
+        if (!actualWinner.equals(expectedWinner)) {
+          System.out.println("Expected a different winner candidate.");
+          return false;
+        }
+
       }
-      Ballot.addParty(p1);
-      Ballot.addParty(p2);
-      // Ballots: 2x"P1C0" versus 1x"P2C0"
-      Ballot b1 = new Ballot();
-      b1.vote(p1.getCandidate(Candidate.OFFICE[0]));
-      Ballot b2 = new Ballot();
-      b2.vote(p1.getCandidate(Candidate.OFFICE[0]));
-      Ballot b3 = new Ballot();
-      b3.vote(p2.getCandidate(Candidate.OFFICE[0]));
-      // expected winner name
-      final String expectedWinner = "P1C0";
 
-      BallotBox box = new BallotBox();
-      // add ballots
-      box.submit(b1);
-      box.submit(b2);
-      box.submit(b3);
-      // add duplicates
-      box.submit(b1);
-      box.submit(b1);
-      box.submit(b3);
+      // one Ballot with a vote for an office with two Candidates
+      {
+        // prepare data of related instances
+        final String office = Candidate.OFFICE[2];
+        Party p1 = new Party("P1"), p2 = new Party("P2");
+        p1.addCandidate(new Candidate("P1C", office));
+        p2.addCandidate(new Candidate("P2C", office));
+        Ballot.addParty(p1);
+        Ballot.addParty(p2);
 
-      // # of ballots
-      if (box.getNumBallots() != 3) {
-        System.out.println("# of ballots (with duplicates) doesn't match expected value.");
-        return false;
-      }
+        // Ballots: 2x"P1C0" versus 1x"P2C0"
+        Ballot b = new Ballot();
+        b.vote(p2.getCandidate(office));
+        // expected winner name
+        final String expectedWinnerName = "P2C";
 
-      // check winner
-      String actualWinner = box.getWinner(Candidate.OFFICE[0]).getName();
-      if (!actualWinner.equals(expectedWinner)) {
-        System.out.println("Expected a different winner candidate.");
-        return false;
+        BallotBox box = new BallotBox();
+        // add ballots
+        box.submit(b);
+
+        // # of ballots
+        if (box.getNumBallots() != 1) {
+          System.out.println("# of ballots (with duplicates) doesn't match expected value.");
+          return false;
+        }
+
+        // check winner
+        Candidate actualWinner = box.getWinner(office);
+        if (!actualWinner.getName().equals(expectedWinnerName)) {
+          System.out.println("Expected a different winner candidate.");
+          return false;
+        }
       }
 
     } catch (Exception e) {

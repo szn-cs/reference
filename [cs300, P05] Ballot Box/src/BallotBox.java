@@ -64,22 +64,39 @@ public class BallotBox {
 
     // Retrieve the list of potential Candidates for the given office
     ArrayList<Candidate> candidates = Ballot.getCandidates(office);
-    int[] counter = new int[candidates.size()]; // votes counter parallel array - corresponding to
-                                                // candidates list
+    if (candidates.size() == 0)
+      return null; // if no candidates for office
+
+    // votes counter parallel array - corresponding to candidates list
+    int[] counter = new int[candidates.size()];
     // tracking how many votes each of the Candidates receives
     for (Ballot b : ballots) {
-      if (b == null)
+      if (b == null) // if no ballot
         continue;
       Candidate candidateVote = b.getVote(office); // get vote for office
+      if (candidateVote == null) // if no cast for office
+        continue;
       int index = candidates.indexOf(candidateVote); // get index of corresponding array
+      if (index < 0) // if candidate was not found in the list of possible candidates
+        continue;
       counter[index]++; // add vote to counter
     }
 
     // Find the Candidate who has received the most votes
-    int largestCountIndex = 0; // index with largest count
-    for (int i = 1; i < counter.length; i++)
-      if (counter[i] > counter[largestCountIndex])
-        largestCountIndex = i;
+    int largestCountIndex = -1; // index with largest count
+    for (int i = 0; i < counter.length; i++) {
+      if (counter[i] > 0) {
+        if (largestCountIndex == -1)
+          largestCountIndex = i;
+        else if (counter[i] > counter[largestCountIndex])
+          largestCountIndex = i;
+      }
+    }
+
+    if (largestCountIndex == -1) // if there are no votes for the office position
+      return null;
+
+    // get candidate with most votes
     winner = candidates.get(largestCountIndex);
 
     // For this implementation, in the case of a tie between Candidates , return the Candidate who
@@ -94,7 +111,7 @@ public class BallotBox {
    */
   public void submit(Ballot incomingBallot) {
     // validate ballot: should not be a duplicate
-    if (ballots.contains(incomingBallot))
+    if (incomingBallot == null || ballots.contains(incomingBallot))
       return; // skip
 
     ballots.add(incomingBallot);

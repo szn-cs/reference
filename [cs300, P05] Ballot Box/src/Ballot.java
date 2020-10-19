@@ -51,8 +51,8 @@ public class Ballot {
    * @param p target party to add to parties list
    */
   public static void addParty(Party p) {
-    // if the class already contains this party, do nothing
-    if (parties.contains(p))
+    // if the class already contains this party or is null, do nothing
+    if (p == null || parties.contains(p))
       return;
 
     parties.add(p);
@@ -88,7 +88,7 @@ public class Ballot {
   public Candidate getVote(String office) {
     for (int index = 0; index < Candidate.OFFICE.length; index++)
       if (Candidate.OFFICE[index].equals(office))
-        return votes[index];
+        return votes[index]; // candidate or null if no vote
 
     return null; // no vote for this office
   }

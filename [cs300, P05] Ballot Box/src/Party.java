@@ -89,6 +89,9 @@ public class Party {
    *                                  another member of the Party
    */
   public void addCandidate(Candidate c) throws IllegalArgumentException {
+    if (c == null) // make sure no nulls are passed
+      return;
+
     // validate: no other Candidate in this Party is running for the same office
     for (Candidate e : candidates)
       if (e.getOffice().equals(c.getOffice()))
