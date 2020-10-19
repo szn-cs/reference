@@ -76,7 +76,8 @@ public class BallotBox {
       Candidate candidateVote = b.getVote(office); // get vote for office
       if (candidateVote == null) // if no cast for office
         continue;
-      int index = candidates.indexOf(candidateVote); // get index of corresponding array
+      // get index of corresponding array
+      int index = findCandidate(candidates, candidateVote);
       if (index < 0) // if candidate was not found in the list of possible candidates
         continue;
       counter[index]++; // add vote to counter
@@ -102,6 +103,24 @@ public class BallotBox {
     // For this implementation, in the case of a tie between Candidates , return the Candidate who
     // appears first in the list of potential Candidates
     return winner;
+  }
+
+  /**
+   * Find candidate in an ArrayList of candidates
+   * 
+   * @param candidates      list of candidate instances
+   * @param targetCandidate candidate instance to search for
+   * @return index of candidate in list if found, else -1
+   */
+  private int findCandidate(ArrayList<Candidate> candidates, Candidate targetCandidate) {
+    final String targetCandidateStr = targetCandidate.toString();
+    int i; // index of the found candidate in the array
+    for (i = 0; i < candidates.size(); i++) {
+      // compare candidates using string name (as tests expect)
+      if (candidates.get(i).toString().equals(targetCandidateStr))
+        return i;
+    }
+    return -1; // not found
   }
 
   /**
