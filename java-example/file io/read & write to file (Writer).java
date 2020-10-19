@@ -21,6 +21,32 @@ public class StudentNamesReaderWriter {
   // create an empty ArrayList of students
   private static ArrayList<Student> students = new ArrayList<Student>();
 
+  // (unrelated to this class)
+  // read integer input
+  public static int getInteger(Scanner input, String prompt) {
+      int inputValue;
+      
+      System.out.println(prompt + ": ");
+      inputValue = input.nextInt();
+      
+      return inputValue;
+  } // 
+   /**   
+      getString - Prompts for an input string from the user
+      @param   input  - the source of the input (a Scanner object)
+      @param   prompt - the prompt to show the user
+      @return  The string entered by the user (which could be empty)
+   */
+ 
+  public static String getString(Scanner input, String prompt) {
+      String userInput;
+      
+      System.out.println(prompt);
+      userInput = input.nextLine();
+
+      return userInput;
+  } 
+
   /**
    * Reads and processes a file that should contain first and last names of a set of students
    * 
