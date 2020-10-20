@@ -53,7 +53,7 @@ typedef struct blockHeader {
     */
 } blockHeader;         
 
-/* Global variable - DO NOT CHANGE. It should always point to the first block,
+/* Global variable - DO NOT CHANGE. It should always point to the first block (header),
  * i.e., the block at the lowest address.
  */
 blockHeader *heapStart = NULL;     
@@ -70,8 +70,8 @@ int allocsize;
 /* 
  * Function for allocating 'size' bytes of heap memory.
  * Argument size: requested size for the payload
- * Returns address of allocated block on success.
- * Returns NULL on failure.
+ * Returns address/pointer of allocated block (allocated payload of 'size' bytes) on success.
+ * Returns NULL on failure - if there isn't a free block large enough to satisfy the request.
  * This function should:
  * - Check size - Return NULL if not positive or if larger than heap space.
  * - Determine block size rounding up to a multiple of 8 and possibly adding padding as a result.
@@ -79,9 +79,46 @@ int allocsize;
  * - Use SPLITTING to divide the chosen free block into two if it is too large.
  * - Update header(s) and footer as needed.
  * Tips: Be careful with pointer arithmetic and scale factors.
+ * 
+ * Tests: 
+    test_alloc1: a simple 8-byte allocation
+    test_alloc1_nospace: allocation is too big to fit in available space3 
+    test_writeable: write to a chunk from Mem_Alloc and check the value
+    test_align1: the first pointer returned is 8-byte aligned
+    test_alloc2: a few allocations in multiples of 4 bytes
+    test_alloc2_nospace: the second allocation is too big to fit 
+    test_align2: a few allocations in multiples of 4 bytes checked for alignment 
+    test_alloc3: many odd sized allocations 
+    test_align3: many odd sized allocations checked for alignment
  */
 void* myAlloc(int size) {     
-    //TODO: Your code goes in here.
+    /* 
+
+    Allocator: 
+    - implicit free list structure
+        - Using headers with size and status information (p-bit & a-bit)
+        - free block footers for heap structure, storing block size
+    - Block allocation: 
+        - next-fit placement policy
+        - split block policy (to minimize internal fragmentation)
+            - splinting: remainder of free block should be at least 8 bytes in size.
+        - double-word (8 bytes) aligned (to improve performance)
+        - total size of the allocated block including header must be a multiple of 8 
+    - No additional heap memory should be requested from the OS.
+    */
+
+    // to get that size rather than using 4 bytes.
+    sizeof(blockHeader);
+
+    // Double check your pointer arithmetic's automatic scaling. int* would increment the address by 4 bytes. Cast your heap block pointers to void* or char* to set the scale factor to 1. What scale factor is used for blockHeader*?
+    (blockHeader*) ptr;
+
+    // verify 8 byte aligned pointer: last hexadecimal digit should be multiple of 8 (i.e. 0 or 8)
+    printf("%08x", (unsigned int)(ptr)); 
+
+    // check if a block is allocated or not.
+    if((size_status & 1) == 0);
+
     return NULL;
 } 
  
@@ -92,19 +129,38 @@ void* myAlloc(int size) {
  * Returns -1 on failure.
  * This function should:
  * - Return -1 if ptr is NULL.
- * - Return -1 if ptr is not a multiple of 8.
- * - Return -1 if ptr is outside of the heap space.
- * - Return -1 if ptr block is already freed.
+ * - Return -1 if ptr is not a multiple of 8 (not 8 byte aligned).
+ * - Return -1 if ptr is outside of the heap space (not within the range of memory allocated by myInit()).
+ * - Return -1 if ptr block is already freed (points to a free block).
  * - USE IMMEDIATE COALESCING if one or both of the adjacent neighbors are free.
  * - Update header(s) and footer as needed.
+ * 
+ 
+ Tests: 
+    test_free1: a few allocations in multiples of 4 bytes followed by frees
+    test_free2: many odd sized allocations and interspersed frees
+    test_coalesce1: check for coalescing free space
+    test_coalesce2: check for coalescing free space
+    test_coalesce3: check for coalescing free space
+    test_coalesce4: check for coalescing free space
+    test_coalesce5: check for coalescing free space (first chunk)
+    test_coalesce6: check for coalescing free space (last chunk)
  */                    
 int myFree(void *ptr) {    
-    //TODO: Your code goes in here.
+
+    /* 
+    Freeing memory: 
+        - immediate coalescing with adjacent free memory blocks.
+            - requires only one header and one footer in the coalesced free block, and you should not waste time clearing old headers, footers, or data.
+
+
+    */
+
     return -1;
 } 
  
 /*
- * Function used to initialize the memory allocator.
+ * Function used to initialize the memory allocator (memory-mapped segment being used to simulate the heap segment).
  * Intended to be called ONLY once by a program.
  * Argument sizeOfRegion: the size of the heap space to be allocated.
  * Returns 0 on success.
@@ -115,7 +171,7 @@ int myInit(int sizeOfRegion) {
     static int allocated_once = 0; //prevent multiple myInit calls
  
     int pagesize;  // page size
-    int padsize;   // size of padding when heap size not a multiple of page size
+    int padsize;   // size of p\adding when heap size not a multiple of page size
     void* mmap_ptr; // pointer to memory mapped area
     int fd;
 
@@ -124,7 +180,7 @@ int myInit(int sizeOfRegion) {
     if (0 != allocated_once) {
         fprintf(stderr, 
         "Error:mem.c: InitHeap has allocated space during a previous call\n");
-        return -1;
+        return -1;\
     }
     if (sizeOfRegion <= 0) {
         fprintf(stderr, "Error:mem.c: Requested block size is not positive\n");
@@ -190,6 +246,8 @@ int myInit(int sizeOfRegion) {
  * t_Begin  : address of the first byte in the block (where the header starts) 
  * t_End    : address of the last byte in the block 
  * t_Size   : size of the block as stored in the block header
+ * 
+ * TODO: It is recommended that you extend the implementation to display the information stored in the footers of the free blocks too.
  */                     
 void dispMem() {     
  
