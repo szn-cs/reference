@@ -15,42 +15,48 @@
 #include <string.h>
 #include "myHeap.h"
  
+// general flags indicating operation status
+#define FAILURE -1
+#define SUCCESS 0
+
 /*
- * This structure serves as the header for each allocated and free block.
- * It also serves as the footer for each free block but only containing size.
+ * Severs as: 
+ * - The header for each allocated/free memory block.
+ * or
+ * - The footer for each free block (only containing size).
  */
-typedef struct blockHeader {           
-    int size_status;
+typedef struct blockHeader {    
     /*
-    * Size of the block is always a multiple of 8.
-    * Size is stored in all block headers and free block footers.
-    *
-    * Status is stored only in headers using the two least significant bits.
-    *   Bit0 => least significant bit, last bit
-    *   Bit0 == 0 => free block
-    *   Bit0 == 1 => allocated block
-    *
-    *   Bit1 => second last bit 
-    *   Bit1 == 0 => previous block is free
-    *   Bit1 == 1 => previous block is allocated
-    * 
-    * End Mark: 
-    *  The end of the available memory is indicated using a size_status of 1.
-    * 
-    * Examples:
-    * 
-    * 1. Allocated block of size 24 bytes:
-    *    Header:
-    *      If the previous block is allocated, size_status should be 27
-    *      If the previous block is free, size_status should be 25
-    * 
-    * 2. Free block of size 24 bytes:
-    *    Header:
-    *      If the previous block is allocated, size_status should be 26
-    *      If the previous block is free, size_status should be 24
-    *    Footer:
-    *      size_status should be 24
-    */
+     * size of block - stored in all block headers and free block footers: 
+     *     - always a multiple of 8
+     * 
+     * status of block - stored only in headers using the two least significant bits: 
+     *     - Bit0 (least significant bit, last bit): status of current block
+     *          0 => free block
+     *          1 => allocated block
+     *     - Bit1 (second last bit): status of previous block
+     *          0 => free block
+     *          1 => allocated block
+     * 
+     * Special case: 
+     * - End Mark: The end of the available memory is indicated using a size_status of 1.
+     * 
+     * 
+     * Examples:
+     * 
+     * 1. Allocated block of size 24 bytes:
+     *    Header:
+     *      If the previous block is allocated, size_status should be 27
+     *      If the previous block is free, size_status should be 25
+     * 
+     * 2. Free block of size 24 bytes:
+     *    Header:
+     *      If the previous block is allocated, size_status should be 26
+     *      If the previous block is free, size_status should be 24
+     *    Footer:
+     *      size_status should be 24
+     */
+    int size_status;
 } blockHeader;         
 
 /* Global variable - DO NOT CHANGE. It should always point to the first block (header),
@@ -62,23 +68,25 @@ blockHeader *heapStart = NULL;
  */
 int allocsize;
 
-/*
- * Additional global variables may be added as needed below
- */
 
  
 /* 
- * Function for allocating 'size' bytes of heap memory.
+ * Function for allocating 'size' bytes from process's heap memory.
+ * Allocator design choices: 
+ *    - implicit free list structure
+ *        - Using headers with size and status information (p-bit & a-bit)
+ *        - free block footers for heap structure, storing block size
+ *    - Block allocation: 
+ *        - next-fit placement policy to chose a free block
+ *        - split block policy to divide too large chosen free block (to minimize internal fragmentation)
+ *            - splinting: remainder of free block should be at least 8 bytes in size.
+ *        - double-word (8 bytes) aligned (to improve performance)
+ *        - padding: total size of the allocated block including header must be a multiple of 8
+ *    - No additional heap memory should be requested from the OS.
+ * 
  * Argument size: requested size for the payload
  * Returns address/pointer of allocated block (allocated payload of 'size' bytes) on success.
- * Returns NULL on failure - if there isn't a free block large enough to satisfy the request.
- * This function should:
- * - Check size - Return NULL if not positive or if larger than heap space.
- * - Determine block size rounding up to a multiple of 8 and possibly adding padding as a result.
- * - Use NEXT-FIT PLACEMENT POLICY to chose a free block
- * - Use SPLITTING to divide the chosen free block into two if it is too large.
- * - Update header(s) and footer as needed.
- * Tips: Be careful with pointer arithmetic and scale factors.
+ * Returns NULL on failure
  * 
  * Tests: 
     test_alloc1: a simple 8-byte allocation
@@ -92,26 +100,18 @@ int allocsize;
     test_align3: many odd sized allocations checked for alignment
  */
 void* myAlloc(int size) {     
-    /* 
+    // Adjust scale factor to perform pointer arithmetic as expected
+    // Double check your pointer arithmetic's automatic scaling. int* would increment the address by 4 bytes. Cast your heap block pointers to void* or char* to set the scale factor to 1. What scale factor is used for blockHeader*?
+    (blockHeader*) ptr;
 
-    Allocator: 
-    - implicit free list structure
-        - Using headers with size and status information (p-bit & a-bit)
-        - free block footers for heap structure, storing block size
-    - Block allocation: 
-        - next-fit placement policy
-        - split block policy (to minimize internal fragmentation)
-            - splinting: remainder of free block should be at least 8 bytes in size.
-        - double-word (8 bytes) aligned (to improve performance)
-        - total size of the allocated block including header must be a multiple of 8 
-    - No additional heap memory should be requested from the OS.
-    */
+    // case: Check size - Return NULL if not positive or if larger than heap space.
+    // case: if there isn't a free block large enough to satisfy the request.
+
+    // Determine block size rounding up to a multiple of 8 and possibly adding padding as a result.
 
     // to get that size rather than using 4 bytes.
     sizeof(blockHeader);
 
-    // Double check your pointer arithmetic's automatic scaling. int* would increment the address by 4 bytes. Cast your heap block pointers to void* or char* to set the scale factor to 1. What scale factor is used for blockHeader*?
-    (blockHeader*) ptr;
 
     // verify 8 byte aligned pointer: last hexadecimal digit should be multiple of 8 (i.e. 0 or 8)
     printf("%08x", (unsigned int)(ptr)); 
@@ -119,21 +119,25 @@ void* myAlloc(int size) {
     // check if a block is allocated or not.
     if((size_status & 1) == 0);
 
+    // Update header(s) and footer as needed.
+
     return NULL;
 } 
  
 /* 
  * Function for freeing up a previously allocated block.
+ * Freeing memory: 
+ *     - immediate coalescing with adjacent free memory blocks, 
+ *       if one or both of the adjacent neighbors are free.
+ *     - requires only one header and one footer in the coalesced free block, 
+ *       and you should not waste time clearing old headers, footers, or data.
+ * 
  * Argument ptr: address of the block to be freed up.
  * Returns 0 on success.
  * Returns -1 on failure.
- * This function should:
- * - Return -1 if ptr is NULL.
- * - Return -1 if ptr is not a multiple of 8 (not 8 byte aligned).
- * - Return -1 if ptr is outside of the heap space (not within the range of memory allocated by myInit()).
- * - Return -1 if ptr block is already freed (points to a free block).
- * - USE IMMEDIATE COALESCING if one or both of the adjacent neighbors are free.
- * - Update header(s) and footer as needed.
+ *      - if ptr is .
+ *      - if ptr is .
+ *      - if ptr .
  * 
  
  Tests: 
@@ -146,17 +150,17 @@ void* myAlloc(int size) {
     test_coalesce5: check for coalescing free space (first chunk)
     test_coalesce6: check for coalescing free space (last chunk)
  */                    
-int myFree(void *ptr) {    
+int myFree(void *ptr) {
+    /* Validate input pointer */    
+    if(ptr == NULL) // case: NULL
+        return FAILURE; 
+    // case: not a multiple of 8 (not 8 byte aligned)
+    // case: outside of the heap space (not within the range of memory allocated by myInit())
+    // case: block is already freed (points to a free block)
 
-    /* 
-    Freeing memory: 
-        - immediate coalescing with adjacent free memory blocks.
-            - requires only one header and one footer in the coalesced free block, and you should not waste time clearing old headers, footers, or data.
+    // Update header(s) and footer as needed.
 
-
-    */
-
-    return -1;
+    return FAILURE;
 } 
  
 /*
