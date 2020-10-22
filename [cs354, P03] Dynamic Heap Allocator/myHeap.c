@@ -1,3 +1,8 @@
+/*
+contributions: 
+- iterators https://www.cs.yale.edu/homes/aspnes/pinewiki/C(2f)Iterators.html
+*/
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Copyright 2019-2020 Jim Skrentny
@@ -13,20 +18,38 @@
 #include <sys/mman.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <assert.h>
 #include "myHeap.h"
- 
+
+// Debug flag
+#define DEBUG if(1)
 // general flags indicating operation status
 #define FAILURE -1
 #define SUCCESS 0
+// Processor's unit of data in bytes
+#define WORD 4 
+#define DOUBLE_WORD (2 * WORD)
+// heap space end mark
+#define END_MARK 1
 
 /*
  * Severs as: 
  * - The header for each allocated/free memory block.
  * or
  * - The footer for each free block (only containing size).
+ * 
+ * Adjust scale factor to perform pointer arithmetic with automatic scaling as expected.
+        - void* or char* = to set the scale factor to 1. 
+        - int* = would increment the address by 4 bytes. 
+        - blockHeader* = 4 bytes
+   
  */
 typedef struct blockHeader {    
     /*
+     * Using headers with size and status information (p-bit & a-bit).
+     * 
      * size of block - stored in all block headers and free block footers: 
      *     - always a multiple of 8
      * 
@@ -37,10 +60,10 @@ typedef struct blockHeader {
      *     - Bit1 (second last bit): status of previous block
      *          0 => free block
      *          1 => allocated block
+     *
+     * Footer of free blocks - storing block size.
      * 
-     * Special case: 
-     * - End Mark: The end of the available memory is indicated using a size_status of 1.
-     * 
+     * End Mark - The end of the available memory is indicated using a size_status of 1.
      * 
      * Examples:
      * 
@@ -57,110 +80,238 @@ typedef struct blockHeader {
      *      size_status should be 24
      */
     int size_status;
-} blockHeader;         
+} blockHeader, blockFooter;         
 
-/* Global variable - DO NOT CHANGE. It should always point to the first block (header),
- * i.e., the block at the lowest address.
- */
+/* Global variable - DO NOT CHANGE. It should always point to the first block (block at the lowest address) */
 blockHeader *heapStart = NULL;     
 
-/* Size of heap allocation padded to round to nearest page size.
- */
+/* Size of heap allocation padded to round to nearest page size. */
 int allocsize;
 
+/* most recently allocated block */
+blockHeader* recentBlock = NULL; 
 
- 
+// check bit at particular position if set, otherwise false for 0.
+bool isBitAtPositionSet(int *i, int p) { return (*i & (1 << (p-1))) ? true : false; }
+// toggle at bit particular position.
+void toggleBitAtPosition(int *i, int p) { *i = *i ^ (1 << (p-1)); }
+// unset all bits to particular position
+int unsetBitsTillPosition(int *i, int p) { return *i >> p << p; }
+
+/**
+ * Implicit free list & heap information functions: 
+ */
+// check a-bit flag. if a block is allocated or not.
+bool isCurrentAllocated(blockHeader* b) { return isBitAtPositionSet(&b->size_status, 1); }
+// check p-bit flag. if preceding block is allocated or not.
+bool isPreviousAllocated(blockHeader* b) { return isBitAtPositionSet(&b->size_status, 2); }
+// toggle a-bit flag - current block allocation status
+void toggleABit(blockHeader* b) { toggleBitAtPosition(&b->size_status, 1); }
+// toggle p-bit flag - previous block allocation status
+void togglePBit(blockHeader* b) { toggleBitAtPosition(&b->size_status, 2); }
+// extract size of block from size_status block information
+int getSize(blockHeader *b) { return unsetBitsTillPosition(&b->size_status, 2); }
+// Calculate padding if needed from block payload size - total size of the allocated block including header must be a multiple of 8
+int getBlockPadding(int payloadSize, int multiple) {
+    return multiple - (payloadSize + sizeof(blockHeader)) % multiple;
+}
+
+/**
+ * Block iterator functions: 
+ */
+bool blockDone(blockHeader* b) { return b->size_status == END_MARK; }
+blockHeader* blockNext(blockHeader* b) { 
+    if(blockDone(b)) return NULL; 
+    return (void *) b + getSize(b); 
+}
+blockHeader* blockNextWrapAround(blockHeader* b) {
+    if(blockDone(b)) 
+        return (void *) heapStart;
+    else {
+        blockHeader *next = blockNext(b); // next block
+        return (void *) next; // wrap-around if required
+    } 
+}
+blockHeader* blockFirst(blockHeader* recentBlock) {
+    // if no previously allocated block
+    return (recentBlock == NULL) ? heapStart : blockNext(recentBlock);
+}
+blockHeader* blockPrevFree(blockHeader* b) { 
+    if(b == heapStart || isPreviousAllocated(b)) return NULL;
+    blockFooter* footer = b - sizeof(blockFooter); 
+    return b - footer->size_status;
+}
+
+/**
+ * Heap allocator policies' functions: 
+ */
+/*
+ * verify 8 byte aligned pointer: last hexadecimal digit should be multiple of 8 (i.e. 0 or 8)
+ * alignment: double-word (8 bytes) aligned (to improve performance)
+ */
+bool isDoubleWordAligned(void* ptr) { return ((unsigned int)(ptr) % DOUBLE_WORD) == 0; }
+
+/**
+ * next-fit placement policy to chose a free block.
+ */
+int nextFitPlacementPolicy(int blockSize, blockHeader** ptr) {
+    for(blockHeader* b = blockFirst(recentBlock); b != recentBlock; b = blockNextWrapAround(b)) {
+        // loop through free blocks only, that have enough space
+        if(!isCurrentAllocated(b) && getSize(b) >= blockSize) {
+            *ptr = b;
+            return SUCCESS;
+        }
+    }
+    return FAILURE; 
+}
+
+/*
+ * split block policy to divide too large chosen free block (to minimize internal fragmentation). 
+ * splinting - remainder of free block should be at least 8 bytes in size.
+ */
+void splitBlockPolicy(int *blockSize, blockHeader* freeBlock) {
+    // validate block size: checking if split is possible
+    if(*blockSize >= getSize(freeBlock)) return; // skip if no free block remainder
+
+    // validate free block remainder: should be at least 8 bytes in size.
+    int remainderSize = getSize(freeBlock) - *blockSize;
+    if(remainderSize < 8) {
+        *blockSize = getSize(freeBlock); // take up entire free block 
+        return;
+    }
+
+    // remainder free block
+    blockHeader *remainderBlock = (void *) freeBlock + *blockSize; 
+    // add header to remaining free block
+    remainderBlock->size_status = remainderSize;
+    togglePBit(remainderBlock); // update p-bit
+    // add footer 
+    blockHeader *footer = (void *) remainderBlock + (remainderSize - sizeof(blockHeader)); 
+    footer->size_status = remainderSize;   
+}
+
+// immediate coalescing with adjacent free memory blocks, if one or both of the adjacent neighbors are free
+blockHeader* immediateCoalescingPolicy(int* blockSize, void* ptr) {
+    // get adjacent blocks
+    blockHeader *prev = NULL, *next = NULL;
+    if((next = blockNext(ptr)) != NULL) *blockSize += getSize(next);
+    if((prev = blockPrevFree(ptr)) != NULL) {
+        *blockSize += getSize(prev);
+        return prev;
+    };
+    return ptr;
+}
+
+/**
+ * myAlloc Tests: 
+    ✔   test_alloc1: a simple 8-byte allocation
+    ✔   test_alloc1_nospace: allocation is too big to fit in available space3 
+    ✔   test_writeable: write to a chunk from Mem_Alloc and check the value
+    ✔   test_align1: the first pointer returned is 8-byte aligned
+    ✔   test_alloc2: a few allocations in multiples of 4 bytes
+    ✔   test_alloc2_nospace: the second allocation is too big to fit 
+    ✔   test_align2: a few allocations in multiples of 4 bytes checked for alignment 
+    ✔   test_alloc3: many odd sized allocations 
+    ✔   test_align3: many odd sized allocations checked for alignment
+*/
 /* 
  * Function for allocating 'size' bytes from process's heap memory.
+ * 
  * Allocator design choices: 
- *    - implicit free list structure
- *        - Using headers with size and status information (p-bit & a-bit)
- *        - free block footers for heap structure, storing block size
- *    - Block allocation: 
- *        - next-fit placement policy to chose a free block
- *        - split block policy to divide too large chosen free block (to minimize internal fragmentation)
- *            - splinting: remainder of free block should be at least 8 bytes in size.
- *        - double-word (8 bytes) aligned (to improve performance)
- *        - padding: total size of the allocated block including header must be a multiple of 8
+ *    - implicit free list structure: a-bit, p-bit. headers and footers.
+ *    - Block allocation: next-fit, splitting, double-word alignment, padding (double-word multiples).
  *    - No additional heap memory should be requested from the OS.
  * 
  * Argument size: requested size for the payload
  * Returns address/pointer of allocated block (allocated payload of 'size' bytes) on success.
  * Returns NULL on failure
- * 
- * Tests: 
-    test_alloc1: a simple 8-byte allocation
-    test_alloc1_nospace: allocation is too big to fit in available space3 
-    test_writeable: write to a chunk from Mem_Alloc and check the value
-    test_align1: the first pointer returned is 8-byte aligned
-    test_alloc2: a few allocations in multiples of 4 bytes
-    test_alloc2_nospace: the second allocation is too big to fit 
-    test_align2: a few allocations in multiples of 4 bytes checked for alignment 
-    test_alloc3: many odd sized allocations 
-    test_align3: many odd sized allocations checked for alignment
  */
-void* myAlloc(int size) {     
-    // Adjust scale factor to perform pointer arithmetic as expected
-    // Double check your pointer arithmetic's automatic scaling. int* would increment the address by 4 bytes. Cast your heap block pointers to void* or char* to set the scale factor to 1. What scale factor is used for blockHeader*?
-    (blockHeader*) ptr;
+void* myAlloc(int size) {
+    blockHeader* b = NULL; // allocated block
 
-    // case: Check size - Return NULL if not positive or if larger than heap space.
-    // case: if there isn't a free block large enough to satisfy the request.
-
+    // validate size: if non-positive or larger than heap space short-circuit
+    if(size < 1 || size > allocsize)
+        return NULL; 
+    
     // Determine block size rounding up to a multiple of 8 and possibly adding padding as a result.
+    assert(sizeof(blockHeader) == WORD); // make sure header size matches a single WORD
+    int blockSize = sizeof(blockHeader) + size + getBlockPadding(size, DOUBLE_WORD); 
+    // validate block size: if larger than heap allocation short-circuit
+    if(blockSize > allocsize) 
+        return NULL;
 
-    // to get that size rather than using 4 bytes.
-    sizeof(blockHeader);
+    // choose matching block if any
+    if(nextFitPlacementPolicy(blockSize, &b) == FAILURE) {
+        // if there isn't a free block large enough to satisfy the request.
+        return NULL;
+    }; 
+    DEBUG printf("chosen free block: %08x\n", (unsigned int)(b)); 
+    
+    // double word alignment of payload
+    if(!isDoubleWordAligned(b + 1)) {
+        fprintf(stderr, "Issue with double word alignment");
+        exit(1);
+    }; 
 
+    // split block if possible
+    splitBlockPolicy(&blockSize, b);
+    
+    // update allocated header
+    bool prevAllocated = isPreviousAllocated(b);
+    b->size_status = blockSize; // override with modified block size
+    toggleABit(b); // a-bit toggle
+    if(prevAllocated) togglePBit(b); // p-bit toggle
 
-    // verify 8 byte aligned pointer: last hexadecimal digit should be multiple of 8 (i.e. 0 or 8)
-    printf("%08x", (unsigned int)(ptr)); 
+    recentBlock = b; // set most recent allocated
 
-    // check if a block is allocated or not.
-    if((size_status & 1) == 0);
-
-    // Update header(s) and footer as needed.
-
-    return NULL;
+    DEBUG printf("Allocated block: %08x, %i\n", (unsigned int)(b), getSize(b)); 
+    return (void*) (b + 1); // return address/pointer to payload
 } 
- 
+
+/**
+ *  Tests: 
+        test_free1: a few allocations in multiples of 4 bytes followed by frees
+        test_free2: many odd sized allocations and interspersed frees
+        test_coalesce1: check for coalescing free space
+        test_coalesce2: check for coalescing free space
+        test_coalesce3: check for coalescing free space
+        test_coalesce4: check for coalescing free space
+        test_coalesce5: check for coalescing free space (first chunk)
+        test_coalesce6: check for coalescing free space (last chunk)
+ */
 /* 
  * Function for freeing up a previously allocated block.
- * Freeing memory: 
- *     - immediate coalescing with adjacent free memory blocks, 
- *       if one or both of the adjacent neighbors are free.
- *     - requires only one header and one footer in the coalesced free block, 
- *       and you should not waste time clearing old headers, footers, or data.
+ * 
+ * Freeing memory policies: 
+ *     - immediate coalescing.
+ *     - requires only one header and one footer in the coalesced free block, without clearing up older data
  * 
  * Argument ptr: address of the block to be freed up.
  * Returns 0 on success.
  * Returns -1 on failure.
- *      - if ptr is .
- *      - if ptr is .
- *      - if ptr .
- * 
- 
- Tests: 
-    test_free1: a few allocations in multiples of 4 bytes followed by frees
-    test_free2: many odd sized allocations and interspersed frees
-    test_coalesce1: check for coalescing free space
-    test_coalesce2: check for coalescing free space
-    test_coalesce3: check for coalescing free space
-    test_coalesce4: check for coalescing free space
-    test_coalesce5: check for coalescing free space (first chunk)
-    test_coalesce6: check for coalescing free space (last chunk)
  */                    
 int myFree(void *ptr) {
-    /* Validate input pointer */    
-    if(ptr == NULL) // case: NULL
-        return FAILURE; 
-    // case: not a multiple of 8 (not 8 byte aligned)
-    // case: outside of the heap space (not within the range of memory allocated by myInit())
-    // case: block is already freed (points to a free block)
+    // validate input pointer
+    if(ptr == NULL) return FAILURE;
+    // validate alignment - not a multiple of 8 (not 8 byte aligned)
+    if(!isDoubleWordAligned(ptr)) return FAILURE;
+    // validate range: outside of the heap space (not within the range of memory allocated by myInit())
+    if(ptr < (void*) heapStart || ptr >= (void*) heapStart + allocsize) return FAILURE;
+    // validate status: block is already freed (points to a free block)
+    if(!isCurrentAllocated(ptr)) return FAILURE;
 
-    // Update header(s) and footer as needed.
+    int blockSize = getSize(ptr); // size of free block
+    // coalesce adjacent blocks
+    ptr = immediateCoalescingPolicy(&blockSize, ptr);
+    // update header
+    bool prevAllocated = isPreviousAllocated(ptr); // p-bit
+    ((blockHeader *) ptr)->size_status = blockSize; 
+    if(prevAllocated) togglePBit(ptr);
+    // add footer  
+    blockHeader *footer = (void *) ptr + (blockSize - sizeof(blockHeader)); 
+    footer->size_status = blockSize;   
 
-    return FAILURE;
+    return SUCCESS;
 } 
  
 /*

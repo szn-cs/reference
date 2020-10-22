@@ -14,6 +14,7 @@ int main() {
    assert(myAlloc(55) != NULL);
    assert(myAlloc(9) != NULL);
    assert(myAlloc(33) != NULL);
+   dispMem(); 
    exit(0);
 }
 

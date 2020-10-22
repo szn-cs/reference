@@ -7,9 +7,8 @@ const int MEM_PAGE_SIZE = 2^10 * 4 ; // 1024*4 bytes = 4 kibi (Ki)
 
 int main() {
     assert(myInit(MEM_PAGE_SIZE) == 0);
-    dispMem(); 
     void* ptr = myAlloc(8);
-    dispMem(); 
     assert(ptr != NULL);
+    dispMem(); 
     exit(0);
 }
