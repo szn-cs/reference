@@ -40,5 +40,6 @@ int main() {
    assert(myFree(ptr[8]) == 0);
    assert(myFree(ptr[6]) == 0);
 
+   dispMem();
    exit(0);
 }

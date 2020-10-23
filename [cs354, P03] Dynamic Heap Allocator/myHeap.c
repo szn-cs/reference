@@ -102,7 +102,7 @@ int unsetBitsTillPosition(int *i, int p) { return *i >> p << p; }
  * Implicit free list & heap information functions: 
  */
 // check a-bit flag. if a block is allocated or not.
-bool isCurrentAllocated(blockHeader* b) { return isBitAtPositionSet(&b->size_status, 1); }
+bool isAllocated(blockHeader* b) { return isBitAtPositionSet(&b->size_status, 1); }
 // check p-bit flag. if preceding block is allocated or not.
 bool isPreviousAllocated(blockHeader* b) { return isBitAtPositionSet(&b->size_status, 2); }
 // toggle a-bit flag - current block allocation status
@@ -121,25 +121,25 @@ int getBlockPadding(int payloadSize, int multiple) {
  */
 bool blockDone(blockHeader* b) { return b->size_status == END_MARK; }
 blockHeader* blockNext(blockHeader* b) { 
-    if(blockDone(b)) return NULL; 
-    return (void *) b + getSize(b); 
+    if(b == NULL || blockDone(b)) return NULL; // if NULL or end mark
+    blockHeader* next = (void *) b + getSize(b);
+    return next;
 }
 blockHeader* blockNextWrapAround(blockHeader* b) {
-    if(blockDone(b)) 
-        return (void *) heapStart;
-    else {
-        blockHeader *next = blockNext(b); // next block
-        return (void *) next; // wrap-around if required
-    } 
+    blockHeader *next; 
+    if(!blockDone(b) && !blockDone(next = blockNext(b))) 
+        return next;
+    
+    return (void *) heapStart; // wrap-around if required
 }
 blockHeader* blockFirst(blockHeader* recentBlock) {
     // if no previously allocated block
-    return (recentBlock == NULL) ? heapStart : blockNext(recentBlock);
+    return recentBlock == NULL ? heapStart : blockNext(recentBlock);   
 }
 blockHeader* blockPrevFree(blockHeader* b) { 
     if(b == heapStart || isPreviousAllocated(b)) return NULL;
-    blockFooter* footer = b - sizeof(blockFooter); 
-    return b - footer->size_status;
+    blockFooter* footer = (void *) b - sizeof(blockFooter); 
+    return (void *) b - footer->size_status; // pointer to the preceding block
 }
 
 /**
@@ -157,7 +157,7 @@ bool isDoubleWordAligned(void* ptr) { return ((unsigned int)(ptr) % DOUBLE_WORD)
 int nextFitPlacementPolicy(int blockSize, blockHeader** ptr) {
     for(blockHeader* b = blockFirst(recentBlock); b != recentBlock; b = blockNextWrapAround(b)) {
         // loop through free blocks only, that have enough space
-        if(!isCurrentAllocated(b) && getSize(b) >= blockSize) {
+        if(!isAllocated(b) && getSize(b) >= blockSize) {
             *ptr = b;
             return SUCCESS;
         }
@@ -169,15 +169,15 @@ int nextFitPlacementPolicy(int blockSize, blockHeader** ptr) {
  * split block policy to divide too large chosen free block (to minimize internal fragmentation). 
  * splinting - remainder of free block should be at least 8 bytes in size.
  */
-void splitBlockPolicy(int *blockSize, blockHeader* freeBlock) {
+int splitBlockPolicy(int *blockSize, blockHeader* freeBlock) {
     // validate block size: checking if split is possible
-    if(*blockSize >= getSize(freeBlock)) return; // skip if no free block remainder
+    if(*blockSize >= getSize(freeBlock)) return FAILURE; // skip if no free block remainder
 
     // validate free block remainder: should be at least 8 bytes in size.
     int remainderSize = getSize(freeBlock) - *blockSize;
     if(remainderSize < 8) {
         *blockSize = getSize(freeBlock); // take up entire free block 
-        return;
+        return FAILURE;
     }
 
     // remainder free block
@@ -188,13 +188,14 @@ void splitBlockPolicy(int *blockSize, blockHeader* freeBlock) {
     // add footer 
     blockHeader *footer = (void *) remainderBlock + (remainderSize - sizeof(blockHeader)); 
     footer->size_status = remainderSize;   
+    return SUCCESS;
 }
 
 // immediate coalescing with adjacent free memory blocks, if one or both of the adjacent neighbors are free
 blockHeader* immediateCoalescingPolicy(int* blockSize, void* ptr) {
     // get adjacent blocks
     blockHeader *prev = NULL, *next = NULL;
-    if((next = blockNext(ptr)) != NULL) *blockSize += getSize(next);
+    if((next = blockNext(ptr)) != NULL && !isAllocated(next)) *blockSize += getSize(next);
     if((prev = blockPrevFree(ptr)) != NULL) {
         *blockSize += getSize(prev);
         return prev;
@@ -253,9 +254,12 @@ void* myAlloc(int size) {
         exit(1);
     }; 
 
+    blockFooter *next = blockNext(b); // initial next block
+    // update next block's p-bit
+    if(next != NULL && !blockDone(next)) togglePBit(next);
+
     // split block if possible
-    splitBlockPolicy(&blockSize, b);
-    
+    splitBlockPolicy(&blockSize, b);   
     // update allocated header
     bool prevAllocated = isPreviousAllocated(b);
     b->size_status = blockSize; // override with modified block size
@@ -267,6 +271,7 @@ void* myAlloc(int size) {
     DEBUG printf("Allocated block: %08x, %i\n", (unsigned int)(b), getSize(b)); 
     return (void*) (b + 1); // return address/pointer to payload
 } 
+
 
 /**
  *  Tests: 
@@ -295,21 +300,32 @@ int myFree(void *ptr) {
     if(ptr == NULL) return FAILURE;
     // validate alignment - not a multiple of 8 (not 8 byte aligned)
     if(!isDoubleWordAligned(ptr)) return FAILURE;
-    // validate range: outside of the heap space (not within the range of memory allocated by myInit())
-    if(ptr < (void*) heapStart || ptr >= (void*) heapStart + allocsize) return FAILURE;
-    // validate status: block is already freed (points to a free block)
-    if(!isCurrentAllocated(ptr)) return FAILURE;
+    // validate range of payload: outside of the heap space (not within the range of memory allocated by myInit())
+    if(ptr < (void*) heapStart + sizeof(blockHeader) || ptr > (void*) heapStart + allocsize - DOUBLE_WORD) return FAILURE;
 
+    // get header from payload pointer
+    ptr = (void *) ptr - sizeof(blockHeader); 
+    // validate status: block is already freed (points to a free block)
+    if(!isAllocated(ptr)) return FAILURE;
+
+
+    // TODO: Should the recent block allocated variable be cleared after feeing memory ? 
+    if(recentBlock == ptr) recentBlock = NULL; // reset recent block
+    // printf("\n%p\n", recentBlock);
+    
     int blockSize = getSize(ptr); // size of free block
     // coalesce adjacent blocks
     ptr = immediateCoalescingPolicy(&blockSize, ptr);
-    // update header
-    bool prevAllocated = isPreviousAllocated(ptr); // p-bit
-    ((blockHeader *) ptr)->size_status = blockSize; 
-    if(prevAllocated) togglePBit(ptr);
+    // update block information
+    blockFooter *footer, *next;
+    bool prevAllocated = isPreviousAllocated(ptr);
+    ((blockHeader *) ptr)->size_status = blockSize; // status flags are unset.
+    if(prevAllocated) togglePBit(ptr);  // set p-bit to initial state
     // add footer  
-    blockHeader *footer = (void *) ptr + (blockSize - sizeof(blockHeader)); 
-    footer->size_status = blockSize;   
+    footer = (void *) ptr + (blockSize - sizeof(blockFooter)); 
+    footer->size_status = blockSize;
+    // update next block p-bit
+    if((next = blockNext(ptr)) != NULL && !blockDone(next)) togglePBit(next);
 
     return SUCCESS;
 } 
