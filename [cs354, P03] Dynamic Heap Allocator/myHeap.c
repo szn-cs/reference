@@ -275,14 +275,14 @@ void* myAlloc(int size) {
 
 /**
  *  Tests: 
-        test_free1: a few allocations in multiples of 4 bytes followed by frees
-        test_free2: many odd sized allocations and interspersed frees
-        test_coalesce1: check for coalescing free space
-        test_coalesce2: check for coalescing free space
-        test_coalesce3: check for coalescing free space
-        test_coalesce4: check for coalescing free space
-        test_coalesce5: check for coalescing free space (first chunk)
-        test_coalesce6: check for coalescing free space (last chunk)
+        ✔ test_free1: a few allocations in multiples of 4 bytes followed by frees
+        ✔ test_free2: many odd sized allocations and interspersed frees
+        ✔ test_coalesce1: check for coalescing free space
+        ✔ test_coalesce2: check for coalescing free space
+        ✔ test_coalesce3: check for coalescing free space
+        ✔ test_coalesce4: check for coalescing free space
+        ✔ test_coalesce5: check for coalescing free space (first chunk)
+        ✔ test_coalesce6: check for coalescing free space (last chunk)
  */
 /* 
  * Function for freeing up a previously allocated block.
