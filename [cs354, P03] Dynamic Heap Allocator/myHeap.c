@@ -75,11 +75,14 @@ typedef struct blockHeader {
      */
     int size_status;
 } blockHeader, blockFooter;         
+
 /* Global variable - DO NOT CHANGE. It should always point to the first block (block at the lowest address) */
 blockHeader *heapStart = NULL;     
+
 /* Size of heap allocation padded to round to nearest page size. */
 int allocsize;
-/* Last searched block (usually the most recently allocated block) */
+
+/* next-fit pointer - last searched block (most recently allocated block) */
 blockHeader* lastSearched = NULL; 
 
 /**
@@ -88,6 +91,7 @@ blockHeader* lastSearched = NULL;
 bool isBitAtPositionSet(int *, int);
 void toggleBitAtPosition(int *, int);
 int unsetBitsTillPosition(int *, int);
+
 /**
  * Implicit free list & heap information functions: 
  */
@@ -97,6 +101,7 @@ void toggleABit(blockHeader*);
 void togglePBit(blockHeader*);
 int getSize(blockHeader*);
 int getBlockPadding(int payloadSize, int multiple);
+
 /**
  * Block iterator functions - implemented to match used policies: 
  */
@@ -105,6 +110,7 @@ blockHeader* blockFirst(blockHeader* lastSearched);
 blockHeader* blockNext(blockHeader*);
 blockHeader* blockPrevFree(blockHeader*);
 blockHeader* blockNextWrapAround(blockHeader*);
+
 /**
  * Heap allocator policies' functions: 
  */
@@ -179,6 +185,8 @@ void* myAlloc(int size) {
  */                    
 int myFree(void *ptr) {
     blockHeader *b; // block header section
+    blockFooter *footer; // block footer section
+    blockHeader *next; // next block header
     int blockSize; // size of the block
 
     // validate input pointer
@@ -188,6 +196,7 @@ int myFree(void *ptr) {
 
     // get block header from payload pointer
     b = (void *) ptr - sizeof(blockHeader); 
+    ptr = NULL; // prevent usage of ptr after this line
     blockSize = getSize(b); // size of free block
     bool isLastSeached = lastSearched == b; // current block is where prev search finished 
 
@@ -201,22 +210,18 @@ int myFree(void *ptr) {
 
     // coalesce adjacent blocks
     bool isPointerUpdated = immediateCoalescingPolicy(&blockSize, &b) == 1;
-    
+
     // update search starting block, if it is the one freed
     if(isLastSeached && isPointerUpdated) lastSearched = b;
     
     // update block information
-    blockFooter *footer, *next;
-    bool prevAllocated = isPreviousAllocated(ptr);
-    ((blockHeader *) ptr)->size_status = blockSize; // with status flags unset.
-    if(prevAllocated) togglePBit(ptr);  // set p-bit to initial state
+    bool prevAllocated = isPreviousAllocated(b);
+    b->size_status = blockSize; // with status flags unset.
+    if(prevAllocated) togglePBit(b);  // set p-bit to initial state
     // add footer  
-    footer = (void *) ptr + (blockSize - sizeof(blockFooter)); 
+    footer = (void *) b + (blockSize - sizeof(blockFooter)); 
     footer->size_status = blockSize;
     
-    // update next block p-bit
-    if((next = blockNext(ptr)) != NULL && !blockDone(next)) togglePBit(next);
-
     return SUCCESS;
 }
  
@@ -448,8 +453,12 @@ int splitBlockPolicy(int *blockSize, blockHeader* freeBlock) {
 int immediateCoalescingPolicy(int* blockSize, blockHeader** ptr) {
     blockHeader *prev = NULL, *next = NULL; // adjacent blocks
     // if next block is free
-    if((next = blockNext(*ptr)) != NULL && !isAllocated(next)) 
-        *blockSize += getSize(next);
+    next = blockNext(*ptr);
+    if(next != NULL && !blockDone(next)) 
+        if(!isAllocated(next)) 
+            *blockSize += getSize(next); // coalesce free next 
+        else // update p-bit of block following coalesced part only if needed
+            togglePBit(next);
     // if prev block is free
     if((prev = blockPrevFree(*ptr)) != NULL) {
         *blockSize += getSize(prev);
