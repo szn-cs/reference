@@ -157,12 +157,13 @@ void* myAlloc(int size) {
         exit(1);
     }; 
 
-    blockFooter *next = blockNext(b); // initial next block
-    // update next block's p-bit
-    if(next != NULL && !blockDone(next)) togglePBit(next);
-
     // split block if possible
-    splitBlockPolicy(&blockSize, b);
+    if(splitBlockPolicy(&blockSize, b) == FAILURE) {
+        // update next block only if no split has happened.
+        blockFooter *next = blockNext(b); // initial next block
+        // update next block's p-bit
+        if(next != NULL && !blockDone(next)) togglePBit(next);
+    };
     // update allocated header
     bool prevAllocated = isPreviousAllocated(b);
     b->size_status = blockSize; // override with modified block size
@@ -186,7 +187,6 @@ void* myAlloc(int size) {
 int myFree(void *ptr) {
     blockHeader *b; // block header section
     blockFooter *footer; // block footer section
-    blockHeader *next; // next block header
     int blockSize; // size of the block
 
     // validate input pointer
@@ -454,11 +454,12 @@ int immediateCoalescingPolicy(int* blockSize, blockHeader** ptr) {
     blockHeader *prev = NULL, *next = NULL; // adjacent blocks
     // if next block is free
     next = blockNext(*ptr);
-    if(next != NULL && !blockDone(next)) 
+    if(next != NULL && !blockDone(next)) {
         if(!isAllocated(next)) 
             *blockSize += getSize(next); // coalesce free next 
         else // update p-bit of block following coalesced part only if needed
             togglePBit(next);
+    }
     // if prev block is free
     if((prev = blockPrevFree(*ptr)) != NULL) {
         *blockSize += getSize(prev);

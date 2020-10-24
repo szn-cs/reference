@@ -25,8 +25,11 @@ int main() {
    assert(myFree(ptr[1]) == 0);
    assert(myFree(ptr[2]) == 0);
 
+   dispMem();
    ptr[2] = myAlloc(1600);
    assert(ptr[2] != NULL);
+   dispMem();
+   exit(0);
 
    exit(0);
 }

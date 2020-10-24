@@ -6,7 +6,6 @@
 int main() {
    assert(myInit(4096) == 0);
    void * ptr[9];
-   dispMem();
    ptr[0] = myAlloc(1);
    ptr[1] = (myAlloc(5));
    ptr[2] = (myAlloc(8));
@@ -15,13 +14,9 @@ int main() {
    assert(ptr[1] != NULL);
    assert(ptr[2] != NULL);
    assert(ptr[3] != NULL);
-   dispMem();
    
    assert(myFree(ptr[1]) == 0);
-   dispMem();
    assert(myFree(ptr[0]) == 0);
-   dispMem();
-   exit(0);
    assert(myFree(ptr[3]) == 0);
    
    ptr[4] = (myAlloc(1));
@@ -29,16 +24,13 @@ int main() {
    assert(ptr[4] != NULL);
    assert(ptr[5] != NULL);
    assert(myFree(ptr[5]) == 0);
-   dispMem();
    
    ptr[6] = (myAlloc(9));
    ptr[7] = (myAlloc(33));
    assert(ptr[6] != NULL);
    assert(ptr[7] != NULL);
-   dispMem();
    
    assert(myFree(ptr[4]) == 0);
-   dispMem();
 
    ptr[8] = (myAlloc(55));
    assert(ptr[8] != NULL);
