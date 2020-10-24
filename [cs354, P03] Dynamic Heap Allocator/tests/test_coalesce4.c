@@ -39,6 +39,7 @@ int main() {
 
    ptr[2] = myAlloc(2500);
    assert(ptr[2] != NULL);
+   dispMem();
 
    exit(0);
 }

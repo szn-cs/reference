@@ -76,7 +76,8 @@ typedef struct blockHeader {
     int size_status;
 } blockHeader, blockFooter;         
 
-/* Global variable - DO NOT CHANGE. It should always point to the first block (block at the lowest address) */
+/* Global variable - DO NOT CHANGE. It should always point to the first block (block at 
+the lowest address) */
 blockHeader *heapStart = NULL;     
 
 /* Size of heap allocation padded to round to nearest page size. */
@@ -137,7 +138,8 @@ void* myAlloc(int size) {
     if(size < 1 || size > allocsize)
         return NULL; 
     
-    // Determine block size rounding up to a multiple of 8 and possibly adding padding as a result.
+    // Determine block size rounding up to a multiple of 8 and possibly adding padding 
+    // as a result.
     assert(sizeof(blockHeader) == WORD); // make sure header size matches a single WORD
     int blockSize = sizeof(blockHeader) + size + getBlockPadding(size, DOUBLE_WORD); 
     // validate block size: if larger than heap allocation short-circuit
@@ -198,7 +200,8 @@ int myFree(void *ptr) {
     b = (void *) ptr - sizeof(blockHeader); 
     ptr = NULL; // prevent usage of ptr after this line
     blockSize = getSize(b); // size of free block
-    bool isLastSeached = lastSearched == b; // current block is where prev search finished 
+    // current block is where prev search finished 
+    bool isLastSeached = lastSearched == b; 
 
     // validate range block: outside of the heap space allocated for the process
     // between first possible header and last, taking into account alignment requirements
@@ -413,7 +416,8 @@ int nextFitPlacementPolicy(int blockSize, blockHeader** ptr) {
 }
 
 /*
- * split block policy to divide too large chosen free block (to minimize internal fragmentation). 
+ * split block policy to divide too large chosen free block (to minimize internal 
+ * fragmentation). 
  * dealing with splinting - remainder of free block should be at least 8 bytes in size.
  * 
  * blockSize: block size requested for allocation
@@ -422,7 +426,8 @@ int nextFitPlacementPolicy(int blockSize, blockHeader** ptr) {
  */
 int splitBlockPolicy(int *blockSize, blockHeader* freeBlock) {
     // validate block size: checking if split is possible
-    if(*blockSize >= getSize(freeBlock)) return FAILURE; // skip if no free block remainder
+    if(*blockSize >= getSize(freeBlock)) 
+        return FAILURE; // skip if no free block remainder
 
     // validate free block remainder: should be at least 8 bytes in size.
     int remainderSize = getSize(freeBlock) - *blockSize;
@@ -443,7 +448,8 @@ int splitBlockPolicy(int *blockSize, blockHeader* freeBlock) {
 }
 
 /* 
- * Immediate coalescing with adjacent free memory blocks, if one or both of the adjacent neighbors are free 
+ * Immediate coalescing with adjacent free memory blocks, if one or both of the 
+ * adjacent neighbors are free.
  * 
  * blockSize: size of the block, updated in case coalesced.
  * ptr: free block to be coalesced with neighboring free blocks
@@ -565,7 +571,9 @@ bool isAllocated(blockHeader* b) { return isBitAtPositionSet(&b->size_status, 1)
  * 
  * b: block header to check
  */
-bool isPreviousAllocated(blockHeader* b) { return isBitAtPositionSet(&b->size_status, 2); }
+bool isPreviousAllocated(blockHeader* b) { 
+    return isBitAtPositionSet(&b->size_status, 2); 
+}
 
 /* 
  * Toggle current block allocation status (a-bit flag).

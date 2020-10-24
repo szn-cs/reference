@@ -31,5 +31,7 @@ int main() {
    free += (884 + HEADER);
    ptr[3] = myAlloc(free - HEADER - 40);
    assert(ptr[3] != NULL);
+   dispMem();
+
    exit(0);
 }
