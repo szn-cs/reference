@@ -35,7 +35,7 @@
 #include "myHeap.h"
 
 // Debug flag
-#define DEBUG if(0)
+#define DEBUG 0
 // general flags indicating operation status
 #define FAILURE -1
 #define SUCCESS 0
@@ -151,7 +151,7 @@ void* myAlloc(int size) {
         // if there isn't a free block large enough to satisfy the request.
         return NULL;
     }; 
-    DEBUG printf("chosen free block: %08x\n", (unsigned int)(b)); 
+    if(DEBUG) printf("chosen free block: %08x\n", (unsigned int)(b)); 
     
     // double word alignment of payload
     if(!isDoubleWordAligned(b + 1)) {
@@ -174,7 +174,7 @@ void* myAlloc(int size) {
 
     lastSearched = b; // set most recent allocated
 
-    DEBUG printf("Allocated block: %08x, %i\n", (unsigned int)(b), getSize(b)); 
+    if(DEBUG) printf("Allocated block: %08x, %i\n", (unsigned int)(b), getSize(b)); 
     return (void*) (b + 1); // return address/pointer to payload
 } 
 
@@ -307,7 +307,7 @@ int myInit(int sizeOfRegion) {
 } 
                   
 /* 
- * Function to be used for DEBUGGING to help you visualize your heap structure.
+ * Function to be used for if(DEBUG)GING to help you visualize your heap structure.
  * Prints out a list of all the blocks including this information:
  * No.      : serial number of the block 
  * Status   : free/used (allocated)
