@@ -10,25 +10,27 @@
 ///////////////////////// ALWAYS CREDIT OUTSIDE HELP //////////////////////////
 //
 // Persons: NONE
-// Online Sources: NONE
+// Online Sources:
+// - iterating through list while removing elements from it:
+// https://stackoverflow.com/questions/1196586/calling-remove-in-foreach-loop-in-java
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// import java.io.FileNotFoundException;
-// import java.util.ArrayList;
-// import java.util.Scanner;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
+/**
+ * NOTE- Methods/Fields supported on Gradescope tester:
+ * 
+ * PApplet: PImage loadImage(String), void image(PImage,int,int), void size(int,int), void
+ * getSurface().setTitle(String), and void main(String). int mouseX, int mouseY, and boolean
+ * mousePressed.
+ * 
+ * PImage: int width, and int height
+ */
 import processing.core.PApplet;
 import processing.core.PImage;
-
-
-// References to use only of these api methods:
-// - two fields within PImage: int width, and int height.
-// - three fields within PApplet: int mouseX, int mouseY, and boolean mousePressed.
-// - five methods within PApplet: PImage loadImage(String), void image(PImage,int,int),
-// void size(int,int), void getSurface().setTitle(String), and void main(String).
-
 
 /**
  * Treasure Hunst style adventure puzzle game: Involves graphical elements that the user can click
@@ -39,8 +41,7 @@ import processing.core.PImage;
  */
 public class TreasureHunt extends PApplet {
   private PImage backgroundImage; // loaded background image instance
-  private ArrayList<InteractiveObject> gameObjects;
-
+  private ArrayList<InteractiveObject> gameObjects; // list of objects in game
 
   /**
    * Main method to launch the graphic application
@@ -66,31 +67,38 @@ public class TreasureHunt extends PApplet {
    */
   @Override
   public void setup() {
-    this.getSurface().setTitle("Treasure Hunt"); // Displays the title of the display window
-    /* TODO: Complete the implementation of this method */
-    // load background image
-    backgroundImage = this.loadImage("images" + File.separator + "background-scene.png");
+    // Displays the title of the display window
+    this.getSurface().setTitle("Treasure Hunt");
     // initialize processing object
     InteractiveObject.setProcessing(this);
-    
-    // load the background image lename, and introductory text message, and interactive objects or clues descriptions from a text le.
-    loadGameSettings("clues" + File.separator + "treasureHunt.clues");
-    
     // initialize game objects
     gameObjects = new ArrayList<InteractiveObject>();
+    // load the background image filename, introductory text messages, and interactive objects or
+    // clues descriptions from a text file.
+    loadGameSettings("clues" + File.separator + "treasureHunt.clues");
 
-    
-    
-    // test 1 - create visible koala
-    InteractiveObject k = new VisibleObject("koala", 350, 65)
-    // test 2 - create clickable koala instead.
-//    InteractiveObject k =  new ClickableObject("koala", 350, 65,
-//        new Action("What a cute stuffed koala! It looks like a real one!"));
-
-        
-    // add visible objects to the game
-    gameObjects.add(k);
-
+    // Manual test use cases:
+    /*
+     * Test case - Action act method: Now, test this out by creating a new visible object with the
+     * name "phone" within your TreasureHunt.setup() method, and its position can be (700,490).
+     * Instead of adding this visible object to the gameObjects array list, deactivate it before
+     * creating an action that will activate it when the key is dragged over the chest. Then, make
+     * sure that this visible object (the phone) appears when this happens.
+     */
+    /*
+     * Test case - Test this out by adding a new DraggableObject to the gameObjects list in
+     * TreasureHunt.setup(), similar to how we were testing the koala. Create a new draggable object
+     * with the name "key" at position (70,70) to accomplish what is shown in Fig. 1. You should
+     * then try dragging this object around the playground scene, while the program runs.
+     */
+    /*
+     * Test case - To test this out, let's add a new VisibleObject to the gameObjects arraylist from
+     * the setup() method (like our koala and key). The name of this new visible object will be
+     * "chest" and its position can be (365,400). Then, change your key from a DraggableObject to a
+     * DroppableObject with this chest as it's target. You'll also need an Action, one with the
+     * message "Open sesame!" will be helpful. Make sure that dragging this key onto this chest
+     * produces the expected output.
+     */
   }
 
   /**
@@ -98,25 +106,34 @@ public class TreasureHunt extends PApplet {
    */
   @Override
   public void draw() {
-    /* TODO: Implement this method */
-    this.image(this.backgroundImage, 0, 0); // draw background image
-
-    // update each interactive object
-    for (InteractiveObject o : gameObjects) {
-      Action action = o.update();
-      // invoke action on object if any
-      if (action != null)
-        action.act();
-    }
+    // draw background image
+    this.image(this.backgroundImage, 0, 0);
 
     /*
-     * Now that we have a way for interactive objects to be activated, let's remove deactivated
-     * objects from our gameObjects array list. This will be the job of our TreasureHunt's draw()
-     * method. After calling update() on every interactive object in gameObjects list, our
-     * TreasureHunt's draw() method should search through and remove all deactivated objects from
-     * the gameObjects array list. After implementing this, you should see the key and chest
-     * disappear after the key is dragged onto the chest.
+     * Iterative over list, removing elements from it. Update each interactive object on each frame
+     * and perform their actions if any
      */
+    int i = 0;
+    while (i < gameObjects.size()) {
+      if (gameObjects.get(i) == null) { // remove any nulls and skip
+        gameObjects.remove(i);
+        continue;
+      }
+
+      // update object, retrieving action if any
+      Action action = gameObjects.get(i).update();
+      // invoke action on object if any
+      if (action != null)
+        action.act(gameObjects);
+      // remove deactivated objects from the game (e.g. key & chest disappear after key is dragged
+      // onto the chest)
+      if (!gameObjects.get(i).isActive()) {
+        gameObjects.remove(i);
+        continue;
+      }
+
+      i++; // increment regularly only when the element is preserved in the list
+    }
   }
 
 

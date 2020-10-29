@@ -1,6 +1,6 @@
 //////////////// FILE HEADER (INCLUDE IN EVERY FILE) //////////////////////////
 //
-// Title: Treasure Hunst game (P06 assignment)
+// Title: Treasure Hunt game (P06 assignment)
 // Course: CS 300 Fall 2020
 //
 // Author: Safi Nassar
@@ -26,34 +26,42 @@
  */
 public class DroppableObject extends DraggableObject {
   private VisibleObject target; // object over which this object can be dropped
-  private Action action; // action that results from dropping this object
-  // over target
-  // initialize new object
+  private Action action; // action that results from dropping this object over target
 
+  /**
+   * Constructor: initialize new droppable object
+   * 
+   * @param name   object identifier, corresponding also to file name of graphical file for this
+   *               object.
+   * @param x      coordinate on the graphical window
+   * @param y      coordinate on the graphical window
+   * @param target object dropped on
+   * @param action performed when dropping on target
+   */
   public DroppableObject(String name, int x, int y, VisibleObject target, Action action) {
+    super(name, x, y); // initialize draggable object
+    this.target = target;
+    this.action = action;
   }
 
+  /**
+   * Performs action on successful drop and deactivates the involved objects -
+   * 
+   * @return action in response to a successful drop, otherwise null
+   */
   @Override
   protected Action drop() {
-    // Recall that this drop() method that we are overloading is called whenever this objects is
-    // done
-    // being dragged. We just need to check whether this object is over it's target and whether it's
-    // target is active at that time. When both of these conditions are true, this method should 1)
-    // deactivate both this and the target objects, and 2) return this object's action.
+    // this object is over its target & its target is active:
+    if (this.isOver(target) && target.isActive()) {
+      // deactivate both this object and the target object
+      this.deactivate();
+      target.deactivate();
+      // return action to perform
+      return this.action;
+    }
 
-    /*
-     * To test this out, let's add a new VisibleObject to the gameObjects arraylist from the setup()
-     * method (like our koala and key). The name of this new visible object will be "chest" and its
-     * position can be (365,400). Then, change your key from a DraggableObject to a DroppableObject
-     * with this chest as it's target. You'll also need an Action, one with the message
-     * "Open sesame!" will be helpful. Make sure that dragging this key onto this chest produces the
-     * expected output.
-     */
-  } // returns action and deactivates objects
-  // in response to successful drop
-  // When this object is over its target and its target is active:
-  // deactivate both this object and the target object, and return action,
-  // otherwise return null
+    return null; // skip doing no action
+  }
 }
 
 

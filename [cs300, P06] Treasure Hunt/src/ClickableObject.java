@@ -1,6 +1,6 @@
 //////////////// FILE HEADER (INCLUDE IN EVERY FILE) //////////////////////////
 //
-// Title: Treasure Hunst game (P06 assignment)
+// Title: Treasure Hunt game (P06 assignment)
 // Course: CS 300 Fall 2020
 //
 // Author: Safi Nassar
@@ -17,10 +17,8 @@
 // import java.io.FileNotFoundException;
 // import java.util.ArrayList;
 // import java.util.Scanner;
-import java.io.File;
-import java.util.ArrayList;
 import processing.core.PApplet;
-import processing.core.PImage;
+
 
 /**
  * Intractable objects by clicking
@@ -29,30 +27,47 @@ import processing.core.PImage;
  */
 public class ClickableObject extends VisibleObject {
   private Action action; // action returned from update when this object is clicked
-  private boolean mouseWasPressed; // tracks whether the mouse was pressed
-  // during the last update()
-  // initializes this new object
+  private boolean mouseWasPressed; // tracks whether the mouse was pressed during the last update()
 
+  /**
+   * Constructor: initializes this new object
+   * 
+   * @param name   object identifier, corresponding also to file name of graphical file for this
+   *               object.
+   * @param x      coordinate on the graphical window
+   * @param y      coordinate on the graphical window
+   * @param action action to perform on clicking the object
+   */
   public ClickableObject(String name, int x, int y, Action action) {
+    super(name, x, y); // initialize VisibleObject
+    this.action = action;
+    mouseWasPressed = false;
   }
 
+  /**
+   * Update implementation: updates the state of the clickable object
+   * 
+   * @return returns action only when mouse is first clicked on this object
+   */
   @Override
   public Action update() {
-    // determine whether mouse button is currentlypressed down 
-    this.mousePressed; // PApplet.mousePressed field.
-    
-    
-    
-//    In order to return our action only when the mouse is rst pressed on
-//        this clickable object (not repeatedly for as long as the button is held down), we'll make sure
-//        that the mouse is currently pressed, is over this clickable object, and was not pressed on the
-//        previous update.
-    
-    
-//    The position of the mouse can be accessed through PApplet.mouseX and
-//    PApplet.mouseY for this purpose.
-    
-  } // calls VisibleObject update, then returns
-  // action only when mouse is first clicked
-  // on this object
+    super.update(); // minimum action on each frame (draw object)
+    PApplet p = InteractiveObject.getProcessing(); // get processing instance
+
+    // Determine whether mouse button is currently pressed down using PApplet.mousePressed field
+    if (!p.mousePressed) {
+      mouseWasPressed = false; // unset flag
+      return null;
+    }
+
+    /*
+     * skip subsequent mouse presses (was not pressed on the previous update i.e. proceed only on
+     * first pressed event). OR mouse is not over this clickable object
+     */
+    if (mouseWasPressed || !this.isOver(p.mouseX, p.mouseY))
+      return null;
+
+    this.mouseWasPressed = true; // set prev pressed flag
+    return this.action; // return action to perform.
+  }
 }
