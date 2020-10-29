@@ -76,29 +76,6 @@ public class TreasureHunt extends PApplet {
     // load the background image filename, introductory text messages, and interactive objects or
     // clues descriptions from a text file.
     loadGameSettings("clues" + File.separator + "treasureHunt.clues");
-
-    // Manual test use cases:
-    /*
-     * Test case - Action act method: Now, test this out by creating a new visible object with the
-     * name "phone" within your TreasureHunt.setup() method, and its position can be (700,490).
-     * Instead of adding this visible object to the gameObjects array list, deactivate it before
-     * creating an action that will activate it when the key is dragged over the chest. Then, make
-     * sure that this visible object (the phone) appears when this happens.
-     */
-    /*
-     * Test case - Test this out by adding a new DraggableObject to the gameObjects list in
-     * TreasureHunt.setup(), similar to how we were testing the koala. Create a new draggable object
-     * with the name "key" at position (70,70) to accomplish what is shown in Fig. 1. You should
-     * then try dragging this object around the playground scene, while the program runs.
-     */
-    /*
-     * Test case - To test this out, let's add a new VisibleObject to the gameObjects arraylist from
-     * the setup() method (like our koala and key). The name of this new visible object will be
-     * "chest" and its position can be (365,400). Then, change your key from a DraggableObject to a
-     * DroppableObject with this chest as it's target. You'll also need an Action, one with the
-     * message "Open sesame!" will be helpful. Make sure that dragging this key onto this chest
-     * produces the expected output.
-     */
   }
 
   /**
