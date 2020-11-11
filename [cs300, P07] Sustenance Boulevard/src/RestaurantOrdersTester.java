@@ -301,13 +301,6 @@ public class RestaurantOrdersTester {
    * This method checks for the correctness of the RestaurantOrders.placeOrder() considering at
    * least the test scenarios provided in the detailed description of these javadocs.
    * 
-   * (For each of those scenarios, make sure that the size of the list is appropriately updated
-   * after a call without errors of the add() method, and that the contents of the list is as
-   * expected whatever if list is read in the forward or backward directions. You can also check the
-   * correctness of RestaurantOrders.get(int), RestaurantOrders.indexOf(Order), and
-   * RestaurantOrders.size() in this test method.)
-   * 
-   * 
    * @return true when this test verifies a correct functionality, and false otherwise
    */
   public static boolean testRestaurantOrdersAdd() {
@@ -396,10 +389,23 @@ public class RestaurantOrdersTester {
           return false;
       }
 
-      // TODO: check IndexOutOfBoundsException for .get method
-      // for removeOrder and for get methods
-
-      // TODO: check all cases: head, middle, tail
+      // check expected exceptions
+      {
+        try {
+          r.get(4);
+          System.out.println("Expected to throw IndexOutOfBoundsException exception");
+          return false;
+        } catch (IndexOutOfBoundsException e) {
+          // expected behavior
+        }
+        try {
+          r.get(-1);
+          System.out.println("Expected to throw IndexOutOfBoundsException exception");
+          return false;
+        } catch (IndexOutOfBoundsException e) {
+          // expected behavior
+        }
+      }
 
     } catch (Exception e) {
       System.out.println("Unexpected exception thrown");
@@ -411,20 +417,114 @@ public class RestaurantOrdersTester {
 
   /**
    * This method checks for the correctness of the RestaurantOrders.removeOrder() considering at
-   * least the test scenarios provided in the detailed description of these javadocs. (1) Try
-   * removing an order from an empty list or pass a negative index to RestaurantOrders.removeOrder()
-   * method; (2) Try removing an order (at position index 0) from a list which contains only one
-   * order; (3) Try to remove an order (position index 0) from a list which contains at least 2
-   * orders; (4) Try to remove an order from the middle of a non-empty list containing at least 3
-   * orders; (5) Try to remove the order at the end of a list containing at least two orders. For
-   * each of those scenarios, make sure that the size of the list is appropriately updated after a
-   * call without errors of the add() method, and that the contents of the list is as expected
-   * whatever if list is read in the forward or backward directions.
+   * least the test scenarios provided in the detailed description of these javadocs.
    * 
    * @return true when this test verifies a correct functionality, and false otherwise
    */
   public static boolean testRestaurantOrdersRemove() {
-    return false;
+    try {
+      // relative timestamps
+      final long TODAY = System.currentTimeMillis();
+      final long TODAY_AFTERNOON = TODAY + 12 * 60 * 60 * 1000;
+      final long TOMORROW = TODAY + 24 * 60 * 60 * 1000;
+      final long YESTERDAY = TODAY - 24 * 60 * 60 * 1000;
+      // orders objects
+      final Order oYesterday = new Order("Y", YESTERDAY);
+      final Order oMorning = new Order("M", TODAY);
+      final Order oAfternoon = new Order("A", TODAY_AFTERNOON);
+      final Order oTomorrow = new Order("T", TOMORROW);
+
+      // (1) Try removing an order from an empty list or pass a negative index to
+      // RestaurantOrders.removeOrder() method;
+      // check exception handling:
+      {
+        RestaurantOrders r = new RestaurantOrders(); // default constructor
+        try {
+          r.removeOrder(1);
+          System.out.println("Expected to throw IndexOutOfBoundsException exception");
+          return false;
+        } catch (IndexOutOfBoundsException e) {
+          // expected behavior
+        }
+        try {
+          r.removeOrder(0);
+          System.out.println("Expected to throw IndexOutOfBoundsException exception");
+          return false;
+        } catch (IndexOutOfBoundsException e) {
+          // expected behavior
+        }
+        try {
+          r.removeOrder(-1);
+          System.out.println("Expected to throw IndexOutOfBoundsException exception");
+          return false;
+        } catch (IndexOutOfBoundsException e) {
+          // expected behavior
+        }
+      }
+
+      // (2) Try removing an order (at position index 0) from a list which contains only one order;
+      {
+        RestaurantOrders r = new RestaurantOrders(); // default constructor
+        r.placeOrder(oMorning);
+        r.removeOrder(0);
+        if (r.size() != 0)
+          return false;
+        if (!r.readForward().equals("The list contains 0 order(s): [ ]"))
+          return false;
+        if (!r.readBackward().equals("The list contains 0 order(s): [ ]"))
+          return false;
+      }
+
+      // (3) Try to remove an order (position index 0) from a list which contains at least 2 orders;
+      {
+        RestaurantOrders r = new RestaurantOrders(); // default constructor
+        r.placeOrder(oMorning);
+        r.placeOrder(oTomorrow);
+        r.removeOrder(0);
+        if (r.size() != 1)
+          return false;
+        if (!r.readForward().equals("The list contains 1 order(s): [ T ]"))
+          return false;
+        if (!r.readBackward().equals("The list contains 1 order(s): [ T ]"))
+          return false;
+      }
+
+      // (4) Try to remove an order from the middle of a non-empty list containing at least 3 orders
+      {
+        RestaurantOrders r = new RestaurantOrders(); // default constructor
+        r.placeOrder(oYesterday);
+        r.placeOrder(oMorning);
+        r.placeOrder(oTomorrow);
+        r.removeOrder(1);
+        if (r.size() != 2)
+          return false;
+        if (!r.readForward().equals("The list contains 2 order(s): [ Y T ]"))
+          return false;
+        if (!r.readBackward().equals("The list contains 2 order(s): [ T Y ]"))
+          return false;
+      }
+
+      // (5) Try to remove the order at the end of a list containing at least two orders.
+      {
+        RestaurantOrders r = new RestaurantOrders(); // default constructor
+        r.placeOrder(oYesterday);
+        r.placeOrder(oTomorrow);
+        r.removeOrder(1);
+        if (r.size() != 1)
+          return false;
+        if (!r.readForward().equals("The list contains 1 order(s): [ Y ]"))
+          return false;
+        if (!r.readBackward().equals("The list contains 1 order(s): [ Y ]"))
+          return false;
+      }
+
+    } catch (Exception e) {
+      System.out.println("Unexpected exception thrown");
+      return false;
+    }
+
+    return true;
+
   }
 
   /**

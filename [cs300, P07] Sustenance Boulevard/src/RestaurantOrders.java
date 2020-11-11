@@ -16,9 +16,8 @@
 
 
 /**
- * Restaurant order management - using a sorted doubly-linked list of the orders.
- * <p>
- * Where Head: earliest orders, Tail: Most recent orders.
+ * Restaurant order management - using a sorted doubly-linked list to manage the ordered dishes
+ * sorted by their timestamp. Where Head: earliest orders, Tail: Most recent orders.
  * 
  * @author Safi
  */
@@ -49,7 +48,7 @@ public class RestaurantOrders implements SortedListADT<Order> {
   }
 
   /**
-   * Returns the capacity of this list
+   * Getter for capacity of list
    * 
    * @return capacity of the list
    */
@@ -58,7 +57,9 @@ public class RestaurantOrders implements SortedListADT<Order> {
   }
 
   /**
-   * Returns true if and only if the list is currently empty; false otherwise
+   * Checks if the orders list is empty.
+   * 
+   * @returns true if and only if the list is currently empty; false otherwise
    */
   @Override
   public boolean isEmpty() {
@@ -68,7 +69,9 @@ public class RestaurantOrders implements SortedListADT<Order> {
   }
 
   /**
-   * Returns the number of orders currently in the list
+   * Getter for size of list
+   * 
+   * @returns the number of orders currently in the list
    */
   @Override
   public int size() {
@@ -96,7 +99,7 @@ public class RestaurantOrders implements SortedListADT<Order> {
   }
 
   /**
-   * Returns a String representation of the orders in this list from head to tail, space-separated
+   * Creates a String representation of the orders in this list from head to tail, space-separated
    * 
    * @return formated string representation of the orders list
    */
@@ -115,7 +118,7 @@ public class RestaurantOrders implements SortedListADT<Order> {
   }
 
   /**
-   * Returns a String representation of the orders in this list from tail to head, space-separated
+   * Creates a String representation of the orders in this list from tail to head, space-separated
    * 
    * @return formated string representation of the orders list
    */
@@ -137,6 +140,7 @@ public class RestaurantOrders implements SortedListADT<Order> {
    * Adds a new Order to this sorted list in the correct position (most recent order to tail) if
    * there is room in the list
    * 
+   * @param newOrder the target order to add into the list
    * @throws IllegalArgumentException if newOrder has the same timestamp as an existing order, a
    *                                  negative timestamp , or is null.
    */
@@ -156,6 +160,7 @@ public class RestaurantOrders implements SortedListADT<Order> {
   /**
    * Validate an order's timestamp as duplicate timestamps are not allowed in the list.
    * 
+   * @param o the target Order object
    * @return true if the input order has unique timestamp, otherwise false if it an order with the
    *         same timestamp already exist in the list.
    */
@@ -252,7 +257,7 @@ public class RestaurantOrders implements SortedListADT<Order> {
   /**
    * Find specified order's dishes in the list
    * <p>
-   * (Note that matching the timestamp here does not matter , we are only concerned with the food
+   * (Note that matching the timestamp here does not matter, we are only concerned with the food
    * contained in the order)
    * 
    * @param findObject element to find in this list
