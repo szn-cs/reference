@@ -15,9 +15,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * This class models and implements an order which carries dishes of type String and timeStamp of
- * type int
- *
+ * This class models and implements an order which carries data about the order: dishes & time stamp
+ * 
+ * @author Safi
  */
 public class Order implements Comparable<Order> {
   private String dishes; // a String representation of the dishes carried
@@ -37,7 +37,7 @@ public class Order implements Comparable<Order> {
   }
 
   /**
-   * Returns String representation of the dishes carried by this Order
+   * Creates a String representation of the dishes carried by this Order
    * 
    * @return a String representation of the dishes carried by this Order
    */
@@ -58,6 +58,7 @@ public class Order implements Comparable<Order> {
   /**
    * Compares this order with another, based on which one was placed earlier
    * 
+   * @param other the target Order object to compare to.
    * @return a negative integer, zero, or a positive integer as this Order has a time stamp which is
    *         less than, equal to, or greater than the specified other Order's timestamp.
    */
@@ -76,6 +77,7 @@ public class Order implements Comparable<Order> {
    * Determines whether the content of this order's dishes field is the same as another's. Does NOT
    * compare timestamps; use compareTo() method for timestamp comparison.
    * 
+   * @param other target order to compare dishes to.
    * @return true if and only if this.dishes is the same as other.dishes; false otherwise
    */
   public boolean equals(Object other) {
