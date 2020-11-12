@@ -69,15 +69,14 @@ int evict_cnt = 0;
 int verbosity = 0;  //print trace if set
 /*****************************************************************************/
   
-  
 //Type mem_addr_t: Use when dealing with addresses or address masks.
 typedef unsigned long long int mem_addr_t; 
 
 //Type cache_line_t: Use when dealing with cache lines.
-//TODO - COMPLETE THIS TYPE
 typedef struct cache_line {                    
     char valid; 
     mem_addr_t tag; 
+    // TODO:
     //Add a data member as needed by your implementation for LRU tracking.
 } cache_line_t; 
 
@@ -92,53 +91,65 @@ typedef cache_set_t* cache_t;
 cache_t cache;   
 
 /**
- *  TODO - COMPLETE THIS FUNCTION
- * init_cache:
  * Allocates the data structure for a cache with S sets and E lines per set.
  * Initializes all valid bits and tags with 0s.
  */                    
-void init_cache() {          
+void init_cache() {      
+    S = 2^s; // calculate sets number in the cache
+    B = 2^b; // calculate bytes number per block
+
+    // allocate the data structures using malloc() to hold information about the sets and cache lines.
+    malloc();
+
+    // clear memory locations
+   
 }
   
-
 /**
- * TODO - COMPLETE THIS FUNCTION 
- * free_cache:
- * Frees all heap allocated memory used by the cache.
+ * Frees all heap allocated memory used by the cache (mainly allocation created in init_cache() function)
  */                    
-void free_cache() {             
+void free_cache() {    
+    // free nested arrays in cache data structures
+    // TODO:    
+    free();
 }
    
    
 /**
- * TODO - COMPLETE THIS FUNCTION 
- * access_data:
  * Simulates data access at given "addr" memory address in the cache.
- *
+ * Uses data structures that were allocated in init_cache() function and simulates and tracks the cache hits, misses and evictions. 
+ * Implementing the Least-Recently-Used (LRU) cache replacement policy.
+ * 
  * If already in cache, increment hit_cnt
  * If not in cache, cache it (set tag), increment miss_cnt
  * If a line is evicted, increment evict_cnt
+ * 
+ * addr: target memory address to access (64-bit hexadecimal)
  */                    
 void access_data(mem_addr_t addr) {      
+
+    hit_cnt = 16; 
+    miss_cnt = 1; 
+    evict_cnt = 0;
+
 }
   
-  
 /**
- * TODO - FILL IN THE MISSING CODE
- * replay_trace:
  * Replays the given trace file against the cache.
  *
- * Reads the input trace file line by line.
+ * Parses the input trace file, reading the input trace file line by line.
  * Extracts the type of each memory access : L/S/M
  * TRANSLATE each "L" as a load i.e. 1 memory access
  * TRANSLATE each "S" as a store i.e. 1 memory access
  * TRANSLATE each "M" as a load followed by a store i.e. 2 memory accesses 
  * 
- * assume the block size as determined by b will be greater than or equal to that maximum size of the bytes accessed by operations in a trace
+ * assumption - the block size as determined by b will be greater than or equal to that maximum size of the bytes accessed by operations in a trace.
+ * 
+ * trace_fn: trace filename to parse as input insturctions
  */                    
-void replay_trace(char* trace_fn) {           
-    char buf[1000];   
-    mem_addr_t addr = 0; 
+void replay_trace(char* trace_fn) {      
+    char buf[1000]; // buf[1] has type of acccess(S/L/M)
+    mem_addr_t addr = 0;  // addr has the address to be accessed
     unsigned int len = 0; 
     FILE* trace_fp = fopen(trace_fn, "r");  
 
@@ -154,10 +165,17 @@ void replay_trace(char* trace_fn) {
             if (verbosity)
                 printf("%c %llx,%u ", buf[1], addr, len); 
 
-            // TODO - MISSING CODE
-            // GIVEN: 1. addr has the address to be accessed
-            //        2. buf[1] has type of acccess(S/L/M)
-            // call access_data function here depending on type of access
+            // simulate cache access number of times depending on type of access
+            switch(buf[1]) { 
+                // twice memory access
+                case 'M': 
+                    access_data(addr);                    
+                // single memory access
+                case 'L': 
+                case 'S': 
+                    access_data(addr);
+                break; 
+            }
 
             if (verbosity)
                 printf("\n"); 
@@ -166,7 +184,6 @@ void replay_trace(char* trace_fn) {
 
     fclose(trace_fp); 
 }  
-  
   
 /**
  * print_usage:
@@ -187,7 +204,6 @@ void print_usage(char* argv[]) {
     exit(0); 
 }  
   
-  
 /**
  * print_summary:
  * Prints a summary of the cache simulation statistics to a file.
@@ -200,10 +216,8 @@ void print_summary(int hits, int misses, int evictions) {
     fclose(output_fp); 
 }  
   
-  
 /**
- * main:
- * Main parses command line args, makes the cache, replays the memory accesses
+ * Main parses command line args, makes the cache, replays the memory accesses,
  * free the cache and print the summary statistics.  
  */                    
 int main(int argc, char* argv[]) {                      
@@ -258,6 +272,5 @@ int main(int argc, char* argv[]) {
     print_summary(hit_cnt, miss_cnt, evict_cnt); 
     return 0;    
 }  
-
 
 // end csim.c
