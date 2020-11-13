@@ -68,16 +68,19 @@ int evict_cnt = 0;
 //Global to control trace output
 int verbosity = 0;  //print trace if set
 /*****************************************************************************/
-  
+
+const int ADDRESS_BITS = 64; // m: # of bits in a memory address
+int t; // # bits required to represent all addresses that map to same set
+
 //Type mem_addr_t: Use when dealing with addresses or address masks.
 typedef unsigned long long int mem_addr_t; 
 
 //Type cache_line_t: Use when dealing with cache lines.
 typedef struct cache_line {                    
     char valid; 
-    mem_addr_t tag; 
-    // TODO:
-    //Add a data member as needed by your implementation for LRU tracking.
+    mem_addr_t tag;
+    // tracking LRU policy:
+    // Using the set of lines as an ordered list (in LRU order)
 } cache_line_t; 
 
 //Type cache_set_t: Use when dealing with cache sets
@@ -95,14 +98,31 @@ cache_t cache;
  * Initializes all valid bits and tags with 0s.
  */                    
 void init_cache() {      
-    S = 2^s; // calculate sets number in the cache
-    B = 2^b; // calculate bytes number per block
+    // S: # of sets in cache, E: # of lines per set, B: # of bytes per block.
+    S = pow(2, s); // calculate sets
+    B = pow(2, b); // calculate bytes per block
 
-    // allocate the data structures using malloc() to hold information about the sets and cache lines.
-    malloc();
+    /* allocate the data structures using malloc() to hold information about the sets and cache lines. */
+    // allocate cache size of sets
+    if((cache = malloc(S * sizeof(cache_set_t))) == NULL) {
+        fprintf(stderr, "Error: Allocation failed - %s\n", strerror(errno));
+        exit(1);
+    }
+    // allocate sets lines
+    for(int i = 0; i < S; i++) {
+        if((cache[i] = malloc(E * sizeof(cache_line_t))) == NULL) {
+            fprintf(stderr, "Error: Allocation failed - %s\n", strerror(errno));
+            exit(1);
+        }
+    }
 
-    // clear memory locations
-   
+    /* clear memory locations */
+    for(int set = 0; set < S; set++) {
+        for(int line = 0; line < E; line++) {
+            cache[set][line].valid = 0;
+            cache[set][line].tag = 0;
+        }
+    }
 }
   
 /**
@@ -110,27 +130,110 @@ void init_cache() {
  */                    
 void free_cache() {    
     // free nested arrays in cache data structures
-    // TODO:    
-    free();
+    for(int set = 0; set < S; set++) {
+        free(cache[set]); cache[set] = NULL;            
+    }
+    free(cache); cache = NULL;
 }
    
    
 /**
  * Simulates data access at given "addr" memory address in the cache.
  * Uses data structures that were allocated in init_cache() function and simulates and tracks the cache hits, misses and evictions. 
- * Implementing the Least-Recently-Used (LRU) cache replacement policy.
+ * Implementing the Least-Recently-Used (LRU) cache replacement policy. 
  * 
- * If already in cache, increment hit_cnt
- * If not in cache, cache it (set tag), increment miss_cnt
- * If a line is evicted, increment evict_cnt
+ * Approach used to tracking LRU caches - List: Move the most recently used cache line to the head of the list. Thus, each set will point to the most recently used cache line. Evict the tail of the list as the least recently used.
  * 
  * addr: target memory address to access (64-bit hexadecimal)
+ *       addr composed of tag-bits, set-bits, block offset bits.
  */                    
 void access_data(mem_addr_t addr) {      
+    mem_addr_t tag, set; // tag and set portions of the address. 
+    
+    // addr composed of: tag, set, block
+    tag = addr >> (s + b); // retrieve tag number
+    // extract set portion using shifting
+    set = addr << t >> (t + b);
+    // extract set portion using address masking
+    // set = (addr >> b) & (S - 1); 
 
-    hit_cnt = 16; 
-    miss_cnt = 1; 
-    evict_cnt = 0;
+    if (verbosity) {
+        printf("set: %llx ", set);
+        printf("tag: %llx ", tag);
+        // printf("m: %i ", t + s + b);
+        for(int i = 0; i < E; i++) 
+            printf("v:%llx ", cache[set][i].valid);
+    }
+
+    // get occupied starting cache position
+    int mostRecent = -1; // first occupied line (most recently accessed line)
+    while(++mostRecent < E && cache[set][mostRecent].valid == 0);
+
+    // [CASE 1] If already in cache, increment hit_cnt
+    // iterate over the cache
+    for(int line = mostRecent; line < E; line++) {
+        if(cache[set][line].valid && cache[set][line].tag == tag) {
+            if (verbosity) 
+                printf("hit ");
+            ++hit_cnt; 
+
+            // shift & move to the head (most-recently used) of list
+            int shiftIndex = line-1; 
+            while(cache[set][shiftIndex].valid == 1 && shiftIndex >= 0) {
+                // move one spot right
+                cache[set][shiftIndex + 1] = cache[set][shiftIndex]; 
+                --shiftIndex;
+            }
+            // set head to accessed memory
+            cache[set][mostRecent].tag = tag;
+
+            if (verbosity) {
+                printf("\e[33m [");
+                for(int i = 0; i < E; i++) 
+                    printf("%i|%llx, ", cache[set][i].valid, cache[set][i].tag);
+                printf("] \e[0m");
+            }
+
+            return; 
+        }
+    }
+
+    /*
+    // validate address set mapping
+    if(!(set >= 0 && set < S)) // do not map to the current cache sets
+        return;
+        // printf("\n%i \n\n", set);
+    */
+
+    // [CASE 2] If not in cache, cache it (set tag), increment miss_cnt
+    if (verbosity) 
+        printf("miss ");
+    ++miss_cnt; 
+    // case there is a free line available in the cache
+    if(mostRecent != 0) { // if free line
+        // printf("\n%i\n", mostRecent);
+        int freeLine = mostRecent - 1; // next free line in order
+        cache[set][freeLine].tag = tag;
+        cache[set][freeLine].valid = 1;
+        return; 
+    } 
+
+    // [CASE 3] If a line is evicted, increment evict_cnt
+    if (verbosity) 
+        printf("eviction ");
+    ++evict_cnt;
+    // shift & move to the head (most-recently used) of list
+    int shiftIndex = E - 1; // shift all elements to the right 
+    while(shiftIndex-- > 0)
+        // move one spot right
+        cache[set][shiftIndex + 1] = cache[set][shiftIndex];
+    // set head to accessed memory
+    cache[set][0].tag = tag; // head at index 0 (most recent occupied)
+    cache[set][0].valid = 1;
+    for(int i = 0; i < E; i++) {
+        printf("V:%llx ", cache[set][i].valid);
+        printf("Tag:%llx ", cache[set][i].tag);
+    }
 
 }
   
@@ -250,6 +353,8 @@ int main(int argc, char* argv[]) {
                 exit(1); 
         }
     }
+
+    t = ADDRESS_BITS - s - b; // caculate the t bits
 
     //Make sure that all required command line args were specified.
     if (s == 0 || E == 0 || b == 0 || trace_file == NULL) {
