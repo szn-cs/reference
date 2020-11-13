@@ -293,7 +293,7 @@ void replay_trace(char* trace_fn) {
 
 /**
  * Print information on how to use csim to standard output.
- * 
+ *
  * argv: command-line arguments
  */
 void print_usage(char* argv[]) {
@@ -313,7 +313,7 @@ void print_usage(char* argv[]) {
 
 /**
  * Prints a summary of the cache simulation statistics to a file.
- * 
+ *
  * hits: number of hits
  * misses: number of misses
  * evictions: number of evictions
@@ -329,7 +329,7 @@ void print_summary(int hits, int misses, int evictions) {
 /**
  * Main parses command line args, makes the cache, replays the memory accesses,
  * free the cache and print the summary statistics.
- * 
+ *
  * argc: command-line argument count
  * argv: command-line argument value
  * program exit status
