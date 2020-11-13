@@ -168,7 +168,7 @@ void access_data(mem_addr_t addr) {
     printf("set: %llx ", set);
     printf("tag: %llx ", tag);
     // printf("m: %i ", t + s + b);
-    for (int i = 0; i < E; i++) printf("v:%llx ", cache[set][i].valid);
+    for (int i = 0; i < E; i++) printf("v:%i ", cache[set][i].valid);
   }
 
   // get occupied starting cache position
@@ -235,10 +235,6 @@ void access_data(mem_addr_t addr) {
   // set head to accessed memory
   cache[set][0].tag = tag;  // head at index 0 (most recent occupied)
   cache[set][0].valid = 1;
-  for (int i = 0; i < E; i++) {
-    printf("V:%llx ", cache[set][i].valid);
-    printf("Tag:%llx ", cache[set][i].tag);
-  }
 }
 
 /**
