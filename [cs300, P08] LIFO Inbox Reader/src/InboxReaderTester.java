@@ -1,9 +1,6 @@
-import java.util.EmptyStackException;
-import java.util.NoSuchElementException;
-
 //////////////// FILE HEADER (INCLUDE IN EVERY FILE) //////////////////////////
 //
-// Title: InboxReaderTester.java
+// Title: InboxReaderTester.java (Assignment P08)
 // Course: CS 300 Fall 2020
 //
 // Author: Safi Nassar
@@ -16,6 +13,9 @@ import java.util.NoSuchElementException;
 // Online Sources: NONE
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+import java.util.EmptyStackException;
+import java.util.NoSuchElementException;
 
 /**
  * Implements unit test methods to check the correctness of the implementation of the MessageStack,
@@ -99,8 +99,13 @@ public class InboxReaderTester {
       {
         if (!(ms.isEmpty() == true && ms.size() == 0))
           return false;
-        if (ms.peek() != null)
+
+        try {
+          ms.peek();
           return false;
+        } catch (EmptyStackException e) {
+          // Expected behavior
+        }
       }
 
       // (2) You can consider calling peek method on the empty stack. An EmptyStackException is
@@ -124,7 +129,7 @@ public class InboxReaderTester {
           return false;
         if (!ms.peek().equals(m1) || ms.size() != 1 || ms.isEmpty() == true)
           return false;
-        if (ms.pop().equals(m1) || ms.size() != 0 || ms.isEmpty() != true)
+        if (!ms.pop().equals(m1) || ms.size() != 0 || ms.isEmpty() != true)
           return false;
       }
 
@@ -157,8 +162,11 @@ public class InboxReaderTester {
         }
       }
 
-    } catch (Exception e) {
+    } catch (
+
+    Exception e) {
       System.out.println("Unexpected exception thrown");
+      System.out.println(e);
       return false;
     }
 
@@ -242,6 +250,7 @@ public class InboxReaderTester {
 
     } catch (Exception e) {
       System.out.println("Unexpected exception thrown");
+      System.out.println(e);
       return false;
     }
 
@@ -267,7 +276,7 @@ public class InboxReaderTester {
           return false;
         if (!inbox.peekReadMessage().equals("Nothing in Read"))
           return false;
-        if (!inbox.readMessage().equals("Nothing in Read"))
+        if (!inbox.readMessage().equals("Nothing in Unread"))
           return false;
         // verify sizes are not changed
         if (!inbox.getStatistics().equals("Unread (0)" + "\n" + "Read (0)"))
@@ -286,7 +295,7 @@ public class InboxReaderTester {
         inbox.receiveMessage(m1);
         if (!inbox.getStatistics().equals("Unread (1)" + "\n" + "Read (0)"))
           return false;
-        if (!inbox.peekReadMessage().equals(m1.toString()))
+        if (!inbox.peekReadMessage().equals("Nothing in Read"))
           return false;
         if (!inbox.traverseUnreadMessages()
             .equals("Unread(1)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n"))
@@ -297,10 +306,10 @@ public class InboxReaderTester {
         inbox.receiveMessage(m2);
         if (!inbox.getStatistics().equals("Unread (2)" + "\n" + "Read (0)"))
           return false;
-        if (!inbox.peekReadMessage().equals(m2.toString()))
+        if (!inbox.peekReadMessage().equals("Nothing in Read"))
           return false;
-        if (!inbox.traverseUnreadMessages().equals("Unread(2)\n" + m1.getID() + " "
-            + m1.getSUBJECT() + "\n" + m2.getID() + " " + m2.getSUBJECT() + "\n"))
+        if (!inbox.traverseUnreadMessages().equals("Unread(2)\n" + m2.getID() + " "
+            + m2.getSUBJECT() + "\n" + m1.getID() + " " + m1.getSUBJECT() + "\n"))
           return false;
         if (!inbox.traverseReadMessages().equals("Read(0)\n"))
           return false;
@@ -308,11 +317,11 @@ public class InboxReaderTester {
         inbox.receiveMessage(m3);
         if (!inbox.getStatistics().equals("Unread (3)" + "\n" + "Read (0)"))
           return false;
-        if (!inbox.peekReadMessage().equals(m3.toString()))
+        if (!inbox.peekReadMessage().equals("Nothing in Read"))
           return false;
         if (!inbox.traverseUnreadMessages()
-            .equals("Unread(3)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n" + m2.getID() + " "
-                + m2.getSUBJECT() + "\n" + m3.getID() + " " + m3.getSUBJECT() + "\n"))
+            .equals("Unread(3)\n" + m3.getID() + " " + m3.getSUBJECT() + "\n" + m2.getID() + " "
+                + m2.getSUBJECT() + "\n" + m1.getID() + " " + m1.getSUBJECT() + "\n"))
           return false;
         if (!inbox.traverseReadMessages().equals("Read(0)\n"))
           return false;
@@ -320,12 +329,12 @@ public class InboxReaderTester {
         inbox.receiveMessage(m4);
         if (!inbox.getStatistics().equals("Unread (4)" + "\n" + "Read (0)"))
           return false;
-        if (!inbox.peekReadMessage().equals(m4.toString()))
+        if (!inbox.peekReadMessage().equals("Nothing in Read"))
           return false;
         if (!inbox.traverseUnreadMessages()
-            .equals("Unread(3)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n" + m2.getID() + " "
-                + m2.getSUBJECT() + "\n" + m3.getID() + " " + m3.getSUBJECT() + "\n" + m4.getID()
-                + " " + m4.getSUBJECT() + "\n"))
+            .equals("Unread(4)\n" + m4.getID() + " " + m4.getSUBJECT() + "\n" + m3.getID() + " "
+                + m3.getSUBJECT() + "\n" + m2.getID() + " " + m2.getSUBJECT() + "\n" + m1.getID()
+                + " " + m1.getSUBJECT() + "\n"))
           return false;
         if (!inbox.traverseReadMessages().equals("Read(0)\n"))
           return false;
@@ -333,7 +342,7 @@ public class InboxReaderTester {
         // read messages:
         if (!inbox.readMessage().equals(m4.toString()))
           return false;
-        if (!inbox.peekReadMessage().equals(m3.toString()))
+        if (!inbox.peekReadMessage().equals(m4.toString()))
           return false;
         // verify sizes are not changed
         if (!inbox.getStatistics().equals("Unread (3)" + "\n" + "Read (1)"))
@@ -341,7 +350,7 @@ public class InboxReaderTester {
 
         if (!inbox.readMessage().equals(m3.toString()))
           return false;
-        if (!inbox.peekReadMessage().equals(m2.toString()))
+        if (!inbox.peekReadMessage().equals(m3.toString()))
           return false;
         // verify sizes are not changed
         if (!inbox.getStatistics().equals("Unread (2)" + "\n" + "Read (2)"))
@@ -349,7 +358,7 @@ public class InboxReaderTester {
 
         if (!inbox.readMessage().equals(m2.toString()))
           return false;
-        if (!inbox.peekReadMessage().equals(m1.toString()))
+        if (!inbox.peekReadMessage().equals(m2.toString()))
           return false;
         // verify sizes are not changed
         if (!inbox.getStatistics().equals("Unread (1)" + "\n" + "Read (3)"))
@@ -357,18 +366,19 @@ public class InboxReaderTester {
 
         if (!inbox.readMessage().equals(m1.toString()))
           return false;
-        if (!inbox.peekReadMessage().equals("Nothing in Read"))
+        if (!inbox.peekReadMessage().equals(m1.toString()))
           return false;
         // verify sizes are not changed
         if (!inbox.getStatistics().equals("Unread (0)" + "\n" + "Read (4)"))
           return false;
 
-        if (!inbox.readMessage().equals("Nothing in Read"))
+        if (!inbox.readMessage().equals("Nothing in Unread"))
           return false;
       }
 
     } catch (Exception e) {
       System.out.println("Unexpected exception thrown");
+      System.out.println(e);
       return false;
     }
 
@@ -400,7 +410,7 @@ public class InboxReaderTester {
       inbox.receiveMessage(m1);
       if (!inbox.getStatistics().equals("Unread (1)" + "\n" + "Read (0)"))
         return false;
-      if (!inbox.peekReadMessage().equals(m1.toString()))
+      if (!inbox.peekReadMessage().equals("Nothing in Read"))
         return false;
       if (!inbox.traverseUnreadMessages()
           .equals("Unread(1)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n"))
@@ -411,10 +421,10 @@ public class InboxReaderTester {
       inbox.receiveMessage(m2);
       if (!inbox.getStatistics().equals("Unread (2)" + "\n" + "Read (0)"))
         return false;
-      if (!inbox.peekReadMessage().equals(m2.toString()))
+      if (!inbox.peekReadMessage().equals("Nothing in Read"))
         return false;
-      if (!inbox.traverseUnreadMessages().equals("Unread(2)\n" + m1.getID() + " " + m1.getSUBJECT()
-          + "\n" + m2.getID() + " " + m2.getSUBJECT() + "\n"))
+      if (!inbox.traverseUnreadMessages().equals("Unread(2)\n" + m2.getID() + " " + m2.getSUBJECT()
+          + "\n" + m1.getID() + " " + m1.getSUBJECT() + "\n"))
         return false;
       if (!inbox.traverseReadMessages().equals("Read(0)\n"))
         return false;
@@ -422,11 +432,11 @@ public class InboxReaderTester {
       inbox.receiveMessage(m3);
       if (!inbox.getStatistics().equals("Unread (3)" + "\n" + "Read (0)"))
         return false;
-      if (!inbox.peekReadMessage().equals(m3.toString()))
+      if (!inbox.peekReadMessage().equals("Nothing in Read"))
         return false;
       if (!inbox.traverseUnreadMessages()
-          .equals("Unread(3)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n" + m2.getID() + " "
-              + m2.getSUBJECT() + "\n" + m3.getID() + " " + m3.getSUBJECT() + "\n"))
+          .equals("Unread(3)\n" + m3.getID() + " " + m3.getSUBJECT() + "\n" + m2.getID() + " "
+              + m2.getSUBJECT() + "\n" + m1.getID() + " " + m1.getSUBJECT() + "\n"))
         return false;
       if (!inbox.traverseReadMessages().equals("Read(0)\n"))
         return false;
@@ -435,18 +445,19 @@ public class InboxReaderTester {
       inbox.receiveMessage(m3);
       if (!inbox.getStatistics().equals("Unread (4)" + "\n" + "Read (0)"))
         return false;
-      if (!inbox.peekReadMessage().equals(m3.toString()))
+      if (!inbox.peekReadMessage().equals("Nothing in Read"))
         return false;
       if (!inbox.traverseUnreadMessages()
-          .equals("Unread(4)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n" + m2.getID() + " "
-              + m2.getSUBJECT() + "\n" + m3.getID() + " " + m3.getSUBJECT() + "\n" + m3.getID()
-              + " " + m3.getSUBJECT() + "\n"))
+          .equals("Unread(4)\n" + m3.getID() + " " + m3.getSUBJECT() + "\n" + m3.getID() + " "
+              + m3.getSUBJECT() + "\n" + m2.getID() + " " + m2.getSUBJECT() + "\n" + m1.getID()
+              + " " + m1.getSUBJECT() + "\n"))
         return false;
       if (!inbox.traverseReadMessages().equals("Read(0)\n"))
         return false;
 
     } catch (Exception e) {
       System.out.println("Unexpected exception thrown");
+      System.out.println(e);
       return false;
     }
 
@@ -474,7 +485,7 @@ public class InboxReaderTester {
           return false;
         if (!inbox.peekReadMessage().equals("Nothing in Read"))
           return false;
-        if (!inbox.traverseUnreadMessages().equals("Unread(3)\n"))
+        if (!inbox.traverseUnreadMessages().equals("Unread(0)\n"))
           return false;
         if (!inbox.traverseReadMessages().equals("Read(0)\n"))
           return false;
@@ -488,11 +499,11 @@ public class InboxReaderTester {
       // verify status before the tested method call
       if (!inbox.getStatistics().equals("Unread (3)" + "\n" + "Read (0)"))
         return false;
-      if (!inbox.peekReadMessage().equals(m3.toString()))
+      if (!inbox.peekReadMessage().equals("Nothing in Read"))
         return false;
       if (!inbox.traverseUnreadMessages()
-          .equals("Unread(3)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n" + m2.getID() + " "
-              + m2.getSUBJECT() + "\n" + m3.getID() + " " + m3.getSUBJECT() + "\n"))
+          .equals("Unread(3)\n" + m3.getID() + " " + m3.getSUBJECT() + "\n" + m2.getID() + " "
+              + m2.getSUBJECT() + "\n" + m1.getID() + " " + m1.getSUBJECT() + "\n"))
         return false;
       if (!inbox.traverseReadMessages().equals("Read(0)\n"))
         return false;
@@ -505,12 +516,12 @@ public class InboxReaderTester {
           return false;
         if (!inbox.getStatistics().equals("Unread (0)" + "\n" + "Read (3)"))
           return false;
-        if (!inbox.peekReadMessage().equals("Nothing in Read"))
+        if (!inbox.peekReadMessage().equals(m1.toString()))
           return false;
         if (!inbox.traverseUnreadMessages().equals("Unread(0)\n"))
           return false;
         if (!inbox.traverseReadMessages()
-            .equals("Read(0)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n" + m2.getID() + " "
+            .equals("Read(3)\n" + m1.getID() + " " + m1.getSUBJECT() + "\n" + m2.getID() + " "
                 + m2.getSUBJECT() + "\n" + m3.getID() + " " + m3.getSUBJECT() + "\n"))
           return false;
       }
@@ -522,7 +533,7 @@ public class InboxReaderTester {
           return false;
         if (!inbox.getStatistics().equals("Unread (0)" + "\n" + "Read (3)"))
           return false;
-        if (!inbox.peekReadMessage().equals("Nothing in Read"))
+        if (!inbox.peekReadMessage().equals(m1.toString()))
           return false;
         if (!inbox.traverseUnreadMessages().equals("Unread(0)\n"))
           return false;
@@ -553,6 +564,7 @@ public class InboxReaderTester {
 
     } catch (Exception e) {
       System.out.println("Unexpected exception thrown");
+      System.out.println(e);
       return false;
     }
 
@@ -629,6 +641,7 @@ public class InboxReaderTester {
 
     } catch (Exception e) {
       System.out.println("Unexpected exception thrown");
+      System.out.println(e);
       return false;
     }
 
