@@ -1,3 +1,5 @@
+
+
 /**
  * This class implements a LinkedNode data type for a linked linear data structure
  * 

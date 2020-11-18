@@ -1,4 +1,5 @@
 
+
 /**
  * This class models a text message
  * 
@@ -69,13 +70,13 @@ public class Message {
    */
   @Override
   public boolean equals(Object o) {
-    return o instanceof Message && this.ID == ((Message)o).ID &&
-           this.SUBJECT.equals(((Message) o).SUBJECT) && this.TEXT.equals(((Message) o).TEXT);
+    return o instanceof Message && this.ID == ((Message) o).ID
+        && this.SUBJECT.equals(((Message) o).SUBJECT) && this.TEXT.equals(((Message) o).TEXT);
   }
-  
+
   /**
-   * Resets the id generator to 1. This method can be called at the top of each of 
-   * the first created message in every test method will have 1 as ID.
+   * Resets the id generator to 1. This method can be called at the top of each of the first created
+   * message in every test method will have 1 as ID.
    */
   public static void resetIdGenerator() {
     idGenerator = 1;

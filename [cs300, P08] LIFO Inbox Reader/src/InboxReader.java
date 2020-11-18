@@ -3,13 +3,9 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 /**
- * This class implements a LIFO Inbox Reader 
+ * Driver This class implements a LIFO Inbox Reader
+ * 
  * @author Mouna
- *
- */
-/**
- * @author mouna
- *
  */
 public class InboxReader {
   private final String WELCOME_MSG = "--- Welcome to our LIFO Inbox Reader App! ----";
@@ -67,7 +63,7 @@ public class InboxReader {
     System.out.println("[9] Logout and EXIT");
     System.out.println("----------------------------------------------");
   }
-  
+
   /**
    * Loads unread messages from a given file. The file contains a message per line. The subject and
    * the text of a message are separated by a colon :
@@ -90,7 +86,7 @@ public class InboxReader {
           continue;
         }
         // split the line with respect to colon :
-        String[] messageParts = line.split(":",2);
+        String[] messageParts = line.split(":", 2);
         if (messageParts.length < 2) {
           // print error message - correct format (subject: text)
           lineNumber++;
@@ -152,7 +148,8 @@ public class InboxReader {
             System.out.println(INBOX.markAllMessagesAsRead() + " messages marked as read.");
             break;
           case "7": // [7] Empty Read
-            System.out.println("Read Empty. " + INBOX.emptyReadMessageBox() + " read messages deleted.");
+            System.out
+                .println("Read Empty. " + INBOX.emptyReadMessageBox() + " read messages deleted.");
             break;
           case "8": // [8] Print Statistics
             System.out.println(INBOX.getStatistics());
@@ -172,5 +169,5 @@ public class InboxReader {
     }
   }
 
-  
+
 }
