@@ -630,6 +630,8 @@ int getSize(blockHeader* b) {
  * padding memory block size
  */
 int getBlockPadding(int payloadSize, int multiple) {
+  if((payloadSize + sizeof(blockHeader)) % 8 == 0) return 0;
+  // calculate remainder complement
   return multiple - (payloadSize + sizeof(blockHeader)) % multiple;
 }
 
