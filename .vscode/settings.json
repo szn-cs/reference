@@ -17,5 +17,17 @@
   },
   "peacock.color": "#314aa6",
   "peacock.remoteColor": "#d622f4",
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "files.associations": {
+    "*.config.json": "jsonc",
+    "random": "c",
+    "type_traits": "c",
+    "istream": "c",
+    "ostream": "c",
+    "ratio": "c",
+    "array": "c",
+    "functional": "c",
+    "tuple": "c",
+    "utility": "c"
+  }
 }

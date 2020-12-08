@@ -133,6 +133,10 @@ public class SpeakersQueue {
     System.out.println("Is Empty? " + test.isEmpty()); // should be: false
     test.enqueue("Jim");
     test.enqueue("Beck");
+    test.enqueue("Beck");
+    test.enqueue("Beck");
+    test.enqueue("Beck");
+    test.enqueue("Beck");
     System.out.println(test); // should be: [ Deb Jim Beck ]
 
     // test the dequeue method:
