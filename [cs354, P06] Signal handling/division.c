@@ -22,74 +22,128 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <assert.h>
-#include <string.h>
 #include <errno.h>
-#include <stdbool.h>
 #include <signal.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include <time.h>
+#include <unistd.h>
 
+// input buffer size
 #define BUFFER_SIZE 100
 
-int divisionOp = 0; // total count of how many division operations were successfully completed
+// total count of how many division operations were successfully completed
+int divisionOp = 0;
 
-void handleArithmeticSignal(int signal)  {
-  printf("Error: a division by 0 operation was attempted.");
-  printf("\nTotal number of operations completed successfully: %i\n", divisionOp);
-  printf("The program will be terminated.\n");
-  exit(0);
-}
+void promptInput(int *, int *);
+void registerHandler();
+/**
+ * signal handlers
+ */
+void handleArithmeticSignal(int);
+void handleInterrupt(int);
 
-void handleInterrupt(int signal) {
-  printf("\nTotal number of operations completed successfully: %i\n", divisionOp);
-  printf("The program will be terminated.\n");
-  exit(0);
-}
+/**
+ * Main registers handlers, makes calculation on user input integers
+ *
+ * argc: command-line argument count
+ * argv: command-line argument value
+ * program exit status
+ */
+int main(int argc, char *argv[]) {
+  int int1, int2;  // input values
 
-int main() {
-  int int1, int2; // input values
+  registerHandler();  // register handlers
 
-  struct sigaction act1; // signal action struct
-  memset(&act1, 0, sizeof(act1)); // clear memory
-  act1.sa_handler = &handleArithmeticSignal;
-  // register user signal
-  if(sigaction(SIGFPE, &act1, NULL) == -1) {
-    exit(1);
-  };
+  while (1) {
+    promptInput(&int1, &int2);
 
-  struct sigaction act2; // signal action struct
-  memset(&act2, 0, sizeof(act2)); // clear memory
-  act2.sa_handler = &handleInterrupt;
-  // register user signal
-  if(sigaction(SIGINT, &act2, NULL) == -1) {
-    exit(1);
-  };
-
-  while(1) {
-    // prompt for user input integers
-    char *str = malloc(BUFFER_SIZE);
-    printf("Enter first integer: ");
-    if (fgets(str, BUFFER_SIZE, stdin) == NULL) {
-        exit(1);
-    }
-    int1 = atoi(str); 
-    printf("Enter second integer: ");
-    if (fgets(str, BUFFER_SIZE, stdin) == NULL) {
-      exit(1);
-    }
-    int2 = atoi(str);
-    
     // Calculate the quotient and remainder of input numbers division
-    struct div_t { int quot; int rem; };
-    int quotient = int1 / int2; 
+    int quotient = int1 / int2;
     int remainder = int1 % int2;
 
-    printf("%i / %i is %i with a remainder of %i\n", int1, int2, quotient, remainder);
+    printf("%i / %i is %i with a remainder of %i\n", int1, int2, quotient,
+           remainder);
 
     divisionOp++;
   }
+}
+
+/**
+ * prompt for user input and parse integers
+ *
+ * int1: first user input target
+ * int2: second user input target
+ */
+void promptInput(int *int1, int *int2) {
+  // get first integer
+  char *str = malloc(BUFFER_SIZE);
+  printf("Enter first integer: ");
+  if (fgets(str, BUFFER_SIZE, stdin) == NULL) {
+    fprintf(stderr, "Could not read input. %s\n", strerror(errno));
+    exit(1);
+  }
+  *int1 = atoi(str);
+
+  // get second integer
+  printf("Enter second integer: ");
+  if (fgets(str, BUFFER_SIZE, stdin) == NULL) {
+    fprintf(stderr, "Could not read input. %s\n", strerror(errno));
+    exit(1);
+  }
+  *int2 = atoi(str);
+}
+
+/**
+ * Register signal handlers to corresponding signal types
+ */
+void registerHandler() {
+  struct sigaction act1;           // signal action struct
+  memset(&act1, 0, sizeof(act1));  // clear memory
+  act1.sa_handler = &handleArithmeticSignal;
+  // register signal
+  if (sigaction(SIGFPE, &act1, NULL) == -1) {
+    fprintf(stderr, "Could not register signal handler. %s\n", strerror(errno));
+    exit(1);
+  };
+
+  struct sigaction act2;           // signal action struct
+  memset(&act2, 0, sizeof(act2));  // clear memory
+  act2.sa_handler = &handleInterrupt;
+  // register signal
+  if (sigaction(SIGINT, &act2, NULL) == -1) {
+    fprintf(stderr, "Could not register signal handler. %s\n", strerror(errno));
+    exit(1);
+  };
+}
+
+/**
+ * Arithmetic signal handler (division by zero)
+ *
+ * signal: signal identifier
+ */
+void handleArithmeticSignal(int signal) {
+  printf(
+      "Error: a division by 0 operation was attempted.\n"
+      "Total number of operations completed successfully: %i\n"
+      "The program will be terminated.\n",
+      divisionOp);
+  exit(0);
+}
+
+/**
+ * keyboard interrupt signal handler (Ctrl+c)
+ *
+ * signal: signal identifier
+ */
+void handleInterrupt(int signal) {
+  printf(
+      "\nTotal number of operations completed successfully: %i\n"
+      "The program will be terminated.\n",
+      divisionOp);
+  exit(0);
 }
