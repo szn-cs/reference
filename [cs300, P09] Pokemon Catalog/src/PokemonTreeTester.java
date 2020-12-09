@@ -1,5 +1,3 @@
-import java.util.NoSuchElementException;
-
 //////////////// FILE HEADER (INCLUDE IN EVERY FILE) //////////////////////////
 //
 // Title: PokemonNode.java
@@ -15,6 +13,8 @@ import java.util.NoSuchElementException;
 // Online Sources: NONE
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+import java.util.NoSuchElementException;
 
 /**
  * This class checks the correctness of the implementation of the methods defined in the class
