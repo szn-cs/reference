@@ -1,23 +1,91 @@
 import java.util.*;
 
-// must be implemented using a List of HashMaps - Think about the operations that will be done on a SymTable to decide whether to use an ArrayList or a LinkedList
 public class SymTable {
- // HashMaps must map a String to a Sym
- private List<HashMap<String,Sym>>; 
+  private List<HashMap<String, Sym>> table; // stores symbols by scope (mapping a string
+                                            // to Sym instance)
 
-//  SymTable()	This is the constructor; it should initialize the SymTable's List field to contain a single, empty HashMap.
+  /**
+   * constructor: initializes the SymTable's List field to contain a single, empty HashMap.
+   */
+  SymTable() {
+    /*
+     * TODO: choose specific List implemention - ArrayList or LinkedList, according to SymTable
+     * operations used
+     */
+    this.table = new ArrayList<HashMap<String, Sym>>();
+    this.table.add(new HashMap<>());
+  }
 
-// void addDecl(String name, Sym sym) throws DuplicateSymException, EmptySymTableException	If this SymTable's list is empty, throw an EmptySymTableException. If either name or sym (or both) is null, throw a IllegalArgumentException. If the first HashMap in the list already contains the given name as a key, throw a DuplicateSymException. Otherwise, add the given name and sym to the first HashMap in the list.
+  /**
+   * add the given name and sym to the first HashMap in the list
+   * 
+   * @param name
+   * @param sym
+   * @throws DuplicateSymException    If the first HashMap in the list already contains the given
+   *                                  name as a key
+   * @throws EmptySymTableException   If this SymTable's list is empty
+   * @throws IllegalArgumentException If either name or sym (or both) is null
+   */
+  void addDecl(String name, Sym sym) throws DuplicateSymException, EmptySymTableException {
 
-// void addScope()	Add a new, empty HashMap to the front of the list.
+  }
 
-// Sym lookupLocal(String name)	If this SymTable's list is empty, throw an EmptySymTableException. Otherwise, if the first HashMap in the list contains name as a key, return the associated Sym; otherwise, return null.
+  /**
+   * Add a new, empty HashMap to the front of the list.
+   */
+  void addScope() {
+    this.table.add(new HashMap<>());
+  }
 
-// Sym lookupGlobal(String name)	If this SymTable's list is empty, throw an EmptySymTableException. If any HashMap in the list contains name as a key, return the first associated Sym (i.e., the one from the HashMap that is closest to the front of the list); otherwise, return null.
+  /**
+   * 
+   * @param name
+   * @return
+   * @throws EmptySymTableException If this SymTable's list is empty
+   */
+  Sym lookupLocal(String name) {
+    // Otherwise, if the first HashMap in the list contains name as a key, return the associated
+    // Sym;
+    // otherwise, return null.
+    return new Sym(); // TODO:
+  }
 
-// void removeScope() throws EmptySymTableException	If this SymTable's list is empty, throw an EmptySymTableException; otherwise, remove the HashMap from the front of the list. To clarify, throw an exception only if before attempting to remove, the list is empty (i.e. there are no HashMaps to remove).
 
-// void print()	This method is for debugging. First, print “\nSym Table\n”. Then, for each HashMap M in the list, print M.toString() followed by a newline. Finally, print one more newline. All output should go to System.out.
+  /**
+   * 
+   * @param name
+   * @return
+   * 
+   * @throws EmptySymTableException If this SymTable's list is empty
+   */
+  Sym lookupGlobal(String name) {
+    // If any HashMap in the list contains name as a key, return the first
+    // associated Sym (i.e., the one from the HashMap that is closest to the front of the list);
+    // otherwise, return null.
+    return new Sym(); // TODO:
+  }
 
+
+  /**
+   * 
+   * @throws EmptySymTableException If this SymTable's list is empty
+   */
+  void removeScope() {
+    // otherwise, remove the HashMap from the front of the list. To clarify,
+    // throw an exception only if before attempting to remove, the list is empty (i.e. there are no
+    // HashMaps to remove).
+
+  }
+
+  /**
+   * This method is for debugging
+   */
+  void print() {
+    String output = "\nSym Table\n"; // output accumolator with required format
+    for (HashMap<String, Sym> scope : this.table) {
+      output += scope.toString() + "\n";
+    }
+    System.out.println(output);
+  }
 }
 

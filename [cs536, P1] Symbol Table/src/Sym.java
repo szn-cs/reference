@@ -1,26 +1,40 @@
+/**
+ * Sym class: represents a symbol entry in the symbol-table data structure.
+ * 
+ * symbol instances store information about each identifier retlating to its declaration or scope
+ * (e.g. type, location stored at runtime)
+ * 
+ * @author Safi
+ */
 public class Sym {
-  
+  private String type; // type of identifier (e.g. "int", "double", etc.)
+
   /**
-   * This is the constructor; it should initialize the Sym to have the given type.
+   * constructor: initializes the Sym to have the given type.
+   * 
    * @param type
    */
   public void Sym(String type) {
-
-  }	
-
-  /**
-   * Return this Sym's type.
-   * @return
-   */
-  String getType()	{
-
+    this.type = type;
   }
-  
+
   /**
-   * Return this Sym's type. (This method will be changed later in a future project when more information is stored in a Sym.)
+   * getter: this Sym's type.
+   * 
+   * @return identifier declaration type
    */
-  String toString()	{
-    
+  String getType() {
+    return this.type;
+  }
+
+  /**
+   * string representation: this Sym's type
+   * 
+   * @return identifier declaration type
+   */
+  @Override
+  String toString() {
+    return this.type;
   }
 
 }
