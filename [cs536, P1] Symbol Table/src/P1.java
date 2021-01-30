@@ -1,74 +1,226 @@
 import java.util.*;
 
 /**
- * To test your SymTable implementation, you will write a main program in a file named P1.java. The
- * program must not expect any command-line arguments or user input. It can read from one or more
- * files; if you set it up to do that, be sure to hand in the file(s) along with P1.java.
- * 
- * Be sure that your P1.java tests all of the Sym and SymTable operations and all situations under
- * which exceptions are thrown. Also think about testing both “boundary” and “non-boundary” cases.
- * 
- * It is up to you how your program works. A suggested approach is to write your program so that
- * output is only produced if one of the methods that it is testing does not work as expected (e.g.,
- * if the lookupLocal method of the SymTable class returns null when you expect it to return a
- * non-null value). This will make it much easier to determine whether your test succeeds or fails.
- * The one exception to this approach is that P1.java will need to test the print method of the
- * SymTable class and that will cause output to be produced.
- * 
- * 
- */
-
-/**
- * P1 class: tests the SymTable & related classes.
+ * P1 class: tests the SymTable & related classes - Sym
+ * <p>
+ * Note: test methods tend to preserve names of corresponding methods being
+ * verified & are prefixed with "test_".
+ * </p>
  * 
  * @author Safi
  */
 public class P1 {
    /**
-    * test driver: calls unit test methods & annotates each test with pass/fail status
+    * test driver: calls unit test methods & annotates each test with pass/fail
+    * status
     * 
     * @param args input arguments if any
     */
    public static void main(String[] args) {
       boolean status = true; // test state
-      String m = "Unit Tests:\n"; // output message accumolator
+      String m = "———————————\nUnit Tests:\n"; // output message accumolator
       HashMap<String, Boolean> u = new HashMap<>(); // unit test status info
 
       // run unit tests & record status
-      u.put("testSymTableConstructor", testSymTableConstructor() ? true : false);
+      { // custom exception definitions
+         u.put("test_exception", test_exception() ? true : false);
+      }
+      { // Sym class & related functionality
+         u.put("test_Sym", test_Sym() ? true : false);
+      }
+      { // SymTable class
+         u.put("test_SymTable", test_SymTable() ? true : false);
+         u.put("test_addDecl", test_addDecl() ? true : false);
+         u.put("test_addScope", test_addScope() ? true : false);
+         u.put("test_lookupLocal", test_lookupLocal() ? true : false);
+         u.put("test_lookupGlobal", test_lookupGlobal() ? true : false);
+         u.put("test_removeScope", test_removeScope() ? true : false);
+         u.put("test_print", test_print() ? true : false);
+      }
 
       // loop through unite test results
       for (Map.Entry<String, Boolean> entry : u.entrySet()) {
-         m += "|→ " + entry.getKey() + " ";
          if (entry.getValue())
             m += "✔️";
          else {
             status = false;
             m += "❌";
          }
+         m += "  → " + entry.getKey() + "\n";
       }
 
-      System.out.print(m + "\n\n");
-      System.out.println((status ? "✔️  PASS" : "❌  FAIL") + " test suite status.");
+      System.out.println(m + "\n⇒ " + (status ? "✔️  PASS" : "❌  FAIL") + " test suite status.");
    }
 
    /**
-    * checks the correctness of the constructor implemented in the SymTable class
+    * checks the correctness of the constructor & related getter/setter methods
+    * implemented in the Sym class
     * 
-    * @return true: verifies a correct functionality. false: otherwise
+    * @return true: verifies a correct functionality, otherwise false.
     */
-   public static boolean testSymTableConstructor() {
+   public static boolean test_Sym() {
       try {
-
-         {
-            SymTable s = new SymTable();
-            s.print();
+         Sym symbol;
+         { // instance instantiation must not throw
+            symbol = new Sym("integer");
          }
-
+         { // getType method
+            String type = symbol.getType();
+            if (!type.equals("integer"))
+               return false;
+         }
+         { // toString method
+            String string = symbol.toString();
+            if (!string.equals("integer"))
+               return false;
+         }
       } catch (Exception e) {
          System.out.println("Unexpected Error thrown.");
          return false;
       }
       return true;
    }
+
+   /**
+    * checks the correctness of custom checked exception classes
+    * 
+    * @return true: verifies a correct functionality, otherwise false.
+    */
+   public static boolean test_exception() {
+      try {
+         { // construction custom exceptions must not throw
+           // without message
+            new EmptySymTableException();
+            new DuplicateSymException();
+            // with message
+            new EmptySymTableException("Message");
+            new DuplicateSymException("Message");
+         }
+      } catch (Exception e) {
+         System.out.println("Unexpected Error thrown.");
+         return false;
+      }
+      return true;
+   }
+
+   /**
+    * checks the correctness of the constructor implemented in the SymTable class
+    * 
+    * @return true: verifies a correct functionality, otherwise false.
+    */
+   public static boolean test_SymTable() {
+      try {
+         SymTable s;
+         { // constuction of symbol-table must not throw
+            s = new SymTable();
+         }
+         { // must contain a default HashMap element
+            String output = s.print();
+            if (!output.equals("\nSym Table\n{}\n"))
+               return false;
+         }
+      } catch (Exception e) {
+         System.out.println("Unexpected Error thrown.");
+         return false;
+      }
+      return true;
+   }
+
+   /**
+    * checks the correctness of the constructor implemented in the SymTable class
+    * 
+    * @return true: verifies a correct functionality, otherwise false.
+    */
+   public static boolean test_addDecl() {
+      try {
+         {
+
+         }
+      } catch (Exception e) {
+         System.out.println("Unexpected Error thrown.");
+         return false;
+      }
+      return true;
+   }
+
+   /**
+    * checks the correctness of the constructor implemented in the SymTable class
+    * 
+    * @return true: verifies a correct functionality, otherwise false.
+    */
+   public static boolean test_addScope() {
+      try {
+
+      } catch (Exception e) {
+         System.out.println("Unexpected Error thrown.");
+         return false;
+      }
+      return true;
+
+   }
+
+   /**
+    * checks the correctness of the constructor implemented in the SymTable class
+    * 
+    * @return true: verifies a correct functionality, otherwise false.
+    */
+   public static boolean test_lookupLocal() {
+      try {
+
+      } catch (Exception e) {
+         System.out.println("Unexpected Error thrown.");
+         return false;
+      }
+      return true;
+
+   }
+
+   /**
+    * checks the correctness of the constructor implemented in the SymTable class
+    * 
+    * @return true: verifies a correct functionality, otherwise false.
+    */
+   public static boolean test_lookupGlobal() {
+      try {
+
+      } catch (Exception e) {
+         System.out.println("Unexpected Error thrown.");
+         return false;
+      }
+      return true;
+
+   }
+
+   /**
+    * checks the correctness of the constructor implemented in the SymTable class
+    * 
+    * @return true: verifies a correct functionality, otherwise false.
+    */
+   public static boolean test_removeScope() {
+      try {
+
+      } catch (Exception e) {
+         System.out.println("Unexpected Error thrown.");
+         return false;
+      }
+      return true;
+
+   }
+
+   /**
+    * checks the correctness of the constructor implemented in the SymTable class
+    * 
+    * @return true: verifies a correct functionality, otherwise false.
+    */
+   public static boolean test_print() {
+      try {
+         
+      } catch (Exception e) {
+         System.out.println("Unexpected Error thrown.");
+         return false;
+      }
+      return true;
+
+   }
+
 }

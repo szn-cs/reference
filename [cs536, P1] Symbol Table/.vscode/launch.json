@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch P1",
+      "request": "launch",
+      "mainClass": "P1",
+      "projectName": "[cs536, P1] Symbol Table_578eb9a6",
+      "console": "integratedTerminal"
+
+    },
+  ]
+}

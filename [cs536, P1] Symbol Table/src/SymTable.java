@@ -1,17 +1,23 @@
 import java.util.*;
 
+/**
+ * SymTable: symbol-table data structure implementation
+ * 
+ * <p>
+ * each HashMap in the list stores symbols corresponding to specific scope in
+ * the compiled program.
+ * </p>
+ */
 public class SymTable {
-  private List<HashMap<String, Sym>> table; // stores symbols by scope (mapping a string
-                                            // to Sym instance)
+  private List<HashMap<String, Sym>> table; // stores symbols by scope, mapping identifier name to its associated
+                                            // information
 
   /**
-   * constructor: initializes the SymTable's List field to contain a single, empty HashMap.
+   * constructor: initializes the SymTable's List field to contain a single, empty
+   * HashMap.
    */
-  SymTable() {
-    /*
-     * TODO: choose specific List implemention - ArrayList or LinkedList, according to SymTable
-     * operations used
-     */
+  public SymTable() {
+    /* Note: LinkedList could be considered once implementation becomes clearer. */
     this.table = new ArrayList<HashMap<String, Sym>>();
     this.table.add(new HashMap<>());
   }
@@ -21,19 +27,19 @@ public class SymTable {
    * 
    * @param name
    * @param sym
-   * @throws DuplicateSymException    If the first HashMap in the list already contains the given
-   *                                  name as a key
+   * @throws DuplicateSymException    If the first HashMap in the list already
+   *                                  contains the given name as a key
    * @throws EmptySymTableException   If this SymTable's list is empty
    * @throws IllegalArgumentException If either name or sym (or both) is null
    */
-  void addDecl(String name, Sym sym) throws DuplicateSymException, EmptySymTableException {
+  public void addDecl(String name, Sym sym) throws DuplicateSymException, EmptySymTableException {
 
   }
 
   /**
    * Add a new, empty HashMap to the front of the list.
    */
-  void addScope() {
+  public void addScope() {
     this.table.add(new HashMap<>());
   }
 
@@ -43,13 +49,13 @@ public class SymTable {
    * @return
    * @throws EmptySymTableException If this SymTable's list is empty
    */
-  Sym lookupLocal(String name) {
-    // Otherwise, if the first HashMap in the list contains name as a key, return the associated
+  public Sym lookupLocal(String name) throws EmptySymTableException {
+    // Otherwise, if the first HashMap in the list contains name as a key, return
+    // the associated
     // Sym;
     // otherwise, return null.
     return new Sym(); // TODO:
   }
-
 
   /**
    * 
@@ -58,34 +64,37 @@ public class SymTable {
    * 
    * @throws EmptySymTableException If this SymTable's list is empty
    */
-  Sym lookupGlobal(String name) {
+  public Sym lookupGlobal(String name) throws EmptySymTableException {
     // If any HashMap in the list contains name as a key, return the first
-    // associated Sym (i.e., the one from the HashMap that is closest to the front of the list);
+    // associated Sym (i.e., the one from the HashMap that is closest to the front
+    // of the list);
     // otherwise, return null.
     return new Sym(); // TODO:
   }
-
 
   /**
    * 
    * @throws EmptySymTableException If this SymTable's list is empty
    */
-  void removeScope() {
+  public void removeScope() throws EmptySymTableException {
     // otherwise, remove the HashMap from the front of the list. To clarify,
-    // throw an exception only if before attempting to remove, the list is empty (i.e. there are no
+    // throw an exception only if before attempting to remove, the list is empty
+    // (i.e. there are no
     // HashMaps to remove).
 
   }
 
   /**
    * This method is for debugging
+   * 
+   * @return string representation of the symbol-table for debugging purposes
    */
-  void print() {
+  public String print() {
     String output = "\nSym Table\n"; // output accumolator with required format
     for (HashMap<String, Sym> scope : this.table) {
       output += scope.toString() + "\n";
     }
-    System.out.println(output);
+    System.out.println(output); // (as per specification)
+    return output;
   }
 }
-

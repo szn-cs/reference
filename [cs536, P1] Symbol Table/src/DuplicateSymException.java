@@ -1,3 +1,27 @@
-// simply define the two checked exceptions that can be thrown by the SymTable class. Each exception must be able to be created using a constructor that takes no arguments
-public class DuplicateSymException extends Exception { 
+/**
+ * DuplicateSymException checked exception defintion: duplicate entries in the
+ * symbol HashMap
+ * 
+ * <p>
+ * used by SymTable class
+ * </p>
+ * 
+ * @author Safi
+ */
+public class DuplicateSymException extends Exception {
+  /**
+   * constructor: create exception without a message
+   */
+  public DuplicateSymException() {
+    super();
+  }
+
+  /**
+   * constructor: create exception with custom error message
+   * 
+   * @param message error message
+   */
+  public DuplicateSymException(String message) {
+    super(message);
+  }
 }

@@ -1,3 +1,27 @@
-// simply define the two checked exceptions that can be thrown by the SymTable class. Each exception must be able to be created using a constructor that takes no arguments
+/**
+ * EmptySymTableException checked exception defintion: empty symbol-table data
+ * structure.
+ * 
+ * <p>
+ * used by SymTable class
+ * </p>
+ * 
+ * @author Safi
+ */
 public class EmptySymTableException extends Exception {
+  /**
+   * constructor: create exception without a message
+   */
+  public EmptySymTableException() {
+    super();
+  }
+
+  /**
+   * constructor: create exception with custom error message
+   * 
+   * @param message error message
+   */
+  public EmptySymTableException(String message) {
+    super(message);
+  }
 }

@@ -1,8 +1,8 @@
 /**
  * Sym class: represents a symbol entry in the symbol-table data structure.
  * 
- * symbol instances store information about each identifier retlating to its declaration or scope
- * (e.g. type, location stored at runtime)
+ * symbol instances store information about each identifier token retlating to
+ * its declaration or scope (e.g. name, type, location stored at runtime)
  * 
  * @author Safi
  */
@@ -12,9 +12,9 @@ public class Sym {
   /**
    * constructor: initializes the Sym to have the given type.
    * 
-   * @param type
+   * @param type of the identifier
    */
-  public void Sym(String type) {
+  public Sym(String type) {
     this.type = type;
   }
 
@@ -23,7 +23,7 @@ public class Sym {
    * 
    * @return identifier declaration type
    */
-  String getType() {
+  public String getType() {
     return this.type;
   }
 
@@ -33,7 +33,7 @@ public class Sym {
    * @return identifier declaration type
    */
   @Override
-  String toString() {
+  public String toString() {
     return this.type;
   }
 
