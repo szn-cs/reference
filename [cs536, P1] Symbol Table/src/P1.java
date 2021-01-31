@@ -36,7 +36,8 @@ public class P1 {
 	public static void main(String[] args) {
 		boolean status = true; // test state
 		String m = "———————————\nUnit Tests:\n"; // output message accumolator
-		HashMap<String, Boolean> u = new HashMap<>(); // unit test status info
+		// unit test status info
+		LinkedHashMap<String, Boolean> u = new LinkedHashMap<>();
 
 		// run unit tests & record status
 		// custom exception definitions
