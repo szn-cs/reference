@@ -2,9 +2,13 @@ import java.util.*;
 
 /**
  * P1 class: tests the SymTable & related classes - Sym
+ * 
  * <p>
  * Note: test methods tend to preserve names of corresponding methods being
  * verified & are prefixed with "test_".
+ * 
+ * Note: "print" method is used althroughout the unit tests, which excludes it
+ * from being tested.
  * </p>
  * 
  * @author Safi
@@ -35,7 +39,6 @@ public class P1 {
          u.put("test_lookupLocal", test_lookupLocal() ? true : false);
          u.put("test_lookupGlobal", test_lookupGlobal() ? true : false);
          u.put("test_removeScope", test_removeScope() ? true : false);
-         u.put("test_print", test_print() ? true : false);
       }
 
       // loop through unite test results
@@ -127,14 +130,61 @@ public class P1 {
    }
 
    /**
-    * checks the correctness of the constructor implemented in the SymTable class
+    * checks the correctness of the addDecl method in the SymTable class
+    * <p>
+    * depends on removeScope method
+    * </p>
     * 
     * @return true: verifies a correct functionality, otherwise false.
     */
    public static boolean test_addDecl() {
       try {
-         {
-
+         SymTable table = new SymTable();
+         { // key/vale entry
+            table.addDecl("v1", new Sym("t1"));
+            if (!table.print().equals("\nSym Table\n{v1=t1}\n"))
+               return false;
+            table.addDecl("v2", new Sym("t2"));
+            if (!table.print().equals("\nSym Table\n{v1=t1, v2=t2}\n"))
+               return false;
+         }
+         { // duplicate entry
+            try {
+               table.addDecl("v1", new Sym("t1"));
+               return false;
+            } catch (DuplicateSymException e) {
+               // expected
+            }
+         }
+         { // parameters validation
+            try {
+               table.addDecl(null, new Sym("t4"));
+               return false;
+            } catch (IllegalArgumentException e) {
+               // expected
+            }
+            try {
+               table.addDecl("v4", null);
+               return false;
+            } catch (IllegalArgumentException e) {
+               // expected
+            }
+            try {
+               table.addDecl(null, null);
+               return false;
+            } catch (IllegalArgumentException e) {
+               // expected
+            }
+         }
+         { // symbol-table state
+            table = new SymTable();
+            table.removeScope();
+            try {
+               table.addDecl("v3", new Sym("t3"));
+               return false;
+            } catch (EmptySymTableException e) {
+               // expected
+            }
          }
       } catch (Exception e) {
          System.out.println("Unexpected Error thrown.");
@@ -144,29 +194,71 @@ public class P1 {
    }
 
    /**
-    * checks the correctness of the constructor implemented in the SymTable class
+    * checks the correctness of the addScope implemented in the SymTable class
     * 
     * @return true: verifies a correct functionality, otherwise false.
     */
    public static boolean test_addScope() {
       try {
-
+         SymTable table = new SymTable();
+         { // add scope operation in order
+            table.addScope();
+            table.addDecl("v1", new Sym("t1"));
+            if (!table.print().equals("\nSym Table\n{v1=t1}\n{}\n"))
+               return false;
+            table.addScope();
+            table.addDecl("v2", new Sym("t2"));
+            if (!table.print().equals("\nSym Table\n{v2=t2}\n{v1=t1}\n{}\n"))
+               return false;
+         }
       } catch (Exception e) {
          System.out.println("Unexpected Error thrown.");
          return false;
       }
       return true;
-
    }
 
    /**
-    * checks the correctness of the constructor implemented in the SymTable class
+    * checks the correctness of the lookupLocal implemented in the SymTable class
     * 
     * @return true: verifies a correct functionality, otherwise false.
     */
    public static boolean test_lookupLocal() {
       try {
-
+         SymTable table = new SymTable();
+         Sym symbol;
+         table.addDecl("v1", new Sym("t1"));
+         table.addDecl("v2", new Sym("t2"));
+         table.addDecl("v3", new Sym("x")); // duplicate in another hash map
+         table.addScope();
+         table.addDecl("v3", new Sym("t3"));
+         table.addDecl("v4", new Sym("t4"));
+         { // lookup symbol by name - where list has multiple hash map
+            symbol = table.lookupLocal("v3");
+            if (!symbol.toString().equals("t3"))
+               return false;
+            symbol = table.lookupLocal("v4");
+            if (!symbol.toString().equals("t4"))
+               return false;
+         }
+         { // lookup symbol by name - where list has one hash map
+            table.removeScope();
+            symbol = table.lookupLocal("v1");
+            if (!symbol.toString().equals("t1"))
+               return false;
+            symbol = table.lookupLocal("v2");
+            if (!symbol.toString().equals("t2"))
+               return false;
+         }
+         { // empty symbol-table
+            table.removeScope();
+            try {
+               table.lookupLocal("v1");
+               return false;
+            } catch (EmptySymTableException e) {
+               // expected
+            }
+         }
       } catch (Exception e) {
          System.out.println("Unexpected Error thrown.");
          return false;
@@ -176,51 +268,93 @@ public class P1 {
    }
 
    /**
-    * checks the correctness of the constructor implemented in the SymTable class
+    * checks the correctness of the lookupGlobal implemented in the SymTable class
     * 
     * @return true: verifies a correct functionality, otherwise false.
     */
    public static boolean test_lookupGlobal() {
       try {
-
+         SymTable table = new SymTable();
+         Sym symbol;
+         table.addDecl("v0", new Sym("scope1-t0"));
+         table.addDecl("v1", new Sym("t1"));
+         table.addDecl("v2", new Sym("t2"));
+         table.addScope();
+         table.addDecl("v3", new Sym("t3"));
+         table.addDecl("v4", new Sym("t4"));
+         table.addDecl("v0", new Sym("scope2-t0"));
+         table.addScope();
+         { // lookup symbol by name - where list has multiple hash map
+            symbol = table.lookupGlobal("v0");
+            if (!symbol.toString().equals("scope2-t0"))
+               return false;
+            symbol = table.lookupGlobal("v4");
+            if (!symbol.toString().equals("t4"))
+               return false;
+            symbol = table.lookupGlobal("v1");
+            if (!symbol.toString().equals("t1"))
+               return false;
+         }
+         { // lookup symbol by name - where list has one hash map
+            table.removeScope();
+            table.removeScope();
+            symbol = table.lookupGlobal("v0");
+            if (!symbol.toString().equals("scope1-t0"))
+               return false;
+            symbol = table.lookupGlobal("v1");
+            if (!symbol.toString().equals("t1"))
+               return false;
+         }
+         { // empty symbol-table
+            table.removeScope();
+            try {
+               table.lookupGlobal("v1");
+               return false;
+            } catch (EmptySymTableException e) {
+               // expected
+            }
+         }
       } catch (Exception e) {
          System.out.println("Unexpected Error thrown.");
          return false;
       }
       return true;
-
    }
 
    /**
-    * checks the correctness of the constructor implemented in the SymTable class
+    * checks the correctness of the removeScope implemented in the SymTable class
     * 
     * @return true: verifies a correct functionality, otherwise false.
     */
    public static boolean test_removeScope() {
       try {
-
+         SymTable table = new SymTable();
+         table.addScope();
+         table.addScope();
+         { // remove scope operation
+            table.removeScope();
+            if (!table.print().equals("\nSym Table\n{}\n{}\n"))
+               return false;
+            table.removeScope();
+            if (!table.print().equals("\nSym Table\n{}\n"))
+               return false;
+            table.removeScope();
+            if (!table.print().equals("\nSym Table\n"))
+               return false;
+         }
+         { // empty symbol-table
+            try {
+               table.removeScope();
+               return false;
+            } catch (EmptySymTableException e) {
+               // expected
+            }
+         }
       } catch (Exception e) {
          System.out.println("Unexpected Error thrown.");
          return false;
       }
       return true;
-
-   }
-
-   /**
-    * checks the correctness of the constructor implemented in the SymTable class
-    * 
-    * @return true: verifies a correct functionality, otherwise false.
-    */
-   public static boolean test_print() {
-      try {
-         
-      } catch (Exception e) {
-         System.out.println("Unexpected Error thrown.");
-         return false;
-      }
-      return true;
-
    }
 
 }

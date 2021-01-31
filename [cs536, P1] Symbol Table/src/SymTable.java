@@ -17,8 +17,8 @@ public class SymTable {
    * HashMap.
    */
   public SymTable() {
-    /* Note: LinkedList could be considered once implementation becomes clearer. */
-    this.table = new ArrayList<HashMap<String, Sym>>();
+    /* Note: LinkedList used for efficient insert/remove oprerations */
+    this.table = new LinkedList<HashMap<String, Sym>>();
     this.table.add(new HashMap<>());
   }
 
@@ -27,37 +27,48 @@ public class SymTable {
    * 
    * @param name
    * @param sym
-   * @throws DuplicateSymException    If the first HashMap in the list already
-   *                                  contains the given name as a key
    * @throws EmptySymTableException   If this SymTable's list is empty
    * @throws IllegalArgumentException If either name or sym (or both) is null
+   * @throws DuplicateSymException    If the first HashMap in the list already
+   *                                  contains the given name as a key
    */
   public void addDecl(String name, Sym sym) throws DuplicateSymException, EmptySymTableException {
+    // validate symbol-table state
+    if (this.table.isEmpty())
+      throw new EmptySymTableException();
+    // validate parameters
+    if (name == null || sym == null)
+      throw new IllegalArgumentException("parameters must not be null");
+    if (this.table.get(0).containsKey(name))
+      throw new DuplicateSymException();
 
+    this.table.get(0).put(name, sym);
   }
 
   /**
    * Add a new, empty HashMap to the front of the list.
    */
   public void addScope() {
-    this.table.add(new HashMap<>());
+    this.table.add(0, new HashMap<>());
   }
 
   /**
+   * retrieve symbol by identifier name (key) from first/front hash map element
    * 
-   * @param name
-   * @return
+   * @param name identifier name corresponds to the hash map key
+   * @return matching symbol, otherwise null.
    * @throws EmptySymTableException If this SymTable's list is empty
    */
   public Sym lookupLocal(String name) throws EmptySymTableException {
-    // Otherwise, if the first HashMap in the list contains name as a key, return
-    // the associated
-    // Sym;
-    // otherwise, return null.
-    return new Sym(); // TODO:
+    if (this.table.isEmpty())
+      throw new EmptySymTableException();
+
+    return this.table.get(0).containsKey(name) ? this.table.get(0).get(name) : null;
   }
 
   /**
+   * retrieve symbol by identifier name (key) from any hash maps in the
+   * symbol-table
    * 
    * @param name
    * @return
@@ -65,23 +76,26 @@ public class SymTable {
    * @throws EmptySymTableException If this SymTable's list is empty
    */
   public Sym lookupGlobal(String name) throws EmptySymTableException {
-    // If any HashMap in the list contains name as a key, return the first
-    // associated Sym (i.e., the one from the HashMap that is closest to the front
-    // of the list);
-    // otherwise, return null.
-    return new Sym(); // TODO:
+    if (this.table.isEmpty())
+      throw new EmptySymTableException();
+
+    for (HashMap<String, Sym> element : this.table)
+      if (element.containsKey(name))
+        return element.get(name);
+
+    return null;
   }
 
   /**
+   * remove the HashMap from the front of the list
    * 
    * @throws EmptySymTableException If this SymTable's list is empty
    */
   public void removeScope() throws EmptySymTableException {
-    // otherwise, remove the HashMap from the front of the list. To clarify,
-    // throw an exception only if before attempting to remove, the list is empty
-    // (i.e. there are no
-    // HashMaps to remove).
+    if (this.table.isEmpty())
+      throw new EmptySymTableException();
 
+    this.table.remove(0);
   }
 
   /**
