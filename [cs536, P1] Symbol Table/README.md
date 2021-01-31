@@ -63,6 +63,7 @@ checks the correctness of the removeScope implemented in the SymTable class
 # Compiler for a C-- language
 
 -   C-- is a simple programming language that uses Pascal identifiers.
+- Assumption: the compiler lexical and syntax analysis phases would be executed in parallel, where the scanner would stream tokens to the parser for evaluation. The compiler would insert & remove current scopes from the list while the analysis process is being executed, and priority is given to the current scope (latest pushed to the list).
 
 ## Terminology:
 
