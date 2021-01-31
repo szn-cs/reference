@@ -1,22 +1,31 @@
+///////////////////////////////////////////////////////////////////////////////
+// Title: P1 assignment
+// Files: P1.java, SymTable.java, Sym.java, EmptySymTableException.java, DuplicateSymException
+// Semester: CS536 Spring 2021
+//
+// Author: Safi Nassar
+// Email: nassar2@wisc.edu
+// CS Login: safi@cs.wisc.edu
+// Lecturer's Name: Loris D'Antoni
+//
+///////////////////////////////////////////////////////////////////////////////
 import java.util.*;
 
 /**
  * P1 class: tests the SymTable & related classes - Sym
  * 
  * <p>
- * Note: test methods tend to preserve names of corresponding methods being
- * verified & are prefixed with "test_".
+ * Note: test methods tend to preserve names of corresponding methods being verified & are prefixed
+ * with "test_".
  * 
- * Note: "print" method is used althroughout the unit tests, which excludes it
- * from being tested.
+ * Note: "print" method is used althroughout the unit tests, which excludes it from being tested.
  * </p>
  * 
  * @author Safi
  */
 public class P1 {
    /**
-    * test driver: calls unit test methods & annotates each test with pass/fail
-    * status
+    * test driver: calls unit test methods & annotates each test with pass/fail status
     * 
     * @param args input arguments if any
     */
@@ -26,20 +35,17 @@ public class P1 {
       HashMap<String, Boolean> u = new HashMap<>(); // unit test status info
 
       // run unit tests & record status
-      { // custom exception definitions
-         u.put("test_exception", test_exception() ? true : false);
-      }
-      { // Sym class & related functionality
-         u.put("test_Sym", test_Sym() ? true : false);
-      }
-      { // SymTable class
-         u.put("test_SymTable", test_SymTable() ? true : false);
-         u.put("test_addDecl", test_addDecl() ? true : false);
-         u.put("test_addScope", test_addScope() ? true : false);
-         u.put("test_lookupLocal", test_lookupLocal() ? true : false);
-         u.put("test_lookupGlobal", test_lookupGlobal() ? true : false);
-         u.put("test_removeScope", test_removeScope() ? true : false);
-      }
+      // custom exception definitions
+      u.put("test_exception", test_exception() ? true : false);
+      // Sym class & related functionality
+      u.put("test_Sym", test_Sym() ? true : false);
+      // SymTable class
+      u.put("test_SymTable", test_SymTable() ? true : false);
+      u.put("test_addDecl", test_addDecl() ? true : false);
+      u.put("test_addScope", test_addScope() ? true : false);
+      u.put("test_lookupLocal", test_lookupLocal() ? true : false);
+      u.put("test_lookupGlobal", test_lookupGlobal() ? true : false);
+      u.put("test_removeScope", test_removeScope() ? true : false);
 
       // loop through unite test results
       for (Map.Entry<String, Boolean> entry : u.entrySet()) {
@@ -56,8 +62,8 @@ public class P1 {
    }
 
    /**
-    * checks the correctness of the constructor & related getter/setter methods
-    * implemented in the Sym class
+    * checks the correctness of the constructor & related getter/setter methods implemented in the
+    * Sym class
     * 
     * @return true: verifies a correct functionality, otherwise false.
     */

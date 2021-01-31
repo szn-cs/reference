@@ -21,4 +21,5 @@
     "configurations": [],
     "compounds": []
   },
+  "prettier.tabWidth": 4,
 }

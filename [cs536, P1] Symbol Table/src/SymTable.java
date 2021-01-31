@@ -4,17 +4,15 @@ import java.util.*;
  * SymTable: symbol-table data structure implementation
  * 
  * <p>
- * each HashMap in the list stores symbols corresponding to specific scope in
- * the compiled program.
+ * each HashMap in the list stores symbols corresponding to specific scope in the compiled program.
  * </p>
  */
 public class SymTable {
-  private List<HashMap<String, Sym>> table; // stores symbols by scope, mapping identifier name to its associated
-                                            // information
+  private List<HashMap<String, Sym>> table; // stores symbols by scope, mapping identifier name to
+                                            // its associated information
 
   /**
-   * constructor: initializes the SymTable's List field to contain a single, empty
-   * HashMap.
+   * constructor: initializes the SymTable's List field to contain a single, empty HashMap.
    */
   public SymTable() {
     /* Note: LinkedList used for efficient insert/remove oprerations */
@@ -29,8 +27,8 @@ public class SymTable {
    * @param sym
    * @throws EmptySymTableException   If this SymTable's list is empty
    * @throws IllegalArgumentException If either name or sym (or both) is null
-   * @throws DuplicateSymException    If the first HashMap in the list already
-   *                                  contains the given name as a key
+   * @throws DuplicateSymException    If the first HashMap in the list already contains the given
+   *                                  name as a key
    */
   public void addDecl(String name, Sym sym) throws DuplicateSymException, EmptySymTableException {
     // validate symbol-table state
@@ -67,8 +65,7 @@ public class SymTable {
   }
 
   /**
-   * retrieve symbol by identifier name (key) from any hash maps in the
-   * symbol-table
+   * retrieve symbol by identifier name (key) from any hash maps in the symbol-table
    * 
    * @param name
    * @return
