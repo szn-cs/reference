@@ -97,5 +97,6 @@ checks the correctness of the removeScope implemented in the SymTable class
     -   [generate markdown from javadoc](https://delight-im.github.io/Javadoc-to-Markdown)
         or
     -   generate javadoc to extract method headers: `find . -type f -name "*.java" | xargs javadoc -d ../javadoc`
+-   Add headers for each file
 -   Verify code format
 -   Verify code execution on CSL machines
