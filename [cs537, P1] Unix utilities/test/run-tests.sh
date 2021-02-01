@@ -1,6 +1,10 @@
 #!/bin/bash
 
-TESTS_PATH="/u/c/s/cs537-1/tests/p1"
+# this file's directory path
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+# TESTS_PATH="/u/c/s/cs537-1/tests/p1"
+TESTS_PATH="${DIR}"
 
 TMP_DIR="tests-tmp"
 OUT_DIR="tests-out"
@@ -8,9 +12,13 @@ OUT_DIR="tests-out"
 rm -rf $TMP_DIR
 rm -rf $OUT_DIR
 
-cp -r $TESTS_PATH $TMP_DIR
+echo "$DIR"
+echo "$TMP_DIR"
+echo "$OUT_DIR"
 
-chmod +x $TMP_DIR/tester/run-tests.sh
+mkdir -p "${TMP_DIR}" && mkdir -p "${OUT_DIR}" && cp -a "${TESTS_PATH}/." "${TMP_DIR}"
+
+chmod +x "${TMP_DIR}/tester/run-tests.sh"
 
 for utility in my-look my-rev; do
     echo
@@ -20,7 +28,7 @@ for utility in my-look my-rev; do
     else
         echo
         echo "*** Linting output for $utility"
-        python ~cs537-1/projects/lint/cpplint.py --root=~cs537-1/handin --extensions=c,h $utility.c
+        python ./lint/cpplint.py --root="$pwd" --extensions=c,h $utility.c
 
         echo
         echo "*** Compiler output for $utility"
@@ -29,9 +37,9 @@ for utility in my-look my-rev; do
         echo
         echo "*** Valgrind output for $utility"
         if [ $utility = "my-look" ]; then
-            valgrind --show-reachable=yes ./$utility -f my-look.c '#' > /dev/null
+            valgrind --show-reachable=yes ./$utility -f my-look.c '#' >/dev/null
         else
-            valgrind --show-reachable=yes ./$utility -f my-rev.c > /dev/null
+            valgrind --show-reachable=yes ./$utility -f my-rev.c >/dev/null
         fi
 
         echo
