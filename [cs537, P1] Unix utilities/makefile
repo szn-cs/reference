@@ -1,13 +1,13 @@
 CC = gcc 
-CFLAGS = -Wall -Werror
+CFLAGS = -Wall -Werror -g
 
 compile: my-look my-rev
 
 my-look: my-look.c
-	$(CC) $(CFLAGS) my-look.c -o ./object/my-look
+	$(CC) $(CFLAGS) $@ -o ./object/$<
 
 my-rev: my-rev.c
-	$(CC) $(CFLAGS) my-rev.c -o ./object/my-rev
+	$(CC) $(CFLAGS) $@ -o ./object/$<
 
 clean: 
 	rm *.o ./object/*
@@ -20,3 +20,6 @@ test-help:
 
 test-list: 
 	./test/list-tests.sh
+
+valgrind: 
+	valgrind --show-reachable=yes --leak-check=full ./my-diff "args"

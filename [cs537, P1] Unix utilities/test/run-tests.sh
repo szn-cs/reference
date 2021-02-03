@@ -32,7 +32,7 @@ for utility in my-look my-rev; do
 
         echo
         echo "*** Compiler output for $utility"
-        gcc -o $utility $utility.c -Wall -Werror
+        gcc -o $utility ./object/$utility.c -Wall -Werror
 
         echo
         echo "*** Valgrind output for $utility"
