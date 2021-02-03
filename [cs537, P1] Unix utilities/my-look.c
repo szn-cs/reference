@@ -33,10 +33,10 @@ static struct Config {
  * pick mode & associated variables
  *
  */
-static void cliAdapter(int argc, char const* argv[], struct Config* config) {
+static void cliAdapter(int argc, char* const argv[], struct Config* config) {
     int nextOption;
     char* filename = NULL;
-    opterr = 0; // suppress printing errors 
+    opterr = 0; // suppress printing errors
 
     // parse option arguments:
     // if multiple arguments provided it will process the first argument only.
@@ -50,7 +50,7 @@ static void cliAdapter(int argc, char const* argv[], struct Config* config) {
                 return;
             case 'f':
                 config->functionality = COMPARE;
-                if (config->variable.target = fopen(optarg, "r") == NULL)
+                if ((config->variable.target = fopen(optarg, "r")) == NULL)
                     goto fileError;
                 break;
             case '\1':
@@ -88,17 +88,15 @@ argumentError:
  *
  * @param string to search for
  * @param target dictionary (list of words)
+ * @param output stream (by default stdout)
  */
-void findPrefixedLine(char* prefix, FILE* target) {
-    char* buffer[BUFFER_SIZE]; // read-in buffer 
+void findPrefixedLine(char* prefix, FILE* target, FILE* output) {
+    char* buffer[BUFFER_SIZE]; // read-in buffer
     size_t n = 0;
 
-    // read input line by line 
-    while (fgets(&buffer, BUFFER_SIZE, target) != NULL) {
-        fprintf(stdout, "%s", buffer);
-    }
-
-    // fclose(target);
+    // read input line by line
+    while (fgets(&buffer, BUFFER_SIZE, target) != NULL)
+        fprintf(output, "%s", buffer);
 }
 
 void compareStringPrefix(char* prefix, char* line) {
@@ -179,7 +177,7 @@ int main(int argc, char const* argv[]) {
     // choose function to execute
     switch (config.functionality) {
         case COMPARE:
-            findPrefixedLine(config.variable.prefix, config.variable.target);
+            findPrefixedLine(config.variable.prefix, config.variable.target, config.variable.output);
             // TODO: check if closing stdin breaks program
             break;
         case USAGE:
@@ -188,6 +186,12 @@ int main(int argc, char const* argv[]) {
         case INFO:
             printInformation();
             break;
+    }
+
+    if (fclose(config.variable.target) != 0) {
+        printf("Closing ! .\n");
+        printf("Error while closing the file.\n");
+        exit(1);
     }
 
     return 0;

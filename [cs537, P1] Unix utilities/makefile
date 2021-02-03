@@ -1,16 +1,22 @@
 CC = gcc 
-CFLAGS = -Wall -Werror -g
+
+# strict compilcation
+# CFLAGS = -Wall -Werror -g 
+
+# inhibit all warnings
+CFLAGS = -g -w -O0
 
 compile: my-look my-rev
 
 my-look: my-look.c
-	$(CC) $(CFLAGS) $@ -o ./object/$<
+	$(CC) $(CFLAGS) $< -o ./object/$@
 
 my-rev: my-rev.c
-	$(CC) $(CFLAGS) $@ -o ./object/$<
+	$(CC) $(CFLAGS) $< -o ./object/$@
 
-clean: 
+clean:
 	rm *.o ./object/*
+	mkdir -p ./object
 
 test-all:
 	./test/run-tests.sh -c
