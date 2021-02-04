@@ -20,8 +20,8 @@ mkdir -p "${TMP_DIR}" && mkdir -p "${OUT_DIR}" && cp -a "${TESTS_PATH}/." "${TMP
 
 chmod +x "${TMP_DIR}/tester/run-tests.sh"
 
-# for utility in my-look my-rev; do
-for utility in my-look; do
+# for utility in my-look my-rev; do # original
+for utility in my-look; do # custom
     echo
     echo "*** Start testing the $utility utility..."
     if [ ! -f $utility.c ]; then
@@ -33,20 +33,20 @@ for utility in my-look; do
 
         echo
         echo "*** Compiler output for $utility"
-        # gcc -o ./$utility $utility.c -Wall -Werror
-        gcc -o ./$utility $utility.c -W
+        gcc -o ./$utility $utility.c -Wall -Werror # original
+        # gcc -o ./$utility $utility.c -W # custom
 
-        echo
-        echo "*** Valgrind output for $utility"
-        if [ $utility = "my-look" ]; then
-            valgrind --show-reachable=yes ./$utility -f my-look.c '#' >/dev/null
-        else
-            valgrind --show-reachable=yes ./$utility -f my-rev.c >/dev/null
-        fi
+        # echo
+        # echo "*** Valgrind output for $utility"
+        # if [ $utility = "my-look" ]; then
+        #     valgrind --show-reachable=yes ./$utility -f my-look.c '#' >/dev/null
+        # else
+        #     valgrind --show-reachable=yes ./$utility -f my-rev.c >/dev/null
+        # fi
 
-        echo
-        echo "*** Testing output for $utility"
-        ./$TMP_DIR/tester/run-tests.sh -d $TMP_DIR/$utility -o $OUT_DIR/$utility $*
+        # echo
+        # echo "*** Testing output for $utility"
+        # ./$TMP_DIR/tester/run-tests.sh -d $TMP_DIR/$utility -o $OUT_DIR/$utility $*
     fi
 done
 

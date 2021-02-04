@@ -6,6 +6,7 @@ CC = gcc
 # inhibit all warnings
 CFLAGS = -g -w -O0
 
+
 compile: my-look my-rev
 
 my-look: my-look.c
@@ -29,3 +30,11 @@ test-list:
 
 valgrind: 
 	valgrind --show-reachable=yes --leak-check=full ./my-diff "args"
+
+# watch files and execute make with `make watch LABEL=<label to execute>`
+watch:
+	# required:
+	# -	"cli-watch" npm package
+	watch -f ./*.c -r "make test-all && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
+	
+

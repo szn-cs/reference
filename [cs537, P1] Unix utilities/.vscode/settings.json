@@ -18,6 +18,9 @@
     "peacock.remoteColor": "#277fda",
     "files.associations": {
         "*.config.json": "jsonc",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "unistd.h": "c",
+        "getopt_posix.h": "c",
+        "getopt_core.h": "c"
     }
 }
