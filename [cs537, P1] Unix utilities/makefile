@@ -16,8 +16,8 @@ my-rev: my-rev.c
 	$(CC) $(CFLAGS) $< -o ./object/$@
 
 clean:
-	rm *.o ./object/*
 	mkdir -p ./object
+	rm *.o ./object/* 
 
 test-all:
 	./test/run-tests.sh -c
