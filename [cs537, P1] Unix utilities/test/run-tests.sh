@@ -36,17 +36,17 @@ for utility in my-look; do # custom
         gcc -o ./$utility $utility.c -Wall -Werror # original
         # gcc -o ./$utility $utility.c -W # custom
 
-        # echo
-        # echo "*** Valgrind output for $utility"
-        # if [ $utility = "my-look" ]; then
-        #     valgrind --show-reachable=yes ./$utility -f my-look.c '#' >/dev/null
-        # else
-        #     valgrind --show-reachable=yes ./$utility -f my-rev.c >/dev/null
-        # fi
+        echo
+        echo "*** Valgrind output for $utility"
+        if [ $utility = "my-look" ]; then
+            valgrind --show-reachable=yes ./$utility -f my-look.c '#' >/dev/null
+        else
+            valgrind --show-reachable=yes ./$utility -f my-rev.c >/dev/null
+        fi
 
-        # echo
-        # echo "*** Testing output for $utility"
-        # ./$TMP_DIR/tester/run-tests.sh -d $TMP_DIR/$utility -o $OUT_DIR/$utility $*
+        echo
+        echo "*** Testing output for $utility"
+        ./$TMP_DIR/tester/run-tests.sh -d $TMP_DIR/$utility -o $OUT_DIR/$utility $*
     fi
 done
 

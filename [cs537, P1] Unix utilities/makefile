@@ -29,7 +29,7 @@ test-list:
 	./test/list-tests.sh
 
 valgrind: 
-	valgrind --show-reachable=yes --leak-check=full ./my-diff "args"
+	valgrind -v --show-reachable=yes --leak-check=full ./my-look -f dictionary odd
 
 # watch files and execute make with `make watch LABEL=<label to execute>`
 watch:
