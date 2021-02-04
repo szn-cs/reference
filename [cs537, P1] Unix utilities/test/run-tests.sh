@@ -20,7 +20,8 @@ mkdir -p "${TMP_DIR}" && mkdir -p "${OUT_DIR}" && cp -a "${TESTS_PATH}/." "${TMP
 
 chmod +x "${TMP_DIR}/tester/run-tests.sh"
 
-for utility in my-look my-rev; do
+# for utility in my-look my-rev; do
+for utility in my-look; do
     echo
     echo "*** Start testing the $utility utility..."
     if [ ! -f $utility.c ]; then
@@ -32,7 +33,8 @@ for utility in my-look my-rev; do
 
         echo
         echo "*** Compiler output for $utility"
-        gcc -o $utility ./object/$utility.c -Wall -Werror
+        # gcc -o ./$utility $utility.c -Wall -Werror
+        gcc -o ./$utility $utility.c -W
 
         echo
         echo "*** Valgrind output for $utility"

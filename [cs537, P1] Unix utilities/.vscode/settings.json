@@ -15,5 +15,9 @@
         "titleBar.inactiveBackground": "#1e66b099",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.remoteColor": "#277fda"
+    "peacock.remoteColor": "#277fda",
+    "files.associations": {
+        "*.config.json": "jsonc",
+        "stdlib.h": "c"
+    }
 }

@@ -5,11 +5,9 @@
 #include <stdbool.h>
 #include <assert.h>
 
-
 extern int errno; // error number
 extern char* optarg;
 extern int optind, opterr, optopt;
-
 
 #define DEBUG false // debug flag
 // messages defined in specification
@@ -18,7 +16,7 @@ extern int optind, opterr, optopt;
 #define MESSAGE_FILE_ERROR "my-look: cannot open file"
 
 /* note: assuming input lines are a subset of those in /usr/share/dict/words (longest line ~30 chars) */
-static const int BUFFER_SIZE = 128; // maximum line length
+static const size_t BUFFER_SIZE = 128; // maximum line length
 static struct Config {
     enum { COMPARE, USAGE, INFO } functionality;
     struct {
@@ -27,7 +25,6 @@ static struct Config {
         FILE* output; // result output stream
     } variable;
 };
-
 
 /**
  * pick mode & associated variables
@@ -43,7 +40,7 @@ static void cliAdapter(int argc, char* const argv[], struct Config* config) {
     while ((nextOption = getopt(argc, argv, "-Vhf:")) != -1) {
         switch (nextOption) {
             case 'V':
-                config->functionality = USAGE;
+                config->functionality = INFO;
                 return;
             case 'h':
                 config->functionality = INFO;
@@ -64,14 +61,17 @@ static void cliAdapter(int argc, char* const argv[], struct Config* config) {
         }
     }
 
-fileError:
-    printf("%s\n", MESSAGE_FILE_ERROR);
-    exit(1);
+    // verify argument count
 verifyArgumentCount:
-    if (argc - optind == 0) // must be last argument
-        return;
+    if (argc - optind != 0 || argc < 2) // must be last argument
+        goto argumentError;
+    return;
+
 argumentError:
     printf("%s\n", MESSAGE_ARG_ERROR);
+    exit(1);
+fileError:
+    printf("%s\n", MESSAGE_FILE_ERROR);
     exit(1);
 }
 
@@ -92,19 +92,16 @@ argumentError:
  */
 void findPrefixedLine(char* prefix, FILE* target, FILE* output) {
     char* buffer[BUFFER_SIZE]; // read-in buffer
-    size_t n = 0;
 
     // read input line by line
-    while (fgets(&buffer, BUFFER_SIZE, target) != NULL)
-        fprintf(output, "%s", buffer);
+    while (fgets(&buffer, BUFFER_SIZE, target) != NULL) {
+        if (strncasecmp(prefix, buffer, strlen(prefix)) == 0) {
+            // remove new line 
+            char* token = strtok(buffer, "\n");
+            fprintf(output, "%s\n", token);
+        }
+    }
 }
-
-void compareStringPrefix(char* prefix, char* line) {
-    // if (strncasecmp())
-    //     printf("%s", buffer)
-
-}
-
 
 /**
  * @brief print utility information
@@ -189,7 +186,6 @@ int main(int argc, char const* argv[]) {
     }
 
     if (fclose(config.variable.target) != 0) {
-        printf("Closing ! .\n");
         printf("Error while closing the file.\n");
         exit(1);
     }
