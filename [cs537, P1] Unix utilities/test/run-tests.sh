@@ -20,8 +20,8 @@ mkdir -p "${TMP_DIR}" && mkdir -p "${OUT_DIR}" && cp -a "${TESTS_PATH}/." "${TMP
 
 chmod +x "${TMP_DIR}/tester/run-tests.sh"
 
-# for utility in my-look my-rev; do # original
-for utility in my-look; do # custom
+for utility in my-look my-rev; do # original
+    # for utility in my-rev; do # custom
     echo
     echo "*** Start testing the $utility utility..."
     if [ ! -f $utility.c ]; then

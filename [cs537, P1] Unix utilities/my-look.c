@@ -1,17 +1,16 @@
 /**
  * @file my-look.c
- * @brief a simplified implementation of 'look' command.
+ * @brief a simplified implementation of 'look' unix command.
  * @copyright Copyright (c) 2021 by Safi Nassar
  */
 
 #include <assert.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-extern int errno;  // error number
+extern int errno;
 extern char *optarg;
 extern int optind, opterr, optopt;
 
@@ -94,15 +93,16 @@ int main(int argc, char *argv[]) {
 
   // execute requested functionality
   switch (config.functionality) {
-    case COMPARE:
-      findPrefixedLine(config.variable.prefix, config.variable.target,
-                       config.variable.output);
-      break;
     case USAGE:
       printDocumentation();
       break;
     case INFO:
       printInformation();
+      break;
+    case COMPARE:
+    default:
+      findPrefixedLine(config.variable.prefix, config.variable.target,
+                       config.variable.output);
       break;
   }
 
@@ -124,8 +124,12 @@ int main(int argc, char *argv[]) {
  * @param config program's behavior configuration
  */
 static void cliAdapter(int argc, char ***argv, struct Config *config) {
-  int nextOption;  // option key
-  opterr = 0;      // suppress printing errors
+  if (argc <= 1)
+    goto argumentError;  // short-circuit when no arguments (beside command)
+
+  opterr = 0;          // suppress printing errors
+  int nextOption;      // option key
+  int repetition = 0;  // number of case repetition for 'f' key
 
   // parse option & non-option arguments:
   while ((nextOption = getopt(argc, *argv, "-Vhf:")) != -1) {
@@ -137,14 +141,17 @@ static void cliAdapter(int argc, char ***argv, struct Config *config) {
         config->functionality = USAGE;
         return;
       case 'f':
-        config->functionality = COMPARE;
         // create requested file stream
         if ((config->variable.target = fopen(optarg, "r")) == NULL)
           goto fileError;
+        repetition++;
         break;
       case '\1':  // parse non-option arguments
+        config->functionality = COMPARE;
         config->variable.prefix = optarg;
-        goto verifyArgumentCount;
+        // must be last argument and no previous option repititions
+        if (argc - optind != 0 || repetition > 1) goto argumentError;
+        return;
       case '?':
       default:
         // error parsing, unknown character, missing required argument
@@ -152,15 +159,10 @@ static void cliAdapter(int argc, char ***argv, struct Config *config) {
     }
   }
 
-  // verify argument count
-verifyArgumentCount:
-  if (argc - optind != 0 || argc < 2)  // must be last argument
-    goto argumentError;
-  return;
-
 argumentError:
   printf("%s\n", MESSAGE_ARG_ERROR);
   exit(1);
+
 fileError:
   printf("%s\n", MESSAGE_FILE_ERROR);
   exit(1);

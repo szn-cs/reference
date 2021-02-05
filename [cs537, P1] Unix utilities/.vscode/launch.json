@@ -10,14 +10,14 @@
             "request": "launch",
             "type": "cppdbg",
             "program": "${fileDirname}/object/${fileBasenameNoExtension}",
+            // "args": ["-V", "2>", "/dev/null"],
+            // "args": ["-f", "dictionary", "-f", "dictionary", "str"],
             // "args": ["-f","dictionary","worded"],
-            "args": ["2>", "/dev/null"],
-            "args": ["-V", "2>", "/dev/null"],
+            // "args": ["2>", "/dev/null"],
             // "args": ["once"],
             // "args": ["filename","-V",],
-            // "args": ["filename","-V",],
+            "args": ["-f","dictionary",],
             "environment": [],
-            
             "MIMode": "gdb",
             "stopAtEntry": false,
             "setupCommands": [

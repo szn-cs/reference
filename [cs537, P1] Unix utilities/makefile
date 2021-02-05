@@ -35,6 +35,6 @@ valgrind:
 watch:
 	# required:
 	# -	"cli-watch" npm package
-	watch -f ./*.c -r "make test-all && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
+	watch -f ./**/*.c -r "make test-all && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
 	
 
