@@ -532,3 +532,13 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+void customecho() {
+  // TODO:
+  cprintf("custom system calls executed !\n");
+
+  //   - You still need to have lock acquire and lock release code (just as what
+  //   kill() does in proc.c), but you are not required to fully understand
+  //   them.
+  //   return 0;
+}

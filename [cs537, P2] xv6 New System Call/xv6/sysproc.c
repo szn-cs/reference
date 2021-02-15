@@ -89,3 +89,13 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+/**
+ * @brief
+ *
+ * @return int
+ */
+int sys_customecho(void) {
+    customecho();
+    return 0;
+}

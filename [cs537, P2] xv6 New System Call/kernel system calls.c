@@ -18,8 +18,6 @@ value to make sure it isn't -1.
 to look through the ptable.proc data structure to find the process with the
 matching pid.
 
-- You still need to have lock acquire and lock release code (just as what kill()
-does in proc.c), but you are not required to fully understand them.
 */
 
 /**
