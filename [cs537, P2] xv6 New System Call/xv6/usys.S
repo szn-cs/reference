@@ -1,3 +1,5 @@
+### defines system calls in assembly, where syscall is linked to a trap instruction. 
+
 #include "syscall.h"
 #include "traps.h"
 

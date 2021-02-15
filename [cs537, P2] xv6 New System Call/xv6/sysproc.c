@@ -1,3 +1,6 @@
+//* contains function which links between syscall and actual function
+// implementation.
+
 #include "types.h"
 #include "x86.h"
 #include "defs.h"

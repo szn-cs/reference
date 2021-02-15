@@ -1,3 +1,5 @@
+//* user-level header file for all syscalls */
+
 struct stat;
 struct rtcdate;
 

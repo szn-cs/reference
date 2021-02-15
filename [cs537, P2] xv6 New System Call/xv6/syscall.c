@@ -1,3 +1,5 @@
+// syscall()
+
 #include "types.h"
 #include "defs.h"
 #include "param.h"
@@ -119,9 +121,12 @@ void syscall(void) {
   int num;
   struct proc *curproc = myproc();
 
+  // TODO: check if system call was successful
+
   num = curproc->tf->eax;
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    curproc->tf->eax = syscalls[num]();
+    curproc->tf->eax = syscalls[num]();  // returns the result of the syscalll
+                                         // implementation function
   } else {
     cprintf("%d %s: unknown sys call %d\n", curproc->pid, curproc->name, num);
     curproc->tf->eax = -1;

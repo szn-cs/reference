@@ -1,3 +1,5 @@
+//* This file contains where the actual kill function.
+
 #include "types.h"
 #include "defs.h"
 #include "param.h"
