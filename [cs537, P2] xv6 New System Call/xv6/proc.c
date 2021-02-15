@@ -481,4 +481,36 @@ int customecho(int pid) {
   }
   release(&ptable.lock);
   return -1;
-}                 
+}
+
+/**
+ * returns the number of system calls that the process
+ * identified by pid has completed (not just initiated);
+ *
+ * calls to getnumsyscalls(), getnumsyscallsgood(), fork(), exec(), and sbrk()
+ * should not be counted in that total.
+ *
+ * @param pid process identifier
+ * @return number of system calls invoked, or -1 if pid is not a
+ * valid pid.
+ */
+int getnumsyscalls(int pid) {
+  // NOTE: Make sure you increment the appropriate counter after the system call
+  // (except for those we have said to exclude) has returned and check its
+  // return value to make sure it isn't -1.
+
+  return 0;
+}
+
+/**
+ * returns the number of system calls that the process identified by pid has
+ * completed successfully(i.e., with a return code that is not -1);
+ *
+ * calls to getnumsyscalls(), getnumsyscallsgood(), fork(), exec(), and sbrk()
+ * should not be counted in this total.
+ *
+ * @param pid process identifier
+ * @return number of system calls completed successfully, or -1 if pid is not a
+ * valid pid
+ */
+int getnumsyscallsgood(int pid) { return 0; }
