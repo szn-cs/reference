@@ -466,12 +466,19 @@ void procdump(void) {
   }
 }
 
-void customecho() {
-  // TODO:
-  cprintf("custom system calls executed !\n");
+int customecho(int pid) {
+  struct proc *p;
 
-  //   - You still need to have lock acquire and lock release code (just as what
-  //   kill() does in proc.c), but you are not required to fully understand
-  //   them.
-  //   return 0;
-}
+  // NOTE: must call lock acquire and lock release code if writting to process
+  // table
+  acquire(&ptable.lock);
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if (p->pid == pid) {
+      cprintf("The process name: %s\n", p->name);
+      release(&ptable.lock);
+      return 0;
+    }
+  }
+  release(&ptable.lock);
+  return -1;
+}                 

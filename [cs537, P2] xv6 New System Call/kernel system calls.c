@@ -1,8 +1,6 @@
 /*
 - related files for the project: syscall.c, sysproc.c, proc.h, proc.c, usys.S
 
-- look for example at sys_kill system call to create your own.
-
 - How will you find out the pid that has been passed to your two system calls?
 This is the same as what sys_kill() must do.
 
