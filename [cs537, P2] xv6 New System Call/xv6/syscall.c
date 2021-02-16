@@ -91,29 +91,34 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_customecho(void);
+extern int sys_getnumsyscalls(void);
+extern int sys_getnumsyscallsgood(void);
 
-static int (*syscalls[])(void) = {[SYS_fork] sys_fork,
-                                  [SYS_exit] sys_exit,
-                                  [SYS_wait] sys_wait,
-                                  [SYS_pipe] sys_pipe,
-                                  [SYS_read] sys_read,
-                                  [SYS_kill] sys_kill,
-                                  [SYS_exec] sys_exec,
-                                  [SYS_fstat] sys_fstat,
-                                  [SYS_chdir] sys_chdir,
-                                  [SYS_dup] sys_dup,
-                                  [SYS_getpid] sys_getpid,
-                                  [SYS_sbrk] sys_sbrk,
-                                  [SYS_sleep] sys_sleep,
-                                  [SYS_uptime] sys_uptime,
-                                  [SYS_open] sys_open,
-                                  [SYS_write] sys_write,
-                                  [SYS_mknod] sys_mknod,
-                                  [SYS_unlink] sys_unlink,
-                                  [SYS_link] sys_link,
-                                  [SYS_mkdir] sys_mkdir,
-                                  [SYS_close] sys_close,
-                                  [SYS_customecho] sys_customecho
+static int (*syscalls[])(void) = {
+    [SYS_fork] sys_fork,
+    [SYS_exit] sys_exit,
+    [SYS_wait] sys_wait,
+    [SYS_pipe] sys_pipe,
+    [SYS_read] sys_read,
+    [SYS_kill] sys_kill,
+    [SYS_exec] sys_exec,
+    [SYS_fstat] sys_fstat,
+    [SYS_chdir] sys_chdir,
+    [SYS_dup] sys_dup,
+    [SYS_getpid] sys_getpid,
+    [SYS_sbrk] sys_sbrk,
+    [SYS_sleep] sys_sleep,
+    [SYS_uptime] sys_uptime,
+    [SYS_open] sys_open,
+    [SYS_write] sys_write,
+    [SYS_mknod] sys_mknod,
+    [SYS_unlink] sys_unlink,
+    [SYS_link] sys_link,
+    [SYS_mkdir] sys_mkdir,
+    [SYS_close] sys_close,
+    [SYS_getnumsyscalls] sys_getnumsyscalls,
+    [SYS_getnumsyscallsgood] sys_getnumsyscallsgood,
+    [SYS_customecho] sys_customecho,
 
 };
 
@@ -121,12 +126,27 @@ void syscall(void) {
     int num;
     struct proc *curproc = myproc();
 
-    // TODO: check if system call was successful
-
     num = curproc->tf->eax;
     if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
         curproc->tf->eax = syscalls[num]();  // returns the result of the
                                              // syscalll implementation function
+
+        // excluded system calls
+        switch (num) {
+            case SYS_getnumsyscalls:
+            case SYS_getnumsyscallsgood:
+            case SYS_fork:
+            case SYS_exec:
+            case SYS_sbrk:
+                // skip as these shouldn't be counted in the total.
+                break;
+            default:
+                // increment counters for system calls
+                if (curproc->tf->eax != -1) curproc->successfulCall++;
+                curproc->totalCall++;
+                break;
+        }
+
     } else {
         cprintf("%d %s: unknown sys call %d\n", curproc->pid, curproc->name,
                 num);

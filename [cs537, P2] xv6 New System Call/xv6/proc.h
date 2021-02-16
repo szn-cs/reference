@@ -50,7 +50,11 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 
-  // TODO: Add two counters for the required system calls
+  // system calls counters
+  int totalCall;       // total number of system calls (that the process
+                       // identified by pid has completed, not just initiated)
+  int successfulCall;  // # of successful system calls (with a return code
+                       // that is not -1)
 };
 
 // Process memory is laid out contiguously, low addresses first:

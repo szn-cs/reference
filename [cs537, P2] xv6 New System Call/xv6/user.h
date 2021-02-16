@@ -26,6 +26,8 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int customecho(int);
+int getnumsyscalls(int);
+int getnumsyscallsgood(int);
 
 // ulib.c
 int stat(const char*, struct stat*);
