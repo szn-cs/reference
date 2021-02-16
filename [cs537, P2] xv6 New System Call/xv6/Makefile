@@ -50,9 +50,6 @@ TOOLPREFIX := $(shell if i386-jos-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/d
 	echo "***" 1>&2; exit 1; fi)
 endif
 
-example: 
-	echo $TOOLPREFIX;
-
 # If the makefile can't find QEMU, specify its path here
 # QEMU = qemu-system-i386
 
