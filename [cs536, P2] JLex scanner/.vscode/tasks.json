@@ -4,15 +4,16 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "build java",
+			"label": "make",
 			"type": "shell",
-			"command": "javac -d ./src/bytecode ./src/*.java"
+			"command": "make",
+			"options": { "cwd": "${cwd}/src/" }
 		},
 		{
-			// TODO: fix this, it doesn't work.
-			"label": "test java",
+			"label": "test",
 			"type": "shell",
-			"command": "java \"$(pwd)/src/bytecode/P2\" > ./temporary/result",
+			"command": "make test",
+			"options": { "cwd": "${cwd}/src/" },
 			"dependsOn": ["build"]
 		}
 	]

@@ -1,12 +1,14 @@
 {
 	"configurations": [
 		{
+			// TODO:
 			"type": "java",
 			"name": "Launch",
 			"request": "launch",
 			"mainClass": "P2",
 			"projectName": "[cs536, P2]",
-			"console": "integratedTerminal"
+			"console": "integratedTerminal",
+			"cwd": "${workspaceFolder}/src/"
 		}
 	]
 }
