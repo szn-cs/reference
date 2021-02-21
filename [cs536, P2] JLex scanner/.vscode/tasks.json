@@ -4,7 +4,7 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "make",
+			"label": "build",
 			"type": "shell",
 			"command": "make",
 			"options": { "cwd": "${cwd}/src/" }
@@ -14,7 +14,21 @@
 			"type": "shell",
 			"command": "make test",
 			"options": { "cwd": "${cwd}/src/" },
-			"dependsOn": ["build"]
+			"dependsOn": ["clean", "build"]
+		},
+		{
+			"label": "watch",
+			"type": "shell",
+			"command": "make watch",
+			"options": { "cwd": "${cwd}/src/" },
+			"dependsOn": ["clean", "build"]
+		},
+		{
+			"label": "clean",
+			"type": "shell",
+			"command": "make clean",
+			"options": { "cwd": "${cwd}/src/" },
+			"dependsOn": [""]
 		}
 	]
 }

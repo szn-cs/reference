@@ -11,33 +11,37 @@
 ###
 
 # define the java compiler to be used and the flags
-JC = javac
-FLAGS = -g -cp $(CP) 
-CP = ./deps:.
+C = javac
+CLASSPATH = ./deps:.
+FLAGS = -g -cp $(CLASSPATH) 
 
+# compile tester
 P2.class: P2.java Yylex.class sym.class
-	$(JC) $(FLAGS) P2.java
+	$(C) $(FLAGS) P2.java
 
+# compile lexer
 Yylex.class: cminusminus.jlex.java ErrMsg.class sym.class
-	$(JC) $(FLAGS) cminusminus.jlex.java
+	$(C) $(FLAGS) cminusminus.jlex.java
 
+# generate lexer
 cminusminus.jlex.java: cminusminus.jlex sym.class
-	java -cp $(CP) JLex.Main cminusminus.jlex
+	java -cp $(CLASSPATH) JLex.Main cminusminus.jlex
 
 sym.class: sym.java
-	$(JC) $(FLAGS) sym.java
+	$(C) $(FLAGS) sym.java
 
 ErrMsg.class: ErrMsg.java
-	$(JC) $(FLAGS) ErrMsg.java
+	$(C) $(FLAGS) ErrMsg.java
 
 	
 ###
-# testing - add more here to run your tester and compare its results
-# to expected results
+# testing
+# TODO: add more here to run your tester and compare its results to expected results
 ###
 test:
-	java -cp $(CP) P2 
+	java -cp $(CLASSPATH) P2
 	diff allTokens.in allTokens.out
+
 
 ###
 # clean up
@@ -48,3 +52,10 @@ clean:
 
 cleantest:
 	rm -f allTokens.out
+
+# watch files and execute make with `make watch LABEL=<label to execute>`
+watch:
+	# requires:
+	# -	"cli-watch" npm package
+	watch -f "./**/P2.java;./**/*.in;./**/*.jlex"  -r "make clean && make && make test && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
+	

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Title: P2 assignment
-// Files: P2.java, sym.java, ErrMsg.java
+// Files: P2.java, sym.java, ErrMsg.java, cminusminus.java, & dependencies
 // Semester: CS536 Spring 2021
 //
 // Author: Safi Nassar
@@ -12,16 +12,24 @@
 
 import java.util.*;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java_cup.runtime.*; // defines Symbol
+
+/**
+ * configuration class for controling testing bahavior
+ */
+class config {
+    // test directories reltivate path
+    final public static String INPUT_DIRECTORY = "./test/in/";
+    final public static String OUTPUT_DIRECTORY = "./test/out/";
+}
+
 
 /**
  * P2 class: tests the test the C-- scanner testing all tokens, and related
  * classes. e.g., input that causes errors, character numbers, values associated
  * with tokens
- * <p>
- * Note: test methods tend to preserve names of corresponding methods being
- * verified & are prefixed with "test_".
- * </p>
  * 
  * @author Safi
  */
@@ -36,8 +44,8 @@ public class P2 {
         // test all tokens
         testAllTokens();
         CharNum.num = 1;
-
-        // ADD CALLS TO OTHER TEST METHODS HERE
+        // another test
+        anotherTest();
     }
 
     /**
@@ -49,12 +57,14 @@ public class P2 {
      * comparing the input and output files (e.g., using a 'diff' command).
      */
     private static void testAllTokens() throws IOException {
+        Path inPath = Paths.get(config.INPUT_DIRECTORY, "allTokens.in");
+        Path outPath = Paths.get(config.OUTPUT_DIRECTORY, "allTokens.out");
         // open input and output files
         FileReader inFile = null;
         PrintWriter outFile = null;
         try {
-            inFile = new FileReader("allTokens.in");
-            outFile = new PrintWriter(new FileWriter("allTokens.out"));
+            inFile = new FileReader(inPath.toString());
+            outFile = new PrintWriter(new FileWriter(outPath.toString()));
         } catch (FileNotFoundException ex) {
             System.err.println("File allTokens.in not found.");
             System.exit(-1);
@@ -63,137 +73,121 @@ public class P2 {
             System.exit(-1);
         }
 
+        runScanner(inFile, outFile);
+        outFile.close();
+    }
+
+    private static void anotherTest() throws IOException {
+    }
+
+    /**
+     * runs scanner - pipes input strings through scanner to an output file,
+     * writing the analyzed tokens
+     * 
+     * @param in  input stream of strings
+     * @param out output stream for writing tokens to
+     */
+    private static void runScanner(FileReader in, PrintWriter out)
+            throws IOException {
         // create and call the scanner
-        Yylex scanner = new Yylex(inFile);
+        Yylex scanner = new Yylex(in);
         Symbol token = scanner.next_token();
         while (token.sym != sym.EOF) {
-            switch (token.sym) {
-                case sym.BOOL:
-                    outFile.println("bool");
-                    break;
-                case sym.INT:
-                    outFile.println("int");
-                    break;
-                case sym.VOID:
-                    outFile.println("void");
-                    break;
-                case sym.TRUE:
-                    outFile.println("true");
-                    break;
-                case sym.FALSE:
-                    outFile.println("false");
-                    break;
-                case sym.STRUCT:
-                    outFile.println("struct");
-                    break;
-                case sym.CIN:
-                    outFile.println("cin");
-                    break;
-                case sym.COUT:
-                    outFile.println("cout");
-                    break;
-                case sym.IF:
-                    outFile.println("if");
-                    break;
-                case sym.ELSE:
-                    outFile.println("else");
-                    break;
-                case sym.WHILE:
-                    outFile.println("while");
-                    break;
-                case sym.RETURN:
-                    outFile.println("return");
-                    break;
-                case sym.ID:
-                    outFile.println(((IdTokenVal) token.value).idVal);
-                    break;
-                case sym.INTLITERAL:
-                    outFile.println(((IntLitTokenVal) token.value).intVal);
-                    break;
-                case sym.STRINGLITERAL:
-                    outFile.println(((StrLitTokenVal) token.value).strVal);
-                    break;
-                case sym.LCURLY:
-                    outFile.println("{");
-                    break;
-                case sym.RCURLY:
-                    outFile.println("}");
-                    break;
-                case sym.LPAREN:
-                    outFile.println("(");
-                    break;
-                case sym.RPAREN:
-                    outFile.println(")");
-                    break;
-                case sym.SEMICOLON:
-                    outFile.println(";");
-                    break;
-                case sym.COMMA:
-                    outFile.println(",");
-                    break;
-                case sym.DOT:
-                    outFile.println(".");
-                    break;
-                case sym.WRITE:
-                    outFile.println("<<");
-                    break;
-                case sym.READ:
-                    outFile.println(">>");
-                    break;
-                case sym.PLUSPLUS:
-                    outFile.println("++");
-                    break;
-                case sym.MINUSMINUS:
-                    outFile.println("--");
-                    break;
-                case sym.PLUS:
-                    outFile.println("+");
-                    break;
-                case sym.MINUS:
-                    outFile.println("-");
-                    break;
-                case sym.TIMES:
-                    outFile.println("*");
-                    break;
-                case sym.DIVIDE:
-                    outFile.println("/");
-                    break;
-                case sym.NOT:
-                    outFile.println("!");
-                    break;
-                case sym.AND:
-                    outFile.println("&&");
-                    break;
-                case sym.OR:
-                    outFile.println("||");
-                    break;
-                case sym.EQUALS:
-                    outFile.println("==");
-                    break;
-                case sym.NOTEQUALS:
-                    outFile.println("!=");
-                    break;
-                case sym.LESS:
-                    outFile.println("<");
-                    break;
-                case sym.GREATER:
-                    outFile.println(">");
-                    break;
-                case sym.LESSEQ:
-                    outFile.println("<=");
-                    break;
-                case sym.GREATEREQ:
-                    outFile.println(">=");
-                    break;
-                case sym.ASSIGN:
-                    outFile.println("=");
-                    break;
-                default:
-                    outFile.println("UNKNOWN TOKEN");
-            } // end switch
-
+            System.out.printf("→ %s\n", getTokenValue(token));
+            out.println(getTokenValue(token));
             token = scanner.next_token();
-        } // end while
-        outFile.close();
+        }
+    }
+
+    /**
+     * retrieve the appropriate token value corresponding to a symbol
+     * 
+     * @param token
+     */
+    private static String getTokenValue(Symbol token) {
+        switch (token.sym) {
+            case sym.BOOL:
+                return "bool";
+            case sym.INT:
+                return "int";
+            case sym.VOID:
+                return "void";
+            case sym.TRUE:
+                return "true";
+            case sym.FALSE:
+                return "false";
+            case sym.STRUCT:
+                return "struct";
+            case sym.CIN:
+                return "cin";
+            case sym.COUT:
+                return "cout";
+            case sym.IF:
+                return "if";
+            case sym.ELSE:
+                return "else";
+            case sym.WHILE:
+                return "while";
+            case sym.RETURN:
+                return "return";
+            case sym.ID:
+                return ((IdTokenVal) token.value).idVal;
+            case sym.INTLITERAL:
+                return Integer.toString(((IntLitTokenVal) token.value).intVal);
+            case sym.STRINGLITERAL:
+                return ((StrLitTokenVal) token.value).strVal;
+            case sym.LCURLY:
+                return "{";
+            case sym.RCURLY:
+                return "}";
+            case sym.LPAREN:
+                return "(";
+            case sym.RPAREN:
+                return ")";
+            case sym.SEMICOLON:
+                return ";";
+            case sym.COMMA:
+                return ",";
+            case sym.DOT:
+                return ".";
+            case sym.WRITE:
+                return "<<";
+            case sym.READ:
+                return ">>";
+            case sym.PLUSPLUS:
+                return "++";
+            case sym.MINUSMINUS:
+                return "--";
+            case sym.PLUS:
+                return "+";
+            case sym.MINUS:
+                return "-";
+            case sym.TIMES:
+                return "*";
+            case sym.DIVIDE:
+                return "/";
+            case sym.NOT:
+                return "!";
+            case sym.AND:
+                return "&&";
+            case sym.OR:
+                return "||";
+            case sym.EQUALS:
+                return "==";
+            case sym.NOTEQUALS:
+                return "!=";
+            case sym.LESS:
+                return "<";
+            case sym.GREATER:
+                return ">";
+            case sym.LESSEQ:
+                return "<=";
+            case sym.GREATEREQ:
+                return ">=";
+            case sym.ASSIGN:
+                return "=";
+            default:
+                return "UNKNOWN TOKEN";
+        } // end switch
     }
 }
