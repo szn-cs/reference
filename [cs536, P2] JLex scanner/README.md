@@ -16,6 +16,7 @@ _Safi Nassar - assignment p2_
 
 -   C-- is a simple programming language that uses Pascal identifiers, a small subset of the C++ language.
 -   Assumption: the compiler lexical and syntax analysis phases would be executed in parallel, where the scanner would stream tokens to the parser for evaluation. The compiler would insert & remove current scopes from the list while the analysis process is being executed, and priority is given to the current scope (latest pushed to the list).
+-   Source Language: C-- (made up language) → Host language: Java → Target language: MIPS
 
 ## Terminology:
 
@@ -25,7 +26,7 @@ _Safi Nassar - assignment p2_
 
 Tasks:
 
--   Writing the scanner specification (cminusminus.jlex).
+-   Writing the scanner in abstract level - the scanner specification (cminusminus.jlex).
 -   Writing the main program (P2.java).
 
 ## Submission:

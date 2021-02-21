@@ -1,0 +1,23 @@
+%%
+
+DIGIT=		[0-9]
+LETTER=		[a-zA-Z]
+WHITESPACE=	[ \t\n]      // space, tab, newline
+
+// The next 3 lines are included so that we can use the generated scanner
+// with java CUP (the Java parser generator)
+%implements java_cup.runtime.Scanner
+%function next_token
+%type java_cup.runtime.Symbol
+
+// Turn on line counting
+%line
+
+%%
+
+{LETTER}({LETTER}|{DIGIT})* {System.out.println(yyline+1 + ": ID " + yytext());}
+{DIGIT}+                    {System.out.println(yyline+1 + ": INT");}
+"="                         {System.out.println(yyline+1 + ": ASSIGN");}
+"=="                        {System.out.println(yyline+1 + ": EQUALS");}
+{WHITESPACE}*               { }
+.               	    {System.out.println(yyline+1 + ": bad char");}

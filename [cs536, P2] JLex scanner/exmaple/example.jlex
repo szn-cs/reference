@@ -1,0 +1,19 @@
+// scanner to return two values: the value before the decimal point
+
+  %%
+
+  DIGIT= [0-9]
+  DOT=   "."
+
+  %state DOTSTATE
+
+  %%
+
+  <YYINITIAL>{DIGIT}+{DOT}    { yybegin(DOTSTATE);
+                                -- save the value so far --
+                              }
+
+  <DOTSTATE>{DIGIT}+          { yybegin(YYINITIAL);
+                                -- return the saved value and the new one --
+                              }
+  

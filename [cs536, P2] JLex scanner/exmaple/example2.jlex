@@ -1,0 +1,43 @@
+// A quoted string consists of three parts:
+//      A double quote.
+//      Some text.
+//      A double quote.
+// The text can contain any characters except a newline or a single double-quote character. It can contain an "escaped" quote, which is two double-quote characters in a row.
+// Use JLex states to write a specification to recognize quoted strings, and to return the number of escaped quotes in each such string. To declare a counter, declare a class with a static, public int field, in the "User Code" part of the JLex specification, and update/return that static field.
+
+class Counter {
+    public static int count;
+}
+
+// directives
+%%
+// macros: 
+NOT_QUOTE_OR_NEWLINE = [^\n\"]
+ESCAPSED_QUOTE = ""
+QUOTE = [\"]
+
+%state QUOTED_STR_STATE
+
+// regex
+%%
+
+<YYINITIAL>{QUOTE} 
+{ 
+    yybegin(QUOTED_STR_STATE);
+    Counter.count = 0;
+}
+
+<QUOTED_STR_STATE>{NOT_QUOTE_OR_NEWLINE}*
+{ // do nothing
+}
+
+<QUOTED_STR_STATE>{QUOTE}{QUOTE}
+{ 
+    Counter.count++;
+}
+
+<QUOTED_STR_STATE>{QUOTE}
+{ 
+    yybegin(YYINITIAL);
+    return Counter.count;
+}

@@ -8,6 +8,11 @@ import java_cup.runtime.*; // defines the Symbol class
 // well as the number of the character on that line that starts the token.
 // Some tokens (literals and IDs) also include the value of the token.
 
+// --- User Code section (uninterpreted java code) ----------------------------------------------------------- 
+// User code:
+// - Package name
+// - Import packages of java
+
 class TokenVal {
   // fields
     int linenum;
@@ -54,21 +59,57 @@ class StrLitTokenVal extends TokenVal {
 class CharNum {
     static int num=1;
 }
+
+
 %%
 
+
+// --- JLex directives -----------------------------------------------------------
+// e.g. specifying the value that should be returned on end-of-file, specifying that line counting should be turned on, and specifying that the scanner will be used with the Java parser generator java cup.
+//Options & declarations:
+// - Specifying directives such as %cup, %byacc
+// - The code included in %{…%} will be automatically injected inside the generated lexer
+
+
+
+// macro definitions: which can be used in regular expression rules. 
+// format: `name = regular-expression`
+// WHITESPACE =	[ \t\n]
+LETTER =	[a-zA-Z]
 DIGIT=        [0-9]
 SPACE=        [\040\t]
 
+// any character except a newline, double quote, or backslash
+// NOTSPECIAL = [^\n\"\\]
+
+
+// configure to use with java CUP (parser generator)
 %implements java_cup.runtime.Scanner
 %function next_token
 %type java_cup.runtime.Symbol
 
+// end of file behavior
 %eofval{
 return new Symbol(sym.EOF);
 %eofval}
 
+// turn line counting on: use the variable yyline in the actions. The value of yyline will be the current line number in the input file, counting from zero.
 %line
 
+// declaring states
+// YYINITIAL is the initial default state
+%state STATE1
+
+
+// --- Regular expression rules with actions - specifying a pattern to be match on an input -----------------------------------------------------------
+// Each rule includes an optional state list, a regular expression, and an associated action.
+// Regexp operators `| . * + ? ()`
+// character class operators `- ^ \`  range, not, escapse respectively.
+// the "." rule: makes sure there are no unmatched characters to prevent the scanner from throwing. i.e. matching all "bad" characters (and the associated action issues an error message).
+// Recall - include a list of states at the beginning of the pattern. 
+// For example: <STATE1, STATE2>"abc" { }
+//
+// `yytext()` in actions can be used to get the sequence of characters that was just matched.
 %%
 
 {DIGIT}+  { // NOTE: the following computation of the integer value does NOT
@@ -88,7 +129,7 @@ return new Symbol(sym.EOF);
             CharNum.num++;
             return s;
           }
-        
+
 .         { ErrMsg.fatal(yyline+1, CharNum.num,
                          "ignoring illegal character: " + yytext());
             CharNum.num++;
