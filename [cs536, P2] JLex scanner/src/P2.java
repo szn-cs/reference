@@ -21,8 +21,54 @@ import java_cup.runtime.*; // defines Symbol
  */
 class config {
     // test directories reltivate path
-    final public static String INPUT_DIRECTORY = "./test/in/";
-    final public static String OUTPUT_DIRECTORY = "./test/out/";
+    final public static String INPUT_DIRECTORY = "./test/";
+    final public static String OUTPUT_DIRECTORY = "./test/";
+    final public static Boolean debug = true;
+}
+
+
+/**
+ * manages input and output stream for each test instance, creating temporary
+ * files for each test instance
+ */
+class pipe {
+    public FileReader in = null;
+    public PrintWriter out = null;
+
+    /**
+     * construct pipe source and target
+     *
+     * @param filename input file name excluding extension
+     */
+    pipe(String filename) {
+        // open input and output files
+        try {
+            in = new FileReader(
+                    config.INPUT_DIRECTORY + File.separator + filename + ".in");
+            out = new PrintWriter(new FileWriter(config.OUTPUT_DIRECTORY
+                    + File.separator + filename + ".out"));
+        } catch (FileNotFoundException ex) {
+            System.err.println(filename + " file not found.");
+            System.exit(-1);
+        } catch (IOException ex) {
+            System.err.println(filename + " cannot be opened.");
+            System.exit(-1);
+        }
+    }
+
+    /**
+     * close used streams
+     */
+    public void close() {
+        try {
+            out.close();
+            in.close();
+        } catch (IOException e) {
+            // not common for file I/O
+            System.err.println("error closing files.");
+            System.exit(-1);
+        }
+    }
 }
 
 
@@ -30,22 +76,20 @@ class config {
  * P2 class: tests the test the C-- scanner testing all tokens, and related
  * classes. e.g., input that causes errors, character numbers, values associated
  * with tokens
- * 
+ *
  * @author Safi
  */
 public class P2 {
     /**
      * test driver: calls unit test methods
-     * 
+     *
      * @param args input arguments if any
+     * @throws IOException exception may be thrown by yylex
      */
     public static void main(String[] args) throws IOException {
-        // exception may be thrown by yylex
         // test all tokens
         testAllTokens();
         CharNum.num = 1;
-        // another test
-        anotherTest();
     }
 
     /**
@@ -57,43 +101,41 @@ public class P2 {
      * comparing the input and output files (e.g., using a 'diff' command).
      */
     private static void testAllTokens() throws IOException {
-        Path inPath = Paths.get(config.INPUT_DIRECTORY, "allTokens.in");
-        Path outPath = Paths.get(config.OUTPUT_DIRECTORY, "allTokens.out");
-        // open input and output files
-        FileReader inFile = null;
-        PrintWriter outFile = null;
-        try {
-            inFile = new FileReader(inPath.toString());
-            outFile = new PrintWriter(new FileWriter(outPath.toString()));
-        } catch (FileNotFoundException ex) {
-            System.err.println("File allTokens.in not found.");
-            System.exit(-1);
-        } catch (IOException ex) {
-            System.err.println("allTokens.out cannot be opened.");
-            System.exit(-1);
-        }
-
-        runScanner(inFile, outFile);
-        outFile.close();
-    }
-
-    private static void anotherTest() throws IOException {
+        pipe stream = new pipe("allTokens");
+        lexer(stream.in, stream.out);
+        stream.close();
+        stream = new pipe("reservedWord");
+        lexer(stream.in, stream.out);
+        stream.close();
+        stream = new pipe("characterSymbol");
+        lexer(stream.in, stream.out);
+        stream.close();
+        stream = new pipe("stringLiteral");
+        lexer(stream.in, stream.out);
+        stream.close();
+        stream = new pipe("integerLiteral");
+        lexer(stream.in, stream.out);
+        stream.close();
+        stream = new pipe("identifier");
+        lexer(stream.in, stream.out);
+        stream.close();
     }
 
     /**
      * runs scanner - pipes input strings through scanner to an output file,
      * writing the analyzed tokens
-     * 
+     *
      * @param in  input stream of strings
      * @param out output stream for writing tokens to
      */
-    private static void runScanner(FileReader in, PrintWriter out)
+    private static void lexer(FileReader in, PrintWriter out)
             throws IOException {
         // create and call the scanner
         Yylex scanner = new Yylex(in);
         Symbol token = scanner.next_token();
         while (token.sym != sym.EOF) {
-            System.out.printf("→ %s\n", getTokenValue(token));
+            if (config.debug)
+                System.out.printf("→ %s\n", getTokenValue(token));
             out.println(getTokenValue(token));
             token = scanner.next_token();
         }
@@ -101,7 +143,7 @@ public class P2 {
 
     /**
      * retrieve the appropriate token value corresponding to a symbol
-     * 
+     *
      * @param token
      */
     private static String getTokenValue(Symbol token) {

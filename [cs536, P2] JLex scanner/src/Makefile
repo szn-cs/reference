@@ -33,27 +33,35 @@ sym.class: sym.java
 ErrMsg.class: ErrMsg.java
 	$(C) $(FLAGS) ErrMsg.java
 
-	
-###
-# testing
-# TODO: add more here to run your tester and compare its results to expected results
-###
-test:
-	java -cp $(CLASSPATH) P2
-	diff allTokens.in allTokens.out
 
+###
+# testing - executes java tester class, and compares input and output of each test
+###
+TEST_DIRECTORY = ./test
+# TESTS = $(shell find . -iname "*.in" -exec basename {} .in ';')
+.PHONY: test
+test:
+	java -cp $(CLASSPATH) P2	
+	diff $(TEST_DIRECTORY)/allTokens.in $(TEST_DIRECTORY)/allTokens.out
+	diff $(TEST_DIRECTORY)/reservedWord.in $(TEST_DIRECTORY)/reservedWord.out
+	diff $(TEST_DIRECTORY)/characterSymbol.in $(TEST_DIRECTORY)/characterSymbol.out
+	diff $(TEST_DIRECTORY)/stringLiteral.in $(TEST_DIRECTORY)/stringLiteral.out
+	diff $(TEST_DIRECTORY)/integerLiteral.in $(TEST_DIRECTORY)/integerLiteral.out
+	diff $(TEST_DIRECTORY)/identifier.in $(TEST_DIRECTORY)/identifier.out
 
 ###
 # clean up
 ###
-
+.PHONY: clean
 clean:
 	rm -f *~ *.class cminusminus.jlex.java
 
+.PHONY: cleantest
 cleantest:
-	rm -f allTokens.out
+	rm -f $(TEST_DIRECTORY)/*.out 
 
 # watch files and execute make with `make watch LABEL=<label to execute>`
+.PHONY: watch
 watch:
 	# requires:
 	# -	"cli-watch" npm package
