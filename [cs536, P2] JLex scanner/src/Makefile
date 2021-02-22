@@ -42,12 +42,15 @@ TEST_DIRECTORY = ./test
 .PHONY: test
 test:
 	java -cp $(CLASSPATH) P2	
-	diff $(TEST_DIRECTORY)/reservedWord.in $(TEST_DIRECTORY)/reservedWord.out
-	diff $(TEST_DIRECTORY)/characterSymbol.in $(TEST_DIRECTORY)/characterSymbol.out
-	diff $(TEST_DIRECTORY)/identifier.in $(TEST_DIRECTORY)/identifier.out
+	# diff $(TEST_DIRECTORY)/reservedWord.in $(TEST_DIRECTORY)/reservedWord.out
+	# diff $(TEST_DIRECTORY)/characterSymbol.in $(TEST_DIRECTORY)/characterSymbol.out
+	# diff $(TEST_DIRECTORY)/identifier.in $(TEST_DIRECTORY)/identifier.out
 	diff $(TEST_DIRECTORY)/stringLiteral.in $(TEST_DIRECTORY)/stringLiteral.out
-	diff $(TEST_DIRECTORY)/integerLiteral.in $(TEST_DIRECTORY)/integerLiteral.out
+	# diff $(TEST_DIRECTORY)/integerLiteral.in $(TEST_DIRECTORY)/integerLiteral.out
 	# diff $(TEST_DIRECTORY)/allTokens.in $(TEST_DIRECTORY)/allTokens.out
+	# java -cp ./deps:. P2 2> errors.out 
+	# diff compare with expected file
+
 
 ###
 # clean up

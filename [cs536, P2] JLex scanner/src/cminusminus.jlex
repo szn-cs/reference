@@ -68,7 +68,7 @@ class CharNum {
     return new Symbol(sym.EOF);
 %eofval}
 
-%state IN_QUOTE
+%state INQUOTE, COMMENT
 
 LETTER           = [a-zA-Z]
 DIGIT            = [0-9]
@@ -80,7 +80,7 @@ BADESCAPEDCHAR   = [\\][^nt'\"?\\]
 SINGLECHAR       = [^\n\"\\]
 STRING           = ({ESCAPEDCHAR}|{SINGLECHAR})
 
-COMMENT          = (//|##).*\n
+COMMENT          = (//|##)
 BADESCAPE        = {QUOTE}{SINGLECHAR}*{BADESCAPEDCHAR}+{SINGLECHAR}*{QUOTE}
 UNTERMINATED     = {QUOTE}{STRING}*
 
@@ -127,9 +127,11 @@ _ASSIGN          = "="
 
 %%
 
-<YYINITIAL>{COMMENT} {
-    // ignore comments 
+<YYINITIAL>{COMMENT} { yybegin(COMMENT); }
+<COMMENT>[^\n]* {
+    // ignore
 }
+<COMMENT>[\n] { yybegin(YYINITIAL); }
 
 <YYINITIAL>{_INT} {
     int currentCharNum = CharNum.num;
@@ -202,7 +204,7 @@ _ASSIGN          = "="
 <YYINITIAL>{_INTLITERAL} {
     int currentCharNum = CharNum.num;
     String stringValue = yytext();
-    int value;
+    int value = 0;
 
     /* check for overflow for bad integer literals (integer literals larger than
         Integer.MAX_VALUE)
@@ -211,7 +213,7 @@ _ASSIGN          = "="
     try {
         value = Integer.parseInt(stringValue);
     } catch (NumberFormatException e) {
-        // TODO: the line and column numbers used in the error message should correspond to the position of the first character in the string/integer literal.
+        // the line and column numbers used in the error message should correspond to the position of the first character in the string/integer literal.
         ErrMsg.warn(yyline + 1, currentCharNum,
             "integer literal too large; using max value");
         value = Integer.MAX_VALUE;
@@ -222,42 +224,44 @@ _ASSIGN          = "="
     }
 }
 
-
-<YYINITIAL>{_STRINGLITERAL} {
-    // string literal
+<YYINITIAL>{QUOTE} {
+    yybegin(INQUOTE);
+}
+<INQUOTE>{STRING}*{QUOTE} {
+    yybegin(YYINITIAL);
+    // valid string literal
     int currentCharNum = CharNum.num;
-    String value = yytext();
+    // put quote back and correct character # for message
+    // note: could figure out how to pass state over the transition
+    currentCharNum--; 
+    String value = "\"" + yytext();
     CharNum.num += value.length();
     return new Symbol(sym.STRINGLITERAL, new StrLitTokenVal(yyline + 1, currentCharNum, value));
 }
-<IN_QUOTE> { 
-    
-}
-<YYINITIAL>{UNTERMINATED} {
-    // Unterminated string literals - a string literal is considered to be unterminated if there is a newline or end-of-file before the closing quote. (start looking for the next token after the newline)
-
-    // TODO: line and column numbers correspond to first character
-    ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal ignored");
-    CharNum.num = 1;
-}
-// Bad string literals
-// A string literal is "bad" if it includes a bad "escaped" character; i.e., a backslash followed by something other than an n, a t, a single quote, a double quote, another backslash, or a question mark. Issue the error message: string literal with bad escaped character ignored and ignore the string literal (start looking for the next token after the closing quote). If the string literal has a bad escaped character and is unterminated, issue the error message unterminated string literal with bad escaped character ignored, and ignore the bad string literal (start looking for the next token after the newline). Note that a string literal that has a newline immediately after a backslash should be treated as having a bad escaped character and being unterminated. For example, given:
-    "very bad string \
-    abc
-// the scanner should report an unterminated string literal with a bad escaped character on line 1, and an identifier on line 2.
-<YYINITIAL>{BADESCAPE} {
-    // for a string literal that contains a bad escaped character
-    // TODO: line and column numbers correspond to first character
+<INQUOTE>{SINGLECHAR}*{BADESCAPEDCHAR}+{SINGLECHAR}*{QUOTE} {
+    // Bad string literals - includes a bad "escaped" character; (start looking for the next token after the closing quote). 
+    int currentCharNum = CharNum.num;
+    currentCharNum--; // note: could figure out how to pass state over the transition
+    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "string literal with bad escaped character ignored");
-    CharNum.num = 1;
+    yybegin(YYINITIAL);
 }
-<YYINITIAL>{UNTERMINATEDBAD} {
-    // a string literal that contains a bad escaped character and is unterminated
-    // TODO: line and column numbers correspond to first character
+<INQUOTE>{SINGLECHAR}*{BADESCAPEDCHAR}+{SINGLECHAR}* {
+    // a string literal that contains a bad escaped character and is unterminated; (start looking for the next token after the newline). Note that a string literal that has a newline immediately after a backslash should be treated as having a bad escaped character and being unterminated.
+    int currentCharNum = CharNum.num;
+    currentCharNum--; // note: could figure out how to pass state over the transition
+    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal with bad escaped character ignored");
-    CharNum.num = 1;
+    yybegin(YYINITIAL);
 }
-
+<INQUOTE>{STRING}* {
+    // Unterminated string literals - if there is a newline or end-of-file before the closing quote. (start looking for the next token after the newline)
+    int currentCharNum = CharNum.num;
+    currentCharNum--; // note: could figure out how to pass state over the transition
+    CharNum.num = 1; // reset
+    ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal ignored");
+    yybegin(YYINITIAL);
+}
 
 <YYINITIAL>{_COMMA} {
     int currentCharNum = CharNum.num;
@@ -386,14 +390,17 @@ _ASSIGN          = "="
 }
 
 \n { 
+    yybegin(YYINITIAL); // just to make sure it stays at starting state
     CharNum.num = 1; 
 }
 
 {SPACE}+ { 
+    yybegin(YYINITIAL); // just to make sure it stays at starting state
     CharNum.num += yytext().length(); 
 }
 
 . { 
+    yybegin(YYINITIAL); // just to make sure it stays at starting state
     // Illegal characters
     ErrMsg.fatal(yyline+1, CharNum.num, "illegal character ignored:  " + yytext());
     CharNum.num++;

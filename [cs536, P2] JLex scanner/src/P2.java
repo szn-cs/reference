@@ -109,8 +109,11 @@ public class P2 {
      * comparing the input and output files (e.g., using a 'diff' command).
      */
     private static void testAllTokens() throws IOException {
-        String[] fileList = {"reservedWord", "characterSymbol", "identifier",
-                "stringLiteral", "integerLiteral", "allTokens",};
+        String[] fileList = {
+                // "reservedWord", "characterSymbol", "identifier",
+                "stringLiteral",
+                // "integerLiteral", "allTokens",
+        };
         for (String filename : fileList) {
             pipe stream = new pipe(filename);
             lexer(stream.in, stream.out);
