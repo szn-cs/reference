@@ -1,0 +1,7 @@
+2:1 ***ERROR*** illegal character ignored:  $
+9:1 ***WARNING*** integer literal too large; using max value
+12:1 ***ERROR*** unterminated string literal ignored
+13:2 ***ERROR*** unterminated string literal ignored
+14:4 ***ERROR*** string literal with bad escaped character ignored
+15:6 ***ERROR*** unterminated string literal with bad escaped character ignored
+16:9 ***ERROR*** unterminated string literal with bad escaped character ignored

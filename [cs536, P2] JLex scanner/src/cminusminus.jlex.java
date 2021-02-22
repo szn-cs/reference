@@ -410,7 +410,6 @@ class Yylex implements java_cup.runtime.Scanner {
 			yy_next_state = yy_nxt[yy_rmap[yy_state]][yy_cmap[yy_lookahead]];
 			if (YY_EOF == yy_lookahead && true == yy_initial) {
 
-    // TODO: print error for unterminated quote
     return new Symbol(sym.EOF);
 			}
 			if (YY_F != yy_next_state) {
@@ -804,8 +803,8 @@ class Yylex implements java_cup.runtime.Scanner {
     // Unterminated string literals - if there is a newline or end-of-file before the closing quote. (start looking for the next token after the newline)
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 					case -47:
@@ -829,8 +828,8 @@ class Yylex implements java_cup.runtime.Scanner {
     // a string literal that contains a bad escaped character and is unterminated; (start looking for the next token after the newline). Note that a string literal that has a newline immediately after a backslash should be treated as having a bad escaped character and being unterminated.
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal with bad escaped character ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 					case -49:
@@ -840,8 +839,8 @@ class Yylex implements java_cup.runtime.Scanner {
     // Bad string literals - includes a bad "escaped" character; (start looking for the next token after the closing quote). 
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "string literal with bad escaped character ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 					case -50:
@@ -879,8 +878,8 @@ class Yylex implements java_cup.runtime.Scanner {
     // Unterminated string literals - if there is a newline or end-of-file before the closing quote. (start looking for the next token after the newline)
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 					case -55:
@@ -890,8 +889,8 @@ class Yylex implements java_cup.runtime.Scanner {
     // a string literal that contains a bad escaped character and is unterminated; (start looking for the next token after the newline). Note that a string literal that has a newline immediately after a backslash should be treated as having a bad escaped character and being unterminated.
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal with bad escaped character ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 					case -56:
@@ -925,8 +924,8 @@ class Yylex implements java_cup.runtime.Scanner {
     // Unterminated string literals - if there is a newline or end-of-file before the closing quote. (start looking for the next token after the newline)
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 					case -60:

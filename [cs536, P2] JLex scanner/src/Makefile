@@ -37,20 +37,18 @@ ErrMsg.class: ErrMsg.java
 ###
 # testing - executes java tester class, and compares input and output of each test
 ###
-TEST_DIRECTORY = ./test
+TEST_DIR = .
 # TESTS = $(shell find . -iname "*.in" -exec basename {} .in ';')
+# diff $(TEST_DIR)/reservedWord.in $(TEST_DIR)/reservedWord.out
+# diff $(TEST_DIR)/characterSymbol.in $(TEST_DIR)/characterSymbol.out
+# diff $(TEST_DIR)/identifier.in $(TEST_DIR)/identifier.out
+# diff $(TEST_DIR)/stringLiteral.in $(TEST_DIR)/stringLiteral.out
+# diff $(TEST_DIR)/integerLiteral.in $(TEST_DIR)/integerLiteral.out
 .PHONY: test
 test:
-	java -cp $(CLASSPATH) P2	
-	# diff $(TEST_DIRECTORY)/reservedWord.in $(TEST_DIRECTORY)/reservedWord.out
-	# diff $(TEST_DIRECTORY)/characterSymbol.in $(TEST_DIRECTORY)/characterSymbol.out
-	# diff $(TEST_DIRECTORY)/identifier.in $(TEST_DIRECTORY)/identifier.out
-	diff $(TEST_DIRECTORY)/stringLiteral.in $(TEST_DIRECTORY)/stringLiteral.out
-	# diff $(TEST_DIRECTORY)/integerLiteral.in $(TEST_DIRECTORY)/integerLiteral.out
-	# diff $(TEST_DIRECTORY)/allTokens.in $(TEST_DIRECTORY)/allTokens.out
-	# java -cp ./deps:. P2 2> errors.out 
-	# diff compare with expected file
-
+	java -cp $(CLASSPATH) P2 2> errors.out
+	diff $(TEST_DIR)/allTokens.in $(TEST_DIR)/allTokens.out
+	diff $(TEST_DIR)/errors.expected $(TEST_DIR)/errors.out
 
 ###
 # clean up
@@ -61,7 +59,7 @@ clean:
 
 .PHONY: cleantest
 cleantest:
-	rm -f $(TEST_DIRECTORY)/*.out 
+	rm -f $(TEST_DIR)/*.out 
 
 # watch files and execute make with `make watch LABEL=<label to execute>`
 .PHONY: watch

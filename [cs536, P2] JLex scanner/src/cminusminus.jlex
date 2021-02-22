@@ -242,24 +242,24 @@ _ASSIGN          = "="
     // Bad string literals - includes a bad "escaped" character; (start looking for the next token after the closing quote). 
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "string literal with bad escaped character ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 <INQUOTE>{SINGLECHAR}*{BADESCAPEDCHAR}+{SINGLECHAR}* {
     // a string literal that contains a bad escaped character and is unterminated; (start looking for the next token after the newline). Note that a string literal that has a newline immediately after a backslash should be treated as having a bad escaped character and being unterminated.
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal with bad escaped character ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 <INQUOTE>{STRING}* {
     // Unterminated string literals - if there is a newline or end-of-file before the closing quote. (start looking for the next token after the newline)
     int currentCharNum = CharNum.num;
     currentCharNum--; // note: could figure out how to pass state over the transition
-    CharNum.num = 1; // reset
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal ignored");
+    CharNum.num = 1; // reset
     yybegin(YYINITIAL);
 }
 
