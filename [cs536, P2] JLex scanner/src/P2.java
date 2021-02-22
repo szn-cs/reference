@@ -73,10 +73,14 @@ class pipe {
 
 
 /**
- * P2 class: tests the test the C-- scanner testing all tokens, and related
- * classes. e.g., input that causes errors, character numbers, values associated
- * with tokens
- *
+ * P2 class: tests the scanner generated for the C-- language. testing all
+ * tokens types, input that causes errors, character numbers, values associated
+ * with tokens, etc.
+ * 
+ * <p>
+ * the scanner retrieves the token name, # line, # character, actual value
+ * </p>
+ * 
  * @author Safi
  */
 public class P2 {
@@ -89,7 +93,11 @@ public class P2 {
     public static void main(String[] args) throws IOException {
         // test all tokens
         testAllTokens();
-        CharNum.num = 1;
+        // check correct character & line numbers are returned for every token.
+
+        // To test that your scanner correctly handles an unterminated string
+        // literal with end-of-file before the closing quote, you may use the
+        // file files/eof.txt.
     }
 
     /**
@@ -101,24 +109,13 @@ public class P2 {
      * comparing the input and output files (e.g., using a 'diff' command).
      */
     private static void testAllTokens() throws IOException {
-        pipe stream = new pipe("allTokens");
-        lexer(stream.in, stream.out);
-        stream.close();
-        stream = new pipe("reservedWord");
-        lexer(stream.in, stream.out);
-        stream.close();
-        stream = new pipe("characterSymbol");
-        lexer(stream.in, stream.out);
-        stream.close();
-        stream = new pipe("stringLiteral");
-        lexer(stream.in, stream.out);
-        stream.close();
-        stream = new pipe("integerLiteral");
-        lexer(stream.in, stream.out);
-        stream.close();
-        stream = new pipe("identifier");
-        lexer(stream.in, stream.out);
-        stream.close();
+        String[] fileList = {"reservedWord", "characterSymbol", "identifier",
+                "stringLiteral", "integerLiteral", "allTokens",};
+        for (String filename : fileList) {
+            pipe stream = new pipe(filename);
+            lexer(stream.in, stream.out);
+            stream.close();
+        }
     }
 
     /**
@@ -130,6 +127,7 @@ public class P2 {
      */
     private static void lexer(FileReader in, PrintWriter out)
             throws IOException {
+        CharNum.num = 1; // reset character counter
         // create and call the scanner
         Yylex scanner = new Yylex(in);
         Symbol token = scanner.next_token();

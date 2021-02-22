@@ -35,7 +35,7 @@ class IdTokenVal extends TokenVal {
   // constructor
     IdTokenVal(int line, int ch, String val) {
         super(line, ch);
-    idVal = val;
+        idVal = val;
     }
 }
 
@@ -68,59 +68,62 @@ class CharNum {
     return new Symbol(sym.EOF);
 %eofval}
 
-%state STATE_RESERVED, STATE2, STATE3, STATE4
+%state IN_QUOTE
 
-
-COMMENT          = (//|##)\n
 LETTER           = [a-zA-Z]
 DIGIT            = [0-9]
 SPACE            = [\040\t]
-UNDERSCORE       = "_"
-ESCAPEDCHAR      = (\\[nt?'\"\\])|[^\n\"\\]
-STRING           = ({LETTER}|{ESCAPEDCHAR})
+UNDERSCORE       = [_]
+QUOTE            = [\"]
+ESCAPEDCHAR      = [\\][nt'\"?\\]
+BADESCAPEDCHAR   = [\\][^nt'\"?\\]
+SINGLECHAR       = [^\n\"\\]
+STRING           = ({ESCAPEDCHAR}|{SINGLECHAR})
 
-_INT              = "int"
-_BOOL             = "bool"
-_IF               = "if"
-_RETURN           = "return"
-_TRUE             = "true"
-_CIN              = "cin"
-_VOID             = "void"
-_ELSE             = "else"
-_COUT             = "cout"
-_WHILE            = "while"
-_FALSE            = "false"
-_STRUCT           = "struct"
+COMMENT          = (//|##).*\n
+BADESCAPE        = {QUOTE}{SINGLECHAR}*{BADESCAPEDCHAR}+{SINGLECHAR}*{QUOTE}
+UNTERMINATED     = {QUOTE}{STRING}*
 
-_COMMA            = ";"
-_SEMICOLON        = ","
-_DOT              = "."
-_READ             = ">>"
-_WRITE            = "<<"
-_LPAREN           = "("
-_RPAREN           = ")"
-_PLUSPLUS         = "++"
-_MINUSMINUS       = "--"
-_PLUS             = "+"
-_MINUS            = "-"
-_TIMES            = "*"
-_DIVIDE           = "/"
-_NOT              = "!"
-_AND              = "&&"
-_OR               = "||"
-_EQUALS           = "=="
-_NOTEQUALS        = "!="
-_GREATER          = ">"
-_LESS             = "<"
-_GREATEREQ        = ">="
-_LESSEQ           = "<="
-_LCURLY           = "{"
-_RCURLY           = "}"
-_ASSIGN           = "="
-
-_ID               = ({LETTER}{UNDERSCORE})|({LETTER}|{UNDERSCORE}|{DIGIT})*
-_INTLITERAL       = [{DIGIT}]+
-_STRINGLITERAL    = [\"]{STRING}*[\"]
+_ID              = ({LETTER}|{UNDERSCORE})({LETTER}|{UNDERSCORE}|{DIGIT})*
+_INTLITERAL      = {DIGIT}+
+_STRINGLITERAL   = {QUOTE}{STRING}*{QUOTE}
+_INT             = "int"
+_BOOL            = "bool"
+_IF              = "if"
+_RETURN          = "return"
+_TRUE            = "true"
+_CIN             = "cin"
+_VOID            = "void"
+_ELSE            = "else"
+_COUT            = "cout"
+_WHILE           = "while"
+_FALSE           = "false"
+_STRUCT          = "struct"
+_COMMA           = ","
+_SEMICOLON       = ";"
+_DOT             = "."
+_READ            = ">>"
+_WRITE           = "<<"
+_LPAREN          = "("
+_RPAREN          = ")"
+_PLUSPLUS        = "++"
+_MINUSMINUS      = "--"
+_PLUS            = "+"
+_MINUS           = "-"
+_TIMES           = "*"
+_DIVIDE          = "/"
+_NOT             = "!"
+_AND             = "&&"
+_OR              = "||"
+_EQUALS          = "=="
+_NOTEQUALS       = "!="
+_GREATER         = ">"
+_LESS            = "<"
+_GREATEREQ       = ">="
+_LESSEQ          = "<="
+_LCURLY          = "{"
+_RCURLY          = "}"
+_ASSIGN          = "="
 
 %%
 
@@ -190,7 +193,71 @@ _STRINGLITERAL    = [\"]{STRING}*[\"]
 }
 
 <YYINITIAL>{_ID} {
+    int currentCharNum = CharNum.num;
+    String value = yytext();
+    CharNum.num += value.length();
+    return new Symbol(sym.ID, new IdTokenVal(yyline + 1, currentCharNum, value));
 }
+
+<YYINITIAL>{_INTLITERAL} {
+    int currentCharNum = CharNum.num;
+    String stringValue = yytext();
+    int value;
+
+    /* check for overflow for bad integer literals (integer literals larger than
+        Integer.MAX_VALUE)
+        note - NumberFormatException is not specific for overflow errors, but 
+        reaching this transition state would exclude parsing errors. */
+    try {
+        value = Integer.parseInt(stringValue);
+    } catch (NumberFormatException e) {
+        // TODO: the line and column numbers used in the error message should correspond to the position of the first character in the string/integer literal.
+        ErrMsg.warn(yyline + 1, currentCharNum,
+            "integer literal too large; using max value");
+        value = Integer.MAX_VALUE;
+    } finally {
+        CharNum.num += stringValue.length();
+        return new Symbol(sym.INTLITERAL,
+            new IntLitTokenVal(yyline + 1, currentCharNum, value));
+    }
+}
+
+
+<YYINITIAL>{_STRINGLITERAL} {
+    // string literal
+    int currentCharNum = CharNum.num;
+    String value = yytext();
+    CharNum.num += value.length();
+    return new Symbol(sym.STRINGLITERAL, new StrLitTokenVal(yyline + 1, currentCharNum, value));
+}
+<IN_QUOTE> { 
+    
+}
+<YYINITIAL>{UNTERMINATED} {
+    // Unterminated string literals - a string literal is considered to be unterminated if there is a newline or end-of-file before the closing quote. (start looking for the next token after the newline)
+
+    // TODO: line and column numbers correspond to first character
+    ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal ignored");
+    CharNum.num = 1;
+}
+// Bad string literals
+// A string literal is "bad" if it includes a bad "escaped" character; i.e., a backslash followed by something other than an n, a t, a single quote, a double quote, another backslash, or a question mark. Issue the error message: string literal with bad escaped character ignored and ignore the string literal (start looking for the next token after the closing quote). If the string literal has a bad escaped character and is unterminated, issue the error message unterminated string literal with bad escaped character ignored, and ignore the bad string literal (start looking for the next token after the newline). Note that a string literal that has a newline immediately after a backslash should be treated as having a bad escaped character and being unterminated. For example, given:
+    "very bad string \
+    abc
+// the scanner should report an unterminated string literal with a bad escaped character on line 1, and an identifier on line 2.
+<YYINITIAL>{BADESCAPE} {
+    // for a string literal that contains a bad escaped character
+    // TODO: line and column numbers correspond to first character
+    ErrMsg.fatal(yyline + 1, CharNum.num, "string literal with bad escaped character ignored");
+    CharNum.num = 1;
+}
+<YYINITIAL>{UNTERMINATEDBAD} {
+    // a string literal that contains a bad escaped character and is unterminated
+    // TODO: line and column numbers correspond to first character
+    ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal with bad escaped character ignored");
+    CharNum.num = 1;
+}
+
 
 <YYINITIAL>{_COMMA} {
     int currentCharNum = CharNum.num;
@@ -318,45 +385,16 @@ _STRINGLITERAL    = [\"]{STRING}*[\"]
     return new Symbol(sym.ASSIGN, new TokenVal(yyline + 1, currentCharNum));
 }
 
-
-
-
-
-{DIGIT}+  { 
-    // NOTE: the following computation of the integer value does NOT
-    // check for overflow.  This must be modified.
-    int val = Integer.parseInt(yytext());
-    Symbol s = new Symbol(sym.INTLITERAL, new IntLitTokenVal(yyline+1, CharNum.num, val));
-    CharNum.num += yytext().length();
-    return s;
-
-    // or 
-    // double d = Double.parseDouble(yytext()); // convert String to double
-// INSERT CODE HERE TO CHECK FOR BAD VALUE -- SEE ERRORS AND WARNINGS BELOW
-// int k =  Integer.parseInt(yytext());    // convert to int
-
-    }
-
-"+"       { 
-    // change state example:
-    // yybegin(STATE2);
-    // return back to initial
-    // yybegin(YYINITIAL);
-
-
-    Symbol s = new Symbol(sym.PLUS, new TokenVal(yyline+1, CharNum.num));
-    CharNum.num++;
-    return s;
-    }
-\n        { 
+\n { 
     CharNum.num = 1; 
-    }
+}
 
-{SPACE}+  { 
+{SPACE}+ { 
     CharNum.num += yytext().length(); 
-    }
+}
 
 . { 
-    ErrMsg.fatal(yyline+1, CharNum.num, "ignoring illegal character: " + yytext());
+    // Illegal characters
+    ErrMsg.fatal(yyline+1, CharNum.num, "illegal character ignored:  " + yytext());
     CharNum.num++;
-    }
+}
