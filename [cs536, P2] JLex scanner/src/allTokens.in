@@ -74,3 +74,11 @@ struct
 "// 1234 ## 123"
 "          "
 "##nocommenthere"
+
+- // section for checking character and line counting
+variable"quote"123_variable
+    space      all       over     12345678
+while(false) { // ignore very long count of characters in this line
+    int x = 1+ 5 / 2 ** 9399420; ## ignore this
+    return "are numbers correct ?";
+}

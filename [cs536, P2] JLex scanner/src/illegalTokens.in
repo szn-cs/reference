@@ -6,7 +6,7 @@ dot.name
 1name
 
 // illegal integer literal
-99999999999999
+99999999999999 324234.234234234
 
 // illegal string literal
 "unterminated

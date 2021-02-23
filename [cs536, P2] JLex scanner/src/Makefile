@@ -47,8 +47,9 @@ TEST_DIR = .
 .PHONY: test
 test:
 	java -cp $(CLASSPATH) P2 2> errors.out
-	diff $(TEST_DIR)/allTokens.in $(TEST_DIR)/allTokens.out
+	diff $(TEST_DIR)/allTokens.expected $(TEST_DIR)/allTokens.out
 	diff $(TEST_DIR)/errors.expected $(TEST_DIR)/errors.out
+	diff $(TEST_DIR)/illegalTokens.expected $(TEST_DIR)/illegalTokens.out
 
 ###
 # clean up

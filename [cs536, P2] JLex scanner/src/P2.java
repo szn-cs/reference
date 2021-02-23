@@ -91,15 +91,8 @@ public class P2 {
      * @throws IOException exception may be thrown by yylex
      */
     public static void main(String[] args) throws IOException {
-        // test all tokens
+        // test all tokens both legal and illegal
         testAllTokens();
-
-        // check correct character & line numbers are returned for every token.
-
-        // To test that your scanner correctly handles an unterminated string
-        // literal with end-of-file before the closing quote, you may use the
-        // file files/eof.txt.
-
     }
 
     /**
@@ -107,8 +100,8 @@ public class P2 {
      * 
      * <p>
      * valid tokens are tested by running input file which contains contains all
-     * tokens, one per line, we can verify correctness of the scanner by
-     * comparing the input and output files.
+     * tokens one per line or multiple per line. The scanner correctness is
+     * verified by comparing the input and output files.
      * </p>
      * 
      * <p>
@@ -119,12 +112,13 @@ public class P2 {
      * @throws IOException exception may be thrown by yylex
      */
     private static void testAllTokens() throws IOException {
+        // name of files without extension
         // (note: this was a previous design choice for supporting multiple
         // input file)
-        String[] fileList = {"allTokens", "illegalTokens"
-                // "reservedWord", "characterSymbol", "identifier",
-                // "stringLiteral", "integerLiteral",
-        };
+        String[] fileList = {"allTokens", "illegalTokens",
+                "eof" /*
+                       * unterminated string literal with end-of-file
+                       */};
         for (String filename : fileList) {
             pipe stream = new pipe(filename);
             lexer(stream.in, stream.out);
@@ -150,9 +144,24 @@ public class P2 {
             if (config.debug)
                 System.out.printf("→ %s\n", getTokenValue(token));
             // write token value to a new line in the target file
-            out.println(getTokenValue(token));
+            out.println(formatToken(token));
             token = scanner.next_token();
         }
+    }
+
+    /**
+     * create a proper format for the token properties used in the output test
+     * 
+     * @return formated string which includes all values necessary to validate
+     */
+    private static String formatToken(Symbol token) {
+        TokenVal tokenValue = (TokenVal) token.value;
+        int line = tokenValue.linenum;
+        int character = tokenValue.charnum;
+        String value = getTokenValue(token); // getting the value using symbol
+                                             // comparison removes the need for
+                                             // testing it explicitely
+        return String.format("%3d:%2d\t%s", line, character, value);
     }
 
     /**

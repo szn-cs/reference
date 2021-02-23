@@ -131,7 +131,10 @@ _ASSIGN          = "="
 <COMMENT>[^\n]* {
     // ignore
 }
-<COMMENT>[\n] { yybegin(YYINITIAL); }
+<COMMENT>[\n] { 
+    CharNum.num = 1; 
+    yybegin(YYINITIAL); 
+}
 
 <YYINITIAL>{_INT} {
     int currentCharNum = CharNum.num;
@@ -232,8 +235,6 @@ _ASSIGN          = "="
     // valid string literal
     int currentCharNum = CharNum.num;
     // put quote back and correct character # for message
-    // note: could figure out how to pass state over the transition
-    currentCharNum--; 
     String value = "\"" + yytext();
     CharNum.num += value.length();
     return new Symbol(sym.STRINGLITERAL, new StrLitTokenVal(yyline + 1, currentCharNum, value));
@@ -241,7 +242,6 @@ _ASSIGN          = "="
 <INQUOTE>{SINGLECHAR}*{BADESCAPEDCHAR}+{SINGLECHAR}*{QUOTE} {
     // Bad string literals - includes a bad "escaped" character; (start looking for the next token after the closing quote). 
     int currentCharNum = CharNum.num;
-    currentCharNum--; // note: could figure out how to pass state over the transition
     ErrMsg.fatal(yyline + 1, CharNum.num, "string literal with bad escaped character ignored");
     CharNum.num = 1; // reset
     yybegin(YYINITIAL);
@@ -249,7 +249,6 @@ _ASSIGN          = "="
 <INQUOTE>{SINGLECHAR}*{BADESCAPEDCHAR}+{SINGLECHAR}* {
     // a string literal that contains a bad escaped character and is unterminated; (start looking for the next token after the newline). Note that a string literal that has a newline immediately after a backslash should be treated as having a bad escaped character and being unterminated.
     int currentCharNum = CharNum.num;
-    currentCharNum--; // note: could figure out how to pass state over the transition
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal with bad escaped character ignored");
     CharNum.num = 1; // reset
     yybegin(YYINITIAL);
@@ -257,7 +256,6 @@ _ASSIGN          = "="
 <INQUOTE>{STRING}* {
     // Unterminated string literals - if there is a newline or end-of-file before the closing quote. (start looking for the next token after the newline)
     int currentCharNum = CharNum.num;
-    currentCharNum--; // note: could figure out how to pass state over the transition
     ErrMsg.fatal(yyline + 1, CharNum.num, "unterminated string literal ignored");
     CharNum.num = 1; // reset
     yybegin(YYINITIAL);
@@ -389,19 +387,19 @@ _ASSIGN          = "="
     return new Symbol(sym.ASSIGN, new TokenVal(yyline + 1, currentCharNum));
 }
 
-\n { 
+\n {
+    CharNum.num = 1;
     yybegin(YYINITIAL); // just to make sure it stays at starting state
-    CharNum.num = 1; 
 }
 
-{SPACE}+ { 
-    yybegin(YYINITIAL); // just to make sure it stays at starting state
+{SPACE}+ {
     CharNum.num += yytext().length(); 
+    yybegin(YYINITIAL); // just to make sure it stays at starting state
 }
 
-. { 
-    yybegin(YYINITIAL); // just to make sure it stays at starting state
+. {
     // Illegal characters
     ErrMsg.fatal(yyline+1, CharNum.num, "illegal character ignored:  " + yytext());
     CharNum.num++;
+    yybegin(YYINITIAL); // just to make sure it stays at starting state
 }

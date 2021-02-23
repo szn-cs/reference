@@ -5,3 +5,4 @@
 14:4 ***ERROR*** string literal with bad escaped character ignored
 15:6 ***ERROR*** unterminated string literal with bad escaped character ignored
 16:9 ***ERROR*** unterminated string literal with bad escaped character ignored
+1:1 ***ERROR*** unterminated string literal ignored
