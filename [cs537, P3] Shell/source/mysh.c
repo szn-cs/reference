@@ -1,1 +1,7 @@
-int main() { return 1; }
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    printf("text");
+    return 0;
+}
