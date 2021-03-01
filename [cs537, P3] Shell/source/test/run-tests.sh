@@ -16,14 +16,14 @@ rm -rf "${TESTS_PATH}/tests-out"
 
 chmod +x "${TESTS_PATH}/tester/run-tests.sh"
 
-utility="./object/mysh"
+utility="./mysh.o"
 
 echo
 echo "*** Start testing $utility..."
 
 echo
 echo -e "\e[33m*** Compiler output for $utility\e[0m"
-rm -f ./object/mysh
+rm -f ./mysh.o
 make compile
 
 if [ ! -f $utility ]; then

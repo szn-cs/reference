@@ -42,7 +42,8 @@
 			},
 			"dependsOn": {
 				"type": "${workspaceFolder}/source"
-			}
+			},
+			"dependsOn": ["compile"]
 		},
 		{
 			"label": "test",

@@ -3,21 +3,19 @@ CC = gcc
 # strict compilcation
 CFLAGS = -Wall -Werror -g 
 
-compile: mysh 
+compile: mysh.o
 
-mysh: mysh.c sample_module.c sample_module.h
-	mkdir -p ./object/
-	$(CC) $(CFLAGS) -o ./object/$@  $< sample_module.c
+mysh.o: mysh.c sample_module.c sample_module.h
+	$(CC) $(CFLAGS) -o ./$@  $< sample_module.c
 
 # chmod +x ./object/mysh
 .PHONY:
 run:
-	./object/mysh
+	./mysh.o
 
 .PHONY: clean
 clean:
-	mkdir -p ./object
-	rm *.o ./object/* 
+	rm *.o 
 
 .PHONY:
 test-all:
@@ -33,7 +31,7 @@ test-list:
 
 .PHONY:
 valgrind: 
-	valgrind -v --show-reachable=yes --leak-check=full ./my-look -f dictionary odd
+	valgrind -v --show-reachable=yes --leak-check=full ./mysh.o -f dictionary odd
 
 .PHONY:
 # watch files and execute make with `make watch LABEL=<label to execute>`
