@@ -8,6 +8,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
+#include <getopt.h>
+#include <string.h>
+#include <stdbool.h>
 #include "./mysh.h"
 #include "./message.h"
 
@@ -50,10 +53,10 @@ int main(int argc, char *argv[]) {
     // execute requested functionality
     switch (config.functionality) {
         case BATCH: {
-            batch();
+            batch(config.variable.input);
         } break;
         case INTERACTIVE:
-            prompt();
+            prompt(config.variable.input);
             break;
         default:
             break;
@@ -110,94 +113,154 @@ case_filename:
 /**
  * parse commands
  *
+ * handle following scenarios which are not errors :
+ *  - An empty command line.
+ *  - White spaces include tabs and spaces.
+ *  - Multiple white spaces on an otherwise empty command line.
+ *  - Multiple white spaces between command-line arguments, including before
+ *  the first command on a line and after the last command.
+ *
  */
-void parse() {
-    // - fgets() reading lines of input, strtok() parsing commandline or
-    // strdup() for preserving input string (careful about memory leaks),
+int parse(char ***externalToken, char line[]) {
+    char **token;                 // tokens array of input command
+    char delimiters[] = " \n\t";  // token delimiters
+    char *state = NULL;           // strtok_r reserve state
 
-    // handle following scenarios which are not errors :
-    // - An empty command line.
-    // - White spaces include tabs and spaces.
-    // - Multiple white spaces on an otherwise empty command line.
-    // - Multiple white spaces between command-line arguments, including before
-    // the first command on a line and after the last command.
-    // - Batch file ends without exit command
+    if ((token = malloc(sizeof(char *) * TOKEN_SIZE)) == NULL) {
+        perror("Error: allocating memory. ");
+        fflush(stderr);
+        exit(1);
+    }
+    for (int i = 0; i < TOKEN_SIZE; i++) token[i] = NULL;
+
+    int i;  // token index
+    char *t;
+    t = strtok_r(line, delimiters, &state);
+    for (i = 0; t != NULL && i < TOKEN_SIZE; i++) {
+        token[i] = strdup(t);
+        t = strtok_r(NULL, delimiters, &state);
+    }
+
+    if ((token = realloc(token, i + 1)) == NULL) {
+        perror("Error: allocating memory. ");
+        fflush(stderr);
+        exit(1);
+    }
+
+    // set last token to null, marking the end of array
+    token[i] = NULL;
+
+    *externalToken = token;  // modify external input
+    return i;                // return number of valid tokens
 }
 
 /**
- *
+ * execute single command
  *
  */
-void executeCommand() {
+void executeCommand(char **token) {
+    for (int i = 0; token[i] != NULL; i++)
+        ;
+    printf(">....<\n");
+
+    return;
     /* IMPORTANT:
-         - solve infinite loop problem in parent caused by rewinding streams
-       when calling exit() in child process:
-            1. use _exit().
-            or
-            2. use fclose() to close the shared file with the parent (input
-       commands file) in the child process before calling exit().
+            - solve infinite loop problem in parent caused by rewinding streams
+          when calling exit() in child process:
+               1. use _exit().
+               or
+               2. use fclose() to close the shared file with the parent (input
+          commands file) in the child process before calling exit().
 
-        - You should be able to handle up to 99 tokens for each shell command,
-       100 including the necessary NULL terminator.
+           - You should be able to handle up to 99 tokens for each shell
+          command, 100 including the necessary NULL terminator.
 
-        - if execv() is successful, it will not return; if it does return, there
-        was an error (e.g., the command does not exist). In this case, the child
-        process should call _exit() to terminate itself. Contruct the argv array
-        correctly with argv[3] = NULL;
-     */
+           - if execv() is successful, it will not return; if it does return,
+          there was an error (e.g., the command does not exist). In this case,
+          the child process should call _exit() to terminate itself. Contruct
+          the argv array correctly with argv[3] = NULL;
+        */
 
-    fork();
-    execv();
-    waitpid();
+    // fork();
+    // execv();
+    // waitpid();
 
-error_noCommand:
+error_noCommand : {
     // - command does not exist and cannot be executed
     char *jobName = "";
     fprintf(stderr, ERROR_COMMAND(jobName));
     fflush(stderr);
     // continue processing
-error_longCommand:
+}
+error_longCommand : {
     // - A very long command line (over 512 characters)
     fprintf(stdout, "%s",
             "warning: ignoring long command exceeding 512 characters");
     fflush(stdout);
     // continue processing
 }
+}
+
+/**
+ * read stream, parst lines, and execute each as a separate command
+ *
+ */
+static void executeStream(FILE *input, void (*f)(char *), int action) {
+    char line[LINE_SIZE +
+              1];  // command string input line including null terminator
+    char **token;  // array of tokens
+    int length;    // tokens array length
+
+    if (action == 1) f(line);
+
+    // read stream until it ends (EOF or reading error occurs)
+    /* Note: a better function to use is "getline" which allows to distinguish
+        between EOF and errors. */
+    while (fgets(line, LINE_SIZE, input) != NULL) {
+        if (action == 2) f(line);
+
+        length = parse(&token, line);
+
+        if (length == 0) continue;         // no tokens parsed - ignoring line.
+        if (token[0] == "exit") goto end;  // terminate on exit command
+
+        // execute current input command and wait for it to finish
+        executeCommand(token);
+
+        if (action == 1) f(line);
+    }
+
+end:
+    // shell terminates when it sees the exit command on areaches the end of the
+    // input stream (i.e., the end of the batch file or the user types 'Ctrl-D')
+    free(token);  // cleanup
+    // handle non-error - Batch file ends without exit command
+    return;
+}
 
 /**
  * prompt the shell creates a child process that executes the command you
  * entered and then prompts for more user input when it has finished.
  */
-void prompt() {
-    // 1. display PROMPT to stdout
-    // 2. recieve typed in command (parse the input)
-    //    & execute it and wait for it to finish.
-    // repeated until user types exit or ends their input. ( handle user types
-    // 'Ctrl-D' as a command in interactive mode)
-
-    // simple loop that waits for input
-    // while () {
-    //          executeCommand();
-    // }
-
-    // for both modes: shell terminates when it sees the exit command on a line
-    // or reaches the end of the input stream (i.e., the end of the batch file
-    // or the user types 'Ctrl-D'). NOTE: We will not test the exit command with
-    // extra arguments.
+void prompt(FILE *input) { executeStream(input, &promptPrint, 1); }
+void promptPrint(char *line) {
+    // display PROMPT to stdout
+    fprintf(stdin, PROMPT);
+    fflush(stdin);
 }
 
 /**
+ * reads each line of the batch-file for commands and executes them
  *
- *
+ * batch file: contains the list of commands (each on its own line)
  */
-void batch() {
-    // - batch file: contains the list of commands (each on its own line, read
-    // each line of the batch-file for commands to be executed)
-    // 1. echo line to be exected (If the line is empty or only composed of
-    // whitespace, you should still echo it). (if it is over the 512-character
-    // limit then echo at least the first 512 characters (but you may echo more
-    // if you want)).
-    // 2. execute command in the current line.
+void batch(FILE *input) { executeStream(input, &batchPrint, 2); }
+void batchPrint(char *line) {
+    // echo line to be exected (If the line is empty or only composed of
+    // whitespace, you should still echo it; if it is over the 512-character
+    // limit then echo at least the first 512 characters.)
+    fprintf(stdout, "%s", line);
+    fflush(stdout);
 }
 
 /**

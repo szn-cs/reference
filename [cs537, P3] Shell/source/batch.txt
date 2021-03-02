@@ -1,2 +1,7 @@
-ls
+                l                 s          
 echo
+
+
+
+
+exit
