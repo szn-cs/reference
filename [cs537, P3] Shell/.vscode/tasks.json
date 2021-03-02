@@ -6,7 +6,7 @@
 		{
 			"label": "compile",
 			"command": "make",
-			"args": [""],
+			"args": ["compileWarn"],
 			"options": {
 				"cwd": "${workspaceFolder}/source"
 			},
@@ -15,9 +15,9 @@
 				"echo": true,
 				"reveal": "always",
 				"focus": true,
-				"panel": "new",
+				"panel": "shared",
 				"showReuseMessage": true,
-				"clear": true
+				"clear": false
 			},
 			"group": {
 				"kind": "build",
@@ -36,12 +36,9 @@
 				"echo": true,
 				"reveal": "always",
 				"focus": true,
-				"panel": "new",
+				"panel": "shared",
 				"showReuseMessage": true,
-				"clear": true
-			},
-			"dependsOn": {
-				"type": "${workspaceFolder}/source"
+				"clear": false
 			},
 			"dependsOn": ["compile"]
 		},

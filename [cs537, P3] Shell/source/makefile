@@ -2,16 +2,20 @@ CC = gcc
 
 # strict compilcation
 CFLAGS = -Wall -Werror -g 
+CFLAGSWARN = -Wall -g 
 
 compile: mysh.o
 
-mysh.o: mysh.c sample_module.c sample_module.h
+mysh.o: mysh.c mysh.h message.h sample_module.c sample_module.h
 	$(CC) $(CFLAGS) -o ./$@  $< sample_module.c
+
+compileWarn: mysh.c mysh.h message.h sample_module.c sample_module.h
+	$(CC) $(CFLAGSWARN) -o ./mysh.o $< sample_module.c
 
 # chmod +x ./object/mysh
 .PHONY:
 run:
-	./mysh.o
+	./mysh.o batch.txt
 
 .PHONY: clean
 clean:
