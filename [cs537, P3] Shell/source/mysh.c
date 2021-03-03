@@ -122,7 +122,7 @@ case_filename:
  *  the first command on a line and after the last command.
  *
  */
-int parse(char ***externalToken, char line[]) {
+static int parse(char ***externalToken, char line[]) {
     char **token;                 // tokens array of input command
     char delimiters[] = " \n\t";  // token delimiters
     char *state = NULL;           // strtok_r reserve state
@@ -162,7 +162,7 @@ int parse(char ***externalToken, char line[]) {
  * execute single command
  *
  */
-void executeCommand(char **token, FILE *sharedFile) {
+static void executeCommand(char **token, FILE *sharedFile) {
     int forkResult;
     if ((forkResult = fork()) == -1)  // check fork status
         goto error_generic;
@@ -179,7 +179,7 @@ void executeCommand(char **token, FILE *sharedFile) {
 
 process_child:
     // execute command with token arguments
-    if (execvp(token[0], token) == -1)  // if error occured in child process
+    if (execv(token[0], token) == -1)  // if error occured in child process
         goto error_childProcess;
     else
         return;  // contiue processing
@@ -260,8 +260,8 @@ end:
  * prompt the shell creates a child process that executes the command you
  * entered and then prompts for more user input when it has finished.
  */
-void prompt(FILE *input) { executeStream(input, &promptPrint, 1); }
-void promptPrint(char *line) {
+static void prompt(FILE *input) { executeStream(input, &promptPrint, 1); }
+static void promptPrint(char *line) {
     // display PROMPT to stdout
     fprintf(stdout, PROMPT);
     fflush(stdout);
@@ -272,8 +272,8 @@ void promptPrint(char *line) {
  *
  * batch file: contains the list of commands (each on its own line)
  */
-void batch(FILE *input) { executeStream(input, &batchPrint, 2); }
-void batchPrint(char *line) {
+static void batch(FILE *input) { executeStream(input, &batchPrint, 2); }
+static void batchPrint(char *line) {
     // echo line to be exected (If the line is empty or only composed of
     // whitespace, you should still echo it; if it is over the 512-character
     // limit then echo at least the first 512 characters.)
@@ -287,7 +287,7 @@ void batchPrint(char *line) {
  * @param filename name of the file to open
  * @return FILE* file descriptor / input stream
  */
-FILE *createFileDescriptor(char *filename) {
+static FILE *createFileDescriptor(char *filename) {
     FILE *s = NULL;
     // create requested file stream
     if ((s = fopen(filename, "r")) == NULL) goto fileError;

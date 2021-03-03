@@ -21,14 +21,14 @@ struct Config {
 };
 
 /* function definitions */
-static void cliAdapter(int, char **, struct Config *);
-static FILE *createFileDescriptor(char *);
-static void executeCommand(char **, FILE *);
-static int parse(char ***, char *);
-static void executeStream(FILE *, void (*f)(char *), int);
-static void batch();
-static void prompt();
-static void batchPrint(char *);
-static void promptPrint(char *);
+static void cliAdapter(int argc, char **argv, struct Config *config);
+static FILE *createFileDescriptor(char *filename);
+static void executeCommand(char **token, FILE *sharedFile);
+static int parse(char ***externalToken, char line[]);
+static void executeStream(FILE *input, void (*f)(char *), int action);
+static void batch(FILE *input);
+static void prompt(FILE *input);
+static void batchPrint(char *line);
+static void promptPrint(char *line);
 
 #endif  // __mysh_h
