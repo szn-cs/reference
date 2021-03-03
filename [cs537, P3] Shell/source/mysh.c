@@ -144,17 +144,18 @@ int parse(char ***externalToken, char line[]) {
         t = strtok_r(NULL, delimiters, &state);
     }
 
-    if ((token = realloc(token, i + 1)) == NULL) {
+    // shrink allocated size instead of using up all TOKEN_SIZE of memory
+    int e = i + 1;  // # of elements in token array
+    if ((token = realloc(token, sizeof(char *) * e)) == NULL) {
         perror("Error: allocating memory. ");
         fflush(stderr);
         exit(1);
     }
 
-    // set last token to null, marking the end of array
-    token[i] = NULL;
+    token[i] = NULL;  // set last token to null, marking the end of array
 
     *externalToken = token;  // modify external input
-    return i;                // return number of valid tokens
+    return i;                // return number of valid tokens excluding NULL
 }
 
 /**
@@ -236,6 +237,7 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
         length = parse(&token, line);
 
         if (length == 0) continue;  // no tokens parsed - ignoring line.
+        // handle special commands:
         if (strcmp(token[0], "exit") == 0)
             goto end;  // terminate on exit command
 

@@ -1,6 +1,2 @@
-/bin/ls
-where cat
-echo hello world
-
-l                 s          
-exit
+ /bin/echo 1 2 3 4
+ 
