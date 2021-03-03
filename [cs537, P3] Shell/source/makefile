@@ -5,6 +5,7 @@ CFLAGS = -Wall -Werror -g
 CFLAGSWARN = -Wall -g 
 
 compile: mysh.o
+	ln -s ./mysh.o ./mysh
 
 mysh.o: mysh.c mysh.h message.h sample_module.c sample_module.h
 	$(CC) $(CFLAGS) -o ./$@  $< sample_module.c
@@ -15,11 +16,12 @@ compileWarn: mysh.c mysh.h message.h sample_module.c sample_module.h
 # chmod +x ./object/mysh
 .PHONY:
 run:
-	./mysh.o batch.txt
+	./mysh.o 
+	# batch.txt
 
 .PHONY: clean
 clean:
-	rm *.o 
+	rm *.o mysh
 
 .PHONY:
 test-all:

@@ -1,7 +1,6 @@
-                l                 s          
-echo
+/bin/ls
+where cat
+echo hello world
 
-
-
-
+l                 s          
 exit

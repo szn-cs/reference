@@ -23,7 +23,7 @@ struct Config {
 /* function definitions */
 static void cliAdapter(int, char **, struct Config *);
 static FILE *createFileDescriptor(char *);
-static void executeCommand(char **);
+static void executeCommand(char **, FILE *);
 static int parse(char ***, char *);
 static void executeStream(FILE *, void (*f)(char *), int);
 static void batch();

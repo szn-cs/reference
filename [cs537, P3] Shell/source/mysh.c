@@ -11,6 +11,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/wait.h>
 #include "./mysh.h"
 #include "./message.h"
 
@@ -44,7 +45,7 @@
  */
 int main(int argc, char *argv[]) {
     // set default variables and program configuration parameters
-    struct Config config = {INTERACTIVE, {}};
+    struct Config config = {INTERACTIVE, {.input = stdin}};
 
     // parse CLI arguments: update configuration of variables & execution
     // function
@@ -126,7 +127,9 @@ int parse(char ***externalToken, char line[]) {
     char delimiters[] = " \n\t";  // token delimiters
     char *state = NULL;           // strtok_r reserve state
 
-    if ((token = malloc(sizeof(char *) * TOKEN_SIZE)) == NULL) {
+    // handles up to 99 tokens for each shell command, 100 including the
+    // necessary NULL terminator.
+    if ((token = malloc(sizeof(char *) * TOKEN_SIZE + 1)) == NULL) {
         perror("Error: allocating memory. ");
         fflush(stderr);
         exit(1);
@@ -158,46 +161,48 @@ int parse(char ***externalToken, char line[]) {
  * execute single command
  *
  */
-void executeCommand(char **token) {
-    for (int i = 0; token[i] != NULL; i++)
-        ;
-    printf(">....<\n");
+void executeCommand(char **token, FILE *sharedFile) {
+    int forkResult;
+    if ((forkResult = fork()) == -1)  // check fork status
+        goto error_generic;
+    else if (forkResult == 0)
+        goto process_child;
 
+    int childPid, statusPtr;
+    childPid = forkResult;
+    // wait for child process
+    if (waitpid(childPid, &statusPtr, 0) == -1) goto error_generic;
+    // if error exit code (e.g.command does not exist)
+    if (WEXITSTATUS(statusPtr) != 0) goto error_noCommand;
     return;
-    /* IMPORTANT:
-            - solve infinite loop problem in parent caused by rewinding streams
-          when calling exit() in child process:
-               1. use _exit().
-               or
-               2. use fclose() to close the shared file with the parent (input
-          commands file) in the child process before calling exit().
 
-           - You should be able to handle up to 99 tokens for each shell
-          command, 100 including the necessary NULL terminator.
-
-           - if execv() is successful, it will not return; if it does return,
-          there was an error (e.g., the command does not exist). In this case,
-          the child process should call _exit() to terminate itself. Contruct
-          the argv array correctly with argv[3] = NULL;
-        */
-
-    // fork();
-    // execv();
-    // waitpid();
+process_child:
+    // execute command with token arguments
+    if (execvp(token[0], token) == -1)  // if error occured in child process
+        goto error_childProcess;
+    else
+        return;  // contiue processing
 
 error_noCommand : {
-    // - command does not exist and cannot be executed
-    char *jobName = "";
-    fprintf(stderr, ERROR_COMMAND(jobName));
+    // command does not exist and cannot be executed
+    fprintf(stderr, ERROR_COMMAND(token[0]));
     fflush(stderr);
-    // continue processing
+    return;  // continue processing
 }
-error_longCommand : {
-    // - A very long command line (over 512 characters)
-    fprintf(stdout, "%s",
-            "warning: ignoring long command exceeding 512 characters");
-    fflush(stdout);
-    // continue processing
+error_generic : {
+    perror("Error: ");
+    fflush(stderr);
+    exit(1);
+}
+error_childProcess : {
+    /*
+    solve infinite loop problem in parent caused by rewinding streams
+    when calling exit() in child process: use _exit() OR fclose() to
+    close the shared file with the parent (input commands file) in the
+    child process before calling exit().
+    */
+    fclose(sharedFile);
+    exit(1);
 }
 }
 
@@ -206,33 +211,44 @@ error_longCommand : {
  *
  */
 static void executeStream(FILE *input, void (*f)(char *), int action) {
-    char line[LINE_SIZE +
-              1];  // command string input line including null terminator
-    char **token;  // array of tokens
-    int length;    // tokens array length
+    // extrabytes: 1 for null terminator + 1 for determining exceeding length
+    const int BUFFER_SIZE = LINE_SIZE + 2;
+    char line[BUFFER_SIZE];  // command string input line
+    char **token;            // array of tokens
+    int length;              // tokens array length
 
     if (action == 1) f(line);
 
     // read stream until it ends (EOF or reading error occurs)
-    /* Note: a better function to use is "getline" which allows to distinguish
-        between EOF and errors. */
-    while (fgets(line, LINE_SIZE, input) != NULL) {
+    /* Note: a better function to use is "getline" which allows to
+       distinguish between EOF and errors. */
+    while (fgets(line, BUFFER_SIZE, input) != NULL) {
+        // A very long command line (over 512 characters)
+        if (strlen(line) > LINE_SIZE) {
+            fprintf(stdout, "%s",
+                    "warning: ignoring long command exceeding 512 characters");
+            fflush(stdout);
+            continue;
+        }
+
         if (action == 2) f(line);
 
         length = parse(&token, line);
 
-        if (length == 0) continue;         // no tokens parsed - ignoring line.
-        if (token[0] == "exit") goto end;  // terminate on exit command
+        if (length == 0) continue;  // no tokens parsed - ignoring line.
+        if (strcmp(token[0], "exit") == 0)
+            goto end;  // terminate on exit command
 
         // execute current input command and wait for it to finish
-        executeCommand(token);
+        executeCommand(token, input);
 
         if (action == 1) f(line);
     }
 
 end:
-    // shell terminates when it sees the exit command on areaches the end of the
-    // input stream (i.e., the end of the batch file or the user types 'Ctrl-D')
+    // shell terminates when it sees the exit command on areaches the end of
+    // the input stream (i.e., the end of the batch file or the user types
+    // 'Ctrl-D')
     free(token);  // cleanup
     // handle non-error - Batch file ends without exit command
     return;
@@ -245,8 +261,8 @@ end:
 void prompt(FILE *input) { executeStream(input, &promptPrint, 1); }
 void promptPrint(char *line) {
     // display PROMPT to stdout
-    fprintf(stdin, PROMPT);
-    fflush(stdin);
+    fprintf(stdout, PROMPT);
+    fflush(stdout);
 }
 
 /**

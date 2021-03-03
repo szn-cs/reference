@@ -16,7 +16,9 @@
 			// "args": ["2>", "/dev/null"],
 			// "args": ["once"],
 			// "args": ["filename","-V",],
-			"args": ["batch.txt"],
+			"args": [
+				//"batch.txt"
+			],
 			"environment": [],
 			"MIMode": "gdb",
 			"stopAtEntry": false,
