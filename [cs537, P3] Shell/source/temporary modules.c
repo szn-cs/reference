@@ -1,45 +1,4 @@
-/**
- * send the output of a program to a file rather than to the screen
- *
- */
-void redirection() {
-    // redirect standard output to a file with ">" character
-    // - example `/bin/ls -la /tmp > output` should not print anything to the
-    // screen, instead output rereouted to file output.
-    // - Note that standard error output should not be changed
-    // -  If the output file exists before you run your program, you should
-    // simply overwrite it (after truncating it, which sets the file's size to
-    // zero bytes).
-    // fork(), setup file descriptors, execv()
-    // approach 1- close stdout, then open new file (which will take its place)
-    // approach 2- use dup2(): 2 different file descriptors can point to the
-    // same open file.
 
-    // FOrmat of redirection:  a command (along with its arguments, if present),
-    // followed by any number of white spaces (including none), the redirection
-    // symbol >,  again any number of white space (including none), followed by
-    // a filename.
-
-    // errors: Multiple redirection operators (e.g.
-    // /bin/ls > > file.txt ), starting with a redirection sign (e.g. > file.txt
-    // ), multiple files to the right of the redirection sign (e.g. /bin/ls >
-    // file1.txt file2.txt ), or not specifying an output file (e.g. /bin/ls >
-    // )are all errors.
-    fprintf(stdout, "%s", ERROR_REDIRECTION);
-    fflush(stdout);
-    // do not execute command and continue to the next line.
-
-    // errors: If if the output file cannot be opened for some reason (e.g.,
-    // the user doesn't have write permission or the name is an existing
-    // directory)
-    char *filename = "";
-    fprintf(stdout, ERROR_IO(filename));
-    fflush(stdout);
-    // do not execute command and continue to the next line.
-
-    // Note: Do not worry about redirection for built-in commands (alias,
-    // unalias, and exit); we will not test these cases.
-}
 
 /**
  * alias shortcuts for commands

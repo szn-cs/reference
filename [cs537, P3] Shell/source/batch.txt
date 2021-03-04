@@ -1,2 +1,3 @@
  /bin/echo 1 2 3 4
  
+ /bin/ls -la /tmp > output

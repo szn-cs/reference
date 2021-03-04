@@ -162,7 +162,8 @@ static int parse(char ***externalToken, char line[]) {
  * execute single command
  *
  */
-static void executeCommand(char **token, FILE *sharedFile) {
+static void executeCommand(char **token, FILE *sharedFile,
+                           char *redirectFilename) {
     int forkResult;
     if ((forkResult = fork()) == -1)  // check fork status
         goto error_generic;
@@ -173,16 +174,21 @@ static void executeCommand(char **token, FILE *sharedFile) {
     childPid = forkResult;
     // wait for child process
     if (waitpid(childPid, &statusPtr, 0) == -1) goto error_generic;
-    // if error exit code (e.g.command does not exist)
+    // if error exit code (e.g. command does not exist)
     if (WEXITSTATUS(statusPtr) != 0) goto error_noCommand;
     return;
 
 process_child:
+    // redirect output (standard error output is not changed)
+    if (redirectFilename != NULL && redirection(stdout, redirectFilename) == -1)
+        // do not execute command and continue to the next line.
+        return;
+
     // execute command with token arguments
     if (execv(token[0], token) == -1)  // if error occured in child process
         goto error_childProcess;
     else
-        return;  // contiue processing
+        return;  // contiue processing other command
 
 error_noCommand : {
     // command does not exist and cannot be executed
@@ -217,6 +223,10 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
     char line[BUFFER_SIZE];  // command string input line
     char **token;            // array of tokens
     int length;              // tokens array length
+    // Note LINE_ZISE for filename exceeds the minimum required for the token
+    char filename[LINE_SIZE];  // redirection filename
+    char *redirectFilename =
+        filename;  // used as modifiable pointer (instead using heap)
 
     if (action == 1) f(line);
 
@@ -234,16 +244,18 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
 
         if (action == 2) f(line);
 
-        length = parse(&token, line);
+        // parse redirection part, if it failed skip commmand
+        if (parseRedirection(line, &redirectFilename) == -1) goto skip;
 
-        if (length == 0) continue;  // no tokens parsed - ignoring line.
+        length = parse(&token, line);
+        if (length == 0) goto skip;  // no tokens parsed
         // handle special commands:
         if (strcmp(token[0], "exit") == 0)
             goto end;  // terminate on exit command
 
         // execute current input command and wait for it to finish
-        executeCommand(token, input);
-
+        executeCommand(token, input, redirectFilename);
+    skip:  // skip current command to last action
         if (action == 1) f(line);
     }
 
@@ -298,4 +310,116 @@ fileError:
     fprintf(stderr, ERROR_FILE(filename));
     fflush(stderr);
     exit(1);
+}
+
+/**
+ * redirect standard output to a file with ">" character, sending the output of
+ * a program to a file rather than to the screen.
+ *
+ *
+ * supported behavior:
+ * - existing file gets truncated and overwritten
+ */
+static int redirection(FILE *current, char *filename) {
+    // setup file descriptors approaches:
+    // - close stdout, then open new file (which will take its place)
+    // - use dup2(): 2 different file descriptors can point to the same open
+    // file.
+    if (fclose(current) == EOF) goto error_fileOpen;
+    if (fopen(filename, "w") == NULL) goto error_fileClose;
+    return 0;
+
+error_fileOpen:
+    perror("Error: ");
+    fflush(stderr);
+    return -1;  // signal failure
+
+error_fileClose:
+    // errors: output file cannot be opened for some reason (e.g., the user
+    // doesn't have write permission or the name is an existing directory)
+    fprintf(stdout, ERROR_IO(filename));
+    fflush(stdout);
+    return -1;  // signal failure
+}
+
+/**
+ * Format of redirection:
+ * command (with its arguments) → white spaces (including none) → redirection
+ * symbol `>` → white space (including none) → filename.
+ *
+ * supported behavior
+ * - unsupported redirection for built-in commands (alias, unalias, and exit)
+ * - NOTE: extenal variable should be located on the same line variable stack
+ */
+static int parseRedirection(char *line, char **externalFilename) {
+    char delimiter[] = ">";  // token delimiters
+    char *state = NULL;      // strtok_r reserve state
+    char *token = NULL;      // token part
+
+    // check for consectutive delimiter
+    // NOTE: strsep instead of strtok can be used to detect repeated delimiters
+    for (int i = 1; i < strlen(line); i++)
+        if (line[i] == '>' && line[i - 1] == line[i]) goto error_parsing;
+    // line composed of only whitespace chars
+    if (isWhitespaceString(line)) return -1;
+
+    // NOTE: strtok modifies the original string to the first token
+    token = strtok_r(line, delimiter, &state);  // part before '>' character
+    // check if beginning with '>' character preceded by whitespace characters.
+    if (line[0] == '>' || (token != NULL && isWhitespaceString(token)))
+        goto error_parsing;
+    // read part after '>' character
+    if ((token = strtok_r(NULL, delimiter, &state)) == NULL)
+        goto no_redirection;
+    if (strtok_r(NULL, delimiter, &state) != NULL) goto error_parsing;
+    trim(token);  // (ignoring start & end whitespace)
+    // validate filename token (no whitespace in-between)
+    for (int i = 0; i < strlen(token); i++)
+        if (isWhitespace(token[i])) goto error_parsing;
+
+    *externalFilename = token;
+    return 0;
+
+no_redirection:
+    *externalFilename = NULL;
+    return 0;
+
+error_parsing:
+    // errors: Multiple redirection operators (e.g. /bin/ls > > file.txt ),
+    // starting with a redirection sign (e.g. > file.txt ), multiple files
+    // to the right of the redirection sign (e.g. /bin/ls > file1.txt
+    // file2.txt ), or not specifying an output file (e.g.     /bin/ls >
+    // )are all errors.
+    fprintf(stdout, "%s", ERROR_REDIRECTION);
+    fflush(stdout);
+    return -1;
+    // do not execute command and continue to the next line.
+}
+
+static inline bool isWhitespaceString(char *s) {
+    for (int i = 0; i < strlen(s); i++)
+        if (!isWhitespace(s[i])) return false;
+    return true;
+}
+
+static inline bool isWhitespace(char c) {
+    char whitespace[] = " \n\t";
+    for (int i = 0; i < strlen(whitespace); i++)
+        if (c == whitespace[i]) return true;
+    return false;
+}
+
+/**
+ * trim string of whitespace
+ * (modified from
+ * https://stackoverflow.com/questions/122616/how-do-i-trim-leading-trailing-whitespace-in-a-standard-way)
+ *
+ * @param s string to be trimmed
+ */
+static inline void trim(char *s) {
+    char *p = s;
+    int l = strlen(p);
+    while (isWhitespace(p[l - 1])) p[--l] = 0;
+    while (*p && isWhitespace(*p)) ++p, --l;
+    memmove(s, p, l + 1);
 }

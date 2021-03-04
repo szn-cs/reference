@@ -23,12 +23,18 @@ struct Config {
 /* function definitions */
 static void cliAdapter(int argc, char **argv, struct Config *config);
 static FILE *createFileDescriptor(char *filename);
-static void executeCommand(char **token, FILE *sharedFile);
+static void executeCommand(char **token, FILE *sharedFile,
+                           char *redirectFilename);
 static int parse(char ***externalToken, char line[]);
 static void executeStream(FILE *input, void (*f)(char *), int action);
 static void batch(FILE *input);
 static void prompt(FILE *input);
 static void batchPrint(char *line);
 static void promptPrint(char *line);
+static int redirection(FILE *current, char *filename);
+static int parseRedirection(char *line, char **filename);
+static inline bool isWhitespaceString(char *s);
+static inline bool isWhitespace(char c);
+static inline void trim(char *s);
 
 #endif  // __mysh_h
