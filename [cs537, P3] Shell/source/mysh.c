@@ -174,8 +174,10 @@ static void executeCommand(char **token, FILE *sharedFile,
     childPid = forkResult;
     // wait for child process
     if (waitpid(childPid, &statusPtr, 0) == -1) goto error_generic;
-    // if error exit code (e.g. command does not exist)
-    if (WEXITSTATUS(statusPtr) != 0) goto error_noCommand;
+
+    // if error exit code related to command (e.g. command does not exist)
+    if (WIFEXITED(statusPtr) == 1 && WEXITSTATUS(statusPtr) == 1)
+        goto error_noCommand;
     return;
 
 process_child:
@@ -368,7 +370,7 @@ static int parseRedirection(char *line, char **externalFilename) {
     token = strtok_r(line, delimiter, &state);  // part before '>' character
     trim(token);
     // check if beginning with '>' character or preceded by whitespace chars
-    if (strlen(token) == 0) goto error_parsing;
+    if (strlen(token) == 0 || line[0] == '>') goto error_parsing;
 
     // part after '>' character
     if ((token = strtok_r(NULL, delimiter, &state)) == NULL)
@@ -396,8 +398,8 @@ error_parsing:
     // to the right of the redirection sign (e.g. /bin/ls > file1.txt
     // file2.txt ), or not specifying an output file (e.g.     /bin/ls >
     // )are all errors.
-    fprintf(stdout, "%s", ERROR_REDIRECTION);
-    fflush(stdout);
+    fprintf(stderr, "%s", ERROR_REDIRECTION);
+    fflush(stderr);
     return -1;
     // do not execute command and continue to the next line.
 }
