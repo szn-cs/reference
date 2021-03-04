@@ -20,10 +20,21 @@ struct Config {
   } variable;
 };
 
+typedef struct AliasStruct {
+  char *label;   // alias command label
+  char **token;  // token array
+  int length;    // # of elements in array
+} AliasStruct;
+
+struct AliasList {
+  AliasStruct **pointer;  // store for alias tokes mappings
+  int length;             // # of elements in the array
+} aliasList;
+
 /* function definitions */
 static void cliAdapter(int argc, char **argv, struct Config *config);
 static FILE *createFileDescriptor(char *filename);
-static void executeCommand(char **token, FILE *sharedFile,
+static void executeCommand(char *command, char **argument, FILE *sharedFile,
                            char *redirectFilename);
 static int parse(char ***externalToken, char line[]);
 static void executeStream(FILE *input, void (*f)(char *), int action);
@@ -36,5 +47,11 @@ static int parseRedirection(char *line, char **filename);
 static inline bool isWhitespaceString(char *s);
 static inline bool isWhitespace(char c);
 static inline void trim(char *s);
+static void alias(char **token, int tokenLength);
+static void unalias(char **token, int tokenLength);
+static int findAlias(char *label, AliasStruct **external_alias);
+static void addAlias(AliasStruct *a);
+static void removeAlias(int index);
+static void printAlias(AliasStruct *a);
 
 #endif  // __mysh_h

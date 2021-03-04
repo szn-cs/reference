@@ -51,6 +51,11 @@ int main(int argc, char *argv[]) {
     // function
     cliAdapter(argc, argv, &config);
 
+    // NOTE: could have implemented doubly-linked list, but decided to use a
+    // simple list.
+    aliasList.pointer = NULL;  // initialize alias array
+    aliasList.length = 0;
+
     // execute requested functionality
     switch (config.functionality) {
         case BATCH: {
@@ -68,6 +73,14 @@ int main(int argc, char *argv[]) {
         perror("Error: while closing file. ");
         fflush(stderr);
         exit(1);
+    }
+    for (int i = 0; i < aliasList.length; i++) {
+        for (int j = 0; j < aliasList.pointer[i]->length; j++) {
+            free(aliasList.pointer[j]->token);
+            aliasList.pointer[j]->token = NULL;
+        }
+        free(aliasList.pointer[i]);
+        aliasList.pointer[i] = NULL;
     }
 
     return 0;
@@ -162,7 +175,7 @@ static int parse(char ***externalToken, char line[]) {
  * execute single command
  *
  */
-static void executeCommand(char **token, FILE *sharedFile,
+static void executeCommand(char *command, char **argument, FILE *sharedFile,
                            char *redirectFilename) {
     int forkResult;
     if ((forkResult = fork()) == -1)  // check fork status
@@ -187,14 +200,14 @@ process_child:
         return;
 
     // execute command with token arguments
-    if (execv(token[0], token) == -1)  // if error occured in child process
+    if (execv(command, argument) == -1)  // if error occured in child process
         goto error_childProcess;
     else
         return;  // contiue processing other command
 
 error_noCommand : {
     // command does not exist and cannot be executed
-    fprintf(stderr, ERROR_COMMAND(token[0]));
+    fprintf(stderr, ERROR_COMMAND(command));
     fflush(stderr);
     return;  // continue processing
 }
@@ -246,17 +259,28 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
 
         if (action == 2) f(line);
 
-        // parse redirection part, if it failed skip commmand
+        // parse redirection part delimited by '>', if it failed skip commmand
         if (parseRedirection(line, &redirectFilename) == -1) goto skip;
 
+        // parse command line
         length = parse(&token, line);
         if (length == 0) goto skip;  // no tokens parsed
-        // handle special commands:
+        /* handle special commands: */
+        // 'exit' command
         if (strcmp(token[0], "exit") == 0)
             goto end;  // terminate on exit command
+        // 'alias' or 'unalias' commands
+        if (strcmp(token[0], "alias") == 0) {
+            alias(token, length);
+            goto skip;
+        }
+        if (strcmp(token[0], "unalias") == 0) {
+            unalias(token, length);
+            goto skip;
+        }
 
         // execute current input command and wait for it to finish
-        executeCommand(token, input, redirectFilename);
+        executeCommand(token[0], &token[1], input, redirectFilename);
     skip:  // skip current command to last action
         if (action == 1) f(line);
     }
@@ -266,6 +290,7 @@ end:
     // the input stream (i.e., the end of the batch file or the user types
     // 'Ctrl-D')
     free(token);  // cleanup
+    token = NULL;
     // handle non-error - Batch file ends without exit command
     return;
 }
@@ -431,4 +456,154 @@ static inline void trim(char *s) {
     while (isWhitespace(p[l - 1])) p[--l] = 0;
     while (*p && isWhitespace(*p)) ++p, --l;
     memmove(s, p, l + 1);
+}
+
+/**
+ * alias shortcuts for commands (built-in command means that the shell
+ * interprets this command directly)
+ * usage: `mysh> alias ls /bin/ls`
+ *
+ * supported behavior:
+ * → unsupported - aliases to other aliases, aliases that involve redirection,
+ * or redirection of aliases
+ * → additional arguments (e.g. ll -a where ll is an alias-name) is undefined
+ * behavior. All alias calls must consist of only the alias-name.
+ * - stores alias in a global data structure.
+ */
+static void alias(char **token, int tokenLength) {
+    AliasStruct *a = NULL;  // target alias to handle
+    char *label = token[1];
+    int aliasArgument = tokenLength - 2;  // # of tokens after 'alias' & label
+
+    switch (tokenLength) {
+        case 1:
+            goto case_displayAll;
+        case 2:
+            goto case_displaySingle;
+        default:
+            goto case_alias;
+    }
+
+case_alias : {
+    // handle special labels
+    if (strcmp(label, "alias") == 0 || strcmp(label, "unalias") == 0 ||
+        strcmp(label, "exit") == 0)
+        goto error_specialAlias;
+
+    // `alias <alias-name> <... replacement strigns>` if alias name already
+    // exist, replace its value.
+    if (findAlias(label, &a) == -1) {  // if not found
+        // create alias structure
+        a = calloc(1, sizeof(AliasStruct));
+        a->label = strdup(label);  // set label
+        addAlias(a);
+    } else {
+        // free alias tokens
+        for (int i = 0; i < a->length; i++) {
+            free(a->token[i]);
+            a->token[i] = NULL;
+        }
+        a->length = 0;
+    }
+
+    // copy argument tokens over the alias structure
+    a->token = malloc(sizeof(char *) * aliasArgument);
+    for (int i = 0; i < aliasArgument; i++) a->token[i] = strdup(token[i + 2]);
+    a->length = aliasArgument;
+
+    return;
+}
+
+case_displayAll : {
+    // `alias` should display all the aliases that have been set up (one per
+    // line).
+    for (int i = 0; i < aliasList.length; i++) printAlias(aliasList.pointer[i]);
+    return;
+}
+
+case_displaySingle:
+    // `alias <alias name>` if word matches alias name, print it (alias and
+    // replacement value).
+    if ((findAlias(label, &a) != -1)) printAlias(a);
+    return;  // continue.
+
+error_specialAlias:
+    // error: cannot be used as alias-names: alias, unalias, and exit.
+    fprintf(stderr, "%s", ERROR_ALIAS);
+    fflush(stderr);
+    return;  // continue
+}
+
+static void printAlias(AliasStruct *a) {
+    fprintf(stdout, "%s ", a->label);
+    /* print each token separated by one space*/
+    for (int j = 0; j < a->length; j++)
+        fprintf(stdout, "%*s", 1 + !!j, a->token[j]);
+    fprintf(stdout, "\n");
+    fflush(stdout);
+}
+
+static int findAlias(char *label, AliasStruct **external_alias) {
+    for (int i = 0; i < aliasList.length; i++)
+        if (strcmp(aliasList.pointer[i]->label, label)) {
+            *external_alias = aliasList.pointer[i];
+            return i;
+        }
+    return -1;
+}
+
+static void addAlias(AliasStruct *a) {
+    // add object to global alias list
+    if ((aliasList.pointer =
+             realloc(aliasList.pointer,
+                     sizeof(AliasStruct *) * (++aliasList.length))) == NULL) {
+        perror("Error: allocating memory. ");
+        fflush(stderr);
+        exit(1);
+    }
+    aliasList.pointer[aliasList.length - 1] = a;
+}
+
+static void removeAlias(int index) {
+    // free element target index
+    for (int i = 0; i < aliasList.pointer[index]->length; i++) {
+        free(aliasList.pointer[index]->token[i]);
+        aliasList.pointer[index]->token[i] = NULL;
+    }
+    free(aliasList.pointer[index]);
+    aliasList.pointer[index] = NULL;
+
+    // shift all elements one position in the array to the left
+    for (int i = index + 1; index + 1 < aliasList.length; i++) {
+        aliasList.pointer[index] = aliasList.pointer[index + 1];
+    }
+    --aliasList.length;  // decrement list elements number
+}
+
+/**
+ * remove alias from the list data structure
+ * usage: `unalias <alias name>`
+ *
+ */
+static void unalias(char **token, int tokenLength) {
+    AliasStruct *a = NULL;  // target alias to handle
+    char *label = token[1];
+
+    if (tokenLength == 2)
+        goto case_unalias;
+    else
+        goto error_argument;
+
+case_unalias : {
+    int index;
+    // if alias doesn't exist ignore.
+    if (((index = findAlias(label, &a)) != -1)) removeAlias(index);
+    return;  // continue
+}
+
+error_argument:
+    // errors: if no argument or too many arguments to unalias
+    fprintf(stdout, "%s", ERROR_UNALIAS);
+    fflush(stdout);
+    return;  // continue
 }

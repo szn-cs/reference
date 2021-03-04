@@ -1,17 +1,17 @@
 CC = gcc 
 
 # strict compilcation
-CFLAGS = -Wall -Werror -g 
-CFLAGSWARN = -Wall -g 
+CFLAGS = -Wall -Werror -g
+CFLAGSWARN = -Wall -g
 
 compile: mysh.o
 	ln -s ./mysh.o ./mysh
 
-mysh.o: mysh.c mysh.h message.h sample_module.c sample_module.h
-	$(CC) $(CFLAGS) -o ./$@  $< sample_module.c
+mysh.o: mysh.c mysh.h message.h
+	$(CC) $(CFLAGS) -o ./$@  $<
 
-compileWarn: mysh.c mysh.h message.h sample_module.c sample_module.h
-	$(CC) $(CFLAGSWARN) -o ./mysh.o $< sample_module.c
+compileWarn: mysh.c mysh.h message.h
+	$(CC) $(CFLAGSWARN) -o ./mysh.o $<
 
 # chmod +x ./object/mysh
 .PHONY:
