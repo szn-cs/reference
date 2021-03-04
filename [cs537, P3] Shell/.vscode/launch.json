@@ -9,7 +9,7 @@
 			"cwd": "${workspaceFolder}/source",
 			"request": "launch",
 			"type": "cppdbg",
-			"program": "${workspaceRoot}/source/mysh.o",
+			"program": "${workspaceRoot}/source/mysh",
 			// "args": ["-V", "2>", "/dev/null"],
 			// "args": ["-f", "dictionary", "-f", "dictionary", "str"],
 			// "args": ["-f","dictionary","worded"],

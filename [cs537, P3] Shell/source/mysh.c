@@ -4,16 +4,9 @@
  * @copyright Copyright (c) 2021 by Safi Nassar
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <unistd.h>
-#include <getopt.h>
-#include <string.h>
-#include <stdbool.h>
-#include <sys/wait.h>
+#include "./utility.h"
+#include "./alias.h"
 #include "./mysh.h"
-#include "./message.h"
 
 /**
  *  Shell / Command-line interpreter
@@ -76,6 +69,8 @@ int main(int argc, char *argv[]) {
     }
     for (int i = 0; i < aliasList.length; i++) {
         for (int j = 0; j < aliasList.pointer[i]->length; j++) {
+            free(aliasList.pointer[i]->label);
+            aliasList.pointer[i]->label = NULL;
             free(aliasList.pointer[i]->token[j]);
             aliasList.pointer[i]->token[j] = NULL;
         }
@@ -157,18 +152,27 @@ static int parse(char ***externalToken, char line[]) {
         t = strtok_r(NULL, delimiters, &state);
     }
 
-    // shrink allocated size instead of using up all TOKEN_SIZE of memory
-    int e = i + 1;  // # of elements in token array
-    if ((token = realloc(token, sizeof(char *) * e)) == NULL) {
+    /* shrink allocated size instead of using up all TOKEN_SIZE of memory */
+    int currentSize = TOKEN_SIZE + 1;  // current array size + terminal
+    // new array size = # of valid elements in token array + terminal
+    int elementSize = i + 1;
+    // free up references before shrinking
+    for (int j = elementSize; j < currentSize; j++) {
+        free(token[j]);
+        token[j] = NULL;
+    }
+    // reallocated to actual valid elements size
+    if ((token = realloc(token, sizeof(char *) * elementSize)) == NULL) {
         perror("Error: allocating memory. ");
         fflush(stderr);
         exit(1);
     }
 
-    token[i] = NULL;  // set last token to null, marking the end of array
+    token[elementSize - 1] =
+        NULL;  // set last token to null, marking the end of array
 
     *externalToken = token;  // modify external input
-    return i;                // return number of valid tokens excluding NULL
+    return elementSize - 1;  // return number of valid tokens excluding NULL
 }
 
 /**
@@ -293,6 +297,10 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
         executeCommand(command, argument, input, redirectFilename);
     skip:  // skip current command to last action
         if (action == 1) f(line);
+        for (int i = 0; i < length; i++) {
+            free(token[i]);
+            token[i] = NULL;
+        }
     }
 
 end:
@@ -328,25 +336,6 @@ static void batchPrint(char *line) {
     // limit then echo at least the first 512 characters.)
     fprintf(stdout, "%s", line);
     fflush(stdout);
-}
-
-/**
- * open file for reading with error handling
- *
- * @param filename name of the file to open
- * @return FILE* file descriptor / input stream
- */
-static FILE *createFileDescriptor(char *filename) {
-    FILE *s = NULL;
-    // create requested file stream
-    if ((s = fopen(filename, "r")) == NULL) goto fileError;
-    return s;
-
-fileError:
-    // - batch file does not exist or cannot be opened
-    fprintf(stderr, ERROR_FILE(filename));
-    fflush(stderr);
-    exit(1);
 }
 
 /**
@@ -439,35 +428,6 @@ error_parsing:
     // do not execute command and continue to the next line.
 }
 
-static inline bool isWhitespaceString(char *s) {
-    for (int i = 0; i < strlen(s); i++)
-        if (!isWhitespace(s[i])) return false;
-    return true;
-}
-
-static inline bool isWhitespace(char c) {
-    char whitespace[] = " \n\t";
-    for (int i = 0; i < strlen(whitespace); i++)
-        if (c == whitespace[i]) return true;
-    return false;
-}
-
-/**
- * trim string of whitespace
- * (modified from
- * https://stackoverflow.com/questions/122616/how-do-i-trim-leading-trailing-whitespace-in-a-standard-way)
- *
- * @param s string to be trimmed
- */
-static inline void trim(char *s) {
-    if (s == NULL) return;  // shortcircuit
-    char *p = s;
-    int l = strlen(p);
-    while (isWhitespace(p[l - 1])) p[--l] = 0;
-    while (*p && isWhitespace(*p)) ++p, --l;
-    memmove(s, p, l + 1);
-}
-
 /**
  * alias shortcuts for commands (built-in command means that the shell
  * interprets this command directly)
@@ -543,53 +503,6 @@ error_specialAlias:
     fprintf(stderr, "%s", ERROR_ALIAS);
     fflush(stderr);
     return;  // continue
-}
-
-static void printAlias(AliasStruct *a) {
-    fprintf(stdout, "%s ", a->label);
-    /* print each token separated by one space, and excluding null terminator */
-    for (int j = 0; j < a->length - 1; j++)
-        fprintf(stdout, "%s%s", a->token[j], (j < a->length - 2) ? " " : "");
-    fprintf(stdout, "\n");
-    fflush(stdout);
-}
-
-static int findAlias(char *label, AliasStruct **external_alias) {
-    for (int i = 0; i < aliasList.length; i++)
-        if (strcmp(aliasList.pointer[i]->label, label) == 0) {
-            *external_alias = aliasList.pointer[i];
-            return i;
-        }
-    return -1;
-}
-
-static void addAlias(AliasStruct *a) {
-    // add object to global alias list
-    if ((aliasList.pointer =
-             realloc(aliasList.pointer,
-                     sizeof(AliasStruct *) * (++aliasList.length))) == NULL) {
-        perror("Error: allocating memory. ");
-        fflush(stderr);
-        exit(1);
-    }
-    aliasList.pointer[aliasList.length - 1] = a;
-}
-
-static void removeAlias(int index) {
-    // free element target index
-    for (int i = 0; i < aliasList.pointer[index]->length; i++) {
-        free(aliasList.pointer[index]->token[i]);
-        aliasList.pointer[index]->token[i] = NULL;
-    }
-    free(aliasList.pointer[index]->label);
-    free(aliasList.pointer[index]);
-    aliasList.pointer[index] = NULL;
-
-    // shift all elements one position in the array to the left
-    for (int i = index; i + 1 < aliasList.length; i++)
-        aliasList.pointer[i] = aliasList.pointer[i + 1];
-
-    --aliasList.length;  // decrement list elements number
 }
 
 /**

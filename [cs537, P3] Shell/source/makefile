@@ -1,23 +1,25 @@
 CC = gcc 
 
 # strict compilcation
-CFLAGS = -Wall -Werror -g
-CFLAGSWARN = -Wall -g
+FLAG = -Wall -Werror -g
 
-compile: mysh.o
-	ln -s ./mysh.o ./mysh
+compile: mysh
 
-mysh.o: mysh.c mysh.h message.h
-	$(CC) $(CFLAGS) -o ./$@  $<
+mysh: mysh.c mysh.h message.h utility.o alias.o
+	$(CC) $(FLAG) -o ./$@ $< utility.o alias.o
 
-compileWarn: mysh.c mysh.h message.h
-	$(CC) $(CFLAGSWARN) -o ./mysh.o $<
+alias.o: alias.c alias.h
+	$(CC) $(FLAG) -c $<
+
+utility.o: utility.c utility.h message.h
+	$(CC) $(FLAG) -c $<
 
 # chmod +x ./object/mysh
 .PHONY:
 run:
-	./mysh.o 
-	# batch.txt
+	./mysh 
+
+# batch.txt
 
 .PHONY: clean
 clean:
@@ -37,7 +39,7 @@ test-list:
 
 .PHONY:
 valgrind: 
-	valgrind -v --show-reachable=yes --leak-check=full ./mysh.o -f dictionary odd
+	valgrind -v --show-reachable=yes --leak-check=full ./mysh -f dictionary odd
 
 .PHONY:
 # watch files and execute make with `make watch LABEL=<label to execute>`
