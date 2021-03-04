@@ -363,19 +363,25 @@ static int parseRedirection(char *line, char **externalFilename) {
     // line composed of only whitespace chars
     if (isWhitespaceString(line)) return -1;
 
+    // part before '>'
     // NOTE: strtok modifies the original string to the first token
     token = strtok_r(line, delimiter, &state);  // part before '>' character
-    // check if beginning with '>' character preceded by whitespace characters.
-    if (line[0] == '>' || (token != NULL && isWhitespaceString(token)))
-        goto error_parsing;
-    // read part after '>' character
+    trim(token);
+    // check if beginning with '>' character or preceded by whitespace chars
+    if (strlen(token) == 0) goto error_parsing;
+
+    // part after '>' character
     if ((token = strtok_r(NULL, delimiter, &state)) == NULL)
         goto no_redirection;
-    if (strtok_r(NULL, delimiter, &state) != NULL) goto error_parsing;
     trim(token);  // (ignoring start & end whitespace)
+    // check if '>' character at the end
+    if (strlen(token) == 0) goto error_parsing;
     // validate filename token (no whitespace in-between)
     for (int i = 0; i < strlen(token); i++)
         if (isWhitespace(token[i])) goto error_parsing;
+
+    // if another part exists (more than one '>' character)
+    if (strtok_r(NULL, delimiter, &state) != NULL) goto error_parsing;
 
     *externalFilename = token;
     return 0;
@@ -417,6 +423,7 @@ static inline bool isWhitespace(char c) {
  * @param s string to be trimmed
  */
 static inline void trim(char *s) {
+    if (s == NULL) return;  // shortcircuit
     char *p = s;
     int l = strlen(p);
     while (isWhitespace(p[l - 1])) p[--l] = 0;
