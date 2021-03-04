@@ -17,7 +17,7 @@
 			// "args": ["once"],
 			// "args": ["filename","-V",],
 			"args": [
-				//"batch.txt"
+				// "batch.txt"
 			],
 			"environment": [],
 			"MIMode": "gdb",

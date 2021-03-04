@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
     }
     for (int i = 0; i < aliasList.length; i++) {
         for (int j = 0; j < aliasList.pointer[i]->length; j++) {
-            free(aliasList.pointer[j]->token);
-            aliasList.pointer[j]->token = NULL;
+            free(aliasList.pointer[i]->token[j]);
+            aliasList.pointer[i]->token[j] = NULL;
         }
         free(aliasList.pointer[i]);
         aliasList.pointer[i] = NULL;
@@ -238,10 +238,13 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
     char line[BUFFER_SIZE];  // command string input line
     char **token;            // array of tokens
     int length;              // tokens array length
+    char *command;           // command token
+    char **argument;         // argument tokens
     // Note LINE_ZISE for filename exceeds the minimum required for the token
     char filename[LINE_SIZE];  // redirection filename
     char *redirectFilename =
-        filename;  // used as modifiable pointer (instead using heap)
+        filename;            // used as modifiable pointer (instead using heap)
+    AliasStruct *aliasData;  // alias corresponding to current command
 
     if (action == 1) f(line);
 
@@ -265,22 +268,29 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
         // parse command line
         length = parse(&token, line);
         if (length == 0) goto skip;  // no tokens parsed
+
+        command = token[0];
+        argument = token;
         /* handle special commands: */
         // 'exit' command
-        if (strcmp(token[0], "exit") == 0)
+        if (strcmp(command, "exit") == 0)
             goto end;  // terminate on exit command
         // 'alias' or 'unalias' commands
-        if (strcmp(token[0], "alias") == 0) {
+        if (strcmp(command, "alias") == 0) {
             alias(token, length);
             goto skip;
         }
-        if (strcmp(token[0], "unalias") == 0) {
+        if (strcmp(command, "unalias") == 0) {
             unalias(token, length);
             goto skip;
         }
+        if ((findAlias(command, &aliasData)) != -1) {
+            command = aliasData->token[0];
+            argument = aliasData->token;
+        }
 
         // execute current input command and wait for it to finish
-        executeCommand(token[0], &token[1], input, redirectFilename);
+        executeCommand(command, argument, input, redirectFilename);
     skip:  // skip current command to last action
         if (action == 1) f(line);
     }
@@ -506,10 +516,11 @@ case_alias : {
         a->length = 0;
     }
 
+    // allocate memory for tokens including NULL terminator
+    a->token = calloc(aliasArgument + 1, sizeof(char *));
     // copy argument tokens over the alias structure
-    a->token = malloc(sizeof(char *) * aliasArgument);
     for (int i = 0; i < aliasArgument; i++) a->token[i] = strdup(token[i + 2]);
-    a->length = aliasArgument;
+    a->length = aliasArgument + 1;  // arguments + Null terminator
 
     return;
 }
@@ -536,16 +547,16 @@ error_specialAlias:
 
 static void printAlias(AliasStruct *a) {
     fprintf(stdout, "%s ", a->label);
-    /* print each token separated by one space*/
-    for (int j = 0; j < a->length; j++)
-        fprintf(stdout, "%*s", 1 + !!j, a->token[j]);
+    /* print each token separated by one space, and excluding null terminator */
+    for (int j = 0; j < a->length - 1; j++)
+        fprintf(stdout, "%s%s", a->token[j], (j < a->length - 2) ? " " : "");
     fprintf(stdout, "\n");
     fflush(stdout);
 }
 
 static int findAlias(char *label, AliasStruct **external_alias) {
     for (int i = 0; i < aliasList.length; i++)
-        if (strcmp(aliasList.pointer[i]->label, label)) {
+        if (strcmp(aliasList.pointer[i]->label, label) == 0) {
             *external_alias = aliasList.pointer[i];
             return i;
         }
@@ -570,13 +581,14 @@ static void removeAlias(int index) {
         free(aliasList.pointer[index]->token[i]);
         aliasList.pointer[index]->token[i] = NULL;
     }
+    free(aliasList.pointer[index]->label);
     free(aliasList.pointer[index]);
     aliasList.pointer[index] = NULL;
 
     // shift all elements one position in the array to the left
-    for (int i = index + 1; index + 1 < aliasList.length; i++) {
-        aliasList.pointer[index] = aliasList.pointer[index + 1];
-    }
+    for (int i = index; i + 1 < aliasList.length; i++)
+        aliasList.pointer[i] = aliasList.pointer[i + 1];
+
     --aliasList.length;  // decrement list elements number
 }
 
@@ -603,7 +615,7 @@ case_unalias : {
 
 error_argument:
     // errors: if no argument or too many arguments to unalias
-    fprintf(stdout, "%s", ERROR_UNALIAS);
-    fflush(stdout);
+    fprintf(stderr, "%s", ERROR_UNALIAS);
+    fflush(stderr);
     return;  // continue
 }
