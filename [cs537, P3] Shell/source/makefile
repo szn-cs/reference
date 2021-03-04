@@ -1,7 +1,8 @@
 CC = gcc 
 
 # strict compilcation
-FLAG = -Wall -Werror -g
+# -Werror
+FLAG = -Wall  -g
 
 compile: mysh
 

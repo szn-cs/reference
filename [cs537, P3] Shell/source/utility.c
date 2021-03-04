@@ -1,11 +1,23 @@
 #include "./utility.h"
 
+/**
+ * check if string is composed of only whitespace chars
+ *
+ * @param s string to test
+ * @return true string is composed of whitespace characaters, otherwise false
+ */
 bool isWhitespaceString(char *s) {
     for (int i = 0; i < strlen(s); i++)
         if (!isWhitespace(s[i])) return false;
     return true;
 }
 
+/**
+ * check if character is whitespace
+ *
+ * @param c character to test
+ * @return true character is whitespace, otherwise false
+ */
 bool isWhitespace(char c) {
     char whitespace[] = " \n\t";
     for (int i = 0; i < strlen(whitespace); i++)
@@ -14,7 +26,8 @@ bool isWhitespace(char c) {
 }
 
 /**
- * trim string of whitespace
+ * trim string of whitespace (remove preceeding and leading whitespace)
+ *
  * (modified from
  * https://stackoverflow.com/questions/122616/how-do-i-trim-leading-trailing-whitespace-in-a-standard-way)
  *
@@ -30,7 +43,7 @@ void trim(char *s) {
 }
 
 /**
- * open file for reading with error handling
+ * open file for reading with required error handling
  *
  * @param filename name of the file to open
  * @return FILE* file descriptor / input stream

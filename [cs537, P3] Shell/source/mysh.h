@@ -36,6 +36,7 @@ static void executeCommand(char *command, char **argument, FILE *sharedFile,
                            char *redirectFilename);
 static int parse(char ***externalToken, char line[]);
 static void executeStream(FILE *input, void (*f)(char *), int action);
+static void cleanTokenList(char **token, int length);
 static void batch(FILE *input);
 static void prompt(FILE *input);
 static void batchPrint(char *line);
@@ -44,5 +45,6 @@ static int redirection(FILE *current, char *filename);
 static int parseRedirection(char *line, char **filename);
 static void alias(char **token, int tokenLength);
 static void unalias(char **token, int tokenLength);
+static void freeConfig(struct Config *c);
 
 #endif  // __mysh_h

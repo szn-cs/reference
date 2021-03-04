@@ -61,22 +61,9 @@ int main(int argc, char *argv[]) {
             break;
     }
 
-    // clean up
-    if (fclose(config.variable.input) != 0) {
-        perror("Error: while closing file. ");
-        fflush(stderr);
-        exit(1);
-    }
-    for (int i = 0; i < aliasList.length; i++) {
-        for (int j = 0; j < aliasList.pointer[i]->length; j++) {
-            free(aliasList.pointer[i]->label);
-            aliasList.pointer[i]->label = NULL;
-            free(aliasList.pointer[i]->token[j]);
-            aliasList.pointer[i]->token[j] = NULL;
-        }
-        free(aliasList.pointer[i]);
-        aliasList.pointer[i] = NULL;
-    }
+    // cleanup:
+    freeConfig(&config);
+    freeAliasList();
 
     return 0;
 }
@@ -131,33 +118,33 @@ case_filename:
  *
  */
 static int parse(char ***externalToken, char line[]) {
-    char **token;                 // tokens array of input command
+    char **token = NULL;          // tokens array of input command
     char delimiters[] = " \n\t";  // token delimiters
     char *state = NULL;           // strtok_r reserve state
 
     // handles up to 99 tokens for each shell command, 100 including the
     // necessary NULL terminator.
-    if ((token = malloc(sizeof(char *) * TOKEN_SIZE + 1)) == NULL) {
+    int maximumSize = TOKEN_SIZE + 1;  // maximum starting array size + terminal
+    if ((token = malloc(sizeof(char *) * maximumSize)) == NULL) {
         perror("Error: allocating memory. ");
         fflush(stderr);
         exit(1);
     }
-    for (int i = 0; i < TOKEN_SIZE; i++) token[i] = NULL;
+    for (int i = 0; i < maximumSize; i++) token[i] = NULL;
 
-    int i;  // token index
+    int i = 0;  // token index
     char *t;
     t = strtok_r(line, delimiters, &state);
     for (i = 0; t != NULL && i < TOKEN_SIZE; i++) {
         token[i] = strdup(t);
         t = strtok_r(NULL, delimiters, &state);
     }
-
-    /* shrink allocated size instead of using up all TOKEN_SIZE of memory */
-    int currentSize = TOKEN_SIZE + 1;  // current array size + terminal
     // new array size = # of valid elements in token array + terminal
     int elementSize = i + 1;
+
+    /* shrink allocated size instead of using up all TOKEN_SIZE of memory */
     // free up references before shrinking
-    for (int j = elementSize; j < currentSize; j++) {
+    for (int j = elementSize; j < maximumSize; j++) {
         free(token[j]);
         token[j] = NULL;
     }
@@ -167,9 +154,8 @@ static int parse(char ***externalToken, char line[]) {
         fflush(stderr);
         exit(1);
     }
-
-    token[elementSize - 1] =
-        NULL;  // set last token to null, marking the end of array
+    // set last token to null, marking the end of array
+    token[elementSize - 1] = NULL;
 
     *externalToken = token;  // modify external input
     return elementSize - 1;  // return number of valid tokens excluding NULL
@@ -240,7 +226,7 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
     // extrabytes: 1 for null terminator + 1 for determining exceeding length
     const int BUFFER_SIZE = LINE_SIZE + 2;
     char line[BUFFER_SIZE];  // command string input line
-    char **token;            // array of tokens
+    char **token = NULL;     // array of tokens
     int length;              // tokens array length
     char *command;           // command token
     char **argument;         // argument tokens
@@ -297,20 +283,34 @@ static void executeStream(FILE *input, void (*f)(char *), int action) {
         executeCommand(command, argument, input, redirectFilename);
     skip:  // skip current command to last action
         if (action == 1) f(line);
-        for (int i = 0; i < length; i++) {
-            free(token[i]);
-            token[i] = NULL;
-        }
+        // clean token list
+        cleanTokenList(token, length);
+        token = NULL;
     }
 
 end:
     // shell terminates when it sees the exit command on areaches the end of
     // the input stream (i.e., the end of the batch file or the user types
     // 'Ctrl-D')
-    free(token);  // cleanup
+    cleanTokenList(token, length);
     token = NULL;
     // handle non-error - Batch file ends without exit command
     return;
+}
+
+/**
+ * Freeup token list allocated during parsing of input line
+ *
+ * @param token list of tokens (strings) to deallocate
+ * @param length number of valid elemenets in the list
+ */
+static void cleanTokenList(char **token, int length) {
+    if (token == NULL) return;
+    for (int i = 0; i < length; i++) {
+        free(token[i]);
+        token[i] = NULL;
+    }
+    free(token);  // cleanup
 }
 
 /**
@@ -462,25 +462,18 @@ case_alias : {
 
     // `alias <alias-name> <... replacement strigns>` if alias name already
     // exist, replace its value.
-    if (findAlias(label, &a) == -1) {  // if not found
-        // create alias structure
-        a = calloc(1, sizeof(AliasStruct));
-        a->label = strdup(label);  // set label
-        addAlias(a);
-    } else {
-        // free alias tokens
-        for (int i = 0; i < a->length; i++) {
-            free(a->token[i]);
-            a->token[i] = NULL;
-        }
-        a->length = 0;
-    }
+    if (findAlias(label, &a) == -1)  // if not found
+        addAlias(&a);                // allocate alias and add to list
+    else
+        freeAliasStruct(a);  // free and reset alias struct entry
 
-    // allocate memory for tokens including NULL terminator
-    a->token = calloc(aliasArgument + 1, sizeof(char *));
+    // replace and setup alias entry with new data
+    a->label = strdup(label);       // set label
+    a->length = aliasArgument + 1;  // arguments + Null terminator
+    // allocate memory for tokens
+    a->token = calloc(a->length, sizeof(char *));
     // copy argument tokens over the alias structure
     for (int i = 0; i < aliasArgument; i++) a->token[i] = strdup(token[i + 2]);
-    a->length = aliasArgument + 1;  // arguments + Null terminator
 
     return;
 }
@@ -531,4 +524,17 @@ error_argument:
     fprintf(stderr, "%s", ERROR_UNALIAS);
     fflush(stderr);
     return;  // continue
+}
+
+/**
+ * free related memory reference for configuration struct
+ *
+ * @param c configuration structure holding opened file parameters
+ */
+static void freeConfig(struct Config *c) {
+    if (fclose(c->variable.input) != 0) {
+        perror("Error: while closing file. ");
+        fflush(stderr);
+        exit(1);
+    }
 }
