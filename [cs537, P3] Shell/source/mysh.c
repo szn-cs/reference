@@ -465,7 +465,7 @@ case_alias : {
     if (findAlias(label, &a) == -1)  // if not found
         addAlias(&a);                // allocate alias and add to list
     else
-        freeAliasStruct(a);  // free and reset alias struct entry
+        freeAliasStruct(a, false);  // free and reset alias struct entry
 
     // replace and setup alias entry with new data
     a->label = strdup(label);       // set label

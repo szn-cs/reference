@@ -28,6 +28,6 @@ void removeAlias(int index);
 void printAlias(AliasStruct *a);
 void shiftArrayElement(int start, int end, void **pointer);
 void freeAliasList();
-void freeAliasStruct(AliasStruct *a);
+void freeAliasStruct(AliasStruct *a, bool freePointer);
 
 #endif  // __alias_h

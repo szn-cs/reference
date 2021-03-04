@@ -22,7 +22,7 @@ int findAlias(char *label, AliasStruct **external_alias) {
 }
 
 void addAlias(AliasStruct **a) {
-    if (*a == NULL) *a = calloc(1, sizeof(AliasStruct));
+    if (*a == NULL) *a = realloc(*a, sizeof(AliasStruct));
 
     // add object to global alias list
     ++aliasList.length;  // increment length
@@ -38,8 +38,8 @@ void addAlias(AliasStruct **a) {
 }
 
 void removeAlias(int index) {
-    freeAliasStruct(aliasList.pointer[index]);  // free element target index
-    free(aliasList.pointer[index]);
+    freeAliasStruct(aliasList.pointer[index],
+                    true);  // free element target index
     aliasList.pointer[index] = NULL;
 
     shiftArrayElement(index, aliasList.length, (void **)aliasList.pointer);
@@ -73,9 +73,10 @@ void shiftArrayElement(int start, int end, void **pointer) {
  *
  */
 void freeAliasList() {
-    for (int i = 0; i < aliasList.length; i++)
-        freeAliasStruct(aliasList.pointer[i]);
-
+    for (int i = 0; i < aliasList.length; i++) {
+        freeAliasStruct(aliasList.pointer[i], true);
+        aliasList.pointer[i] = NULL;
+    }
     free(aliasList.pointer);
     aliasList.pointer = NULL;
 }
@@ -85,7 +86,7 @@ void freeAliasList() {
  *
  * @param a alias struct to free
  */
-void freeAliasStruct(AliasStruct *a) {
+void freeAliasStruct(AliasStruct *a, bool freePointer) {
     free(a->label);
     a->label = NULL;
 
@@ -97,4 +98,6 @@ void freeAliasStruct(AliasStruct *a) {
     free(a->token);
     a->token = NULL;
     a->length = 0;  // reset length
+
+    if (freePointer) free(a);
 }
