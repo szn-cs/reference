@@ -1,3 +1,9 @@
+/**
+ * @file alias.h
+ * @brief alias array data structure related functions
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #ifndef __alias_h
 #define __alias_h
 
@@ -12,17 +18,17 @@
 #include "./message.h"
 
 typedef struct AliasStruct {
-  char *label;   // alias command label
-  char **token;  // token array
-  int length;    // # of elements in array
+    char *label;   // alias command label
+    char **token;  // token array
+    int length;    // # of elements in array
 } AliasStruct;
 
 struct AliasList {
-  AliasStruct **pointer;  // store for alias tokes mappings
-  int length;             // # of elements in the array
+    AliasStruct **pointer;  // store for alias tokes mappings
+    int length;             // # of elements in the array
 } aliasList;
 
-int findAlias(char *label, AliasStruct **external_alias);
+int findAlias(char *label, AliasStruct **externalAlias);
 void addAlias(AliasStruct **a);
 void removeAlias(int index);
 void printAlias(AliasStruct *a);

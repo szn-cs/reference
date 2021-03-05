@@ -1,3 +1,9 @@
+/**
+ * @file mysh.h
+ * @brief basic shell implementation.
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #ifndef __mysh_h
 #define __mysh_h
 

@@ -1,3 +1,9 @@
+/**
+ * @file utility.c
+ * @brief lambda and utility function
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #include "./utility.h"
 
 /**

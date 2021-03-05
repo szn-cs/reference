@@ -1,3 +1,9 @@
+/**
+ * @file message.h
+ * @brief errors & specification messages
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #ifndef __message_h
 #define __message_h
 

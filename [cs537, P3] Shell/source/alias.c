@@ -1,5 +1,16 @@
+/**
+ * @file alias.c
+ * @brief alias array data structure related functions
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #include "./alias.h"
 
+/**
+ * print a single alias entry
+ *
+ * @param a pointer to alias data structure
+ */
 void printAlias(AliasStruct *a) {
     if (a == NULL) return;
 
@@ -11,16 +22,29 @@ void printAlias(AliasStruct *a) {
     fflush(stdout);
 }
 
-int findAlias(char *label, AliasStruct **external_alias) {
+/**
+ * find a registered alias in the list
+ *
+ * @param label alias label string to search for
+ * @param externalAlias pointer to alias variable to modify
+ * @return int index of found alias entry, or -1 if not found
+ */
+int findAlias(char *label, AliasStruct **externalAlias) {
     for (int i = 0; i < aliasList.length; i++)
         if (strcmp(aliasList.pointer[i]->label, label) == 0) {
-            *external_alias = aliasList.pointer[i];
+            *externalAlias = aliasList.pointer[i];
             return i;
         }
-    *external_alias = NULL;
+    *externalAlias = NULL;
     return -1;
 }
 
+/**
+ * insert an alias entry into the global alias list
+ *
+ * @param a pointer to alias to add, the variable is modified with newly
+ * allocated instance if non is provided
+ */
 void addAlias(AliasStruct **a) {
     if (*a == NULL) *a = realloc(*a, sizeof(AliasStruct));
 
@@ -37,6 +61,11 @@ void addAlias(AliasStruct **a) {
     aliasList.pointer[aliasList.length - 1] = *a;  // add element to the end
 }
 
+/**
+ * remove alias entry from global alias list
+ *
+ * @param index number of target alias entry in the global list
+ */
 void removeAlias(int index) {
     freeAliasStruct(aliasList.pointer[index],
                     true);  // free element target index
@@ -69,7 +98,7 @@ void shiftArrayElement(int start, int end, void **pointer) {
 }
 
 /**
- * free alias global list
+ * free alias global list and all associated structures
  *
  */
 void freeAliasList() {
@@ -85,6 +114,7 @@ void freeAliasList() {
  * free alias structure elements
  *
  * @param a alias struct to free
+ * @param freePointer flag - whether to free the alias struct pointer itself
  */
 void freeAliasStruct(AliasStruct *a, bool freePointer) {
     free(a->label);

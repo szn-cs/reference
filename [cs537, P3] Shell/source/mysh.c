@@ -116,6 +116,9 @@ case_filename:
  *  - Multiple white spaces between command-line arguments, including before
  *  the first command on a line and after the last command.
  *
+ * @param externalToken external token list pointer to modify
+ * @param line string of command line to parse
+ * @return # of tokens parsed
  */
 static int parse(char ***externalToken, char line[]) {
     char **token = NULL;          // tokens array of input command
@@ -162,8 +165,13 @@ static int parse(char ***externalToken, char line[]) {
 }
 
 /**
- * execute single command
+ * execute command with provided arguments
  *
+ * @param command string
+ * @param argument strings list
+ * @param sharedFile opened file descriptor shared between child and parent
+ *                      processes
+ * @param redirectFilename file to redirect output to
  */
 static void executeCommand(char *command, char **argument, FILE *sharedFile,
                            char *redirectFilename) {
@@ -219,8 +227,12 @@ error_childProcess : {
 }
 
 /**
- * read stream, parst lines, and execute each as a separate command
+ * read stream, parse lines, and execute each as a separate command
  *
+ * @param input input stream to read command from
+ * @param f action function to perform in specified instruction location
+ * @param action specified location to execute provided action at
+ *                  (1 for interactive mode, & 2 for batch mode)
  */
 static void executeStream(FILE *input, void (*f)(char *), int action) {
     // extrabytes: 1 for null terminator + 1 for determining exceeding length
@@ -314,10 +326,18 @@ static void cleanTokenList(char **token, int length) {
 }
 
 /**
- * prompt the shell creates a child process that executes the command you
+ * prompt the shell creates a child process that executes the command
  * entered and then prompts for more user input when it has finished.
+ *
+ * @param input action function to execute in 'executeStream' method
  */
 static void prompt(FILE *input) { executeStream(input, &promptPrint, 1); }
+
+/**
+ * print action for interactive mode
+ *
+ * @param line consumed command line string
+ */
 static void promptPrint(char *line) {
     // display PROMPT to stdout
     fprintf(stdout, PROMPT);
@@ -328,8 +348,16 @@ static void promptPrint(char *line) {
  * reads each line of the batch-file for commands and executes them
  *
  * batch file: contains the list of commands (each on its own line)
+ *
+ * @param input action function to execute in 'executeStream' method
  */
 static void batch(FILE *input) { executeStream(input, &batchPrint, 2); }
+
+/**
+ * print action for batch mode
+ *
+ * @param line consumed command line string
+ */
 static void batchPrint(char *line) {
     // echo line to be exected (If the line is empty or only composed of
     // whitespace, you should still echo it; if it is over the 512-character
@@ -342,9 +370,12 @@ static void batchPrint(char *line) {
  * redirect standard output to a file with ">" character, sending the output of
  * a program to a file rather than to the screen.
  *
- *
  * supported behavior:
  * - existing file gets truncated and overwritten
+ *
+ * @param current stream to replace
+ * @param filename file to redirect output to
+ * @return redirection status: 0 for success, -1 for redirection failure
  */
 static int redirection(FILE *current, char *filename) {
     // setup file descriptors approaches:
@@ -369,6 +400,8 @@ error_fileClose:
 }
 
 /**
+ * parse redirection tokens
+ *
  * Format of redirection:
  * command (with its arguments) → white spaces (including none) → redirection
  * symbol `>` → white space (including none) → filename.
@@ -376,6 +409,10 @@ error_fileClose:
  * supported behavior
  * - unsupported redirection for built-in commands (alias, unalias, and exit)
  * - NOTE: extenal variable should be located on the same line variable stack
+ *
+ * @param line command line to parse
+ * @param externalFilename external variable to modify with extracted filename
+ * @return parsing status: 0 for successful string parsing, otherwise -1
  */
 static int parseRedirection(char *line, char **externalFilename) {
     char delimiter[] = ">";  // token delimiters
@@ -431,6 +468,7 @@ error_parsing:
 /**
  * alias shortcuts for commands (built-in command means that the shell
  * interprets this command directly)
+ *
  * usage: `mysh> alias ls /bin/ls`
  *
  * supported behavior:
@@ -439,6 +477,9 @@ error_parsing:
  * → additional arguments (e.g. ll -a where ll is an alias-name) is undefined
  * behavior. All alias calls must consist of only the alias-name.
  * - stores alias in a global data structure.
+ *
+ * @param token alias tokens - command and arguments
+ * @param tokenLength array length of tokens
  */
 static void alias(char **token, int tokenLength) {
     AliasStruct *a = NULL;  // target alias to handle
@@ -500,8 +541,11 @@ error_specialAlias:
 
 /**
  * remove alias from the list data structure
+ *
  * usage: `unalias <alias name>`
  *
+ * @param token alias tokens - command and arguments
+ * @param tokenLength array length of tokens
  */
 static void unalias(char **token, int tokenLength) {
     AliasStruct *a = NULL;  // target alias to handle

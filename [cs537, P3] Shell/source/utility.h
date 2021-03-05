@@ -1,3 +1,9 @@
+/**
+ * @file utility.h
+ * @brief lambda and utility function
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #ifndef __utility_h
 #define __utility_h
 

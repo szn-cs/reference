@@ -18,9 +18,11 @@
     "peacock.remoteColor": "#738835",
     "files.associations": {
         "*.config.json": "jsonc",
+        "*.jlex": "lex",
         "types.h": "c",
         "defs.h": "c",
         "stat.h": "c",
-        "user.h": "c"
+        "user.h": "c",
+        "alias.h": "c"
     }
 }
