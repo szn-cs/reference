@@ -1,0 +1,25 @@
+{
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#348301",
+    "activityBar.activeBorder": "#80b2fe",
+    "activityBar.background": "#348301",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#80b2fe",
+    "activityBarBadge.foreground": "#15202b",
+    "statusBar.background": "#348301",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#48b601",
+    "titleBar.activeBackground": "#348301",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#34830199",
+    "titleBar.inactiveForeground": "#e7e7e799"
+},
+  "peacock.remoteColor": "#48b601",
+  "launch": {
+  
+    "configurations": [],
+    "compounds": []
+  },
+  "prettier.tabWidth": 4,
+}

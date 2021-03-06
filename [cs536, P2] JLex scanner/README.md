@@ -75,3 +75,11 @@ Submission:
 -   Add headers for each file
 -   Verify code format
 -   Verify code execution on CSL machines
+
+# To-do list: 
+setup project to work with Jlex and debug :
+- [x] Setup http://pages.cs.wisc.edu/~loris/cs536/resources.html
+- [x] Download JLex
+- [x] Jlex docs https://www.cs.princeton.edu/~appel/modern/java/JLex/
+- [ ] JLex examples http://youtu.be/MsorbCquv5k
+

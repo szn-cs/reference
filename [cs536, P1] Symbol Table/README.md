@@ -83,3 +83,9 @@ checks the correctness of the removeScope implemented in the SymTable class
 -   Add headers for each file
 -   Verify code format
 -   Verify code execution on CSL machines
+
+material todo list: 
+- [x] check optional homework exercises 
+- [x] compare with github code and improve implementation. 
+- [x] check implementation with provided p1.java file (github).
+- [x] P1 after deadline check links for testing files - http://pages.cs.wisc.edu/~loris/cs536/asn/p1/p1.html
