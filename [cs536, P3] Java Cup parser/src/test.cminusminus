@@ -1,2 +1,7 @@
+/** 
+- include code that corresponds to every grammar rule in the file cminusminus.grammar. 
+- test.cminusminus should contain no syntax errors (you should also test your parser on some bad inputs, but don't hand those in).
+*/
+
 int x;
 int y;

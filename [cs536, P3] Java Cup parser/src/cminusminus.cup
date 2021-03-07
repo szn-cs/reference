@@ -11,17 +11,17 @@ import java.util.*;
  */
 parser code {:
 
-public void syntax_error(Symbol currToken) {
-    if (currToken.value == null) {
-        ErrMsg.fatal(0,0, "Syntax error at end of file");
+    public void syntax_error(Symbol currToken) {
+        if (currToken.value == null) {
+            ErrMsg.fatal(0,0, "Syntax error at end of file");
+        }
+        else {
+            ErrMsg.fatal(((TokenVal)currToken.value).linenum,
+                        ((TokenVal)currToken.value).charnum,
+                        "Syntax error");
+        }
+        System.exit(-1);
     }
-    else {
-        ErrMsg.fatal(((TokenVal)currToken.value).linenum,
-                     ((TokenVal)currToken.value).charnum,
-                     "Syntax error");
-    }
-    System.exit(-1);
-}
 :};
 
 
@@ -82,20 +82,29 @@ non terminal TypeNode         type;
 non terminal IdNode           id;
 
 
-/* Precedences
- *
- * NOTE: Add precedence and associativity declarations here.
+/* Precedences & Associativity
  *
  */
 
 
 start with program;
 
+/* 1. TODO:  Add precedence and associativity declarations here. Run Java Cup and fix any ambiguity errors.
+
+- Assignment is right associative.
+- dot operator is left associative.
+- relational and equality operators (<, >, <=, >=, ==, and !=) are non-associative (i.e., expressions like a < b < c are not allowed and should cause a syntax error).
+- All of the other binary operators are left associative.
+- The unary minus and not (!) operators have the highest precedence, then multiplication and division, then addition and subtraction, then the relational and equality operators, then the logical and operator (&&), then the logical or operator (||), and finally the assignment operator (=).
+
+Note that the same token (MINUS) is used for both the unary and binary minus operator, and that they have different precedences; however, the C-- grammar has been written so that the unary minus operator has the correct (highest) precedence; therefore, you can declare MINUS to have the precedence appropriate for the binary minus operator.
+
+*/ 
+
+
+
 
 /* The grammar with actions
- *
- * NOTE: add more grammar rules below.
- *
  */
 program         ::= declList: d
                 {: RESULT = new ProgramNode(new DeclListNode(d));
@@ -130,3 +139,11 @@ id              ::= ID:i
                 {: RESULT = new IdNode(i.linenum, i.charnum, i.idVal);
                 :}
                 ;
+
+/* 2. TODO: Add grammar rules: 
+Building an Abstract-Syntax Tree
+To make your parser build an abstract-syntax tree, you must add new productions, declarations, and actions. You will need to decide, for each nonterminal that you add, what type its associated value should have. Then you must add the appropriate nonterminal declaration to the specification. For most nonterminals, the value will either be some kind of tree node (a subclass of ASTnode) or a LinkedList of some kind of node (use the information in ast.java to guide your decision). Note that you cannot use parameterized types for the types of nonterminals; so if the translation of a nonterminal is a LinkedList of some kind of node, you will have to declare its type as just plain LinkedList.
+
+You must also add actions to each new grammar production that you add to cminusminus.cup. Make sure that each action ends by assigning an appropriate value to RESULT. Note that the parser will return a Symbol whose value field contains the value assigned to RESULT in the production for the root nonterminal (nonterminal program).
+
+*/

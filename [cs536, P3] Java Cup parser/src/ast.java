@@ -102,6 +102,37 @@ import java.util.*;
 //
 // **********************************************************************
 
+/* 3. TODO: Unparsing
+    To test your parser, you must write the unparse methods for the subclasses of ASTnode (in the file ast.java). When the unparse method of the root node of the program's abstract-syntax tree is called, it should print a nicely formatted version of the program (this is called unparsing the abstract-syntax tree). The output produced by calling unparse should be the same as the input to the parser except that:
+
+        1. There will be no comments in the output.
+        2. The output will be "pretty printed" (newlines and indentation will be used to make the program readable); and
+        3. Expressions will be fully parenthesized to reflect the order of evaluation.
+
+    To make grading easier, put open curly braces on the same line as the preceding code and put closing curly braces on a line with no other code (as in the example above). Put the first statement in the body of an if or while on the line following the open curly brace. Whitespace within a line is up to you (as long as it looks reasonable).
+
+    Note: Trying to unparse a tree will help you determine whether you have built the tree correctly in the first place. Besides looking at the output of your unparser, you should try using it as the input to your parser; if it doesn't parse, you've made a mistake either in how you built your abstract-syntax tree or in how you've written your unparser.
+
+Modifying ast.java (IMPORTANT) We will test your program by using our unparse
+methods on your abstract-syntax trees and by using your unparse methods on
+our abstract-syntax trees. To make this work, you will need to:
+
+    1. Modify ast.java only by filling in the bodies of the unparse methods (and you must fill in all of the method bodies).
+
+    2. Make sure that no field is null (i.e., when you call the constructor of a
+    class with a LinkedList argument, that argument should never be null). The
+    only two exceptions to these are ReturnStmtNode and CallExpNode; it is OK to
+    make the ExpNode field of a ReturnStmtNode null (when no value is returned),
+    likewise for the ExpListNode field of a CallExpNode (when the call has no
+    arguments). Thus, you shouldn't be checking to see if a field is null or not,
+    other than in these two nodes.
+
+    3. Follow the convention that the mySize field of a VarDeclNode has the value
+    VarDeclNode.NOT_STRUCT if the type of the declared variable is a non-struct
+    type.
+ 
+ */
+
 // **********************************************************************
 // ASTnode class (base class for all other kinds of nodes)
 // **********************************************************************
