@@ -59,6 +59,7 @@ Executing the tests will generate output files which will be compared to expecte
     - [ ] remaining productions that need to be added
     - [ ] add test cases for final version of test.cminusminus
     - [ ] do not try to implement all of nonterminals at once. Instead, add one new rule at a time to the Java CUP specification, make the corresponding changes to the unparse methods in ast.java, and test your work by augmenting your test.cminusminus or by writing a C-- program that includes the new construct you added, and make sure that it is parsed and unparsed correctly.
+    - [ ] use unparse output as input to parser to check for errors.
 
 - Handing in: ensure that you do not include any extra sub-directories.
   - [ ] lastname.firstname.lastname.firstname.P3.zip

@@ -67,34 +67,29 @@ terminal                GREATEREQ;
 terminal                ASSIGN;
 terminal                UMINUS; // dummy terminal for precedence setting
 
-/* Non-terminals
- *
- * TODO: You will need to add more non-terminals to this list as you add 
- *       productions to the grammar below.
- */
+/* Non-terminals */
 non terminal ProgramNode      program;
 non terminal LinkedList       list_decl;
 non terminal DeclNode         decl;
-non terminal                  list_varDecl;
+non terminal LinkedList       list_varDecl;
 non terminal VarDeclNode      varDecl;
 non terminal                  fnDecl;
 non terminal StructDeclNode   structDecl;
 non terminal                  structBody;
 non terminal                  formals;
-non terminal                  formalsList;
+non terminal LinkedList       list_formals;
 non terminal                  formalDecl;
 non terminal                  fnBody;
-non terminal                  stmtList;
-non terminal                  stmt;
+non terminal LinkedList       list_stmt;
+non terminal StmtNode         stmt;
 non terminal                  assignExp;
 non terminal                  exp;
-non terminal                  term;
+non terminal ExpNode          term;
 non terminal                  fncall;
-non terminal                  actualList;
+non terminal LinkedList       list_actual;
 non terminal TypeNode         type;
 non terminal                  loc;
 non terminal IdNode           id;
-
 
 /* Precedences & Associativity */
 precedence right ASSIGN;
@@ -108,259 +103,252 @@ precedence left UMINUS, NOT;
 start with program;
 
 /* The grammar with actions */
-program                                                                                         ::= 
-            list_decl:x                                                                         {:            
+program                                                                                                     ::= 
+            list_decl:x                                                                                     {:            
                 RESULT = new ProgramNode(new DeclListNode(x));
                                                                                                     :};
-list_decl                                                                                       ::= 
-            list_decl:x1 decl:x2                                                                {:       
+list_decl                                                                                                   ::= 
+            list_decl:x1 decl:x2                                                                            {:       
                 x1.addLast(x2);
                 RESULT = x1;
                                                                                                     :}
-|           /* epsilon */                                                                         {: 
+|           /* epsilon */                                                                                   {: 
                 RESULT = new LinkedList<DeclNode>();
                                                                                                     :};
-decl                                                                                             ::= 
-            varDecl:x                                                                            {: 
+decl                                                                                                        ::= 
+            varDecl:x                                                                                       {: 
                 RESULT = new DeclNode();
                                                                                                      :}
-|           fnDecl:x                                                                               {: 
+|           fnDecl:x                                                                                        {: 
                 RESULT = new DeclNode();
                                                                                                      :}
-|           structDecl:x                                                                           {: 
+|           structDecl:x                                                                                    {: 
                  // struct definitions only at top level
                  RESULT = new DeclNode();
                                                                                                      :};
 
-list_varDecl                                                                                    ::= 
-            list_varDecl varDecl                                                             {: 
+list_varDecl                                                                                                ::= 
+            list_varDecl varDecl                                                                            {: 
                                                                                     
                                                                                                 :}
-|           /* epsilon */                                                                  {: 
+|           /* epsilon */                                                                                   {: 
                                                                                                     
                                                                                                     :};
 
-varDecl                                                                                          ::= 
-            type:t id:i SEMICOLON                                                                {:
+varDecl                                                                                                     ::= 
+            type:t id:i SEMICOLON                                                                           {:
                 RESULT = new VarDeclNode(t, i, VarDeclNode.NOT_STRUCT);         
                                                                                       :}
-|           STRUCT id id SEMICOLON                                                                {:
+|           STRUCT id id SEMICOLON                                                                          {:
                 RESULT = new VarDeclNode();
                                                                                       :};
 
-fnDecl                                                                                          ::= 
-            type id formals fnBody                                                {:
+fnDecl                                                                                                      ::= 
+            type id formals fnBody                                                                          {:
 
                                                                                 :};
 
-structDecl                                                                                   ::= 
-            STRUCT id:i LCURLY structBody:s RCURLY SEMICOLON                                      {:
+structDecl                                                                                                  ::= 
+            STRUCT id:i LCURLY structBody:s RCURLY SEMICOLON                                                {:
                 RESULT = new StructDeclNode();
                                                                                     :};
-structBody                                                                                       ::= 
-            structBody varDecl                                                                       {:
+structBody                                                                                                  ::= 
+            structBody varDecl                                                                              {:
                 
                                                                                     :}
-|           varDecl:v                                                                            {:
+|           varDecl:v                                                                                       {:
                 RESULT = v;
                                                                                     :};
 
-formals                                                                                          ::= 
-            LPAREN RPAREN                                                                            {:
+formals                                                                                                     ::= 
+            LPAREN RPAREN                                                                                   {:
 
                                                                                                 :}
-|           LPAREN formalsList RPAREN                                                                {:
+|           LPAREN list_formals RPAREN                                                                       {:
                 
                                                                                                 :};
 
-formalsList                                                                                      ::=
-            formalDecl                                                                               {:
+list_formals                                                                                                 ::=
+            formalDecl                                                                                      {:
 
                                                                                 :}
-|           formalDecl COMMA formalsList                                                          {:
+|           formalDecl COMMA list_formals                                                                    {:
                 
                                                                                                 :};
 
-formalDecl                                                                                       ::= 
-            type id                                                                                                    {:
+formalDecl                                                                                                  ::= 
+            type id                                                                                         {:
                     // note: no struct parameters
                                                                                     :};
 
-fnBody                                                                                           ::= 
-            LCURLY list_varDecl stmtList RCURLY                                                               {:
+fnBody                                                                                                      ::= 
+            LCURLY list_varDecl list_stmt RCURLY                                                             {:
                                                                                     
                                                                                     :};
 
-stmtList                                                                                         ::= 
-            stmtList stmt                                                                            {:
+list_stmt                                                                                                    ::= 
+            list_stmt stmt                                                                                   {:
                                                                                     
                                                                                                   :}
-|           /* epsilon */                                                                            {:
+|           /* epsilon */                                                                                   {:
                                                                                                     
                                                                                                     :};
 
-stmt                                                                                              ::= 
-            assignExp SEMICOLON                                                                         {:
+stmt                                                                                                        ::= 
+            assignExp SEMICOLON                                                                             {:
                                                                                             
                                                                                             :}
-|           loc PLUSPLUS SEMICOLON                                                                 {:
+|           loc PLUSPLUS SEMICOLON                                                                          {:
                                                                                                             
                                                                                                             :}
-|           loc MINUSMINUS SEMICOLON                                                                 {:
+|           loc MINUSMINUS SEMICOLON                                                                        {:
                                                                                                             
                                                                                                             :}
-|           CIN READ loc SEMICOLON                                                                   {:
+|           CIN READ loc SEMICOLON                                                                          {:
                                                                                                             
                                                                                                             :}
-|           COUT WRITE exp SEMICOLON                                                                 {:        
+|           COUT WRITE exp SEMICOLON                                                                        {:        
                                                                                                             
                                                                                                             :}
-|           IF LPAREN exp RPAREN LCURLY list_varDecl stmtList RCURLY                                 {:
+|           IF LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY                                        {:
                                                                                                             
                                                                                                             :}
-|           IF LPAREN exp RPAREN LCURLY list_varDecl stmtList RCURLY ELSE LCURLY list_varDecl stmtList RCURLY                                                                                                {:
+|           IF LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY ELSE LCURLY list_varDecl list_stmt RCURLY                                                                                                      {:
                                                                                                             
                                                                                                             :}
-|           WHILE LPAREN exp RPAREN LCURLY list_varDecl stmtList RCURLY                                                   {:
+|           WHILE LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY                                     {:
                                                                                                             
                                                                                                             :}
-|           REPEAT LPAREN exp RPAREN LCURLY list_varDecl stmtList RCURLY                                                  {:
+|           REPEAT LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY                                    {:
                                                                                                             
                                                                                                             :}
-|           RETURN exp SEMICOLON                                                                  {:
+|           RETURN exp SEMICOLON                                                                            {:
                                                                                                             
                                                                                                             :}
-|           RETURN SEMICOLON                                                                          {:
+|           RETURN SEMICOLON                                                                                {:
                                                                                                             
                                                                                                             :}
-|           fncall SEMICOLON                                                                          {:
+|           fncall SEMICOLON                                                                                {:
                                                                                                             
                                                                                                             :};
 
-assignExp                                                                                            ::= 
-            loc ASSIGN exp                                                                             {:
+assignExp                                                                                                   ::= 
+            loc ASSIGN exp                                                                                  {:
 
                                                                                                      :};                                 
 
-exp                                                                                                   ::= 
-            assignExp                                                                                   {:
+exp                                                                                                         ::= 
+            assignExp                                                                                       {:
 
                                                                                                         :}
-|           exp PLUS exp                                                                             {:
+|           exp PLUS exp                                                                                    {:
                 
                                                                                                     :}
-|           exp MINUS exp                                                                                {:
+|           exp MINUS exp                                                                                   {:
                 
                                                                                                     :}
-|           exp TIMES exp                                                                                {:
+|           exp TIMES exp                                                                                   {:
                 
                                                                                                     :}
-|           exp DIVIDE exp                                                                               {:
+|           exp DIVIDE exp                                                                                  {:
                 
                                                                                                     :}
-|           NOT exp                                                                              {:
+|           NOT exp                                                                                         {:
                 
                                                                                                     :}
-|           exp AND exp                                                                              {:
+|           exp AND exp                                                                                     {:
                 
                                                                                                     :}
-|           exp OR exp                                                                               {:
+|           exp OR exp                                                                                      {:
                 
                                                                                                     :}
-|           exp EQUALS exp                                                                               {:
+|           exp EQUALS exp                                                                                  {:
                 
                                                                                                     :}
-|           exp NOTEQUALS exp                                                                                {:
+|           exp NOTEQUALS exp                                                                               {:
                 
                                                                                                     :}
-|           exp LESS exp                                                                             {:
+|           exp LESS exp                                                                                    {:
                 
                                                                                                     :}
-|           exp GREATER exp                                                                              {:
+|           exp GREATER exp                                                                                 {:
                 
                                                                                                     :}
-|           exp LESSEQ exp                                                                               {:
+|           exp LESSEQ exp                                                                                  {:
                 
                                                                                                     :}
-|           exp GREATEREQ exp                                                                                {:
+|           exp GREATEREQ exp                                                                               {:
                 
                                                                                                     :}
-|           MINUS term                                                                               {:
+|           MINUS term                                                                                      {:
                 
                                                                                                     :}
             %prec UMINUS
-|           term                                                                                     {: 
+|           term                                                                                            {: 
                 
                                                                                                     :};
 
 
-term                                                                                                     ::= 
-            loc                                                                                          {:
+term                                                                                                        ::= 
+            loc                                                                                             {:
 
                                                                                                         :}
-|           INTLITERAL                                                                                  {:
+|           INTLITERAL:x /*✅*/                                                                                      {:
+                RESULT = new IntLitNode(x.linenum, x.charnum, x.intVal);
+                                                                                                            :}
+|           STRINGLITERAL:x /*✅*/                                                                            {:
+                RESULT = new StringLitNode(x.linenum, x.charnum, x.strVal); 
+                                                                                                            :}
+|           TRUE:x /*✅*/                                                                                           {:
+                RESULT = new TrueNode(x.linenum, x.charnum);
+                                                                                                            :}
+|           FALSE:x /*✅*/                                                                                          {:
+                RESULT = new FalseNode(x.linenum, x.charnum);
+                                                                                                            :}
+|           LPAREN exp RPAREN                                                                               {:
                 
                                                                                                 :}
-|           STRINGLITERAL                                                                                    {:
-                
-                                                                                                :}
-|           TRUE                                                                                  {:
-                
-                                                                                                :}
-|           FALSE                                                                                    {:
-                
-                                                                                                :}
-|           LPAREN exp RPAREN                                                                                   {:
-                
-                                                                                                :}
-|           fncall                                                                                  {:
+|           fncall                                                                                          {:
                 
                                                                                                 :};
 
-fncall                                                                                                   ::=  
-            id LPAREN RPAREN                                                                                 {:
+fncall                                                                                                      ::=  
+            id LPAREN RPAREN                                                                                {:
                     // fn call with no args
                                                                                                         :}
-|           id LPAREN actualList RPAREN                                                                    {:
+|           id LPAREN list_actual RPAREN                                                                     {:
                     // with args
                                                                                                         :};
 
-actualList                                                                                               ::= 
-            exp                                                                                          {:
+list_actual                                                                                                  ::= 
+            exp                                                                                             {:
 
                                                                                                          :}
-|           actualList COMMA exp                                                                          {:
+|           list_actual COMMA exp                                                                            {:
                 
                                                                                                         :};
 
-type                                                                                                     ::= 
-            INT                                                                                          {: 
+type /*✅*/                                                                                                       ::= 
+            INT                                                                                             {: 
                 RESULT = new IntNode();
-                                                                                                         :}
-|           BOOL                                                                                           {:
+                                                                                                            :}
+|           BOOL                                                                                            {:
                 RESULT = new BoolNode();
-                                                                                                           :}
-|           VOID                                                                                           {:
+                                                                                                            :}
+|           VOID                                                                                            {:
                 RESULT = new VoidNode();
-                                                                                                        :};
+                                                                                                            :};
 
-loc                                                                                                      ::= 
+loc                                                                                                         ::= 
             id                                                                                              {:
                                                                                     
                                                                                                             :}
-|           loc DOT id                                                                                       {:
+|           loc DOT id                                                                                      {:
                                                                                                     
                                                                                                             :};
 
-id                                                                                                        ::= 
-            ID:i                                                                                           {: 
-                RESULT = new IdNode(i.linenum, i.charnum, i.idVal);
+id /*✅*/                                                                                                          ::= 
+            ID:x                                                                                              {: 
+                RESULT = new IdNode(x.linenum, x.charnum, x.idVal);
                                                                                                             :};
 
-/* 2. TODO: Add grammar rules: 
-Building an Abstract-Syntax Tree
-To make your parser build an abstract-syntax tree, you must add new productions, declarations, and actions. You will need to decide, for each nonterminal that you add, what type its associated value should have. Then you must add the appropriate nonterminal declaration to the specification. For most nonterminals, the value will either be some kind of tree node (a subclass of ASTnode) or a LinkedList of some kind of node (use the information in ast.java to guide your decision). Note that you cannot use parameterized types for the types of nonterminals; so if the translation of a nonterminal is a LinkedList of some kind of node, you will have to declare its type as just plain LinkedList.
-
-You must also add actions to each new grammar production that you add to cminusminus.cup. Make sure that each action ends by assigning an appropriate value to RESULT. Note that the parser will return a Symbol whose value field contains the value assigned to RESULT in the production for the root nonterminal (nonterminal program).
-
-*/
