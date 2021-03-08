@@ -17,9 +17,6 @@ P3.class: P3.java parser.class Yylex.class ASTnode.class
 parser.class: parser.java ASTnode.class Yylex.class ErrMsg.class
 	$(JC) $(FLAGS) -cp $(CP) parser.java
 
-parser.java: cminusminus.cup
-	java -cp $(CP) java_cup.Main < cminusminus.cup
-
 Yylex.class: cminusminus.jlex.java sym.class ErrMsg.class
 	$(JC) $(FLAGS) -cp $(CP) cminusminus.jlex.java
 
@@ -32,7 +29,7 @@ cminusminus.jlex.java: cminusminus.jlex sym.class
 sym.class: sym.java
 	$(JC) $(FLAGS) -cp $(CP) sym.java
 
-sym.java: cminusminus.cup
+sym.java parser.java: cminusminus.cup
 	java -cp $(CP) java_cup.Main < cminusminus.cup
 
 ErrMsg.class: ErrMsg.java

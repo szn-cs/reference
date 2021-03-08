@@ -2,70 +2,70 @@
  Grammar for C-- programs
  - ambiguous grammar
  **********************************************************************/
-program         ::= declList
-                ;
+program         ::= list_decl
+                                                                            ;
 
-declList        ::= declList decl
+list_decl        ::= list_decl decl
                 | /* epsilon */
-                ;
+                                                                            ;
 
 decl            ::= varDecl
                 | fnDecl
                 | structDecl     // struct definitions only at top level
-                ;
+                                                                            ;
 
-varDeclList     ::= varDeclList varDecl
+list_varDecl     ::= list_varDecl varDecl
                 | /* epsilon */
-                ;
+                                                                            ;
 
 varDecl         ::= type id SEMICOLON
                 | STRUCT id id SEMICOLON
-                ;
+                                                                            ;
 
 fnDecl          ::= type id formals fnBody
-                ;
+                                                                            ;
 
 structDecl      ::= STRUCT id LCURLY structBody RCURLY SEMICOLON
-                ;
+                                                                            ;
 
 structBody      ::= structBody varDecl
                 | varDecl
-                ;
+                                                                            ;
 
 formals         ::= LPAREN RPAREN
-                | LPAREN formalsList RPAREN
-                ;
+                | LPAREN list_formals RPAREN
+                                                                            ;
 
-formalsList     ::= formalDecl
-                | formalDecl COMMA formalsList
-                ;
+list_formals     ::= formalDecl
+                | formalDecl COMMA list_formals
+                                                                            ;
 
 formalDecl      ::= type id        // note: no struct parameters
-                ;
+                                                                            ;
 
-fnBody          ::= LCURLY varDeclList stmtList RCURLY
-                ;
+fnBody          ::= LCURLY list_varDecl list_stmt RCURLY
+                                                                            ;
 
-stmtList        ::= stmtList stmt
+list_stmt        ::= list_stmt stmt
                 | /* epsilon */
-                ;
+                                                                            ;
 
 stmt            ::= assignExp SEMICOLON
                 | loc PLUSPLUS SEMICOLON
                 | loc MINUSMINUS SEMICOLON
                 | CIN READ loc SEMICOLON
                 | COUT WRITE exp SEMICOLON
-                | IF LPAREN exp RPAREN LCURLY varDeclList stmtList RCURLY
-                | IF LPAREN exp RPAREN LCURLY varDeclList stmtList RCURLY ELSE LCURLY varDeclList stmtList RCURLY
-                | WHILE LPAREN exp RPAREN LCURLY varDeclList stmtList RCURLY
-		| REPEAT LPAREN exp RPAREN LCURLY varDeclList stmtList RCURLY
+                | IF LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY
+                | IF LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY ELSE LCURLY list_varDecl list_stmt RCURLY
+                | WHILE LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY
+		| REPEAT LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY
                 | RETURN exp SEMICOLON
                 | RETURN SEMICOLON
                 | fncall SEMICOLON
-                ;
+                                                                            ;
 
 assignExp       ::= loc ASSIGN exp
-                ;
+                                                                            ;
 
 exp             ::= assignExp
                 | exp PLUS exp
@@ -83,7 +83,7 @@ exp             ::= assignExp
                 | exp GREATEREQ exp
                 | MINUS term
                 | term
-                ;
+                                                                            ;
 
 term            ::= loc
                 | INTLITERAL
@@ -92,23 +92,24 @@ term            ::= loc
                 | FALSE
                 | LPAREN exp RPAREN
                 | fncall
-                ;
+                                                                            ;
 
 fncall          ::=  id LPAREN RPAREN   // fn call with no args
-                | id LPAREN actualList RPAREN  // with args
-                ;
+                | id LPAREN list_actual RPAREN  // with args
+                                                                            ;
 
-actualList      ::= exp
-                | actualList COMMA exp
-                ;
+list_actual      ::= exp
+                | list_actual COMMA exp
+                                                                            ;
 
 type            ::= INT
                 | BOOL
                 | VOID
-                ;
+                                                                            ;
 
 loc             ::= id
                 | loc DOT id
 
 id              ::= ID
-                ;
+                                                                            ;
+

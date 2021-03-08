@@ -10,7 +10,6 @@ import java.util.*;
  * than just "Syntax error".
  */
 parser code {:
-
     public void syntax_error(Symbol currToken) {
         if (currToken.value == null) {
             ErrMsg.fatal(0,0, "Syntax error at end of file");
@@ -24,7 +23,6 @@ parser code {:
     }
 :};
 
-
 /* Terminals (tokens returned by the scanner). */
 terminal                INT;
 terminal                BOOL;
@@ -37,7 +35,7 @@ terminal                COUT;
 terminal                IF;
 terminal                ELSE;
 terminal                WHILE;
-terminal		REPEAT;
+terminal		        REPEAT;
 terminal                RETURN;
 terminal IdTokenVal     ID;
 terminal IntLitTokenVal INTLITERAL;
@@ -67,78 +65,297 @@ terminal                GREATER;
 terminal                LESSEQ;
 terminal                GREATEREQ;
 terminal                ASSIGN;
-
+terminal                UMINUS; // dummy terminal for precedence setting
 
 /* Non-terminals
  *
- * NOTE: You will need to add more non-terminals to this list as you
- *       add productions to the grammar below.
+ * TODO: You will need to add more non-terminals to this list as you add 
+ *       productions to the grammar below.
  */
 non terminal ProgramNode      program;
-non terminal LinkedList       declList;
+non terminal LinkedList       list_decl;
 non terminal DeclNode         decl;
+non terminal                  list_varDecl;
 non terminal VarDeclNode      varDecl;
+non terminal                  fnDecl;
+non terminal StructDeclNode   structDecl;
+non terminal                  structBody;
+non terminal                  formals;
+non terminal                  formalsList;
+non terminal                  formalDecl;
+non terminal                  fnBody;
+non terminal                  stmtList;
+non terminal                  stmt;
+non terminal                  assignExp;
+non terminal                  exp;
+non terminal                  term;
+non terminal                  fncall;
+non terminal                  actualList;
 non terminal TypeNode         type;
+non terminal                  loc;
 non terminal IdNode           id;
 
 
-/* Precedences & Associativity
- *
- */
-
+/* Precedences & Associativity */
+precedence right ASSIGN;
+precedence left OR;
+precedence left AND;
+precedence nonassoc LESS, GREATER, LESSEQ, GREATEREQ, EQUALS, NOTEQUALS;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence left UMINUS, NOT;
 
 start with program;
 
-/* 1. TODO:  Add precedence and associativity declarations here. Run Java Cup and fix any ambiguity errors.
+/* The grammar with actions */
+program                                                                                         ::= 
+            list_decl:x                                                                         {:            
+                RESULT = new ProgramNode(new DeclListNode(x));
+                                                                                                    :};
+list_decl                                                                                       ::= 
+            list_decl:x1 decl:x2                                                                {:       
+                x1.addLast(x2);
+                RESULT = x1;
+                                                                                                    :}
+|           /* epsilon */                                                                         {: 
+                RESULT = new LinkedList<DeclNode>();
+                                                                                                    :};
+decl                                                                                             ::= 
+            varDecl:x                                                                            {: 
+                RESULT = new DeclNode();
+                                                                                                     :}
+|           fnDecl:x                                                                               {: 
+                RESULT = new DeclNode();
+                                                                                                     :}
+|           structDecl:x                                                                           {: 
+                 // struct definitions only at top level
+                 RESULT = new DeclNode();
+                                                                                                     :};
 
-- Assignment is right associative.
-- dot operator is left associative.
-- relational and equality operators (<, >, <=, >=, ==, and !=) are non-associative (i.e., expressions like a < b < c are not allowed and should cause a syntax error).
-- All of the other binary operators are left associative.
-- The unary minus and not (!) operators have the highest precedence, then multiplication and division, then addition and subtraction, then the relational and equality operators, then the logical and operator (&&), then the logical or operator (||), and finally the assignment operator (=).
+list_varDecl                                                                                    ::= 
+            list_varDecl varDecl                                                             {: 
+                                                                                    
+                                                                                                :}
+|           /* epsilon */                                                                  {: 
+                                                                                                    
+                                                                                                    :};
 
-Note that the same token (MINUS) is used for both the unary and binary minus operator, and that they have different precedences; however, the C-- grammar has been written so that the unary minus operator has the correct (highest) precedence; therefore, you can declare MINUS to have the precedence appropriate for the binary minus operator.
+varDecl                                                                                          ::= 
+            type:t id:i SEMICOLON                                                                {:
+                RESULT = new VarDeclNode(t, i, VarDeclNode.NOT_STRUCT);         
+                                                                                      :}
+|           STRUCT id id SEMICOLON                                                                {:
+                RESULT = new VarDeclNode();
+                                                                                      :};
 
-*/ 
+fnDecl                                                                                          ::= 
+            type id formals fnBody                                                {:
+
+                                                                                :};
+
+structDecl                                                                                   ::= 
+            STRUCT id:i LCURLY structBody:s RCURLY SEMICOLON                                      {:
+                RESULT = new StructDeclNode();
+                                                                                    :};
+structBody                                                                                       ::= 
+            structBody varDecl                                                                       {:
+                
+                                                                                    :}
+|           varDecl:v                                                                            {:
+                RESULT = v;
+                                                                                    :};
+
+formals                                                                                          ::= 
+            LPAREN RPAREN                                                                            {:
+
+                                                                                                :}
+|           LPAREN formalsList RPAREN                                                                {:
+                
+                                                                                                :};
+
+formalsList                                                                                      ::=
+            formalDecl                                                                               {:
+
+                                                                                :}
+|           formalDecl COMMA formalsList                                                          {:
+                
+                                                                                                :};
+
+formalDecl                                                                                       ::= 
+            type id                                                                                                    {:
+                    // note: no struct parameters
+                                                                                    :};
+
+fnBody                                                                                           ::= 
+            LCURLY list_varDecl stmtList RCURLY                                                               {:
+                                                                                    
+                                                                                    :};
+
+stmtList                                                                                         ::= 
+            stmtList stmt                                                                            {:
+                                                                                    
+                                                                                                  :}
+|           /* epsilon */                                                                            {:
+                                                                                                    
+                                                                                                    :};
+
+stmt                                                                                              ::= 
+            assignExp SEMICOLON                                                                         {:
+                                                                                            
+                                                                                            :}
+|           loc PLUSPLUS SEMICOLON                                                                 {:
+                                                                                                            
+                                                                                                            :}
+|           loc MINUSMINUS SEMICOLON                                                                 {:
+                                                                                                            
+                                                                                                            :}
+|           CIN READ loc SEMICOLON                                                                   {:
+                                                                                                            
+                                                                                                            :}
+|           COUT WRITE exp SEMICOLON                                                                 {:        
+                                                                                                            
+                                                                                                            :}
+|           IF LPAREN exp RPAREN LCURLY list_varDecl stmtList RCURLY                                 {:
+                                                                                                            
+                                                                                                            :}
+|           IF LPAREN exp RPAREN LCURLY list_varDecl stmtList RCURLY ELSE LCURLY list_varDecl stmtList RCURLY                                                                                                {:
+                                                                                                            
+                                                                                                            :}
+|           WHILE LPAREN exp RPAREN LCURLY list_varDecl stmtList RCURLY                                                   {:
+                                                                                                            
+                                                                                                            :}
+|           REPEAT LPAREN exp RPAREN LCURLY list_varDecl stmtList RCURLY                                                  {:
+                                                                                                            
+                                                                                                            :}
+|           RETURN exp SEMICOLON                                                                  {:
+                                                                                                            
+                                                                                                            :}
+|           RETURN SEMICOLON                                                                          {:
+                                                                                                            
+                                                                                                            :}
+|           fncall SEMICOLON                                                                          {:
+                                                                                                            
+                                                                                                            :};
+
+assignExp                                                                                            ::= 
+            loc ASSIGN exp                                                                             {:
+
+                                                                                                     :};                                 
+
+exp                                                                                                   ::= 
+            assignExp                                                                                   {:
+
+                                                                                                        :}
+|           exp PLUS exp                                                                             {:
+                
+                                                                                                    :}
+|           exp MINUS exp                                                                                {:
+                
+                                                                                                    :}
+|           exp TIMES exp                                                                                {:
+                
+                                                                                                    :}
+|           exp DIVIDE exp                                                                               {:
+                
+                                                                                                    :}
+|           NOT exp                                                                              {:
+                
+                                                                                                    :}
+|           exp AND exp                                                                              {:
+                
+                                                                                                    :}
+|           exp OR exp                                                                               {:
+                
+                                                                                                    :}
+|           exp EQUALS exp                                                                               {:
+                
+                                                                                                    :}
+|           exp NOTEQUALS exp                                                                                {:
+                
+                                                                                                    :}
+|           exp LESS exp                                                                             {:
+                
+                                                                                                    :}
+|           exp GREATER exp                                                                              {:
+                
+                                                                                                    :}
+|           exp LESSEQ exp                                                                               {:
+                
+                                                                                                    :}
+|           exp GREATEREQ exp                                                                                {:
+                
+                                                                                                    :}
+|           MINUS term                                                                               {:
+                
+                                                                                                    :}
+            %prec UMINUS
+|           term                                                                                     {: 
+                
+                                                                                                    :};
 
 
+term                                                                                                     ::= 
+            loc                                                                                          {:
 
+                                                                                                        :}
+|           INTLITERAL                                                                                  {:
+                
+                                                                                                :}
+|           STRINGLITERAL                                                                                    {:
+                
+                                                                                                :}
+|           TRUE                                                                                  {:
+                
+                                                                                                :}
+|           FALSE                                                                                    {:
+                
+                                                                                                :}
+|           LPAREN exp RPAREN                                                                                   {:
+                
+                                                                                                :}
+|           fncall                                                                                  {:
+                
+                                                                                                :};
 
-/* The grammar with actions
- */
-program         ::= declList: d
-                {: RESULT = new ProgramNode(new DeclListNode(d));
-                :}
-                ;
+fncall                                                                                                   ::=  
+            id LPAREN RPAREN                                                                                 {:
+                    // fn call with no args
+                                                                                                        :}
+|           id LPAREN actualList RPAREN                                                                    {:
+                    // with args
+                                                                                                        :};
 
-declList        ::= declList:dl decl:d
-                {: dl.addLast(d);
-                   RESULT = dl;
-                :}
-                | /* epsilon */
-                {: RESULT = new LinkedList<DeclNode>();
-                :}
-                ;
+actualList                                                                                               ::= 
+            exp                                                                                          {:
 
-decl            ::= varDecl:v
-                {: RESULT = v;
-                :}
-                ;
+                                                                                                         :}
+|           actualList COMMA exp                                                                          {:
+                
+                                                                                                        :};
 
-varDecl         ::= type:t id:i SEMICOLON
-                {: RESULT = new VarDeclNode(t, i, VarDeclNode.NOT_STRUCT);
-                :}
-                ;
+type                                                                                                     ::= 
+            INT                                                                                          {: 
+                RESULT = new IntNode();
+                                                                                                         :}
+|           BOOL                                                                                           {:
+                RESULT = new BoolNode();
+                                                                                                           :}
+|           VOID                                                                                           {:
+                RESULT = new VoidNode();
+                                                                                                        :};
 
-type            ::= INT
-                {: RESULT = new IntNode();
-                :}
-                ;
+loc                                                                                                      ::= 
+            id                                                                                              {:
+                                                                                    
+                                                                                                            :}
+|           loc DOT id                                                                                       {:
+                                                                                                    
+                                                                                                            :};
 
-id              ::= ID:i
-                {: RESULT = new IdNode(i.linenum, i.charnum, i.idVal);
-                :}
-                ;
+id                                                                                                        ::= 
+            ID:i                                                                                           {: 
+                RESULT = new IdNode(i.linenum, i.charnum, i.idVal);
+                                                                                                            :};
 
 /* 2. TODO: Add grammar rules: 
 Building an Abstract-Syntax Tree

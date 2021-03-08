@@ -44,17 +44,12 @@ Executing the tests will generate output files which will be compared to expecte
     - [ ] unparse methods for the AST nodes (in ast.java).
     - [ ] input file (test.cminusminus) to test implementation.  
   - Steps: 
-    - [ ] Add a few grammar productions to cminusminus.cup.
-    - [ ] Write the corresponding unparse operations.
-    - [ ] Write a test program that uses the new language constructs.
-    - [ ] Create a parser (using make) and run it on your test program.
-  - Steps: 
-    - [ ] start by making a very small change to cminusminus.cup. For example, add the rules and actions for:
-        type ::= BOOL
-        type ::= VOID
-    Also update the appropriate unparse method in ast.java. Make sure that you can create and run the parser after making this small change. (To create the parser, just type make in the directory where you are working.)
+    - [x] Add a few grammar productions to cminusminus.cup - start by making a very small change to cminusminus.cup.
+    - [x] Write the corresponding unparse operations - update the appropriate unparse method in ast.java, and check if parser works.
     - [ ] add the rules needed to allow struct declarations.
     - [ ] add the rules needed to allow programs to include functions with no formal parameters and with empty statement lists only, and update the corresponding unparse methods.
+    - [ ] Write a test program that uses the new language constructs.
+    - [ ] Create a parser (using make) and run it on your test program.
     - [ ] add the rules (and unparse methods) for the simplest kind of expressions -- just plain identifiers.
     - [ ] statement nonterminals
     - [ ] cminusminus.cup adding rules for the statements, and ast.java to define the unparse methods needed for those statements.
