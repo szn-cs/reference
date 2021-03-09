@@ -130,7 +130,7 @@ abstract class ASTnode {
 // ProgramNode,  DeclListNode, FormalsListNode, FnBodyNode,
 // StmtListNode, ExpListNode
 // **********************************************************************
-
+/*✅*/
 class ProgramNode extends ASTnode {
     public ProgramNode(DeclListNode L) {
         myDeclList = L;
@@ -291,7 +291,7 @@ class StructDeclNode extends DeclNode {
 
     // two children
     private IdNode myId;
-	  private DeclListNode myDeclList;
+    private DeclListNode myDeclList;
 }
 
 // **********************************************************************
@@ -473,25 +473,33 @@ class RepeatStmtNode extends StmtNode {
     private DeclListNode myDeclList;
     private StmtListNode myStmtList;
 }
-
+/*✅*/
 class CallStmtNode extends StmtNode {
     public CallStmtNode(CallExpNode call) {
         myCall = call;
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myCall.unparse(p, 0);
+        p.print(";");
     }
 
     // one child
     private CallExpNode myCall;
 }
-
+/*✅*/
 class ReturnStmtNode extends StmtNode {
     public ReturnStmtNode(ExpNode exp) {
         myExp = exp;
     }
 
     public void unparse(PrintWriter p, int indent) {
+        p.print("return");
+        if(myExp != null) {
+            p.print(" ");
+            myExp.unparse(p, 0);
+        }
+        p.print(";");
     }
 
     // one child
@@ -585,7 +593,7 @@ class IdNode extends ExpNode {
     private int myCharNum;
     private String myStrVal;
 }
-
+/*✅*/
 class DotAccessExpNode extends ExpNode {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
         myLoc = loc;
@@ -593,13 +601,16 @@ class DotAccessExpNode extends ExpNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myLoc.unparse(p, 0);
+        p.print(".");
+        myId.unparse(p, 0);
     }
 
     // two children
     private ExpNode myLoc;
     private IdNode myId;
 }
-
+/*✅*/
 class AssignNode extends ExpNode {
     public AssignNode(ExpNode lhs, ExpNode exp) {
         myLhs = lhs;
@@ -607,13 +618,16 @@ class AssignNode extends ExpNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myLhs.unparse(p, 0);
+        p.print(" = ");
+        myExp.unparse(p, 0);
     }
 
     // two children
     private ExpNode myLhs;
     private ExpNode myExp;
 }
-
+/*✅*/
 class CallExpNode extends ExpNode {
     public CallExpNode(IdNode name, ExpListNode elist) {
         myId = name;
@@ -626,13 +640,18 @@ class CallExpNode extends ExpNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myId.unparse(p, 0);
+        p.print("(");
+        if(myExpList != null)
+            myExpList.unparse(p, 0);
+        p.print(")");
     }
 
     // two children
     private IdNode myId;
     private ExpListNode myExpList;  // possibly null
 }
-
+/*✅*/
 abstract class UnaryExpNode extends ExpNode {
     public UnaryExpNode(ExpNode exp) {
         myExp = exp;
@@ -641,7 +660,7 @@ abstract class UnaryExpNode extends ExpNode {
     // one child
     protected ExpNode myExp;
 }
-
+/*✅*/
 abstract class BinaryExpNode extends ExpNode {
     public BinaryExpNode(ExpNode exp1, ExpNode exp2) {
         myExp1 = exp1;
@@ -656,133 +675,173 @@ abstract class BinaryExpNode extends ExpNode {
 // **********************************************************************
 // Subclasses of UnaryExpNode
 // **********************************************************************
-
+/*✅*/
 class UnaryMinusNode extends UnaryExpNode {
     public UnaryMinusNode(ExpNode exp) {
         super(exp);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        p.print("-");
+        myExp.unparse(p, 0);
     }
 }
-
+/*✅*/
 class NotNode extends UnaryExpNode {
     public NotNode(ExpNode exp) {
         super(exp);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        p.print("!");
+        myExp.unparse(p, 0);
     }
 }
 
 // **********************************************************************
 // Subclasses of BinaryExpNode
 // **********************************************************************
-
+/*✅*/
 class PlusNode extends BinaryExpNode {
     public PlusNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" + ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class MinusNode extends BinaryExpNode {
     public MinusNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" - ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class TimesNode extends BinaryExpNode {
     public TimesNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" * ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class DivideNode extends BinaryExpNode {
     public DivideNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" / ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class AndNode extends BinaryExpNode {
     public AndNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" && ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class OrNode extends BinaryExpNode {
     public OrNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" || ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class EqualsNode extends BinaryExpNode {
     public EqualsNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" == ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class NotEqualsNode extends BinaryExpNode {
     public NotEqualsNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" != ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class LessNode extends BinaryExpNode {
     public LessNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" < ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class GreaterNode extends BinaryExpNode {
     public GreaterNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" > ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class LessEqNode extends BinaryExpNode {
     public LessEqNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" <= ");
+        myExp2.unparse(p, 0);
     }
 }
-
+/*✅*/
 class GreaterEqNode extends BinaryExpNode {
     public GreaterEqNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
 
     public void unparse(PrintWriter p, int indent) {
+        myExp1.unparse(p, 0);
+        p.print(" >= ");
+        myExp2.unparse(p, 0);
     }
 }
