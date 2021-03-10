@@ -40,25 +40,25 @@ Executing the tests will generate output files which will be compared to expecte
 - [ ]  http://www2.cs.tum.edu/projekte/cup/examples.php
 - Tasks
   - Files to edit: 
-    - [ ] parser specification (cminusminus.cup using .grammar).
+    - [x] parser specification (cminusminus.cup using .grammar).
     - [ ] unparse methods for the AST nodes (in ast.java).
     - [ ] input file (test.cminusminus) to test implementation.  
   - Steps: 
     - [x] Add a few grammar productions to cminusminus.cup - start by making a very small change to cminusminus.cup.
     - [x] Write the corresponding unparse operations - update the appropriate unparse method in ast.java, and check if parser works.
-    - [ ] add the rules needed to allow struct declarations.
-    - [ ] add the rules needed to allow programs to include functions with no formal parameters and with empty statement lists only, and update the corresponding unparse methods.
-    - [ ] Write a test program that uses the new language constructs.
-    - [ ] Create a parser (using make) and run it on your test program.
-    - [ ] add the rules (and unparse methods) for the simplest kind of expressions -- just plain identifiers.
-    - [ ] statement nonterminals
-    - [ ] cminusminus.cup adding rules for the statements, and ast.java to define the unparse methods needed for those statements.
-    - [ ] Write test inputs statements
-    - [ ] makes sure parser and unparser work on statements
-    - [ ] expression nonterminals implementation. need to give the operators the right precedences and associativities.
-    - [ ] remaining productions that need to be added
-    - [ ] add test cases for final version of test.cminusminus
-    - [ ] do not try to implement all of nonterminals at once. Instead, add one new rule at a time to the Java CUP specification, make the corresponding changes to the unparse methods in ast.java, and test your work by augmenting your test.cminusminus or by writing a C-- program that includes the new construct you added, and make sure that it is parsed and unparsed correctly.
+    - [x] add the rules needed to allow struct declarations.
+    - [x] add the rules needed to allow programs to include functions with no formal parameters and with empty statement lists only, and update the corresponding unparse methods.
+    - [x] Write a test program that uses the new language constructs.
+    - [x] Create a parser (using make) and run it on your test program.
+    - [x] add the rules (and unparse methods) for the simplest kind of expressions -- just plain identifiers.
+    - [x] statement nonterminals
+    - [x] cminusminus.cup adding rules for the statements, and ast.java to define the unparse methods needed for those statements.
+    - [x] Write test inputs statements
+    - [x] makes sure parser and unparser work on statements
+    - [x] expression nonterminals implementation. need to give the operators the right precedences and associativities.
+    - [x] remaining productions that need to be added
+    - [x] add test cases for final version of test.cminusminus
+    - [x] do not try to implement all of nonterminals at once. Instead, add one new rule at a time to the Java CUP specification, make the corresponding changes to the unparse methods in ast.java, and test your work by augmenting your test.cminusminus or by writing a C-- program that includes the new construct you added, and make sure that it is parsed and unparsed correctly.
     - [ ] use unparse output as input to parser to check for errors.
 
 - Handing in: ensure that you do not include any extra sub-directories.

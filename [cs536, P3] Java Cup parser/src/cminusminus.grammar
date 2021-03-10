@@ -58,7 +58,7 @@ stmt            ::= assignExp SEMICOLON
                 | IF LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY
                 | IF LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY ELSE LCURLY list_varDecl list_stmt RCURLY
                 | WHILE LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY
-		| REPEAT LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY
+		        | REPEAT LPAREN exp RPAREN LCURLY list_varDecl list_stmt RCURLY
                 | RETURN exp SEMICOLON
                 | RETURN SEMICOLON
                 | fncall SEMICOLON

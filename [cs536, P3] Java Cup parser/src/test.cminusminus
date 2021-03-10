@@ -1,31 +1,81 @@
-// - include code that corresponds to every grammar rule in the file cminusminus.grammar. 
-int x;
-int y;
-bool t;
+// Declarations - Variable, Struct, Function: list_decl, decl, type, id, 
+// list_varDecl, varDecl, structDecl, structBody, fnDecl, list_formals, formals,
+// formalDecl, fnBody
+    int x; bool y; void z; struct x y; void f(){}
+    struct x { int x; }; struct x { int x; bool y; void z; struct x y; }; 
+    void f(int x){} void f(int x, bool y, void z){}
+    void f(){ int x; } void f(){ x=y; } void f(){ int x; x=y; }
+    void f(int x, bool y){ int x; x=y; }
 
-// Bad inputs - test parser on some bad inputs (IMPORTANT: don't hand those in)
+// Statements: list_stmt, stmt, fncall, list_actual
+void f(){
+    x=y; x++; y--; cin>> y; cout<< z;
+    if(e){} if(e){ int x; x=y; }
+    if(e){} else{} if(e){ int x; x=y; } else{ int x; x=y; }
+    while(e){ int x; x=y; }
+    repeat(e){ int x; x=y; }
+    return; return x;
+    f(); f(x, y);
 
+    // nesting
+    if(e){if(e){}}
+    if(e){if(e){}else{}}else{}
+    while(e){while(e){}}
+    repeat(e){repeat(e){}}
+    if(e){if(e){while(e){repeat(e){
+        if(e){if(e){while(e){repeat(e){
+        }}}else{}}
+    }}}else{}}
+}
 
+// Expressions: exp, assignExp, term, loc
+void f(){
+    x=x; x=x.x; x.x=x; 
+f(
+    x+y, x-y, x*y, x/y, !x, x&&y, x||y, x==y, x!=y, x<y, x>y, x<=y, x>=y, -x,
+    123, "abc", true, false, (x), f()
+);}
 
+// precedence & associativity
+void f() {
+    x.x=x; x=x.x;
+f(
+    !x/x-x>x&&x||x,              // incremental order
+    x||x&&x<x+x*-x,              // reverse order
+    -(((((x||x)&&x)<x)+x)*x),    // override precedence
+    x+-x-x,                      // single minus precendence
 
+    x.x.x, x=x=x,
+    x||x||x, x&&x&&x, x+x+x, x-x-x, x*x*x, x/x/x, -(-(-x)), !!!x
+);}
 
+// mixed organization
+bool c;
+void main(int x, int y) {
+    x++;
+    c = c.c = x > y || f(x, y) + 0;
+    if(!c && (c * c) == c / -c) {
+        bool z;
+        repeat(z = 0 && z != 3) {
+            cin >> z.x.y;
+            z--;
+        }
+    }
+    if(x=2) { return x; } else { return; }
+}
 
-// Example
-
-// input
-// if (b == -1) { x = 4+3*5-y; while (c) { y = y*2+x; } } else { x = 0; }
-
-// output 
-// if ((b == (-1))) {
-//     x = ((4 + (3 * 5)) - y);
-//     while (c) {
-//         y = ((y * 2) + x);
-//     }
-// }
-// else {
-//     x = 0;
-// }
-
-
-// eXAMPLE error
-// i.e., expressions like a < b < c are not allowed and should cause a syntax error
+// Example provided
+int f(){
+    // input:
+    if (b == -1) { x = 4+3*5-y; while (c) { y = y*2+x; } } else { x = 0; }
+    // expected output:
+    if ((b == (-1))) {
+        x = ((4 + (3 * 5)) - y);
+        while (c) {
+            y = ((y * 2) + x);
+        }
+    }
+    else {
+        x = 0;
+    }
+}
