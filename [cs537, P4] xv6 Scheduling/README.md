@@ -3,4 +3,5 @@
 
 # Todo list:
 - [ ] xv6 book chapter 5
+- [ ] Makefile cpu 1 & compilation flags -Og
 - [ ] 
