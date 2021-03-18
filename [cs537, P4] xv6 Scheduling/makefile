@@ -4,27 +4,20 @@ CC = gcc
 # -Werror
 FLAG = -Wall  -g
 
-compile: mysh
+# exit qemu using ctrl+A X
 
-mysh: mysh.c mysh.h message.h utility.o alias.o
-	$(CC) $(FLAG) -o ./$@ $< utility.o alias.o
+# compile xv6
+.PHONE:
+qemu-nox:
+	cd ./src && make qemu-nox
 
-alias.o: alias.c alias.h
-	$(CC) $(FLAG) -c $<
-
-utility.o: utility.c utility.h message.h
-	$(CC) $(FLAG) -c $<
-
-# chmod +x ./object/mysh
-.PHONY:
-run:
-	./mysh 
-
-# batch.txt
+.PHONE:
+qemu-nox-gdb: 
+	cd ./src && make qemu-nox-gdb
 
 .PHONY: clean
 clean:
-	rm *.o mysh
+	cd src && make clean
 
 .PHONY:
 test-all:
@@ -38,9 +31,9 @@ test-help:
 test-list: 
 	./test/list-tests.sh
 
-.PHONY:
-valgrind: 
-	valgrind -v --show-reachable=yes --leak-check=full ./mysh -f dictionary odd
+# .PHONY:
+# valgrind: 
+# 	valgrind -v --show-reachable=yes --leak-check=full ./<executable> -f dictionary odd
 
 .PHONY:
 # watch files and execute make with `make watch LABEL=<label to execute>`
