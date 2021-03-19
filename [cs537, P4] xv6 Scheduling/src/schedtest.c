@@ -4,7 +4,7 @@
 #include "pstat.h"
 
 extern struct pstat pstat;
-static void loop_childProcess(int, char *);
+static int loop_childProcess(int, char *);
 
 static int cpNumber = 0;  // counter of child processes spawned
 
@@ -24,7 +24,8 @@ static int cpNumber = 0;  // counter of child processes spawned
 int main(int argc, char **argv) {
     // parsed arguments
     int sliceA = 0, sliceB = 0, sleepParent = 0;
-    char *sleepA, *sleepB;  // should be passed to exec function
+    char *sleepA, *sleepB;         // should be passed to exec function
+    int cpA_PID = 0, cpB_PID = 0;  // child process IDs for A and B
 
     // verify commandline arguments
     if (argc != 6) {
@@ -42,8 +43,8 @@ int main(int argc, char **argv) {
     sleepParent = atoi(argv[5]);
 
     // spawn processes executing loop user-level program
-    loop_childProcess(sliceA, sleepA);  // A first
-    loop_childProcess(sliceB, sleepB);  // B second
+    cpA_PID = loop_childProcess(sliceA, sleepA);  // A first
+    cpB_PID = loop_childProcess(sliceB, sleepB);  // B second
 
     /* NOTE: assuming sleepParent much larger than
      * sliceA+2*sleepA+sliceB+2*sleepB
@@ -51,9 +52,9 @@ int main(int argc, char **argv) {
     sleep(sleepParent);
 
     getpinfo(&pstat);
-    // TODO: print compensation ticks
-    // printf(1, "%d %d\n", compticksA,
-    //        compticksB);  // compticks of processes in the pstat
+    // print compensation ticks
+    printf(1, "%d %d\n", pstat.compticks[cpA_PID],
+           pstat.compticks[cpB_PID]);  // compticks of processes in the pstat
 
     for (int i = 1; i <= cpNumber; i++) wait();  // wait for child processes
     exit();
@@ -64,14 +65,14 @@ int main(int argc, char **argv) {
  *
  * @param slice time-slice for the forked process
  * @param sleep number of ticks to sleep (argument for loop user program)
+ * @return child process PID
  */
-void loop_childProcess(int slice, char *sleep) {
+int loop_childProcess(int slice, char *sleep) {
     cpNumber++;  // increment child process counter
 
     // fork with specific time-slice
-    // TODO: define function fork2
-    // if (fork2(slice) != 0) return;
-    if (fork() != 0) return;
+    int childPID = 0;
+    if ((childPID = fork2(slice)) != 0) return childPID;
 
     /* ↓ child execution */
     char *argv[] = {"loop", sleep, 0};  // child process argument list
