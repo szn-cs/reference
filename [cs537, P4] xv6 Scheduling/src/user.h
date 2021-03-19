@@ -1,5 +1,7 @@
 struct stat;
 struct rtcdate;
+// custom
+struct pstat;
 
 // system calls
 int fork(void);
@@ -23,8 +25,11 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-// custom
-int fork2(int);
+// custom - declarations for custom system calls mappings
+int setslice(int pid, int slice);
+int getslice(int pid);
+int fork2(int slice);
+int getpinfo(struct pstat*);
 
 // ulib.c
 int stat(const char*, struct stat*);

@@ -23,6 +23,7 @@
         "defs.h": "c",
         "stat.h": "c",
         "user.h": "c",
-        "alias.h": "c"
+        "alias.h": "c",
+        "spinlock.h": "c"
     }
 }

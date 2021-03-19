@@ -29,3 +29,8 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
+// custom system calls: expose interface to user-level programs
+SYSCALL(setslice)
+SYSCALL(getslice)
+SYSCALL(fork2)
+SYSCALL(getpinfo)

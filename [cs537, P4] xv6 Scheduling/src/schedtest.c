@@ -1,7 +1,9 @@
 #include "types.h"
 #include "stat.h"
 #include "user.h"
+#include "pstat.h"
 
+extern struct pstat pstat;
 static void loop_childProcess(int, char *);
 
 static int cpNumber = 0;  // counter of child processes spawned
@@ -48,10 +50,10 @@ int main(int argc, char **argv) {
      * i.e. no need to worry about parent interfering with scheduling queue */
     sleep(sleepParent);
 
-    getinfo();
+    getpinfo(&pstat);
     // TODO: print compensation ticks
-    printf(1, "%d %d\n", compticksA,
-           compticksB);  // compticks of processes in the pstat
+    // printf(1, "%d %d\n", compticksA,
+    //        compticksB);  // compticks of processes in the pstat
 
     for (int i = 1; i <= cpNumber; i++) wait();  // wait for child processes
     exit();
@@ -69,6 +71,7 @@ void loop_childProcess(int slice, char *sleep) {
     // fork with specific time-slice
     // TODO: define function fork2
     // if (fork2(slice) != 0) return;
+    if (fork() != 0) return;
 
     /* ↓ child execution */
     char *argv[] = {"loop", sleep, 0};  // child process argument list

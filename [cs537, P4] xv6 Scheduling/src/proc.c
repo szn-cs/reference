@@ -6,11 +6,14 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "pstat.h"
 
 struct {
     struct spinlock lock;
     struct proc proc[NPROC];
 } ptable;
+
+extern struct pstat pstat;
 
 static struct proc *initproc;
 
@@ -482,3 +485,9 @@ void procdump(void) {
         cprintf("\n");
     }
 }
+
+// TODO: custom implementations of system call funcs (accessible in kernel mode)
+int setslice(int pid, int slice) { return 0; }
+int getslice(int pid) { return 0; }
+int fork2(int slice) { return 0; }
+int getpinfo(struct pstat *pstat) { return 0; }
