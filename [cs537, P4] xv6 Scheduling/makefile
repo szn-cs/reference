@@ -21,7 +21,7 @@ clean:
 
 .PHONY:
 test-all:
-	./test/run-tests.sh -c
+	./test/run-tests.sh -c -v
 
 .PHONY:
 test-help:
