@@ -15,6 +15,12 @@ struct {
 
 extern struct pstat pstat;
 
+// TODO: current scheduling queue data structure (linked-list / fixed-sized
+// array).
+// - add the init user process to the queue.
+// - new allocated process: its scheduler-related PCB should be initialized, and
+// added to the tail of the queue. On exit it must be removed from the queue.
+
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -311,6 +317,17 @@ void scheduler(void) {
     struct cpu *c = mycpu();
     c->proc = 0;
 
+    // TODO:
+    // - peek at current head of scheduler queue, instead of iterating over
+    // ptable.
+    // - If its timeslice (+ compensation ticks if applicable) has not been used
+    // up for this scheduling cycle, keep scheduling it. Otherwise, move to the
+    // next process in the queue and put the previous head to the tail.
+    // - increment necessary counters properly.
+    // - scheduler robin-robins over the queue should correctly give each
+    // process the correct number of ticks per cycle
+
+    // each iteration is equivalent to a timer tick
     for (;;) {
         // Enable interrupts on this processor.
         sti();
@@ -345,6 +362,7 @@ void scheduler(void) {
 // be proc->intena and proc->ncli, but that would
 // break in the few places where a lock is held but
 // there's no process.
+// switches between current context back to the context for scheduler
 void sched(void) {
     int intena;
     struct proc *p = myproc();
@@ -405,8 +423,9 @@ void sleep(void *chan, struct spinlock *lk) {
         release(lk);
     }
     // Go to sleep.
-    p->chan = chan;
-    p->state = SLEEPING;
+    p->chan = chan;  // mark the process's wait channel - waiting mechanism for
+                     // a change in a data structure it points to.
+    p->state = SLEEPING;  // set state to sleeping
 
     sched();
 
@@ -426,11 +445,14 @@ void sleep(void *chan, struct spinlock *lk) {
 static void wakeup1(void *chan) {
     struct proc *p;
 
+    // TODO: avoid falsely waking up the sleeping process.
+    // i.e. if(chan == &ticks && <it is the right time to wake>)
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
         if (p->state == SLEEPING && p->chan == chan) p->state = RUNNABLE;
 }
 
-// Wake up all processes sleeping on chan.
+// Wake up all processes sleeping on chan (e.g. on ticks global variable or on a
+// parent process).
 void wakeup(void *chan) {
     acquire(&ptable.lock);
     wakeup1(chan);
@@ -486,8 +508,87 @@ void procdump(void) {
     }
 }
 
-// TODO: custom implementations of system call funcs (accessible in kernel mode)
-int setslice(int pid, int slice) { return 0; }
-int getslice(int pid) { return 0; }
-int fork2(int slice) { return 0; }
-int getpinfo(struct pstat *pstat) { return 0; }
+/* ↓ custom implementations of system call funcs (accessible in kernel mode) */
+
+/**
+ * @brief sets time-slice of the specified pid
+ *
+ * @param pid target process to modify
+ * @param slice new time-slice of target process
+ * @return 0 on success, otherwise -1
+ */
+int setslice(int pid, int slice) {
+    // validate parameters
+    // TODO: check pid validity (should be registered in the ptable ?)
+    if (!(pid > 0) || !(slice > 0)) goto fail;
+
+    // TODO:
+    // The time-slice of a process could be increased, decreased, or not
+    // changed;
+
+    // if pid is the currently running process, then its time-slice should be
+    // immediately changed and applied to this scheduling interval.
+
+    // If the process has run for the number ticks it should run (or more)
+    // according to the new slice value (e.g. it has run 6 ticks, but the new
+    // time slice value is 4 ticks), you should schedule the next process when
+    // the timer interrupt fires.
+
+    return 0;
+fail:
+    return -1;
+}
+
+/**
+ * @brief get time-slice of a specific process
+ *
+ * @param pid
+ * @return int time-slice of a process
+ */
+int getslice(int pid) {
+    int timeSlice;
+    // validate parameters
+    // TODO: check pid validity (should be registered in the ptable ?)
+    if (!(pid > 0)) goto fail;
+
+    // TODO:
+    return timeSlice;
+fail:
+    return -1;
+}
+
+/**
+ * @brief spawns process (equivalent to official fork) with specific time-slice
+ *
+ * example usage: `fork2(getslice(getpid()))` would inherit slice from parent
+ *
+ * @param slice spawned process time-slice length
+ * @return int child process pid, or 0 for returning in spawned child process,
+ * otherwise -1
+ */
+int fork2(int slice) {
+    // validate parameters
+    if (slice < 0) goto fail;
+
+    // TODO:
+    return fork();
+fail:
+    return -1;
+}
+
+/**
+ * @brief extracts information for each process; used to test scheduler
+ * implementation
+ *
+ * @param pstat statistical information of all processes
+ * @return int 0 on success, otherwise -1
+ */
+int getpinfo(struct pstat *pstat) {
+    // validate parameters
+    if (pstat == 0) goto fail;
+
+    // TODO:
+    return 0;
+fail:
+    return -1;
+}

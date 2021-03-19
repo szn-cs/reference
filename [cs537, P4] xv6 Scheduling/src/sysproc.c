@@ -35,13 +35,14 @@ int sys_sbrk(void) {
     return addr;
 }
 
-int sys_sleep(void) {
+int sys_sleep(void) {  // TODO:
     int n;
     uint ticks0;
 
     if (argint(0, &n) < 0) return -1;
     acquire(&tickslock);
     ticks0 = ticks;
+    // while not slept long enough, go to sleep again
     while (ticks - ticks0 < n) {
         if (myproc()->killed) {
             release(&tickslock);
