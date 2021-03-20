@@ -42,8 +42,19 @@ void trap(struct trapframe *tf) {
             if (cpuid() == 0) {
                 acquire(&tickslock);
                 ticks++;
+
+                // int count = 0, n = ticks;
+                // while (n != 0) {
+                //     n /= 10;  // n = n/10
+                //     ++count;
+                // }
+                // for (int i = 0; i < 3 + count; i++)
+                //     cprintf("\b");  // remove printed
+                // cprintf("[%d] ", ticks);
+
                 // wakeup every blocked process waiting on ticks (which causes
                 // every sleeping process to get fasely scheduled)
+
                 wakeup(&ticks);
                 release(&tickslock);
             }

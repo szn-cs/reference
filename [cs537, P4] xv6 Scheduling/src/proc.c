@@ -344,8 +344,9 @@ void scheduler(void) {
     // - scheduler robin-robins over the queue should correctly give each
     // process the correct number of ticks per cycle
 
-runProcess:  // each iteration is equivalent to a timer tick
-    sti();   // Enable interrupts on this processor.
+    /* each iteration is equivalent to a timer tick */
+runProcess:
+    sti();  // Enable interrupts on this processor.
     acquire(&ptable.lock);
 
     p = 0;  // reset process pointer
@@ -354,7 +355,7 @@ runProcess:  // each iteration is equivalent to a timer tick
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
-        cprintf("running process: %d\n", p->pid);
+        cprintf("[%d] \n", p->pid);
         c->proc = p;
         switchuvm(p);
         p->state = RUNNING;
@@ -367,6 +368,7 @@ runProcess:  // each iteration is equivalent to a timer tick
         c->proc = 0;
     }
 
+    // new round
     release(&ptable.lock);
     goto runProcess;
 }

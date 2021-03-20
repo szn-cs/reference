@@ -9,7 +9,9 @@ struct pstat {
   int inuse[NPROC];
   // PID of each process
   int pid[NPROC];
-  // number of base ticks this process can run in a timeslice
+  // number of base ticks this process can run in a timeslice.
+  // - After a process consumes its time-slice, it should be moved to the back
+  // of the queue
   int timeslice[NPROC];
 
   /* ↓ accumulative during the lifecycle of the process. Gets reset when process
