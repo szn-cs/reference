@@ -53,8 +53,8 @@ int main(int argc, char **argv) {
 
     getpinfo(&pstat);
     // print compensation ticks
-    printf(1, "%d %d\n", pstat.compticks[cpA_PID],
-           pstat.compticks[cpB_PID]);  // compticks of processes in the pstat
+    printf(1, "%d %d\n",  // compticks of processes in the pstat
+           pstat.compticks[cpA_PID], pstat.compticks[cpB_PID]);
 
     for (int i = 1; i <= cpNumber; i++) wait();  // wait for child processes
     exit();

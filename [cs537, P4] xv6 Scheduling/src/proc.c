@@ -288,8 +288,29 @@ int wait(void) {
     }
 }
 
-/*
+/**
+ * @brief helper function: pick next process to run from queue, according to the
+ * schedluing policy.
+ *
+ * @param p last process to run (previous active process)
+ * @return 0 on success, otherwise -1
+ */
+int pickProcess_BasicRR(struct proc **external_p) {
+    struct proc *p = *external_p;
 
+    // get next process in queue or start from first process
+    for (p = p == 0 ? ptable.proc : p + 1;
+         p < &ptable.proc[NPROC] && p->state != UNUSED; p++) {
+        *external_p = p;  // modify external pointer
+        if (p->state == RUNNABLE) goto success;
+    }
+
+    return -1;  // iteration over queue ended
+success:
+    return 0;
+}
+
+/*
 implementation of RR
 struct proc { // linked structure
     struct proc* rr_next;
@@ -300,9 +321,6 @@ set p2.rr_next -> p2
 
 t = time_slice + compensation_ticks
 compensation_ticks = wakeup_time - sleep_time
-
-
-
 */
 // PAGEBREAK: 42
 // Per-CPU process scheduler.
@@ -328,31 +346,33 @@ void scheduler(void) {
     // process the correct number of ticks per cycle
 
     // each iteration is equivalent to a timer tick
-    for (;;) {
-        // Enable interrupts on this processor.
-        sti();
+runProcess:
+    // Enable interrupts on this processor.
+    sti();
+    acquire(&ptable.lock);
 
-        // Loop over process table looking for process to run.
-        acquire(&ptable.lock);
-        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-            if (p->state != RUNNABLE) continue;
+    // reset process pointer
+    p = 0;
+    // choose proper process depending on scheduling policy
+    while (pickProcess_BasicRR(&p) != -1) {
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        cprintf("running process: %d\n", p->pid);
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+        swtch(&(c->scheduler), p->context);
 
-            // Switch to chosen process.  It is the process's job
-            // to release ptable.lock and then reacquire it
-            // before jumping back to us.
-            c->proc = p;
-            switchuvm(p);
-            p->state = RUNNING;
+        switchkvm();  // kernel switch
 
-            swtch(&(c->scheduler), p->context);
-            switchkvm();
-
-            // Process is done running for now.
-            // It should have changed its p->state before coming back.
-            c->proc = 0;
-        }
-        release(&ptable.lock);
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
     }
+
+    release(&ptable.lock);
+    goto runProcess;
 }
 
 // Enter scheduler.  Must hold only ptable.lock
