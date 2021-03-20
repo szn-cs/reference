@@ -299,8 +299,7 @@ int pickProcess_BasicRR(struct proc **external_p) {
     struct proc *p = *external_p;
 
     // get next process in queue or start from first process
-    for (p = p == 0 ? ptable.proc : p + 1;
-         p < &ptable.proc[NPROC] && p->state != UNUSED; p++) {
+    for (p = p == 0 ? ptable.proc : p + 1; p < &ptable.proc[NPROC]; p++) {
         *external_p = p;  // modify external pointer
         if (p->state == RUNNABLE) goto success;
     }
@@ -345,14 +344,11 @@ void scheduler(void) {
     // - scheduler robin-robins over the queue should correctly give each
     // process the correct number of ticks per cycle
 
-    // each iteration is equivalent to a timer tick
-runProcess:
-    // Enable interrupts on this processor.
-    sti();
+runProcess:  // each iteration is equivalent to a timer tick
+    sti();   // Enable interrupts on this processor.
     acquire(&ptable.lock);
 
-    // reset process pointer
-    p = 0;
+    p = 0;  // reset process pointer
     // choose proper process depending on scheduling policy
     while (pickProcess_BasicRR(&p) != -1) {
         // Switch to chosen process.  It is the process's job
