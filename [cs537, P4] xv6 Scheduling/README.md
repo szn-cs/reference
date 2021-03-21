@@ -29,8 +29,7 @@
     - → ƒ sysproc.c → ƒ @ proc.c
   - § First process execution: 
     - → ƒ forkret → ƒ trapasm.S (trapret)
-
-- involved functions: userinit, allocproc, trap, sleep, etc.
+  - other involved functions: sleep, exit, fork, etc.
 - stock xv6 scheduler: basic RR
 - schedules new process (calls `sched()`): on call to yield, sleep, exit, or every 10 ms timer tick
 interval.

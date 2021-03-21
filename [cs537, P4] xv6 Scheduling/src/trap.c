@@ -62,10 +62,11 @@ void trap(struct trapframe *tf) {
                 acquire(&tickslock);
                 ticks++;
 
-                // wakeup every blocked process waiting on ticks (which causes
-                // every sleeping process to get fasely scheduled)
-
+                // NOTE: official implementation wakes up every blocked process
+                // waiting on ticks (which causes every sleeping process to get
+                // fasely scheduled)
                 wakeup(&ticks);
+
                 release(&tickslock);
             }
             lapiceoi();

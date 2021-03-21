@@ -20,7 +20,7 @@ struct {
  * @return pointer to process structure, otherwise if not found null
  */
 struct proc *getProcess(int pid) {
-    if (pid > 0) goto fail;  // pid must positive
+    if (!(pid > 0)) goto fail;  // pid must positive
 
     for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++)
         if (p->state != UNUSED && p->pid == pid) return p;
@@ -30,7 +30,7 @@ fail:
 }
 
 // TODO: current scheduling queue data structure (linked-list / fixed-sized
-// array).
+// array). Use circular queue data structure
 // - add the init user process to the queue.
 // - new allocated process: its scheduler-related PCB should be initialized, and
 // added to the tail of the queue. On exit it must be removed from the queue.
@@ -42,6 +42,9 @@ struct proc { // linked structure
 when p1 wakeup:
 set p2.rr_next -> p2
 */
+
+// TODO: peek at current head of scheduler queue, instead of iterating over
+// ptable.
 
 static struct proc *initproc;
 
@@ -129,13 +132,16 @@ found:
     p->context->eip = (uint)forkret;
 
     // custom fields initialization
-    p->wakeupTime = 0;
+    p->sleepDuration = 0;
+    p->timeSleptAt = 0;
     // inherits from parent, or for first process defaults to 1 timer tick
     p->timeslice = (p->parent) ? p->parent->timeslice : 1;
     p->compticks = 0;
-    p->schedticks = 0;
-    p->sleepticks = 0;
-    p->switches = 0;
+
+    p->statistics.compticks = 0;
+    p->statistics.schedticks = 0;
+    p->statistics.sleepticks = 0;
+    p->statistics.switches = 0;
 
     return p;
 }
@@ -323,21 +329,25 @@ int wait(void) {
  * @brief helper function: pick next process to run from queue, according to the
  * schedluing policy.
  *
+ * scheduler robin-robins over the queue should correctly give each process the
+ * correct number of ticks per cycle.
+ *
  * @param p last process to run (previous active process)
- * @return 0 on success, otherwise -1
+ * @return number of ticks on success, otherwise -1
  */
-int pickProcess_BasicRR(struct proc **external_p) {
+int pickNextProcess_compensationRR(struct proc **external_p) {
     struct proc *p = *external_p;
 
     // get next process in queue or start from first process
-    for (p = p == 0 ? ptable.proc : p + 1; p < &ptable.proc[NPROC]; p++) {
+    for (p = (p == 0) ? ptable.proc : p + 1; p < &ptable.proc[NPROC]; p++) {
         *external_p = p;  // modify external pointer
         if (p->state == RUNNABLE) goto success;
     }
 
     return -1;  // iteration over queue ended
 success:
-    return 0;
+    p->statistics.switches++;            // stats
+    return p->timeslice + p->compticks;  // number of ticks to run
 }
 
 // PAGEBREAK: 42
@@ -351,23 +361,8 @@ success:
 void scheduler(void) {
     struct proc *p;
     struct cpu *c = mycpu();
+    int runDuration = 0;  // number of ticks to run for the picked process
     c->proc = 0;
-
-    // TODO:
-    // - peek at current head of scheduler queue, instead of iterating over
-    // ptable.
-    // - If its timeslice (+ compensation ticks if applicable) has not been used
-    // up for this scheduling cycle, keep scheduling it. Otherwise, move to the
-    // next process in the queue and put the previous head to the tail.
-    // - increment necessary counters properly.
-    // - scheduler robin-robins over the queue should correctly give each
-    // process the correct number of ticks per cycle
-
-    // TODO:
-    // If the process has run for the number ticks it should run (or more)
-    // according to the new slice value (e.g. it has run 6 ticks, but the
-    // new time slice value is 4 ticks), you should schedule the next
-    // process when the timer interrupt fires.
 
     /* each iteration is equivalent to a timer tick */
 runProcess:
@@ -375,21 +370,43 @@ runProcess:
     acquire(&ptable.lock);
 
     p = 0;  // reset process pointer
-    // choose proper process depending on scheduling policy
-    while (pickProcess_BasicRR(&p) != -1) {
+    runDuration = 0;
+    // choose proper process depending on scheduling policy & compensation ticks
+    // If its timeslice (+ compensation ticks if applicable) has not been used
+    // up for this scheduling cycle, keep scheduling it. Otherwise, move to the
+    // next process in the queue and put the previous head to the tail.
+    while ((p && p->state == RUNNING && --runDuration > 0) ||
+           (runDuration = pickNextProcess_compensationRR(&p)) != -1) {
+        cprintf("[%d] \n", p->pid);
+
+        // keep track of used compensation ticks
+        if (runDuration <= p->compticks) {
+            --p->compticks;  // current iteration is using a compensation ticket
+            ++p->statistics.compticks;  // stats
+        }
+
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
-
-        cprintf("[%d] \n", p->pid);
-        // t = time_slice + compensation_ticks
-        // compensation_ticks = wakeup_time - sleep_time
-
         c->proc = p;
         switchuvm(p);
         p->state = RUNNING;
+
+        int previous_timeslice = p->timeslice;  // store old time slice
+
         swtch(&(c->scheduler), p->context);  // switch to process
-        switchkvm();                         // kernel switch
+
+        ++p->statistics.schedticks;  // stats
+
+        /* in case a new slice value is assigned during time slice execution
+            period, the run duration should be recalculated according to the new
+            slice value, and the next process should be scheduled when timer
+            interrupt fires. */
+        if (previous_timeslice != p->timeslice)  // if process slice was updated
+            // update recalculate run duration
+            runDuration += p->timeslice - previous_timeslice;
+
+        switchkvm();  // kernel switch
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
@@ -468,12 +485,22 @@ void sleep(void *chan, struct spinlock *lk) {
         acquire(&ptable.lock);  // DOC: sleeplock1
         release(lk);
     }
+
+    // calculate wakeup time
+    uint ticks0;  // initial ticks timer state when started sleeping
+    ticks0 = ticks;
+
     // Go to sleep.
     p->chan = chan;  // mark the process's wait channel - waiting mechanism for
                      // a change in a data structure it points to.
     p->state = SLEEPING;  // set state to sleeping
 
     sched();
+
+    // finished sleeping (context switched back to this process kernel stack)
+    p->compticks = p->sleepDuration;
+    p->statistics.sleepticks += p->sleepDuration;  // stats
+    p->sleepDuration = 0;                          // reset
 
     // Tidy up.
     p->chan = 0;
@@ -492,10 +519,15 @@ static void wakeup1(void *chan) {
     struct proc *p;
 
     for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-        // wake up when it is right time
-        if (p->state == SLEEPING && p->chan == chan && ticks >= p->wakeupTime) {
+        // wake up when it is right time - calculate wakeup time - sleep should
+        // end after required # of ticks passed
+        if (p->state == SLEEPING && p->chan == chan &&
+            ticks >= (p->timeSleptAt + p->sleepDuration)) {
             p->state = RUNNABLE;
-            p->wakeupTime = 0;  // reset related fields
+            // reset related fields
+            p->timeSleptAt = 0;
+            // p->sleepDuration = 0; // do not reset. Required for setting
+            // compensation ticks
         }
     }
 }
@@ -642,10 +674,10 @@ int getpinfo(struct pstat *pstat) {
 
         pstat->pid[index] = p->pid;
         pstat->timeslice[index] = p->timeslice;
-        pstat->compticks[index] = p->compticks;
-        pstat->schedticks[index] = p->schedticks;
-        pstat->sleepticks[index] = p->sleepticks;
-        pstat->switches[index] = p->switches;
+        pstat->compticks[index] = p->statistics.compticks;
+        pstat->schedticks[index] = p->statistics.schedticks;
+        pstat->sleepticks[index] = p->statistics.sleepticks;
+        pstat->switches[index] = p->statistics.switches;
     }
 
     return 0;

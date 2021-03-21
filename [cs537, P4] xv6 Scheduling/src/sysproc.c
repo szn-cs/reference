@@ -36,16 +36,15 @@ int sys_sbrk(void) {
 }
 
 int sys_sleep(void) {
-    int n;            // number of ticks to sleep
-    uint ticks0;      // initial ticks timer state when started sleeping
-    int timeElapsed;  // time elapsed since beginning to sleep
+    int n;  // number of ticks to sleep
 
     if (argint(0, &n) < 0) return -1;
 
     acquire(&tickslock);
-    ticks0 = ticks;
-    // calcular wakeup time - sleep should end after required # of ticks passed
-    myproc()->wakeupTime = ticks + n;
+
+    // store sleep time required
+    myproc()->sleepDuration = n;
+    myproc()->timeSleptAt = ticks;
 
     // while not slept long enough, go to sleep again
     if (myproc()->killed) {

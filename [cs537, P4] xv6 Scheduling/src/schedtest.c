@@ -8,6 +8,24 @@ static int loop_childProcess(int, char *);
 static int cpNumber = 0;  // counter of child processes spawned
 
 /**
+ * @brief get process index in pstat by pid
+ *
+ * @param pid process id number
+ * @return index corresponding to the process in the pstat data structure, or if
+ * not found 0 (default to the first entry)
+ */
+int getProcessIndex(int pid, struct pstat pstat) {
+    int index = 0;
+    if (!(pid > 0)) goto fail;  // pid must positive
+
+    for (int *entry = pstat.pid; entry < &pstat.pid[NPROC]; index++, entry++)
+        if (pstat.inuse[index] && pstat.pid[index] == pid) return index;
+
+fail:
+    return 0;
+}
+
+/**
  * @brief runs two copies of loop as child processes with custom time-slice
  * and sleep time for each child
  *
@@ -52,9 +70,9 @@ int main(int argc, char **argv) {
     sleep(sleepParent);
 
     getpinfo(&pstat);
-    // print compensation ticks
-    printf(1, "%d %d\n",  // compticks of processes in the pstat
-           pstat.compticks[cpA_PID], pstat.compticks[cpB_PID]);
+    // print compensation ticks in the pstat
+    printf(1, "%d %d\n", pstat.compticks[getProcessIndex(cpA_PID, pstat)],
+           pstat.compticks[getProcessIndex(cpB_PID, pstat)]);
 
     for (int i = 1; i <= cpNumber; i++) wait();  // wait for child processes
     exit();
@@ -68,16 +86,16 @@ int main(int argc, char **argv) {
  * @return child process PID
  */
 int loop_childProcess(int slice, char *sleep) {
-    cpNumber++;  // increment child process counter
+    cpNumber++;        // increment child process counter
+    int childPID = 0;  // fork returned value
 
     // fork with specific time-slice
-    int childPID = 0;
     if ((childPID = fork2(slice)) != 0) return childPID;
 
     /* ↓ child execution */
     char *argv[] = {"loop", sleep, 0};  // child process argument list
     exec("loop", argv);  // replace memory executable w/ user-program
 
-    printf(1, "❌ schedtest: exec sleep failed\n");
+    printf(1, "❌ schedtest: exec loop failed\n");
     exit();
 }
