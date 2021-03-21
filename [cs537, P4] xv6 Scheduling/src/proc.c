@@ -13,6 +13,151 @@ struct {
     struct proc proc[NPROC];
 } ptable;
 
+/** Typical circular Queue implementation in C: current scheduling circular
+ queue data structure (e.g. linked-list or fixed-sized array) (modified from
+ programiz.com/dsa/circular-queue)
+
+ - add the init user process to the queue.
+ - new allocated process: its scheduler-related PCB should be initialized, and
+   added to the tail of the queue. On exit it must be removed from the queue.
+ - peek at current head of scheduler queue, instead of iterating over ptable. */
+
+// size of scheduler queue (which should match the maximum number of processes)
+#define SIZE NPROC
+
+struct proc *queue[SIZE];
+int front = -1, rear = -1;
+
+/**
+ * @brief Check if the queue is full
+ *
+ * @return int 1 if full, otherwise 0
+ */
+int isFull() {
+    if ((front == rear + 1) || (front == 0 && rear == SIZE - 1)) return 1;
+    return 0;
+}
+
+/**
+ * @brief Check if the queue is empty
+ *
+ * @return int 1 for an empty queue, otherwise 0;
+ */
+int isEmpty() {
+    if (front == -1) return 1;
+    return 0;
+}
+
+/**
+ * @brief Adding an element to the scheduler queue
+ *
+ * Fails to enqueue if front == rear + 1
+ *
+ * @param element the process to enqueue into the circular queue
+ */
+void enQueue(struct proc *element) {
+    if (isFull()) {
+        // cprintf("\n Queue is full!! \n");
+
+    } else {
+        if (front == -1) front = 0;
+        rear = (rear + 1) % SIZE;
+        queue[rear % SIZE] = element;
+        // cprintf("\n Inserted -> %d", element->pid);
+    }
+}
+
+/**
+ * @brief Removing an element from the scheduler queue
+ *
+ * @return struct proc* the removed process pointer
+ */
+struct proc *deQueue() {
+    struct proc *element;
+    if (isEmpty()) {
+        // cprintf("\n Queue is empty !! \n");
+        return 0;
+    } else {
+        element = queue[front % SIZE];  // front of the queue
+        if (front == rear)              // if only a single entry was present
+            front = -1, rear = -1;
+        else
+            front = (front + 1) % SIZE;  // increment front, removing
+                                         // essentially the front of the queue
+
+        // cprintf("\n Deleted element -> %d \n", element);
+        return element;
+    }
+}
+
+/**
+ * @brief get the front process entry in the queue
+ *
+ * @return struct proc* process at front of the queue
+ */
+struct proc *peek() {
+    struct proc *element;
+    if (isEmpty()) return 0;
+    element = queue[front % SIZE];
+    return element;
+}
+
+/**
+ * @brief Remove an entry by PID
+ *
+ * NOTE: an entry can be in the middle of the circular list, or lapsed beyond
+ * complete turn, therefore careful comparisons are made.
+ *
+ * @param pid process id to search and remove from the queue
+ * @return struct proc* the process that was removed, or null if none.
+ */
+struct proc *deQueueByPID(int pid) {
+    struct proc *p;   // the process to remove
+    int index;        // index of element matching pid
+    if (isEmpty()) {  // if queue is empty
+        // cprintf("\n Queue is empty !! \n");
+        return 0;
+    } else {
+        // search for pid
+        for (index = front; index <= rear; index++)
+            if ((p = queue[index % SIZE])->pid == pid) goto remove;
+        // in case no match return null
+        return 0;
+    }
+
+remove:
+    if (front == rear) {  // only a single entry was present
+        front = -1, rear = -1;
+    } else {
+        // Q has only one element, so we reset the queue after dequeing it.
+        // shift to fill the space of removed element
+        for (; index < rear; index++)
+            queue[index % SIZE] = queue[(index + 1) % SIZE];
+        rear--;  // reflect removal of element
+    }
+
+    // cprintf("\n Deleted element -> %d \n", queue[index % SIZE]);
+    return p;
+}
+
+/**
+ * @brief helper function to display the queue for debugging
+ */
+void display() {
+    int i;
+    if (isEmpty())
+        cprintf(" \n Empty Queue\n");
+    else {
+        cprintf("\n Front -> %d ", front);
+        cprintf("\n queue -> ");
+        for (i = front; i != rear; i = (i + 1) % SIZE) {
+            cprintf("%d ", queue[i]->pid);
+        }
+        cprintf("%d ", queue[i]->pid);
+        cprintf("\n Rear -> %d \n", rear);
+    }
+}
+
 /**
  * @brief get process by pid
  *
@@ -27,115 +172,6 @@ struct proc *getProcess(int pid) {
 
 fail:
     return 0;
-}
-
-/* Typical circular Queue implementation in C: current scheduling circular queue
- data structure (e.g. linked-list or fixed-sized array) (modified from
- programiz.com/dsa/circular-queue)
-
- - add the init user process to the queue.
- - new allocated process: its scheduler-related PCB should be initialized, and
-   added to the tail of the queue. On exit it must be removed from the queue.
- - peek at current head of scheduler queue, instead of iterating over ptable. */
-
-#define SIZE NPROC
-struct proc *queue[SIZE];
-int front = -1, rear = -1;
-
-// Check if the queue is full
-int isFull() {
-    if ((front == rear + 1) || (front == 0 && rear == SIZE - 1)) return 1;
-    return 0;
-}
-
-// Check if the queue is empty
-int isEmpty() {
-    if (front == -1) return 1;
-    return 0;
-}
-
-// Adding an element
-// Fails to enqueue if front == rear + 1
-void enQueue(struct proc *element) {
-    if (isFull()) {
-        // cprintf("\n Queue is full!! \n");
-
-    } else {
-        if (front == -1) front = 0;
-        rear = (rear + 1) % SIZE;
-        queue[rear] = element;
-        // cprintf("\n Inserted -> %d", element->pid);
-    }
-}
-
-// Removing an element
-struct proc *deQueue() {
-    struct proc *element;
-    if (isEmpty()) {
-        // cprintf("\n Queue is empty !! \n");
-        return 0;
-    } else {
-        element = queue[front % SIZE];
-        if (front == rear)
-            front = -1, rear = -1;
-        else
-            front = (front + 1) % SIZE;
-
-        // cprintf("\n Deleted element -> %d \n", element);
-        return element;
-    }
-}
-
-struct proc *peek() {
-    struct proc *element;
-    if (isEmpty()) return 0;
-    element = queue[front];
-    return element;
-}
-
-struct proc *deQueueByPID(int pid) {
-    struct proc *p;
-    int index;  // index of element matching pid
-    if (isEmpty()) {
-        cprintf("\n Queue is empty !! \n");
-        return 0;
-    } else {
-        // search for pid
-        for (index = front; index <= rear; index++)
-            if ((p = queue[index % SIZE])->pid == pid) goto remove;
-        return 0;
-    }
-
-remove:
-    if (front == rear) {
-        front = -1, rear = -1;
-    } else {
-        // Q has only one element, so we reset the
-        // queue after dequeing it. ?
-        // shift to fill the space of removed element
-        for (; index < rear; index++)
-            queue[index % SIZE] = queue[(index + 1) % SIZE];
-        rear--;  // reflect removal of element
-    }
-
-    cprintf("\n Deleted element -> %d \n", queue[index % SIZE]);
-    return p;
-}
-
-// Display the queue
-void display() {
-    int i;
-    if (isEmpty())
-        cprintf(" \n Empty Queue\n");
-    else {
-        cprintf("\n Front -> %d ", front);
-        cprintf("\n queue -> ");
-        for (i = front; i != rear; i = (i + 1) % SIZE) {
-            cprintf("%d ", queue[i]->pid);
-        }
-        cprintf("%d ", queue[i]->pid);
-        cprintf("\n Rear -> %d \n", rear);
-    }
 }
 
 static struct proc *initproc;
