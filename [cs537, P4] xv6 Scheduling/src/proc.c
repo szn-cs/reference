@@ -13,13 +13,35 @@ struct {
     struct proc proc[NPROC];
 } ptable;
 
-extern struct pstat pstat;
+/**
+ * @brief get process by pid
+ *
+ * @param pid process id number
+ * @return pointer to process structure, otherwise if not found null
+ */
+struct proc *getProcess(int pid) {
+    if (pid > 0) goto fail;  // pid must positive
+
+    for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        if (p->state != UNUSED && p->pid == pid) return p;
+
+fail:
+    return 0;
+}
 
 // TODO: current scheduling queue data structure (linked-list / fixed-sized
 // array).
 // - add the init user process to the queue.
 // - new allocated process: its scheduler-related PCB should be initialized, and
 // added to the tail of the queue. On exit it must be removed from the queue.
+/*
+implementation of RR
+struct proc { // linked structure
+    struct proc* rr_next;
+}
+when p1 wakeup:
+set p2.rr_next -> p2
+*/
 
 static struct proc *initproc;
 
@@ -105,6 +127,15 @@ found:
     p->context = (struct context *)sp;
     memset(p->context, 0, sizeof *p->context);
     p->context->eip = (uint)forkret;
+
+    // custom fields initialization
+    p->wakeupTime = 0;
+    // inherits from parent, or for first process defaults to 1 timer tick
+    p->timeslice = (p->parent) ? p->parent->timeslice : 1;
+    p->compticks = 0;
+    p->schedticks = 0;
+    p->sleepticks = 0;
+    p->switches = 0;
 
     return p;
 }
@@ -309,18 +340,6 @@ success:
     return 0;
 }
 
-/*
-implementation of RR
-struct proc { // linked structure
-    struct proc* rr_next;
-}
-when p1 wakeup:
-set p2.rr_next -> p2
--------
-
-t = time_slice + compensation_ticks
-compensation_ticks = wakeup_time - sleep_time
-*/
 // PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -344,6 +363,12 @@ void scheduler(void) {
     // - scheduler robin-robins over the queue should correctly give each
     // process the correct number of ticks per cycle
 
+    // TODO:
+    // If the process has run for the number ticks it should run (or more)
+    // according to the new slice value (e.g. it has run 6 ticks, but the
+    // new time slice value is 4 ticks), you should schedule the next
+    // process when the timer interrupt fires.
+
     /* each iteration is equivalent to a timer tick */
 runProcess:
     sti();  // Enable interrupts on this processor.
@@ -355,13 +380,16 @@ runProcess:
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
+
         cprintf("[%d] \n", p->pid);
+        // t = time_slice + compensation_ticks
+        // compensation_ticks = wakeup_time - sleep_time
+
         c->proc = p;
         switchuvm(p);
         p->state = RUNNING;
-        swtch(&(c->scheduler), p->context);
-
-        switchkvm();  // kernel switch
+        swtch(&(c->scheduler), p->context);  // switch to process
+        switchkvm();                         // kernel switch
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
@@ -463,10 +491,13 @@ void sleep(void *chan, struct spinlock *lk) {
 static void wakeup1(void *chan) {
     struct proc *p;
 
-    // TODO: avoid falsely waking up the sleeping process.
-    // i.e. if(chan == &ticks && <it is the right time to wake>)
-    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-        if (p->state == SLEEPING && p->chan == chan) p->state = RUNNABLE;
+    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+        // wake up when it is right time
+        if (p->state == SLEEPING && p->chan == chan && ticks >= p->wakeupTime) {
+            p->state = RUNNABLE;
+            p->wakeupTime = 0;  // reset related fields
+        }
+    }
 }
 
 // Wake up all processes sleeping on chan (e.g. on ticks global variable or on a
@@ -536,22 +567,16 @@ void procdump(void) {
  * @return 0 on success, otherwise -1
  */
 int setslice(int pid, int slice) {
-    // validate parameters
-    // TODO: check pid validity (should be registered in the ptable ?)
-    if (!(pid > 0) || !(slice > 0)) goto fail;
-
-    // TODO:
-    // The time-slice of a process could be increased, decreased, or not
-    // changed;
+    struct proc *p;
+    // get process & validate parameters
+    if (!(p = getProcess(pid)) || !(slice > 0)) goto fail;
 
     // if pid is the currently running process, then its time-slice should be
     // immediately changed and applied to this scheduling interval.
+    if (p->pid == myproc()->pid) p->timeslice = slice;
 
-    // If the process has run for the number ticks it should run (or more)
-    // according to the new slice value (e.g. it has run 6 ticks, but the new
-    // time slice value is 4 ticks), you should schedule the next process when
-    // the timer interrupt fires.
-
+    // The time-slice of a process could be increased, decreased, or not
+    // changed;
     return 0;
 fail:
     return -1;
@@ -564,13 +589,12 @@ fail:
  * @return int time-slice of a process
  */
 int getslice(int pid) {
-    int timeSlice;
+    struct proc *p;
     // validate parameters
-    // TODO: check pid validity (should be registered in the ptable ?)
-    if (!(pid > 0)) goto fail;
+    if (!(p = getProcess(pid))) goto fail;
 
-    // TODO:
-    return timeSlice;
+    return p->timeslice;
+
 fail:
     return -1;
 }
@@ -602,10 +626,28 @@ fail:
  * @return int 0 on success, otherwise -1
  */
 int getpinfo(struct pstat *pstat) {
+    int index;       // index shared between ptable and pstat enteries
+    struct proc *p;  // process at current index
     // validate parameters
     if (pstat == 0) goto fail;
 
-    // TODO:
+    // loop through process list and update pstat corresponding enteries
+    for (index = 0, p = ptable.proc; p < &ptable.proc[NPROC]; p++, index++) {
+        if (p->state == UNUSED) {
+            pstat->inuse[index] = 0;
+            continue;
+        } else {
+            pstat->inuse[index] = 1;
+        }
+
+        pstat->pid[index] = p->pid;
+        pstat->timeslice[index] = p->timeslice;
+        pstat->compticks[index] = p->compticks;
+        pstat->schedticks[index] = p->schedticks;
+        pstat->sleepticks[index] = p->sleepticks;
+        pstat->switches[index] = p->switches;
+    }
+
     return 0;
 fail:
     return -1;

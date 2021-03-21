@@ -24,6 +24,10 @@
         "stat.h": "c",
         "user.h": "c",
         "alias.h": "c",
-        "spinlock.h": "c"
+        "spinlock.h": "c",
+        "pstat.h": "c",
+        "mmu.h": "c",
+        "memlayout.h": "c",
+        "param.h": "c"
     }
 }

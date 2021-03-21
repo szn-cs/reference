@@ -25,6 +25,25 @@ void tvinit(void) {
 
 void idtinit(void) { lidt(idt, sizeof(idt)); }
 
+/**
+ * @brief Helper function debugging
+ *
+ * @param ticks # of timer ticks
+ */
+void printTicks(int ticks) {
+    int count = 0, n = ticks;
+    while (n != 0) {
+        n /= 10;  // n = n/10
+        ++count;
+    }
+    // if (myproc() && myproc()->pid != -1) {  // on shell and intial process
+    // for (int i = 0; i < 1 + count; i++) cprintf("\b");  // remove printed
+    // cprintf("⏲ %d", ticks);
+    // }
+
+    cprintf("·", ticks);
+}
+
 // affected value: ticks
 // timer interrupt takes control, making process give up CPU.
 // PAGEBREAK: 41
@@ -42,15 +61,6 @@ void trap(struct trapframe *tf) {
             if (cpuid() == 0) {
                 acquire(&tickslock);
                 ticks++;
-
-                // int count = 0, n = ticks;
-                // while (n != 0) {
-                //     n /= 10;  // n = n/10
-                //     ++count;
-                // }
-                // for (int i = 0; i < 3 + count; i++)
-                //     cprintf("\b");  // remove printed
-                // cprintf("[%d] ", ticks);
 
                 // wakeup every blocked process waiting on ticks (which causes
                 // every sleeping process to get fasely scheduled)
@@ -112,4 +122,7 @@ void trap(struct trapframe *tf) {
 
     // Check if the process has been killed since we yielded
     if (myproc() && myproc()->killed && (tf->cs & 3) == DPL_USER) exit();
+
+    // print timer ticks
+    printTicks(ticks);
 }

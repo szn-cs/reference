@@ -126,8 +126,6 @@ int setslice(int, int);
 int getslice(int);
 int fork2(int);
 int getpinfo(struct pstat*);
-// custom - pstat.h
-// pstat global variable
 
 // swtch.S
 void swtch(struct context**, struct context*);

@@ -3,7 +3,6 @@
 #include "user.h"
 #include "pstat.h"
 
-extern struct pstat pstat;
 static int loop_childProcess(int, char *);
 
 static int cpNumber = 0;  // counter of child processes spawned
@@ -22,6 +21,7 @@ static int cpNumber = 0;  // counter of child processes spawned
  * @param argv argument vector
  */
 int main(int argc, char **argv) {
+    struct pstat pstat;
     // parsed arguments
     int sliceA = 0, sliceB = 0, sleepParent = 0;
     char *sleepA, *sleepB;         // should be passed to exec function

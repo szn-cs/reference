@@ -6,7 +6,30 @@
 - new process inherit time-slice of its parent process. The first user process starts with time-slice of 1 timer tick.
 
 # xv6 specifics: 
-- main.c: ƒ main → ƒ mpmain → proc.c: ƒ scheduler;  & sysproc.c
+- Control timer clock frequency `lapicw(TICR, 10000000)` @ lapic.c
+    https://stackoverflow.com/questions/59276602/how-to-modify-process-preemption-policies-like-rr-time-slices-in-xv6
+- Trace xv6 execution:  https://aphasiayc.github.io/2019/xv6-process.html
+  - § Initialization: 
+    - → ƒ main @ main.c
+    - → ƒ userinit @ proc.c: 1st § process creation (shell: exec `ini` @ init.c)
+    - → ƒ mpmain @ main.c: initializing CPU & running the first process using § shcedular
+  - § Process creation: 
+    - ƒ allocproc @ proc.c: process creation
+  - § Scheduler:
+    - ƒ schedular @ proc.c: pick process, setup cpu, update process state, & start running it
+    - ƒ switchuvm: pick process corredponding page table
+    - ƒ swtch.S: execute the process kernel thread (i.e. from kernel stack)
+  - § trap timer tick or system call: 
+    - → ƒ trap @ trap.c: proceeds with § system call or § timer interrupt handling
+  - § Timer interrupt handling: increments ticks & updates processes status
+    - → ƒ wakeup → ƒ wakup1 @ proc.c: wakes up all that waits for ticks to change (channel)
+    - [force relinquish CPU]
+    - → ƒ trapasm.S (trapret)
+  - § System call handling:
+    - → ƒ sysproc.c → ƒ @ proc.c
+  - § First process execution: 
+    - → ƒ forkret → ƒ trapasm.S (trapret)
+
 - involved functions: userinit, allocproc, trap, sleep, etc.
 - stock xv6 scheduler: basic RR
 - schedules new process (calls `sched()`): on call to yield, sleep, exit, or every 10 ms timer tick
@@ -36,6 +59,7 @@ interval.
   - [ ] No ready processes but sleeping/blocking process - should still acquire compensation ticks when they are blocked. A slice = 2; A runs alone and then sleeps for 3 ticks; when it runs again it will use the compensation ticks.
   - [ ] Multiple processes blocked during same time would be acquiring compensation ticks each.
   - [ ] Fix sleep syscall implementation in `wakeup1`@proc.c - avoid falsely waking up sleeping process until it is the right time.
+  - [ ] Switch back to original timer frequency, and test implementation.
 
 ## submission: 
 - Files: src folder submission at `<...>/p4/slip1/src`, parterners.txt @ p4 
