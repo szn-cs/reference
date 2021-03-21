@@ -29,20 +29,114 @@ fail:
     return 0;
 }
 
-// TODO: current scheduling queue data structure (linked-list / fixed-sized
-// array). Use circular queue data structure
-// - add the init user process to the queue.
-// - new allocated process: its scheduler-related PCB should be initialized, and
-// added to the tail of the queue. On exit it must be removed from the queue.
-// - peek at current head of scheduler queue, instead of iterating over ptable.
-/*
-implementation of RR
-struct proc { // linked structure
-    struct proc* rr_next;
+/* Typical circular Queue implementation in C: current scheduling circular queue
+ data structure (e.g. linked-list or fixed-sized array) (modified from
+ programiz.com/dsa/circular-queue)
+
+ - add the init user process to the queue.
+ - new allocated process: its scheduler-related PCB should be initialized, and
+   added to the tail of the queue. On exit it must be removed from the queue.
+ - peek at current head of scheduler queue, instead of iterating over ptable. */
+
+#define SIZE NPROC
+struct proc *queue[SIZE];
+int front = -1, rear = -1;
+
+// Check if the queue is full
+int isFull() {
+    if ((front == rear + 1) || (front == 0 && rear == SIZE - 1)) return 1;
+    return 0;
 }
-when p1 wakeup:
-set p2.rr_next -> p2
-*/
+
+// Check if the queue is empty
+int isEmpty() {
+    if (front == -1) return 1;
+    return 0;
+}
+
+// Adding an element
+// Fails to enqueue if front == rear + 1
+void enQueue(struct proc *element) {
+    if (isFull()) {
+        // cprintf("\n Queue is full!! \n");
+
+    } else {
+        if (front == -1) front = 0;
+        rear = (rear + 1) % SIZE;
+        queue[rear] = element;
+        // cprintf("\n Inserted -> %d", element->pid);
+    }
+}
+
+// Removing an element
+struct proc *deQueue() {
+    struct proc *element;
+    if (isEmpty()) {
+        // cprintf("\n Queue is empty !! \n");
+        return 0;
+    } else {
+        element = queue[front % SIZE];
+        if (front == rear)
+            front = -1, rear = -1;
+        else
+            front = (front + 1) % SIZE;
+
+        // cprintf("\n Deleted element -> %d \n", element);
+        return element;
+    }
+}
+
+struct proc *peek() {
+    struct proc *element;
+    if (isEmpty()) return 0;
+    element = queue[front];
+    return element;
+}
+
+struct proc *deQueueByPID(int pid) {
+    struct proc *p;
+    int index;  // index of element matching pid
+    if (isEmpty()) {
+        cprintf("\n Queue is empty !! \n");
+        return 0;
+    } else {
+        // search for pid
+        for (index = front; index <= rear; index++)
+            if ((p = queue[index % SIZE])->pid == pid) goto remove;
+        return 0;
+    }
+
+remove:
+    if (front == rear) {
+        front = -1, rear = -1;
+    } else {
+        // Q has only one element, so we reset the
+        // queue after dequeing it. ?
+        // shift to fill the space of removed element
+        for (; index < rear; index++)
+            queue[index % SIZE] = queue[(index + 1) % SIZE];
+        rear--;  // reflect removal of element
+    }
+
+    cprintf("\n Deleted element -> %d \n", queue[index % SIZE]);
+    return p;
+}
+
+// Display the queue
+void display() {
+    int i;
+    if (isEmpty())
+        cprintf(" \n Empty Queue\n");
+    else {
+        cprintf("\n Front -> %d ", front);
+        cprintf("\n queue -> ");
+        for (i = front; i != rear; i = (i + 1) % SIZE) {
+            cprintf("%d ", queue[i]->pid);
+        }
+        cprintf("%d ", queue[i]->pid);
+        cprintf("\n Rear -> %d \n", rear);
+    }
+}
 
 static struct proc *initproc;
 
@@ -140,6 +234,8 @@ found:
     p->statistics.schedticks = 0;
     p->statistics.sleepticks = 0;
     p->statistics.switches = 0;
+
+    enQueue(p);  // add to scheduler queue
 
     return p;
 }
@@ -308,6 +404,9 @@ int wait(void) {
                 p->killed = 0;
                 p->state = UNUSED;
                 release(&ptable.lock);
+
+                deQueueByPID(pid);  // remove it from the scheduler queue too
+
                 return pid;
             }
         }
@@ -336,14 +435,21 @@ int wait(void) {
 int pickNextProcess_compensationRR(struct proc **external_p) {
     struct proc *p = *external_p;
 
-    // get next process in queue or start from first process
-    for (p = (p == 0) ? ptable.proc : p + 1; p < &ptable.proc[NPROC]; p++) {
-        *external_p = p;  // modify external pointer
+    // get next process using ptable or start from first process
+    // for (p = (p == 0) ? ptable.proc : p + 1; p < &ptable.proc[NPROC]; p++) {
+    //     if (p->state == RUNNABLE) goto success;
+    // }
+
+    // get next process using a circular queue
+    for (int index = rear; index >= 0; index--) {
+        p = deQueue();  // extract
+        enQueue(p);     // move to tail
         if (p->state == RUNNABLE) goto success;
     }
 
     return -1;  // iteration over queue ended
 success:
+    *external_p = p;                     // modify external pointer
     p->statistics.switches++;            // stats
     return p->timeslice + p->compticks;  // number of ticks to run
 }
@@ -376,6 +482,7 @@ runProcess:
     while ((p && p->state == RUNNABLE && --runDuration > 0) ||
            (runDuration = pickNextProcess_compensationRR(&p)) != -1) {
         // cprintf("[%d] \n", p->pid); // debug
+        // display();
 
         // keep track of used compensation ticks
         if (runDuration <= p->compticks) {
