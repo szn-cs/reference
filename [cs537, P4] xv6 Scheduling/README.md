@@ -41,23 +41,23 @@ interval.
 - run programs in xv6 concurrently in background: `<user program> &; <user program> &;`
 
 # Todo list:
-- [ ] xv6 book chapter 5, particularly "sleep and wake" section
-- [ ] [xv6 scheduler explanation ](https://www.youtube.com/watch?v=eYfeOT1QYmg)
+- [x] xv6 book chapter 5, particularly "sleep and wake" section
+- [x] [xv6 scheduler explanation ](https://www.youtube.com/watch?v=eYfeOT1QYmg)
 - [x] Makefile cpu 1 & compilation flags -Og
 - implement system calls: 
-  - [ ] setslice, getslice, fork2, getpinfo
+  - [x] setslice, getslice, fork2, getpinfo
 - test implementation by writing user-level programs: 
   - [x] loop
   - [x] schedtest
 - Tests to consider: 
-  - [ ] ensure correct scheduler policy is implemented before proceeding to provided tests. Ensuring correct ticks for each process per cycle, and having processes sleep and wakeup.
-  - [ ] handle large range of jobs: run usertests and forktests
-  - [ ] example: A slice = 2; B slice = 3; A sleeps for 3; should be compensated in next time-slice interval for 2 + 3 ticks. and then reverts back to its original time-slice.
-  - [ ] example: proper sleep accounting: process gets compensated for the amount of time it was actually sleeping, not the time it wasn't scheduled. A slice = 2; B slice = 3; A sleeps for 1; will be compensated 2 + 1 ticks;
-  - [ ] No accumulation of compensation ticks between sleeps. A slice = 2; B slice = 3; A accumulates 3 compenstation ticks, but uses only 1 and then sleeps for 1 tick; It will lose the other 2 ticks and will count only 1 compensation from the latest sleep. A compensation = 2 + 1;
-  - [ ] No ready processes but sleeping/blocking process - should still acquire compensation ticks when they are blocked. A slice = 2; A runs alone and then sleeps for 3 ticks; when it runs again it will use the compensation ticks.
-  - [ ] Multiple processes blocked during same time would be acquiring compensation ticks each.
-  - [ ] Fix sleep syscall implementation in `wakeup1`@proc.c - avoid falsely waking up sleeping process until it is the right time.
+  - [x] ensure correct scheduler policy is implemented before proceeding to provided tests. Ensuring correct ticks for each process per cycle, and having processes sleep and wakeup.
+  - [x] handle large range of jobs: run usertests and forktests
+  - [x] example: A slice = 2; B slice = 3; A sleeps for 3; should be compensated in next time-slice interval for 2 + 3 ticks. and then reverts back to its original time-slice.
+  - [x] example: proper sleep accounting: process gets compensated for the amount of time it was actually sleeping, not the time it wasn't scheduled. A slice = 2; B slice = 3; A sleeps for 1; will be compensated 2 + 1 ticks;
+  - [x] No accumulation of compensation ticks between sleeps. A slice = 2; B slice = 3; A accumulates 3 compenstation ticks, but uses only 1 and then sleeps for 1 tick; It will lose the other 2 ticks and will count only 1 compensation from the latest sleep. A compensation = 2 + 1;
+  - [x] No ready processes but sleeping/blocking process - should still acquire compensation ticks when they are blocked. A slice = 2; A runs alone and then sleeps for 3 ticks; when it runs again it will use the compensation ticks.
+  - [x] Multiple processes blocked during same time would be acquiring compensation ticks each.
+  - [x] Fix sleep syscall implementation in `wakeup1`@proc.c - avoid falsely waking up sleeping process until it is the right time.
   - [x] Switch back to original timer frequency, and test implementation.
 
 ## submission: 
