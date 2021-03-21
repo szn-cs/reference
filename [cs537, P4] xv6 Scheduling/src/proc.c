@@ -484,10 +484,6 @@ void sleep(void *chan, struct spinlock *lk) {
         release(lk);
     }
 
-    // calculate wakeup time
-    uint ticks0;  // initial ticks timer state when started sleeping
-    ticks0 = ticks;
-
     // Go to sleep.
     p->chan = chan;  // mark the process's wait channel - waiting mechanism for
                      // a change in a data structure it points to.
@@ -599,7 +595,7 @@ void procdump(void) {
 int setslice(int pid, int slice) {
     struct proc *p;
     // get process & validate parameters
-    if (!(p = getProcess(pid)) || !(slice > 0)) goto fail;
+    if (pid < 0 || !(p = getProcess(pid)) || !(slice > 0)) goto fail;
 
     // if pid is the currently running process, then its time-slice should be
     // immediately changed and applied to this scheduling interval.
@@ -646,7 +642,7 @@ int fork2(int slice) {
     // always returns the pid of the child in kernel mode
     int childPID = fork();
     // set time slice for child
-    setslice(childPID, slice);
+    if (setslice(childPID, slice) == -1) goto fail;
 
     return childPID;
 fail:
