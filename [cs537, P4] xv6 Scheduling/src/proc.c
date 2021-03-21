@@ -34,6 +34,7 @@ fail:
 // - add the init user process to the queue.
 // - new allocated process: its scheduler-related PCB should be initialized, and
 // added to the tail of the queue. On exit it must be removed from the queue.
+// - peek at current head of scheduler queue, instead of iterating over ptable.
 /*
 implementation of RR
 struct proc { // linked structure
@@ -42,9 +43,6 @@ struct proc { // linked structure
 when p1 wakeup:
 set p2.rr_next -> p2
 */
-
-// TODO: peek at current head of scheduler queue, instead of iterating over
-// ptable.
 
 static struct proc *initproc;
 
@@ -375,9 +373,9 @@ runProcess:
     // If its timeslice (+ compensation ticks if applicable) has not been used
     // up for this scheduling cycle, keep scheduling it. Otherwise, move to the
     // next process in the queue and put the previous head to the tail.
-    while ((p && p->state == RUNNING && --runDuration > 0) ||
+    while ((p && p->state == RUNNABLE && --runDuration > 0) ||
            (runDuration = pickNextProcess_compensationRR(&p)) != -1) {
-        cprintf("[%d] \n", p->pid);
+        // cprintf("[%d] \n", p->pid); // debug
 
         // keep track of used compensation ticks
         if (runDuration <= p->compticks) {
@@ -605,7 +603,8 @@ int setslice(int pid, int slice) {
 
     // if pid is the currently running process, then its time-slice should be
     // immediately changed and applied to this scheduling interval.
-    if (p->pid == myproc()->pid) p->timeslice = slice;
+    // if (p->pid == myproc()->pid)
+    p->timeslice = slice;
 
     // The time-slice of a process could be increased, decreased, or not
     // changed;
@@ -644,8 +643,12 @@ int fork2(int slice) {
     // validate parameters
     if (slice < 0) goto fail;
 
-    // TODO:
-    return fork();
+    // always returns the pid of the child in kernel mode
+    int childPID = fork();
+    // set time slice for child
+    setslice(childPID, slice);
+
+    return childPID;
 fail:
     return -1;
 }

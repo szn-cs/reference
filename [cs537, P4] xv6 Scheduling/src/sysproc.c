@@ -81,14 +81,14 @@ int sys_setslice(void) {
 
 int sys_getslice(void) {
     int pid;
-    if (argint(0, &pid) < 0) return -1;
+    if (argint(0, &pid) < 0 || pid < 0) return -1;
 
     return getslice(pid);
 }
 
 int sys_fork2(void) {
     int slice;
-    if (argint(0, &slice) < 0) return -1;
+    if (argint(0, &slice) < 0 || slice < 0) return -1;
 
     return fork2(slice);
 }

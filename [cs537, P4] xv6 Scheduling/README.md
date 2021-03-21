@@ -58,8 +58,8 @@ interval.
   - [ ] No ready processes but sleeping/blocking process - should still acquire compensation ticks when they are blocked. A slice = 2; A runs alone and then sleeps for 3 ticks; when it runs again it will use the compensation ticks.
   - [ ] Multiple processes blocked during same time would be acquiring compensation ticks each.
   - [ ] Fix sleep syscall implementation in `wakeup1`@proc.c - avoid falsely waking up sleeping process until it is the right time.
-  - [ ] Switch back to original timer frequency, and test implementation.
+  - [x] Switch back to original timer frequency, and test implementation.
 
 ## submission: 
-- Files: src folder submission at `<...>/p4/slip1/src`, parterners.txt @ p4 
+- Files: src folder submission at `<...>/p4/slip2/src`, parterners.txt @ p4 
 - partners.txt even if worked alone: `cslogin wiscNetId lastname firstname`
