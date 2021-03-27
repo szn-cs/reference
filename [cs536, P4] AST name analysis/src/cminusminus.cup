@@ -9,18 +9,17 @@ import java.util.*;
  * than just "Syntax error"
  */
 parser code {:
-
-public void syntax_error(Symbol currToken) {
-    if (currToken.value == null) {
-        ErrMsg.fatal(0,0, "Syntax error at end of file");
+    public void syntax_error(Symbol currToken) {
+        if (currToken.value == null) {
+            ErrMsg.fatal(0,0, "Syntax error at end of file");
+        }
+        else {
+            ErrMsg.fatal(((TokenVal)currToken.value).linenum,
+                        ((TokenVal)currToken.value).charnum,
+                        "Syntax error");
+        }
+        System.exit(-1);
     }
-    else {
-        ErrMsg.fatal(((TokenVal)currToken.value).linenum,
-                     ((TokenVal)currToken.value).charnum,
-                     "Syntax error");
-    }
-    System.exit(-1);
-}
 :};
 
 

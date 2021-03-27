@@ -4,20 +4,18 @@ import java_cup.runtime.*;
 /**
  * Main program to test the C-- parser.
  *
- * There should be 2 command-line arguments:
- *    1. the file to be parsed
- *    2. the output file into which the AST built by the parser should be
- *       unparsed
+ * There should be 2 command-line arguments: 1. the file to be parsed 2. the
+ * output file into which the AST built by the parser should be unparsed
  */
 
 public class P4 {
-    public static void main(String[] args)
-        throws IOException // may be thrown by the scanner
+    public static void main(String[] args) throws IOException // may be thrown
+                                                              // by the scanner
     {
         // check for command-line args
         if (args.length != 2) {
-            System.err.println("please supply name of file to be parsed " +
-			                   "and name of file for unparsed version.");
+            System.err.println("please supply name of file to be parsed "
+                    + "and name of file for unparsed version.");
             System.exit(-1);
         }
 
@@ -35,8 +33,8 @@ public class P4 {
         try {
             outFile = new PrintWriter(args[1]);
         } catch (FileNotFoundException ex) {
-            System.err.println("File " + args[1] +
-                               " could not be opened for writing.");
+            System.err.println(
+                    "File " + args[1] + " could not be opened for writing.");
             System.exit(-1);
         }
 
@@ -48,14 +46,23 @@ public class P4 {
 
         try {
             root = P.parse(); // do the parse
-            System.out.println ("program parsed correctly.");
-        } catch (Exception ex){
+            System.out.println("program parsed correctly.");
+        } catch (Exception ex) {
             System.err.println("Exception occured during parse: " + ex);
             System.exit(-1);
         }
 
-	// ADD NAME ANALYSIS PART HERE
-        ((ASTnode)root.value).unparse(outFile, 0);
+        // if there are no syntal errors, call name analyzer
+        // TODO: ADD NAME ANALYSIS PART HERE
+        // Calling the name analyzer means calling the appropriate method of the
+        // ASTnode
+        // that is the root of the tree built by the parser
+        // root.iterate() ?
+
+        // After that, if there are no errors so far (either scanning, parsing,
+        // or
+        // name-analysis errors), it will call the unparser.
+        ((ASTnode) root.value).unparse(outFile, 0);
         outFile.close();
 
         return;

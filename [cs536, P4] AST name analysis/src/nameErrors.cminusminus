@@ -1,1 +1,3 @@
 
+// nameErrors.cminusminus should contain code with errors detected by the name analyzer. This means that it should include bad and multiply declared names for all of the different kinds of names, and in all of the different places that declarations can appear. It should also include uses of undeclared names in all kinds of statements and expressions as well as bad struct accesses.
+// nameErrors.out should output the expected errors.

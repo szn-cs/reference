@@ -14,92 +14,92 @@ import java.util.*;
 // string; for integer literals, they also contain an integer value.
 //
 // Here are all the different kinds of AST nodes and what kinds of children
-// they have.  All of these kinds of AST nodes are subclasses of "ASTnode".
+// they have. All of these kinds of AST nodes are subclasses of "ASTnode".
 // Indentation indicates further subclassing:
 //
-//     Subclass            Children
-//     --------            ----
-//     ProgramNode         DeclListNode
-//     DeclListNode        linked list of DeclNode
-//     DeclNode:
-//       VarDeclNode       TypeNode, IdNode, int
-//       FnDeclNode        TypeNode, IdNode, FormalsListNode, FnBodyNode
-//       FormalDeclNode    TypeNode, IdNode
-//       StructDeclNode    IdNode, DeclListNode
+// Subclass Children
+// -------- ----
+// ProgramNode DeclListNode
+// DeclListNode linked list of DeclNode
+// DeclNode:
+// VarDeclNode TypeNode, IdNode, int
+// FnDeclNode TypeNode, IdNode, FormalsListNode, FnBodyNode
+// FormalDeclNode TypeNode, IdNode
+// StructDeclNode IdNode, DeclListNode
 //
-//     FormalsListNode     linked list of FormalDeclNode
-//     FnBodyNode          DeclListNode, StmtListNode
-//     StmtListNode        linked list of StmtNode
-//     ExpListNode         linked list of ExpNode
+// FormalsListNode linked list of FormalDeclNode
+// FnBodyNode DeclListNode, StmtListNode
+// StmtListNode linked list of StmtNode
+// ExpListNode linked list of ExpNode
 //
-//     TypeNode:
-//       IntNode           -- none --
-//       BoolNode          -- none --
-//       VoidNode          -- none --
-//       StructNode        IdNode
+// TypeNode:
+// IntNode -- none --
+// BoolNode -- none --
+// VoidNode -- none --
+// StructNode IdNode
 //
-//     StmtNode:
-//       AssignStmtNode      AssignNode
-//       PostIncStmtNode     ExpNode
-//       PostDecStmtNode     ExpNode
-//       ReadStmtNode        ExpNode
-//       WriteStmtNode       ExpNode
-//       IfStmtNode          ExpNode, DeclListNode, StmtListNode
-//       IfElseStmtNode      ExpNode, DeclListNode, StmtListNode,
-//                                    DeclListNode, StmtListNode
-//       WhileStmtNode       ExpNode, DeclListNode, StmtListNode
-//       RepeatStmtNode      ExpNode, DeclListNode, StmtListNode
-//       CallStmtNode        CallExpNode
-//       ReturnStmtNode      ExpNode
+// StmtNode:
+// AssignStmtNode AssignNode
+// PostIncStmtNode ExpNode
+// PostDecStmtNode ExpNode
+// ReadStmtNode ExpNode
+// WriteStmtNode ExpNode
+// IfStmtNode ExpNode, DeclListNode, StmtListNode
+// IfElseStmtNode ExpNode, DeclListNode, StmtListNode,
+// DeclListNode, StmtListNode
+// WhileStmtNode ExpNode, DeclListNode, StmtListNode
+// RepeatStmtNode ExpNode, DeclListNode, StmtListNode
+// CallStmtNode CallExpNode
+// ReturnStmtNode ExpNode
 //
-//     ExpNode:
-//       IntLitNode          -- none --
-//       StrLitNode          -- none --
-//       TrueNode            -- none --
-//       FalseNode           -- none --
-//       IdNode              -- none --
-//       DotAccessNode       ExpNode, IdNode
-//       AssignNode          ExpNode, ExpNode
-//       CallExpNode         IdNode, ExpListNode
-//       UnaryExpNode        ExpNode
-//         UnaryMinusNode
-//         NotNode
-//       BinaryExpNode       ExpNode ExpNode
-//         PlusNode
-//         MinusNode
-//         TimesNode
-//         DivideNode
-//         AndNode
-//         OrNode
-//         EqualsNode
-//         NotEqualsNode
-//         LessNode
-//         GreaterNode
-//         LessEqNode
-//         GreaterEqNode
+// ExpNode:
+// IntLitNode -- none --
+// StrLitNode -- none --
+// TrueNode -- none --
+// FalseNode -- none --
+// IdNode -- none --
+// DotAccessNode ExpNode, IdNode
+// AssignNode ExpNode, ExpNode
+// CallExpNode IdNode, ExpListNode
+// UnaryExpNode ExpNode
+// UnaryMinusNode
+// NotNode
+// BinaryExpNode ExpNode ExpNode
+// PlusNode
+// MinusNode
+// TimesNode
+// DivideNode
+// AndNode
+// OrNode
+// EqualsNode
+// NotEqualsNode
+// LessNode
+// GreaterNode
+// LessEqNode
+// GreaterEqNode
 //
 // Here are the different kinds of AST nodes again, organized according to
 // whether they are leaves, internal nodes with linked lists of children, or
 // internal nodes with a fixed number of children:
 //
 // (1) Leaf nodes:
-//        IntNode,   BoolNode,  VoidNode,  IntLitNode,  StrLitNode,
-//        TrueNode,  FalseNode, IdNode
+// IntNode, BoolNode, VoidNode, IntLitNode, StrLitNode,
+// TrueNode, FalseNode, IdNode
 //
 // (2) Internal nodes with (possibly empty) linked lists of children:
-//        DeclListNode, FormalsListNode, StmtListNode, ExpListNode
+// DeclListNode, FormalsListNode, StmtListNode, ExpListNode
 //
 // (3) Internal nodes with fixed numbers of children:
-//        ProgramNode,     VarDeclNode,     FnDeclNode,     FormalDeclNode,
-//        StructDeclNode,  FnBodyNode,      StructNode,     AssignStmtNode,
-//        PostIncStmtNode, PostDecStmtNode, ReadStmtNode,   WriteStmtNode
-//        IfStmtNode,      IfElseStmtNode,  WhileStmtNode,  RepeatStmtNode,
-//        CallStmtNode
-//        ReturnStmtNode,  DotAccessNode,   AssignExpNode,  CallExpNode,
-//        UnaryExpNode,    BinaryExpNode,   UnaryMinusNode, NotNode,
-//        PlusNode,        MinusNode,       TimesNode,      DivideNode,
-//        AndNode,         OrNode,          EqualsNode,     NotEqualsNode,
-//        LessNode,        GreaterNode,     LessEqNode,     GreaterEqNode
+// ProgramNode, VarDeclNode, FnDeclNode, FormalDeclNode,
+// StructDeclNode, FnBodyNode, StructNode, AssignStmtNode,
+// PostIncStmtNode, PostDecStmtNode, ReadStmtNode, WriteStmtNode
+// IfStmtNode, IfElseStmtNode, WhileStmtNode, RepeatStmtNode,
+// CallStmtNode
+// ReturnStmtNode, DotAccessNode, AssignExpNode, CallExpNode,
+// UnaryExpNode, BinaryExpNode, UnaryMinusNode, NotNode,
+// PlusNode, MinusNode, TimesNode, DivideNode,
+// AndNode, OrNode, EqualsNode, NotEqualsNode,
+// LessNode, GreaterNode, LessEqNode, GreaterEqNode
 //
 // **********************************************************************
 
@@ -113,14 +113,16 @@ abstract class ASTnode {
 
     // this method can be used by the unparse methods to do indenting
     protected void addIndentation(PrintWriter p, int indent) {
-        for (int k = 0; k < indent; k++) p.print(" ");
+        for (int k = 0; k < indent; k++)
+            p.print(" ");
     }
 }
 
 // **********************************************************************
-// ProgramNode,  DeclListNode, FormalsListNode, FnBodyNode,
+// ProgramNode, DeclListNode, FormalsListNode, FnBodyNode,
 // StmtListNode, ExpListNode
 // **********************************************************************
+
 
 class ProgramNode extends ASTnode {
     public ProgramNode(DeclListNode L) {
@@ -134,6 +136,7 @@ class ProgramNode extends ASTnode {
     private DeclListNode myDeclList;
 }
 
+
 class DeclListNode extends ASTnode {
     public DeclListNode(List<DeclNode> S) {
         myDecls = S;
@@ -143,16 +146,18 @@ class DeclListNode extends ASTnode {
         Iterator it = myDecls.iterator();
         try {
             while (it.hasNext()) {
-                ((DeclNode)it.next()).unparse(p, indent);
+                ((DeclNode) it.next()).unparse(p, indent);
             }
         } catch (NoSuchElementException ex) {
-            System.err.println("unexpected NoSuchElementException in DeclListNode.print");
+            System.err.println(
+                    "unexpected NoSuchElementException in DeclListNode.print");
             System.exit(-1);
         }
     }
 
     private List<DeclNode> myDecls;
 }
+
 
 class FormalsListNode extends ASTnode {
     public FormalsListNode(List<FormalDeclNode> S) {
@@ -163,7 +168,7 @@ class FormalsListNode extends ASTnode {
         Iterator<FormalDeclNode> it = myFormals.iterator();
         if (it.hasNext()) { // if there is at least one element
             it.next().unparse(p, indent);
-            while (it.hasNext()) {  // print the rest of the list
+            while (it.hasNext()) { // print the rest of the list
                 p.print(", ");
                 it.next().unparse(p, indent);
             }
@@ -172,6 +177,7 @@ class FormalsListNode extends ASTnode {
 
     private List<FormalDeclNode> myFormals;
 }
+
 
 class FnBodyNode extends ASTnode {
     public FnBodyNode(DeclListNode declList, StmtListNode stmtList) {
@@ -188,6 +194,7 @@ class FnBodyNode extends ASTnode {
     private StmtListNode myStmtList;
 }
 
+
 class StmtListNode extends ASTnode {
     public StmtListNode(List<StmtNode> S) {
         myStmts = S;
@@ -203,6 +210,7 @@ class StmtListNode extends ASTnode {
     private List<StmtNode> myStmts;
 }
 
+
 class ExpListNode extends ASTnode {
     public ExpListNode(List<ExpNode> S) {
         myExps = S;
@@ -212,7 +220,7 @@ class ExpListNode extends ASTnode {
         Iterator<ExpNode> it = myExps.iterator();
         if (it.hasNext()) { // if there is at least one element
             it.next().unparse(p, indent);
-            while (it.hasNext()) {  // print the rest of the list
+            while (it.hasNext()) { // print the rest of the list
                 p.print(", ");
                 it.next().unparse(p, indent);
             }
@@ -226,8 +234,10 @@ class ExpListNode extends ASTnode {
 // DeclNode and its subclasses
 // **********************************************************************
 
+
 abstract class DeclNode extends ASTnode {
 }
+
 
 class VarDeclNode extends DeclNode {
     public VarDeclNode(TypeNode type, IdNode id, int size) {
@@ -246,16 +256,15 @@ class VarDeclNode extends DeclNode {
 
     private TypeNode myType;
     private IdNode myId;
-    private int mySize;  // use value NOT_STRUCT if this is not a struct type
+    private int mySize; // use value NOT_STRUCT if this is not a struct type
 
     public static int NOT_STRUCT = -1;
 }
 
+
 class FnDeclNode extends DeclNode {
-    public FnDeclNode(TypeNode type,
-                      IdNode id,
-                      FormalsListNode formalList,
-                      FnBodyNode body) {
+    public FnDeclNode(TypeNode type, IdNode id, FormalsListNode formalList,
+            FnBodyNode body) {
         myType = type;
         myId = id;
         myFormalsList = formalList;
@@ -270,7 +279,7 @@ class FnDeclNode extends DeclNode {
         p.print("(");
         myFormalsList.unparse(p, 0);
         p.println(") {");
-        myBody.unparse(p, indent+4);
+        myBody.unparse(p, indent + 4);
         p.println("}\n");
     }
 
@@ -279,6 +288,7 @@ class FnDeclNode extends DeclNode {
     private FormalsListNode myFormalsList;
     private FnBodyNode myBody;
 }
+
 
 class FormalDeclNode extends DeclNode {
     public FormalDeclNode(TypeNode type, IdNode id) {
@@ -296,6 +306,10 @@ class FormalDeclNode extends DeclNode {
     private IdNode myId;
 }
 
+
+// TODO: a recommended approach is to have a separate symbol table associated
+// with each struct definition and to store this symbol table in the symbol for
+// the name of the struct type.
 class StructDeclNode extends DeclNode {
     public StructDeclNode(IdNode id, DeclListNode declList) {
         myId = id;
@@ -307,7 +321,7 @@ class StructDeclNode extends DeclNode {
         p.print("struct ");
         myId.unparse(p, 0);
         p.println("{");
-        myDeclList.unparse(p, indent+4);
+        myDeclList.unparse(p, indent + 4);
         addIndentation(p, indent);
         p.println("};\n");
 
@@ -321,8 +335,10 @@ class StructDeclNode extends DeclNode {
 // TypeNode and its Subclasses
 // **********************************************************************
 
+
 abstract class TypeNode extends ASTnode {
 }
+
 
 class IntNode extends TypeNode {
     public IntNode() {
@@ -333,6 +349,7 @@ class IntNode extends TypeNode {
     }
 }
 
+
 class BoolNode extends TypeNode {
     public BoolNode() {
     }
@@ -342,6 +359,7 @@ class BoolNode extends TypeNode {
     }
 }
 
+
 class VoidNode extends TypeNode {
     public VoidNode() {
     }
@@ -350,6 +368,7 @@ class VoidNode extends TypeNode {
         p.print("void");
     }
 }
+
 
 class StructNode extends TypeNode {
     public StructNode(IdNode id) {
@@ -368,8 +387,10 @@ class StructNode extends TypeNode {
 // StmtNode and its subclasses
 // **********************************************************************
 
+
 abstract class StmtNode extends ASTnode {
 }
+
 
 class AssignStmtNode extends StmtNode {
     public AssignStmtNode(AssignNode assign) {
@@ -385,6 +406,7 @@ class AssignStmtNode extends StmtNode {
     private AssignNode myAssign;
 }
 
+
 class PostIncStmtNode extends StmtNode {
     public PostIncStmtNode(ExpNode exp) {
         myExp = exp;
@@ -399,6 +421,7 @@ class PostIncStmtNode extends StmtNode {
     private ExpNode myExp;
 }
 
+
 class PostDecStmtNode extends StmtNode {
     public PostDecStmtNode(ExpNode exp) {
         myExp = exp;
@@ -412,6 +435,7 @@ class PostDecStmtNode extends StmtNode {
 
     private ExpNode myExp;
 }
+
 
 class ReadStmtNode extends StmtNode {
     public ReadStmtNode(ExpNode e) {
@@ -429,6 +453,7 @@ class ReadStmtNode extends StmtNode {
     private ExpNode myExp;
 }
 
+
 class WriteStmtNode extends StmtNode {
     public WriteStmtNode(ExpNode exp) {
         myExp = exp;
@@ -444,6 +469,7 @@ class WriteStmtNode extends StmtNode {
     private ExpNode myExp;
 }
 
+
 class IfStmtNode extends StmtNode {
     public IfStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myDeclList = dlist;
@@ -456,8 +482,8 @@ class IfStmtNode extends StmtNode {
         p.print("if (");
         myExp.unparse(p, 0);
         p.println(") {");
-        myDeclList.unparse(p, indent+4);
-        myStmtList.unparse(p, indent+4);
+        myDeclList.unparse(p, indent + 4);
+        myStmtList.unparse(p, indent + 4);
         addIndentation(p, indent);
         p.println("}");
     }
@@ -467,10 +493,10 @@ class IfStmtNode extends StmtNode {
     private StmtListNode myStmtList;
 }
 
+
 class IfElseStmtNode extends StmtNode {
-    public IfElseStmtNode(ExpNode exp, DeclListNode dlist1,
-                          StmtListNode slist1, DeclListNode dlist2,
-                          StmtListNode slist2) {
+    public IfElseStmtNode(ExpNode exp, DeclListNode dlist1, StmtListNode slist1,
+            DeclListNode dlist2, StmtListNode slist2) {
         myExp = exp;
         myThenDeclList = dlist1;
         myThenStmtList = slist1;
@@ -483,14 +509,14 @@ class IfElseStmtNode extends StmtNode {
         p.print("if (");
         myExp.unparse(p, 0);
         p.println(") {");
-        myThenDeclList.unparse(p, indent+4);
-        myThenStmtList.unparse(p, indent+4);
+        myThenDeclList.unparse(p, indent + 4);
+        myThenStmtList.unparse(p, indent + 4);
         addIndentation(p, indent);
         p.println("}");
         addIndentation(p, indent);
         p.println("else {");
-        myElseDeclList.unparse(p, indent+4);
-        myElseStmtList.unparse(p, indent+4);
+        myElseDeclList.unparse(p, indent + 4);
+        myElseStmtList.unparse(p, indent + 4);
         addIndentation(p, indent);
         p.println("}");
     }
@@ -501,6 +527,7 @@ class IfElseStmtNode extends StmtNode {
     private StmtListNode myElseStmtList;
     private DeclListNode myElseDeclList;
 }
+
 
 class WhileStmtNode extends StmtNode {
     public WhileStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
@@ -514,8 +541,8 @@ class WhileStmtNode extends StmtNode {
         p.print("while (");
         myExp.unparse(p, 0);
         p.println(") {");
-        myDeclList.unparse(p, indent+4);
-        myStmtList.unparse(p, indent+4);
+        myDeclList.unparse(p, indent + 4);
+        myStmtList.unparse(p, indent + 4);
         addIndentation(p, indent);
         p.println("}");
     }
@@ -524,6 +551,7 @@ class WhileStmtNode extends StmtNode {
     private DeclListNode myDeclList;
     private StmtListNode myStmtList;
 }
+
 
 class RepeatStmtNode extends StmtNode {
     public RepeatStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
@@ -533,12 +561,12 @@ class RepeatStmtNode extends StmtNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
-	addIndentation(p, indent);
+        addIndentation(p, indent);
         p.print("repeat (");
         myExp.unparse(p, 0);
         p.println(") {");
-        myDeclList.unparse(p, indent+4);
-        myStmtList.unparse(p, indent+4);
+        myDeclList.unparse(p, indent + 4);
+        myStmtList.unparse(p, indent + 4);
         addIndentation(p, indent);
         p.println("}");
     }
@@ -547,6 +575,7 @@ class RepeatStmtNode extends StmtNode {
     private DeclListNode myDeclList;
     private StmtListNode myStmtList;
 }
+
 
 class CallStmtNode extends StmtNode {
     public CallStmtNode(CallExpNode call) {
@@ -561,6 +590,7 @@ class CallStmtNode extends StmtNode {
 
     private CallExpNode myCall;
 }
+
 
 class ReturnStmtNode extends StmtNode {
     public ReturnStmtNode(ExpNode exp) {
@@ -584,8 +614,10 @@ class ReturnStmtNode extends StmtNode {
 // ExpNode and its subclasses
 // **********************************************************************
 
+
 abstract class ExpNode extends ASTnode {
 }
+
 
 class IntLitNode extends ExpNode {
     public IntLitNode(int lineNum, int charNum, int intVal) {
@@ -603,6 +635,7 @@ class IntLitNode extends ExpNode {
     private int myIntVal;
 }
 
+
 class StringLitNode extends ExpNode {
     public StringLitNode(int lineNum, int charNum, String strVal) {
         myLineNum = lineNum;
@@ -619,6 +652,7 @@ class StringLitNode extends ExpNode {
     private String myStrVal;
 }
 
+
 class TrueNode extends ExpNode {
     public TrueNode(int lineNum, int charNum) {
         myLineNum = lineNum;
@@ -632,6 +666,7 @@ class TrueNode extends ExpNode {
     private int myLineNum;
     private int myCharNum;
 }
+
 
 class FalseNode extends ExpNode {
     public FalseNode(int lineNum, int charNum) {
@@ -647,6 +682,7 @@ class FalseNode extends ExpNode {
     private int myCharNum;
 }
 
+
 class IdNode extends ExpNode {
     public IdNode(int lineNum, int charNum, String strVal) {
         myLineNum = lineNum;
@@ -654,6 +690,17 @@ class IdNode extends ExpNode {
         myStrVal = strVal;
     }
 
+    // TODO: Changing the unparse method so that every use of an ID has its type
+    // (in parentheses) after its name. (The point of this is to help you to see
+    // whether your name analyzer is working correctly; i.e., does it correctly
+    // match each use of a name to the corresponding declaration, and does it
+    // correctly set the link from the IdNode to the information in the symbol
+    // table.) For names of functions, the information should be of the form:
+    // param1Type, param2Type, ..., paramNType -> returnType. For names of
+    // global variables, parameters, and local variables of a non-struct type ,
+    // the information should be int or bool. For a global or local variable
+    // that is of a struct type, the information should be the name of the
+    // struct type.
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
     }
@@ -661,7 +708,11 @@ class IdNode extends ExpNode {
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
+    // link to table symbol this name node is declared at. (to link the node
+    // with the corresponding symbol-table entry)
+    private TSym tableSymbol;
 }
+
 
 class DotAccessExpNode extends ExpNode {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
@@ -680,6 +731,7 @@ class DotAccessExpNode extends ExpNode {
     private IdNode myId;
 }
 
+
 class AssignNode extends ExpNode {
     public AssignNode(ExpNode lhs, ExpNode exp) {
         myLhs = lhs;
@@ -687,16 +739,19 @@ class AssignNode extends ExpNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
-        if (indent != -1)  p.print("(");
+        if (indent != -1)
+            p.print("(");
         myLhs.unparse(p, 0);
         p.print(" = ");
         myExp.unparse(p, 0);
-        if (indent != -1)  p.print(")");
+        if (indent != -1)
+            p.print(")");
     }
 
     private ExpNode myLhs;
     private ExpNode myExp;
 }
+
 
 class CallExpNode extends ExpNode {
     public CallExpNode(IdNode name, ExpListNode elist) {
@@ -719,8 +774,9 @@ class CallExpNode extends ExpNode {
     }
 
     private IdNode myId;
-    private ExpListNode myExpList;  // possibly null
+    private ExpListNode myExpList; // possibly null
 }
+
 
 abstract class UnaryExpNode extends ExpNode {
     public UnaryExpNode(ExpNode exp) {
@@ -729,6 +785,7 @@ abstract class UnaryExpNode extends ExpNode {
 
     protected ExpNode myExp;
 }
+
 
 abstract class BinaryExpNode extends ExpNode {
     public BinaryExpNode(ExpNode exp1, ExpNode exp2) {
@@ -744,6 +801,7 @@ abstract class BinaryExpNode extends ExpNode {
 // Subclasses of UnaryExpNode
 // **********************************************************************
 
+
 class UnaryMinusNode extends UnaryExpNode {
     public UnaryMinusNode(ExpNode exp) {
         super(exp);
@@ -755,6 +813,7 @@ class UnaryMinusNode extends UnaryExpNode {
         p.print(")");
     }
 }
+
 
 class NotNode extends UnaryExpNode {
     public NotNode(ExpNode exp) {
@@ -772,6 +831,7 @@ class NotNode extends UnaryExpNode {
 // Subclasses of BinaryExpNode
 // **********************************************************************
 
+
 class PlusNode extends BinaryExpNode {
     public PlusNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
@@ -785,6 +845,7 @@ class PlusNode extends BinaryExpNode {
         p.print(")");
     }
 }
+
 
 class MinusNode extends BinaryExpNode {
     public MinusNode(ExpNode exp1, ExpNode exp2) {
@@ -800,6 +861,7 @@ class MinusNode extends BinaryExpNode {
     }
 }
 
+
 class TimesNode extends BinaryExpNode {
     public TimesNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
@@ -813,6 +875,7 @@ class TimesNode extends BinaryExpNode {
         p.print(")");
     }
 }
+
 
 class DivideNode extends BinaryExpNode {
     public DivideNode(ExpNode exp1, ExpNode exp2) {
@@ -828,6 +891,7 @@ class DivideNode extends BinaryExpNode {
     }
 }
 
+
 class AndNode extends BinaryExpNode {
     public AndNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
@@ -841,6 +905,7 @@ class AndNode extends BinaryExpNode {
         p.print(")");
     }
 }
+
 
 class OrNode extends BinaryExpNode {
     public OrNode(ExpNode exp1, ExpNode exp2) {
@@ -856,6 +921,7 @@ class OrNode extends BinaryExpNode {
     }
 }
 
+
 class EqualsNode extends BinaryExpNode {
     public EqualsNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
@@ -869,6 +935,7 @@ class EqualsNode extends BinaryExpNode {
         p.print(")");
     }
 }
+
 
 class NotEqualsNode extends BinaryExpNode {
     public NotEqualsNode(ExpNode exp1, ExpNode exp2) {
@@ -884,6 +951,7 @@ class NotEqualsNode extends BinaryExpNode {
     }
 }
 
+
 class LessNode extends BinaryExpNode {
     public LessNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
@@ -897,6 +965,7 @@ class LessNode extends BinaryExpNode {
         p.print(")");
     }
 }
+
 
 class GreaterNode extends BinaryExpNode {
     public GreaterNode(ExpNode exp1, ExpNode exp2) {
@@ -912,6 +981,7 @@ class GreaterNode extends BinaryExpNode {
     }
 }
 
+
 class LessEqNode extends BinaryExpNode {
     public LessEqNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
@@ -925,6 +995,7 @@ class LessEqNode extends BinaryExpNode {
         p.print(")");
     }
 }
+
 
 class GreaterEqNode extends BinaryExpNode {
     public GreaterEqNode(ExpNode exp1, ExpNode exp2) {

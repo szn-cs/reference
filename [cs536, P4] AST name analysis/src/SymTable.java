@@ -9,28 +9,28 @@ public class SymTable {
         list.add(new HashMap<String, TSym>());
     }
 
-  public void addDecl(String name, TSym sym) throws DuplicateSymException,
-  EmptySymTableException, IllegalArgumentException {m
+    public void addDecl(String name, TSym sym) throws DuplicateSymException,
+            EmptySymTableException, IllegalArgumentException {
 
-    if (name == null && sym == null) {
-      throw new IllegalArgumentException();
-    } else if (name == null) {
-      throw new IllegalArgumentException();
-    } else if (sym == null) {
-      throw new IllegalArgumentException();
-    }
+        if (name == null && sym == null) {
+            throw new IllegalArgumentException();
+        } else if (name == null) {
+            throw new IllegalArgumentException();
+        } else if (sym == null) {
+            throw new IllegalArgumentException();
+        }
 
-    if (list.isEmpty()) {
-      throw new EmptySymTableException();
-    }
+        if (list.isEmpty()) {
+            throw new EmptySymTableException();
+        }
 
-    HashMap<String, TSym> symTab = list.get(0);
-    if (symTab.containsKey(name)) {
-      throw new DuplicateSymException();
-    } else {
-      symTab.put(name, sym);
+        HashMap<String, TSym> symTab = list.get(0);
+        if (symTab.containsKey(name)) {
+            throw new DuplicateSymException();
+        } else {
+            symTab.put(name, sym);
+        }
     }
-  }
 
     public void addScope() {
         list.add(0, new HashMap<String, TSym>());
