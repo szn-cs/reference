@@ -28,37 +28,34 @@ Executing the test will generate output file of the formated program.
 ## C-- names & scoping rules: 
   - Allows same name declarations in non-overlapping/nested scopes.
   - Uses of undeclared names - names must be declared before they are used.
-  - Duplicate/Multiply declared names
 
 ### variable declaration
+  - Duplicate/Multiply declared names
   - Bad declaration: 
     - type void declaration for non function
     - variable of bad struct type - i.e. the name of the struct type doesn't exist or is not struct type.
   - If you find a bad variable declaration (a variable of type void or of a bad struct type), give an error message and add nothing to the symbol table.
 
 ### struct
-- If a variable or a function with the same name has been declared in the same scope before, then do not add a SymTable entry for the struct. You don't have to process the variables of the struct in this case.
-- In case a duplicate filed, create SymTable for the struct and add all variables up to but excluding the second occurrence of x and then continue with the rest of the members.
+- struct declaration is scope of one level above it's body.
+- duplicate variable/function name to struct: do not add symbol entry, do not process variables of the struct.
+- Duplicate field: ignore second occurrence. 
 - If a struct is used without declaration like a.b, then you can report two errors (undeclared ID and dot access of non-struct type) or you can just report undeclared ID.
-- a struct and one of its members can have the same name (as struct type declaration is of scope one level outside the struct)
 - struct handling issues: 
   - Bad struct access: name analysis `LHS.RHS` should check:
     - left-hand side of the dot-access is not a name already declared to be of a struct type
     - right-hand side of the dot-access is not the name of a field for the appropriate type of struct. 
   - struct definition: 
-    - name of the struct type can't be a name that has already been declared.
-    - A variable x inside a struct with the same name as another variable inside the struct is illegal (fields of a struct must be unique to that particular struct). 
-    - A variable inside a struct with the same name as a variable or a function outside the struct is legal. 
-  - struct declaration: on variable declaration that is a struct - check struct type has been previously declared and is actually the name of a struct type.
+    - [x] name of the struct type can't be a name that has already been declared.
+    - [x] A variable x inside a struct with the same name as another variable inside the struct is illegal (fields of a struct must be unique to that particular struct). 
+    - [x] A variable inside a struct with the same name as a variable or a function outside the struct is legal. 
+  - [x] struct declaration: on variable declaration that is a struct - check struct type has been previously declared and is actually the name of a struct type.
 
 ### function
-- Formal parameters are on same scope as function body.
-- A function with the same name as another function in the same scope is illegal. You must not add a new SymTable entry in the outer scope for this second occurrence. You should process the formals and the local variables for both the functions.
-- A function with the same name as another variable in the same scope is illegal. In this case, do not create a SymTable entry for the function. However, continue processing the body of the function.
-- If a function with formal parameter a also has a variable declared as a, then create the SymTable for the function and add the formal parameter but not the local variable and then continue with processing.
-- If a function has 2 formal parameters or 2 local variables with the same name, then create the SymTable, add the first parameter/local variable, report the error and then continue with processing.
-- The name of the function is in a scope that is one level outside the scope of the function itself. Thus, a function and one of its formals/local variables can have the same name.
-- During name analysis, if a function name is multiply declared you should still process the formals and the body of the function; don't add a new entry to the current symbol table for the function, but do add a new hashtable to the front of the SymTable's list for the names declared in the body (i.e., the parameters and other local variables of the function).
+- [x] Formal parameters & function body are on same scope.
+- [x] Illegal same name to another function or variable in same scope - do not add entry for second occurence, but continue processing formals and body of the functions.
+- [x] if formal paramter = body variable declared: add formal and ignore param. 
+- [x] Duplicate formal/local: create SymTable, add first parameter/local variable, report the error and then continue with processing.
 
 ### if/else/while
 - if/else and while statements have their own scope. So, names can be reused inside these statements.

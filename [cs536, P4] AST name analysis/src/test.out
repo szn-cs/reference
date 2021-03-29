@@ -1,0 +1,27 @@
+int c;
+struct Point{
+    int x;
+    int y;
+};
+
+struct Point{
+    int x;
+    int y;
+};
+
+int f(int x, bool b) {
+}
+
+void g() {
+    int a;
+    bool b;
+    struct Point p;
+    struct Point pt;
+    (p).x = a;
+    (pt).x = 7;
+    b = (a == 3);
+    f((a + ((p).y * 2)), b);
+    g();
+}
+
+int c;

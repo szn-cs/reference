@@ -9,6 +9,17 @@ public class SymTable {
         list.add(new HashMap<String, TSym>());
     }
 
+    /**
+     * Create symbol table with or without new scopes
+     * 
+     * @param numberScope number of scopes to create with the SymTable
+     */
+    public SymTable(int numberScope) {
+        list = new LinkedList<HashMap<String, TSym>>();
+        for (; numberScope-- > 0;)
+            list.add(0, new HashMap<String, TSym>());
+    }
+
     public void addDecl(String name, TSym sym) throws DuplicateSymException,
             EmptySymTableException, IllegalArgumentException {
 
@@ -20,9 +31,9 @@ public class SymTable {
             throw new IllegalArgumentException();
         }
 
-        if (list.isEmpty()) {
+        if (list.isEmpty())
             throw new EmptySymTableException();
-        }
+
 
         HashMap<String, TSym> symTab = list.get(0);
         if (symTab.containsKey(name)) {
@@ -62,17 +73,16 @@ public class SymTable {
     }
 
     public void removeScope() throws EmptySymTableException {
-        if (list.isEmpty()) {
+        if (list.isEmpty())
             throw new EmptySymTableException();
-        }
+
         list.remove(0);
     }
 
     public void print() {
         System.out.print("\nSym Table\n");
-        for (HashMap<String, TSym> symTab : list) {
+        for (HashMap<String, TSym> symTab : list)
             System.out.println(symTab.toString());
-        }
         System.out.println();
     }
 }

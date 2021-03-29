@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 import java_cup.runtime.*;
 
 /**
@@ -38,33 +39,99 @@ public class P4 {
             System.exit(-1);
         }
 
-        parser P = new parser(new Yylex(inFile));
 
         Symbol root = null; // the parser will return a Symbol whose value
-                            // field is the translation of the root nonterminal
-                            // (i.e., of the nonterminal "program")
+        // field is the translation of the root nonterminal
+        // (i.e., of the nonterminal "program")
+        ASTnode rootNode;
 
+        /** Lexical & Syntax analysis */
         try {
+            parser P = new parser(new Yylex(inFile));
             root = P.parse(); // do the parse
             System.out.println("program parsed correctly.");
         } catch (Exception ex) {
             System.err.println("Exception occured during parse: " + ex);
-            System.exit(-1);
+            System.exit(-1); // exit on syntax error
         }
 
-        // if there are no syntal errors, call name analyzer
-        // TODO: ADD NAME ANALYSIS PART HERE
-        // Calling the name analyzer means calling the appropriate method of the
-        // ASTnode
-        // that is the root of the tree built by the parser
-        // root.iterate() ?
+        rootNode = (ASTnode) root.value;
 
-        // After that, if there are no errors so far (either scanning, parsing,
-        // or
-        // name-analysis errors), it will call the unparser.
-        ((ASTnode) root.value).unparse(outFile, 0);
+        /** Static semantic name analysis */
+        try {
+            traverse(rootNode); // traverse & visit each node
+            System.out.println("program name analyzed correctly.");
+        } catch (Exception ex) {
+            System.err.println("Exception occured during name analyze: " + ex);
+            System.exit(-1); // exit on name analysis error
+        }
+
+        // TODO: After that, if there are no errors so far (either scanning,
+        // parsing, or name-analysis errors)
+
+        /** Unparser code generator */
+        rootNode.unparse(outFile, 0);
         outFile.close();
 
         return;
     }
+
+    /**
+     * Traverse root node
+     * 
+     * @param node
+     */
+    public static void traverse(ASTnode node) throws EmptySymTableException {
+        // tracks current scopes state during traveral of the AST (list of
+        // symbol hashtables each corresponding to a scope level)
+        SymTable l = new SymTable(0);
+        traverse(node, l);
+    }
+
+    /**
+     * Traverse a list of ASTnode trees
+     */
+    public static void traverse(List<? extends ASTnode> nodeList, SymTable l)
+            throws EmptySymTableException {
+        for (ASTnode n : nodeList)
+            if (n instanceof Visitable)
+                traverse(n, l);
+    }
+
+    /**
+     * Traverse ASTnode tree
+     */
+    public static void traverse(ASTnode n, SymTable l)
+            throws EmptySymTableException {
+        // visit each node and manipulate the state of the scope chain and
+        // symbols hashtables as needed.
+        try {
+            ((Visitable) n).visit(l);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
+
+        // traverse children
+        if (n instanceof Iterable) {
+            Iterator<IterationConfig> iterator = ((Iterable) n).getChildren();
+
+            while (iterator.hasNext()) {
+                IterationConfig config = iterator.next();
+
+                if (config.newScope)
+                    l.addScope(); // create new scope for children nodes
+
+                if (!config.list.isEmpty())
+                    traverse(config.list, l);
+
+                if (config.newScope)
+                    l.removeScope(); // discard scope
+            }
+        }
+
+        System.out.println(n.toString() + " visited & children");
+        l.print();
+    }
+
 }

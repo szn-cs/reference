@@ -107,6 +107,36 @@ import java.util.*;
 // ASTnode class (base class for all other kinds of nodes)
 // **********************************************************************
 
+/**
+ * Nodes involved in the name analysis traversal
+ */
+abstract interface Visitable {
+    public void visit(SymTable symbolTable) throws EmptySymTableException;
+}
+
+
+/**
+ * A subtree involving children nodes
+ */
+abstract interface Iterable {
+    public Iterator<IterationConfig> getChildren();
+}
+
+
+class IterationConfig {
+    public boolean newScope = false; // if should create a new scope
+    public List<? extends ASTnode> list = new ArrayList<>(); // nodes list
+
+    public IterationConfig(List<? extends ASTnode> l, boolean scope) {
+        this.newScope = scope;
+        this.list = l;
+    }
+
+    public IterationConfig() {
+    }
+}
+
+
 abstract class ASTnode {
     // every subclass must provide an unparse operation
     abstract public void unparse(PrintWriter p, int indent);
@@ -116,6 +146,29 @@ abstract class ASTnode {
         for (int k = 0; k < indent; k++)
             p.print(" ");
     }
+
+    /**
+     * Default implementation - used only for subclasses implementing the
+     * Visitable interface
+     * 
+     * @param SymTable
+     */
+    public void visit(SymTable symbolTable) throws EmptySymTableException {
+        // ignore
+        System.out.println("› visiting: " + this.getClass().getName());
+    }
+
+    /**
+     * Default implementation - used by subclasses implmenting the Iterable
+     * interface
+     * 
+     * @return
+     */
+    public Iterator<IterationConfig> getChildren() {
+        // empty iterator
+        return (new ArrayList<IterationConfig>()).iterator();
+    }
+
 }
 
 // **********************************************************************
@@ -124,7 +177,7 @@ abstract class ASTnode {
 // **********************************************************************
 
 
-class ProgramNode extends ASTnode {
+class ProgramNode extends ASTnode implements Iterable {
     public ProgramNode(DeclListNode L) {
         myDeclList = L;
     }
@@ -133,11 +186,20 @@ class ProgramNode extends ASTnode {
         myDeclList.unparse(p, indent);
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myDeclList));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
+    }
+
     private DeclListNode myDeclList;
 }
 
 
-class DeclListNode extends ASTnode {
+class DeclListNode extends ASTnode implements Iterable {
     public DeclListNode(List<DeclNode> S) {
         myDecls = S;
     }
@@ -155,11 +217,19 @@ class DeclListNode extends ASTnode {
         }
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        scope.add(new IterationConfig(myDecls, false));
+
+        return scope.iterator();
+    }
+
     private List<DeclNode> myDecls;
 }
 
 
-class FormalsListNode extends ASTnode {
+class FormalsListNode extends ASTnode implements Iterable {
     public FormalsListNode(List<FormalDeclNode> S) {
         myFormals = S;
     }
@@ -175,11 +245,23 @@ class FormalsListNode extends ASTnode {
         }
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        scope.add(new IterationConfig(myFormals, false));
+
+        return scope.iterator();
+    }
+
+    public List<FormalDeclNode> getFormalList() {
+        return myFormals;
+    }
+
     private List<FormalDeclNode> myFormals;
 }
 
 
-class FnBodyNode extends ASTnode {
+class FnBodyNode extends ASTnode implements Iterable {
     public FnBodyNode(DeclListNode declList, StmtListNode stmtList) {
         myDeclList = declList;
         myStmtList = stmtList;
@@ -190,12 +272,22 @@ class FnBodyNode extends ASTnode {
         myStmtList.unparse(p, indent);
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList =
+                new ArrayList<>(List.of(myDeclList, myStmtList));
+        scope.add(new IterationConfig(nodeList, false));
+
+        return scope.iterator();
+    }
+
     private DeclListNode myDeclList;
     private StmtListNode myStmtList;
 }
 
 
-class StmtListNode extends ASTnode {
+class StmtListNode extends ASTnode implements Iterable {
     public StmtListNode(List<StmtNode> S) {
         myStmts = S;
     }
@@ -207,11 +299,19 @@ class StmtListNode extends ASTnode {
         }
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        scope.add(new IterationConfig(myStmts, false));
+
+        return scope.iterator();
+    }
+
     private List<StmtNode> myStmts;
 }
 
 
-class ExpListNode extends ASTnode {
+class ExpListNode extends ASTnode implements Iterable {
     public ExpListNode(List<ExpNode> S) {
         myExps = S;
     }
@@ -227,6 +327,14 @@ class ExpListNode extends ASTnode {
         }
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        scope.add(new IterationConfig(myExps, false));
+
+        return scope.iterator();
+    }
+
     private List<ExpNode> myExps;
 }
 
@@ -236,10 +344,64 @@ class ExpListNode extends ASTnode {
 
 
 abstract class DeclNode extends ASTnode {
+
+    public void visit(SymTable symbolTable, IdNode myId, TypeNode myType,
+            int mySize) throws EmptySymTableException {
+        super.visit(symbolTable);
+
+        TSym symbol = null;
+        TSym typeSymbol; // for struct types
+        TSym localSymbol;
+
+        // create symbol object
+        switch (myType.getType()) {
+            case "struct":
+                typeSymbol = symbolTable
+                        .lookupGlobal(((StructNode) myType).getId().getName());
+                // must exist and be of struct type
+                if (typeSymbol != null && typeSymbol.getType() == "struct")
+                    symbol = new VarSym(myType.getType(),
+                            ((StructNode) myType).getId().getName(), mySize);
+                else
+                    ErrMsg.fatal(myId.getPosition(), 6);
+                break;
+            case "int":
+            case "bool":
+                symbol = new VarSym(myType.getType());
+                break;
+            case "void":
+            default:
+                // report and skip symbol
+                ErrMsg.fatal(myId.getPosition(), 5);
+                break;
+        }
+
+        /**
+         * - If a declaration is both "bad" (e.g., a non-function declared void)
+         * and is a declaration of a name that has already been declared in the
+         * same scope, you should give two error messages (first the "bad"
+         * declaration error, then the "multiply declared" error).
+         */
+        localSymbol = symbolTable.lookupLocal(myId.getName());
+        if (localSymbol != null)
+            ErrMsg.fatal(myId.getPosition(), 1);
+
+        // if no symbol was created
+        if (symbol == null)
+            return;
+
+        // add declaration to symbol table
+        try {
+            symbolTable.addDecl(myId.getName(), symbol);
+        } catch (DuplicateSymException e) {
+            // suppress (handled by a previous check)
+        }
+    }
+
 }
 
 
-class VarDeclNode extends DeclNode {
+class VarDeclNode extends DeclNode implements Visitable {
     public VarDeclNode(TypeNode type, IdNode id, int size) {
         myType = type;
         myId = id;
@@ -254,6 +416,11 @@ class VarDeclNode extends DeclNode {
         p.println(";");
     }
 
+    public void visit(SymTable symbolTable) throws EmptySymTableException {
+        int mySize = -1; // unknown size
+        super.visit(symbolTable, myId, myType, mySize);
+    }
+
     private TypeNode myType;
     private IdNode myId;
     private int mySize; // use value NOT_STRUCT if this is not a struct type
@@ -262,7 +429,7 @@ class VarDeclNode extends DeclNode {
 }
 
 
-class FnDeclNode extends DeclNode {
+class FnDeclNode extends DeclNode implements Visitable, Iterable {
     public FnDeclNode(TypeNode type, IdNode id, FormalsListNode formalList,
             FnBodyNode body) {
         myType = type;
@@ -283,6 +450,40 @@ class FnDeclNode extends DeclNode {
         p.println("}\n");
     }
 
+    public void visit(SymTable symbolTable) throws EmptySymTableException {
+        super.visit(symbolTable);
+
+        ArrayList<String> paramTypeList = new ArrayList<>();
+        for (FormalDeclNode f : myFormalsList.getFormalList())
+            paramTypeList.add(f.getType());
+        FnSym symbol = new FnSym(paramTypeList, myType.getType());
+
+        // add declaration to symbol table
+        try {
+            symbolTable.addDecl(myId.getName(), symbol);
+        } catch (DuplicateSymException e) {
+            ErrMsg.fatal(myId.getPosition(), 1);
+        }
+    }
+
+
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myType, myId));
+            scope.add(new IterationConfig(nodeList, false));
+        }
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myFormalsList, myBody));
+            scope.add(new IterationConfig(nodeList, true));
+        }
+
+        return scope.iterator();
+    }
+
     private TypeNode myType;
     private IdNode myId;
     private FormalsListNode myFormalsList;
@@ -290,16 +491,25 @@ class FnDeclNode extends DeclNode {
 }
 
 
-class FormalDeclNode extends DeclNode {
+class FormalDeclNode extends DeclNode implements Visitable {
     public FormalDeclNode(TypeNode type, IdNode id) {
         myType = type;
         myId = id;
+    }
+
+    public String getType() {
+        return myType.getType();
     }
 
     public void unparse(PrintWriter p, int indent) {
         myType.unparse(p, 0);
         p.print(" ");
         myId.unparse(p, 0);
+    }
+
+    public void visit(SymTable symbolTable) throws EmptySymTableException {
+        int mySize = -1; // unknown size
+        super.visit(symbolTable, myId, myType, mySize);
     }
 
     private TypeNode myType;
@@ -310,7 +520,9 @@ class FormalDeclNode extends DeclNode {
 // TODO: a recommended approach is to have a separate symbol table associated
 // with each struct definition and to store this symbol table in the symbol for
 // the name of the struct type.
-class StructDeclNode extends DeclNode {
+class StructDeclNode extends DeclNode implements Visitable, Iterable {
+    private boolean skipIteration = false; // status flag
+
     public StructDeclNode(IdNode id, DeclListNode declList) {
         myId = id;
         myDeclList = declList;
@@ -327,6 +539,37 @@ class StructDeclNode extends DeclNode {
 
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        {
+            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myId));
+            scope.add(new IterationConfig(nodeList, false));
+        }
+        {
+            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myDeclList));
+            scope.add(new IterationConfig(nodeList, true));
+        }
+
+        return scope.iterator();
+    }
+
+    public void visit(SymTable symbolTable) throws EmptySymTableException {
+        super.visit(symbolTable);
+
+        // TODO:
+        for (FormalDeclNode f : myFormalsList.getFormalList())
+            paramTypeList.add(f.getType());
+        FnSym symbol = new FnSym(paramTypeList, myType.getType());
+
+        // add declaration to symbol table
+        try {
+            symbolTable.addDecl(myId.getName(), symbol);
+        } catch (DuplicateSymException e) {
+            ErrMsg.fatal(myId.getPosition(), 1);
+        }
+    }
+
     private IdNode myId;
     private DeclListNode myDeclList;
 }
@@ -336,11 +579,23 @@ class StructDeclNode extends DeclNode {
 // **********************************************************************
 
 
-abstract class TypeNode extends ASTnode {
+abstract class TypeNode extends ASTnode implements Visitable {
+    /**
+     * String representing the type
+     * 
+     * @return int | bool | void | struct
+     */
+    abstract public String getType();
 }
 
 
 class IntNode extends TypeNode {
+    private static String type = "int";
+
+    public String getType() {
+        return type;
+    }
+
     public IntNode() {
     }
 
@@ -351,32 +606,54 @@ class IntNode extends TypeNode {
 
 
 class BoolNode extends TypeNode {
+    private static String type = "bool";
+
+    public String getType() {
+        return type;
+    }
+
     public BoolNode() {
     }
 
     public void unparse(PrintWriter p, int indent) {
-        p.print("bool");
+        p.print(type);
     }
 }
 
 
 class VoidNode extends TypeNode {
+    private static String type = "void";
+
+    public String getType() {
+        return type;
+    }
+
     public VoidNode() {
     }
 
     public void unparse(PrintWriter p, int indent) {
-        p.print("void");
+        p.print(type);
     }
 }
 
 
 class StructNode extends TypeNode {
+    private static String type = "struct";
+
+    public String getType() {
+        return type;
+    }
+
+    public IdNode getId() {
+        return myId;
+    }
+
     public StructNode(IdNode id) {
         myId = id;
     }
 
     public void unparse(PrintWriter p, int indent) {
-        p.print("struct ");
+        p.print(type + " ");
         myId.unparse(p, 0);
     }
 
@@ -403,6 +680,16 @@ class AssignStmtNode extends StmtNode {
         p.println(";");
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myAssign));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
+    }
+
+
     private AssignNode myAssign;
 }
 
@@ -418,6 +705,14 @@ class PostIncStmtNode extends StmtNode {
         p.println("++;");
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+        scope.add(new IterationConfig(nodeList, true));
+        return scope.iterator();
+    }
+
     private ExpNode myExp;
 }
 
@@ -431,6 +726,15 @@ class PostDecStmtNode extends StmtNode {
         addIndentation(p, indent);
         myExp.unparse(p, 0);
         p.println("--;");
+    }
+
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
     }
 
     private ExpNode myExp;
@@ -449,6 +753,15 @@ class ReadStmtNode extends StmtNode {
         p.println(";");
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
+    }
+
     // 1 child (actually can only be an IdNode or an ArrayExpNode)
     private ExpNode myExp;
 }
@@ -464,6 +777,15 @@ class WriteStmtNode extends StmtNode {
         p.print("cout << ");
         myExp.unparse(p, 0);
         p.println(";");
+    }
+
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
     }
 
     private ExpNode myExp;
@@ -486,6 +808,16 @@ class IfStmtNode extends StmtNode {
         myStmtList.unparse(p, indent + 4);
         addIndentation(p, indent);
         p.println("}");
+    }
+
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList =
+                new ArrayList<>(List.of(myExp, myDeclList, myStmtList));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
     }
 
     private ExpNode myExp;
@@ -521,6 +853,26 @@ class IfElseStmtNode extends StmtNode {
         p.println("}");
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        {
+            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+            scope.add(new IterationConfig(nodeList, false));
+        }
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myThenDeclList, myThenStmtList));
+            scope.add(new IterationConfig(nodeList, true));
+        }
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myElseStmtList, myElseDeclList));
+            scope.add(new IterationConfig(nodeList, true));
+        }
+        return scope.iterator();
+    }
+
     private ExpNode myExp;
     private DeclListNode myThenDeclList;
     private StmtListNode myThenStmtList;
@@ -547,6 +899,16 @@ class WhileStmtNode extends StmtNode {
         p.println("}");
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList =
+                new ArrayList<>(List.of(myExp, myDeclList, myStmtList));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
+    }
+
     private ExpNode myExp;
     private DeclListNode myDeclList;
     private StmtListNode myStmtList;
@@ -571,6 +933,16 @@ class RepeatStmtNode extends StmtNode {
         p.println("}");
     }
 
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList =
+                new ArrayList<>(List.of(myExp, myDeclList, myStmtList));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
+    }
+
     private ExpNode myExp;
     private DeclListNode myDeclList;
     private StmtListNode myStmtList;
@@ -586,6 +958,15 @@ class CallStmtNode extends StmtNode {
         addIndentation(p, indent);
         myCall.unparse(p, indent);
         p.println(";");
+    }
+
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myCall));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
     }
 
     private CallExpNode myCall;
@@ -605,6 +986,15 @@ class ReturnStmtNode extends StmtNode {
             myExp.unparse(p, 0);
         }
         p.println(";");
+    }
+
+    public Iterator<IterationConfig> getChildren() {
+        ArrayList<IterationConfig> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+        scope.add(new IterationConfig(nodeList, true));
+
+        return scope.iterator();
     }
 
     private ExpNode myExp; // possibly null
@@ -695,14 +1085,20 @@ class IdNode extends ExpNode {
     // whether your name analyzer is working correctly; i.e., does it correctly
     // match each use of a name to the corresponding declaration, and does it
     // correctly set the link from the IdNode to the information in the symbol
-    // table.) For names of functions, the information should be of the form:
-    // param1Type, param2Type, ..., paramNType -> returnType. For names of
-    // global variables, parameters, and local variables of a non-struct type ,
-    // the information should be int or bool. For a global or local variable
-    // that is of a struct type, the information should be the name of the
-    // struct type.
+    // table.)
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
+
+        if (symbol != null)
+            p.print("(" + symbol.toString() + ")");
+    }
+
+    public String getName() {
+        return myStrVal;
+    }
+
+    public int[] getPosition() {
+        return new int[] {myLineNum, myCharNum};
     }
 
     private int myLineNum;
@@ -710,7 +1106,7 @@ class IdNode extends ExpNode {
     private String myStrVal;
     // link to table symbol this name node is declared at. (to link the node
     // with the corresponding symbol-table entry)
-    private TSym tableSymbol;
+    private TSym symbol = null;
 }
 
 

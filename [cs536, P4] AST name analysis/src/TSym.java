@@ -1,17 +1,18 @@
+import java.util.*;
+
 /*
- * It is up to you how you store information in each symbol-table entry (each
- * TSym). To implement the changes to the unparser methods you will need to know
- * each name's type. For function names, this includes the return type and the
- * number of parameters and their types. You can modify the TSym class by adding
- * some new fields (e.g., a kind field) and/or by declaring some subclasses
- * (e.g., a subclass for functions that has extra fields for the return type and
- * the list of parameter types). You will probably also want to add new methods
- * that return the values of the new fields and it may be helpful to change the
- * toString method so that you can print the contents of a TSym for debugging
- * purposes.
+ * Symbol types/kinds some new fields (e.g., a kind field) and/or by declaring
+ * some subclasses (e.g., a subclass for functions that has extra fields for the
+ * return type and the list of parameter types). You will probably also want to
+ * add new methods that return the values of the new fields and it may be
+ * helpful to change the toString method so that you can print the contents of a
+ * TSym for debugging purposes.
  */
+
+
+// variable declaration symbol
 public class TSym {
-    private String type;
+    private String type; // bool, int, void, struct
 
     public TSym(String type) {
         this.type = type;
@@ -23,5 +24,90 @@ public class TSym {
 
     public String toString() {
         return type;
+    }
+}
+
+
+/**
+ * variable declaration symbol
+ */
+class VarSym extends TSym {
+    private int size;
+    private String structType; // the id name of the struct type
+
+    // int or bool declaration variables
+    public VarSym(String type) {
+        super(type);
+        this.size = -1;
+    }
+
+    // struct variable declaration
+    public VarSym(String type, String structType, int size) {
+        super(type);
+        this.size = size;
+        this.structType = structType;
+    }
+
+    /**
+     * For names of global variables, parameters, and local variables of a
+     * non-struct type , the information should be int or bool.
+     * 
+     * For a global or local variable that is of a struct type, the information
+     * should be the name of the struct type.
+     */
+    @Override
+    public String toString() {
+        String t = this.getType();
+        if (t == "struct")
+            return structType;
+        else
+            return t;
+    }
+}
+
+
+class FnSym extends TSym {
+    private List<String> paramTypeList;
+    private String returnType;
+
+    public FnSym(List<String> paramTypeList, String returnType) {
+        super(null);
+        // kind = function
+        this.paramTypeList = paramTypeList;
+        this.returnType = returnType;
+    }
+
+    /**
+     * function information form: `param1Type, param2Type, ..., paramNType ->
+     * returnType`
+     */
+    @Override
+    public String toString() {
+        String s = "";
+        for (int i = 0; i < this.paramTypeList.size(); i++) {
+            s += this.paramTypeList.get(i);
+            if (i != this.paramTypeList.size() - 1)
+                s += ",";
+            s += " ";
+        }
+
+        s += "-> ";
+
+        s += returnType;
+
+        return s;
+    }
+
+}
+
+
+class StructSym extends TSym {
+    private String structType; // the id name of the struct type
+    public SymTable symbolTable;
+
+    public StructSym(String type, String structType, SymTable symbolTable) {
+        super(type);
+        this.structType = structType;
+        this.symbolTable = symbolTable;
     }
 }
