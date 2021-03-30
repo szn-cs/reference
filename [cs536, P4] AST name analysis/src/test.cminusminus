@@ -4,8 +4,6 @@
 // names in all of the places that names can be declared and it should include
 // (good) uses of names in all kinds of statements and expressions.
 
-int c;
-
 // example of adding types to declarations on unparsing
 // Defining a struct type example
 struct Point {
@@ -26,7 +24,7 @@ void g() {
     f(a + p.y * 2, b);
     g();
 }
-// results in:
+// results expected:
 //      struct Point {
 //          int x;
 //          int y;

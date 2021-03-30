@@ -98,10 +98,10 @@ class FnSym extends TSym {
             s += this.paramTypeList.get(i);
             if (i != this.paramTypeList.size() - 1)
                 s += ",";
-            s += " ";
+            s += "";
         }
 
-        s += "-> ";
+        s += "->";
 
         s += returnType;
 

@@ -40,7 +40,6 @@ public class Traverser {
         if (n instanceof Visitable)
             try {
                 ((Visitable) n).visit(state);
-                System.out.println(n.toString() + " visited");
             } catch (Exception e) {
                 System.out.println(e.toString());
                 System.exit(-1);
@@ -51,7 +50,8 @@ public class Traverser {
         if (n instanceof Iterable && n.traverseSubtree)
             traverseConfig(((Iterable) n).getChildren(), state);
 
-        state.print();
+        // System.out.println(n.toString() + " visited");
+        // state.print();
     }
 
     /**

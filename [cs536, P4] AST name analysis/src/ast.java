@@ -167,7 +167,7 @@ abstract class ASTnode extends Flag {
      */
     public void visit(SymTable symbolTable) throws EmptySymTableException {
         // ignore
-        System.out.println("› visiting: " + this.getClass().getName());
+        // System.out.println("› visiting: " + this.getClass().getName());
     }
 
     /**
@@ -1191,9 +1191,12 @@ class DotAccessExpNode extends ExpNode implements Visitable {
     }
 
     public void unparse(PrintWriter p, int indent) {
-        p.print("(");
+        if (!(this.myLoc instanceof IdNode))
+            p.print("(");
         myLoc.unparse(p, 0);
-        p.print(").");
+        if (!(this.myLoc instanceof IdNode))
+            p.print(")");
+        p.print(".");
         myId.unparse(p, 0);
     }
 

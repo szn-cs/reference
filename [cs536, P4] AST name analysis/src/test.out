@@ -1,4 +1,3 @@
-int c;
 struct Point{
     int x;
     int y;
@@ -11,9 +10,9 @@ void g() {
     int a;
     bool b;
     struct Point p;
-    (p(Point)).x(int) = a(int);
+    p(Point).x(int) = a(int);
     b(bool) = (a(int) == 3);
-    f(int, bool -> int)((a(int) + ((p(Point)).y(int) * 2)), b(bool));
-    g(-> void)();
+    f(int,bool->int)((a(int) + (p(Point).y(int) * 2)), b(bool));
+    g(->void)();
 }
 
