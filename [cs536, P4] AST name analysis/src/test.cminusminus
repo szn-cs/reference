@@ -1,37 +1,32 @@
-// test.cminusminus should contain code with no errors that exercises all of the name-analysis methods that you wrote for the different AST nodes. This means that it should include (good) declarations of all of the different kinds of names in all of the places that names can be declared and it should include (good) uses of names in all kinds of statements and expressions.
-
+// test.cminusminus should contain code with no errors that exercises all of the
+// name-analysis methods that you wrote for the different AST nodes. This means
+// that it should include (good) declarations of all of the different kinds of
+// names in all of the places that names can be declared and it should include
+// (good) uses of names in all kinds of statements and expressions.
 
 int c;
 
-
+// example of adding types to declarations on unparsing
 // Defining a struct type example
 struct Point {
     int x;
     int y;
 };
+int f(int x, bool b) {}
+void g() {
+    int a;
+    bool b;
+    // Declaring a variable to be of a struct type example
+    struct Point p;
 
-// example of adding types to declarations on unparsing
-        struct Point {
-            int x;
-            int y;
-        };
-        int f(int x, bool b) { }
-        void g() {
-            int a;
-            bool b;
-            struct Point p;
-            // Declaring a variable to be of a struct type example
-            struct Point pt;
+    // Accessing the fields of a struct example
+    p.x = a;
 
-            // Accessing the fields of a struct example
-            p.x = a;
-            pt.x = 7;
-
-            b = a == 3;
-            f(a + p.y*2, b);
-            g();
-        }
-// results in: 
+    b = a == 3;
+    f(a + p.y * 2, b);
+    g();
+}
+// results in:
 //      struct Point {
 //          int x;
 //          int y;
@@ -47,9 +42,3 @@ struct Point {
 //          f(int,bool->int)((a(int) + (p(Point).y(int) * 2)), b(bool));
 //          g(->void)();
 //      }
-// test.cminusminus should contain code with no errors that exercises all of the name-analysis methods that you wrote for the different AST nodes. This means that it should include (good) declarations of all of the different kinds of names in all of the places that names can be declared and it should include (good) uses of names in all kinds of statements and expressions.
-
-
-int c;
-
-

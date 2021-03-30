@@ -29,12 +29,9 @@ public class TSym {
 
 
 /**
- * variable declaration symbol
+ * variable declaration symbol - used by bool/int or struct variables
  */
 class VarSym extends TSym {
-    private int size;
-    private String structType; // the id name of the struct type
-
     // int or bool declaration variables
     public VarSym(String type) {
         super(type);
@@ -42,10 +39,16 @@ class VarSym extends TSym {
     }
 
     // struct variable declaration
-    public VarSym(String type, String structType, int size) {
+    public VarSym(String type, String structTag, int size,
+            StructSym structDeclSym) {
         super(type);
         this.size = size;
-        this.structType = structType;
+        this.structTag = structTag;
+        this.structDeclSym = structDeclSym;
+    }
+
+    StructSym getStructDeclSym() {
+        return this.structDeclSym;
     }
 
     /**
@@ -59,10 +62,17 @@ class VarSym extends TSym {
     public String toString() {
         String t = this.getType();
         if (t == "struct")
-            return structType;
+            return structTag;
         else
             return t;
     }
+
+    // These fields are specific for struct variables
+    private int size;
+    private String structTag; // the id name of the struct type
+    // the matching struct declaration symbol, used later to verify fields
+    // correct usage
+    private StructSym structDeclSym;
 }
 
 
@@ -101,13 +111,24 @@ class FnSym extends TSym {
 }
 
 
+/**
+ * Struct declaration with body
+ */
 class StructSym extends TSym {
-    private String structType; // the id name of the struct type
-    public SymTable symbolTable;
+    private String structTag; // the id name of the struct type
+    private SymTable fieldSymbolTable;
 
-    public StructSym(String type, String structType, SymTable symbolTable) {
-        super(type);
-        this.structType = structType;
-        this.symbolTable = symbolTable;
+    public StructSym(String structTag, SymTable fieldSymbolTable) {
+        super("struct");
+        this.structTag = structTag;
+        this.fieldSymbolTable = fieldSymbolTable;
     }
+
+    public SymTable getField() {
+        return this.fieldSymbolTable;
+    }
+
+
+    // toString - this struct declaration class is not inteded to be linked in
+    // used referenced.
 }

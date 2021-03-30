@@ -1,14 +1,19 @@
 {
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
 	"configurations": [
 		{
-			// TODO:
 			"type": "java",
-			"name": "Launch",
+			"name": "Launch P4",
 			"request": "launch",
-			"mainClass": "P2",
-			"projectName": "[cs536, P2]",
-			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}/src/"
+			"mainClass": "P4",
+			"args": ["test.cminusminus", "test.out"],
+			"projectName": "[cs536, P4] AST name analysis_a51a8050",
+			"cwd": "${workspaceFolder}/src",
+			"classPaths": ["./deps:."],
+			"preLaunchTask": "build"
 		}
 	]
 }

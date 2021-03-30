@@ -12,6 +12,9 @@ import static java.util.Map.entry;
  * This class is used to generate warning and fatal error messages.
  */
 class ErrMsg {
+    // tracks if a fatal error occured during the execution of the program
+    public static boolean errorOccured = false;
+
     public static final HashMap<Integer, String> message =
             new HashMap<>(Map.ofEntries(
                     /**
@@ -78,6 +81,7 @@ class ErrMsg {
      * @param msg     associated message for error
      */
     static void fatal(int lineNum, int charNum, String msg) {
+        errorOccured = true; // set error flag to true
         System.err.println(lineNum + ":" + charNum + " ***ERROR*** " + msg);
     }
 

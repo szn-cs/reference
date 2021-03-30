@@ -111,33 +111,45 @@ import java.util.*;
  * Nodes involved in the name analysis traversal
  */
 abstract interface Visitable {
+    /**
+     * Visit node with a state symbol table to track validity of declarations
+     * 
+     * @param symbolTable current scopes state to track and verify symbols
+     * @throws EmptySymTableException
+     */
     public void visit(SymTable symbolTable) throws EmptySymTableException;
 }
 
 
 /**
- * A subtree involving children nodes
+ * Get subtree children nodes - for further iteration over the sub-nodes
  */
 abstract interface Iterable {
-    public Iterator<IterationConfig> getChildren();
+    /**
+     * Retrieve iteration configuration for children nodes of current parent
+     * node
+     * 
+     * @return iterator of configurations for scoping for each list of child
+     *         nodes.
+     */
+    public Iterator<Traverser.Config> getChildren();
 }
 
 
-class IterationConfig {
-    public boolean newScope = false; // if should create a new scope
-    public List<? extends ASTnode> list = new ArrayList<>(); // nodes list
-
-    public IterationConfig(List<? extends ASTnode> l, boolean scope) {
-        this.newScope = scope;
-        this.list = l;
-    }
-
-    public IterationConfig() {
-    }
+/**
+ * Class holding flags related to the interfaces defined for Visitable and
+ * Iterable
+ * 
+ * (Note: I'm not sure how to share fields of interfaces using Java, so I just
+ * extended the root class)
+ */
+class Flag {
+    // flag to indicate whether to iterate over child nodes
+    public boolean traverseSubtree = true;
 }
 
 
-abstract class ASTnode {
+abstract class ASTnode extends Flag {
     // every subclass must provide an unparse operation
     abstract public void unparse(PrintWriter p, int indent);
 
@@ -164,9 +176,9 @@ abstract class ASTnode {
      * 
      * @return
      */
-    public Iterator<IterationConfig> getChildren() {
+    public Iterator<Traverser.Config> getChildren() {
         // empty iterator
-        return (new ArrayList<IterationConfig>()).iterator();
+        return (new ArrayList<Traverser.Config>()).iterator();
     }
 
 }
@@ -186,11 +198,11 @@ class ProgramNode extends ASTnode implements Iterable {
         myDeclList.unparse(p, indent);
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myDeclList));
-        scope.add(new IterationConfig(nodeList, true));
+        scope.add(new Traverser.Config(nodeList, false));
 
         return scope.iterator();
     }
@@ -202,6 +214,10 @@ class ProgramNode extends ASTnode implements Iterable {
 class DeclListNode extends ASTnode implements Iterable {
     public DeclListNode(List<DeclNode> S) {
         myDecls = S;
+    }
+
+    public List<DeclNode> getDeclarationList() {
+        return myDecls;
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -217,10 +233,10 @@ class DeclListNode extends ASTnode implements Iterable {
         }
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
-        scope.add(new IterationConfig(myDecls, false));
+        scope.add(new Traverser.Config(myDecls, false));
 
         return scope.iterator();
     }
@@ -245,10 +261,10 @@ class FormalsListNode extends ASTnode implements Iterable {
         }
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
-        scope.add(new IterationConfig(myFormals, false));
+        scope.add(new Traverser.Config(myFormals, false));
 
         return scope.iterator();
     }
@@ -272,12 +288,12 @@ class FnBodyNode extends ASTnode implements Iterable {
         myStmtList.unparse(p, indent);
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList =
                 new ArrayList<>(List.of(myDeclList, myStmtList));
-        scope.add(new IterationConfig(nodeList, false));
+        scope.add(new Traverser.Config(nodeList, false));
 
         return scope.iterator();
     }
@@ -299,10 +315,10 @@ class StmtListNode extends ASTnode implements Iterable {
         }
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
-        scope.add(new IterationConfig(myStmts, false));
+        scope.add(new Traverser.Config(myStmts, false));
 
         return scope.iterator();
     }
@@ -327,10 +343,10 @@ class ExpListNode extends ASTnode implements Iterable {
         }
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
-        scope.add(new IterationConfig(myExps, false));
+        scope.add(new Traverser.Config(myExps, false));
 
         return scope.iterator();
     }
@@ -345,6 +361,9 @@ class ExpListNode extends ASTnode implements Iterable {
 
 abstract class DeclNode extends ASTnode {
 
+    /**
+     * Generic implementation used by VarDeclNode & FormalDeclNode
+     */
     public void visit(SymTable symbolTable, IdNode myId, TypeNode myType,
             int mySize) throws EmptySymTableException {
         super.visit(symbolTable);
@@ -358,12 +377,15 @@ abstract class DeclNode extends ASTnode {
             case "struct":
                 typeSymbol = symbolTable
                         .lookupGlobal(((StructNode) myType).getId().getName());
-                // must exist and be of struct type
-                if (typeSymbol != null && typeSymbol.getType() == "struct")
-                    symbol = new VarSym(myType.getType(),
-                            ((StructNode) myType).getId().getName(), mySize);
-                else
+                // must exist & must be of struct type
+                if (typeSymbol == null || typeSymbol.getType() != "struct") {
                     ErrMsg.fatal(myId.getPosition(), 6);
+                    break;
+                }
+
+                symbol = new VarSym(myType.getType(),
+                        ((StructNode) myType).getId().getName(), mySize,
+                        (StructSym) typeSymbol);
                 break;
             case "int":
             case "bool":
@@ -467,24 +489,19 @@ class FnDeclNode extends DeclNode implements Visitable, Iterable {
     }
 
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         {
             ArrayList<ASTnode> nodeList =
-                    new ArrayList<>(List.of(myType, myId));
-            scope.add(new IterationConfig(nodeList, false));
-        }
-        {
-            ArrayList<ASTnode> nodeList =
                     new ArrayList<>(List.of(myFormalsList, myBody));
-            scope.add(new IterationConfig(nodeList, true));
+            scope.add(new Traverser.Config(nodeList, true));
         }
 
         return scope.iterator();
     }
 
-    private TypeNode myType;
+    private TypeNode myType; // return type of function
     private IdNode myId;
     private FormalsListNode myFormalsList;
     private FnBodyNode myBody;
@@ -517,12 +534,12 @@ class FormalDeclNode extends DeclNode implements Visitable {
 }
 
 
-// TODO: a recommended approach is to have a separate symbol table associated
-// with each struct definition and to store this symbol table in the symbol for
-// the name of the struct type.
+/**
+ * - a recommended approach is to have a separate symbol table associated with
+ * each struct definition and to store this symbol table in the symbol for the
+ * name of the struct type.
+ */
 class StructDeclNode extends DeclNode implements Visitable, Iterable {
-    private boolean skipIteration = false; // status flag
-
     public StructDeclNode(IdNode id, DeclListNode declList) {
         myId = id;
         myDeclList = declList;
@@ -539,35 +556,51 @@ class StructDeclNode extends DeclNode implements Visitable, Iterable {
 
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
-
-        {
-            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myId));
-            scope.add(new IterationConfig(nodeList, false));
-        }
-        {
-            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myDeclList));
-            scope.add(new IterationConfig(nodeList, true));
-        }
-
-        return scope.iterator();
-    }
-
     public void visit(SymTable symbolTable) throws EmptySymTableException {
+        // Override subtree traversal - do not traverse over child nodes as part
+        // of the main traversal
+        this.traverseSubtree = false;
+
         super.visit(symbolTable);
 
-        // TODO:
-        for (FormalDeclNode f : myFormalsList.getFormalList())
-            paramTypeList.add(f.getType());
-        FnSym symbol = new FnSym(paramTypeList, myType.getType());
+        // validate struct type Id/name
+        TSym localSymbol = symbolTable.lookupLocal(myId.getName());
+        if (localSymbol != null) {
+            ErrMsg.fatal(myId.getPosition(), 1);
+            return;
+        }
 
-        // add declaration to symbol table
+        // create struct fields symbol table
+        SymTable fieldST = new SymTable(1); // table with no scopes
+        // iterate over field child nodes and add the to the fields table
+        Traverser.traverseConfig(this.getChildren(), fieldST);
+        // create the struct symbol
+        StructSym symbol = new StructSym(myId.getName(), fieldST);
+
+        // add declaration to main symbol table
         try {
             symbolTable.addDecl(myId.getName(), symbol);
         } catch (DuplicateSymException e) {
-            ErrMsg.fatal(myId.getPosition(), 1);
+            // suppress - handled by a previous check
         }
+    }
+
+    /**
+     * NOTE: This method is not used in the main iteration of the AST struct
+     * node, only internally by visit method. The way it is avoided is by
+     * setting the "traverseSubtree" flag to false, thus marking that this
+     * node's childrens shouldn't be iterated over as part of the node's
+     * traversal.
+     */
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
+
+        { // fields nodes
+            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myDeclList));
+            scope.add(new Traverser.Config(nodeList, false));
+        }
+
+        return scope.iterator();
     }
 
     private IdNode myId;
@@ -579,7 +612,7 @@ class StructDeclNode extends DeclNode implements Visitable, Iterable {
 // **********************************************************************
 
 
-abstract class TypeNode extends ASTnode implements Visitable {
+abstract class TypeNode extends ASTnode {
     /**
      * String representing the type
      * 
@@ -669,7 +702,7 @@ abstract class StmtNode extends ASTnode {
 }
 
 
-class AssignStmtNode extends StmtNode {
+class AssignStmtNode extends StmtNode implements Iterable {
     public AssignStmtNode(AssignNode assign) {
         myAssign = assign;
     }
@@ -680,21 +713,20 @@ class AssignStmtNode extends StmtNode {
         p.println(";");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myAssign));
-        scope.add(new IterationConfig(nodeList, true));
+        scope.add(new Traverser.Config(nodeList, false));
 
         return scope.iterator();
     }
-
 
     private AssignNode myAssign;
 }
 
 
-class PostIncStmtNode extends StmtNode {
+class PostIncStmtNode extends StmtNode implements Iterable {
     public PostIncStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -705,11 +737,11 @@ class PostIncStmtNode extends StmtNode {
         p.println("++;");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
-        scope.add(new IterationConfig(nodeList, true));
+        scope.add(new Traverser.Config(nodeList, false));
         return scope.iterator();
     }
 
@@ -717,7 +749,7 @@ class PostIncStmtNode extends StmtNode {
 }
 
 
-class PostDecStmtNode extends StmtNode {
+class PostDecStmtNode extends StmtNode implements Iterable {
     public PostDecStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -728,11 +760,11 @@ class PostDecStmtNode extends StmtNode {
         p.println("--;");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
-        scope.add(new IterationConfig(nodeList, true));
+        scope.add(new Traverser.Config(nodeList, false));
 
         return scope.iterator();
     }
@@ -741,7 +773,7 @@ class PostDecStmtNode extends StmtNode {
 }
 
 
-class ReadStmtNode extends StmtNode {
+class ReadStmtNode extends StmtNode implements Iterable {
     public ReadStmtNode(ExpNode e) {
         myExp = e;
     }
@@ -753,11 +785,11 @@ class ReadStmtNode extends StmtNode {
         p.println(";");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
-        scope.add(new IterationConfig(nodeList, true));
+        scope.add(new Traverser.Config(nodeList, false));
 
         return scope.iterator();
     }
@@ -767,7 +799,7 @@ class ReadStmtNode extends StmtNode {
 }
 
 
-class WriteStmtNode extends StmtNode {
+class WriteStmtNode extends StmtNode implements Iterable {
     public WriteStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -779,11 +811,11 @@ class WriteStmtNode extends StmtNode {
         p.println(";");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
-        scope.add(new IterationConfig(nodeList, true));
+        scope.add(new Traverser.Config(nodeList, false));
 
         return scope.iterator();
     }
@@ -792,7 +824,7 @@ class WriteStmtNode extends StmtNode {
 }
 
 
-class IfStmtNode extends StmtNode {
+class IfStmtNode extends StmtNode implements Iterable {
     public IfStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myDeclList = dlist;
         myExp = exp;
@@ -810,12 +842,18 @@ class IfStmtNode extends StmtNode {
         p.println("}");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
-        ArrayList<ASTnode> nodeList =
-                new ArrayList<>(List.of(myExp, myDeclList, myStmtList));
-        scope.add(new IterationConfig(nodeList, true));
+        {
+            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+            scope.add(new Traverser.Config(nodeList, false));
+        }
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myDeclList, myStmtList));
+            scope.add(new Traverser.Config(nodeList, true));
+        }
 
         return scope.iterator();
     }
@@ -826,7 +864,7 @@ class IfStmtNode extends StmtNode {
 }
 
 
-class IfElseStmtNode extends StmtNode {
+class IfElseStmtNode extends StmtNode implements Iterable {
     public IfElseStmtNode(ExpNode exp, DeclListNode dlist1, StmtListNode slist1,
             DeclListNode dlist2, StmtListNode slist2) {
         myExp = exp;
@@ -853,22 +891,22 @@ class IfElseStmtNode extends StmtNode {
         p.println("}");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         {
             ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
-            scope.add(new IterationConfig(nodeList, false));
+            scope.add(new Traverser.Config(nodeList, false));
         }
         {
             ArrayList<ASTnode> nodeList =
                     new ArrayList<>(List.of(myThenDeclList, myThenStmtList));
-            scope.add(new IterationConfig(nodeList, true));
+            scope.add(new Traverser.Config(nodeList, true));
         }
         {
             ArrayList<ASTnode> nodeList =
                     new ArrayList<>(List.of(myElseStmtList, myElseDeclList));
-            scope.add(new IterationConfig(nodeList, true));
+            scope.add(new Traverser.Config(nodeList, true));
         }
         return scope.iterator();
     }
@@ -881,7 +919,7 @@ class IfElseStmtNode extends StmtNode {
 }
 
 
-class WhileStmtNode extends StmtNode {
+class WhileStmtNode extends StmtNode implements Iterable {
     public WhileStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myExp = exp;
         myDeclList = dlist;
@@ -899,12 +937,18 @@ class WhileStmtNode extends StmtNode {
         p.println("}");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
-        ArrayList<ASTnode> nodeList =
-                new ArrayList<>(List.of(myExp, myDeclList, myStmtList));
-        scope.add(new IterationConfig(nodeList, true));
+        {
+            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+            scope.add(new Traverser.Config(nodeList, false));
+        }
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myDeclList, myStmtList));
+            scope.add(new Traverser.Config(nodeList, true));
+        }
 
         return scope.iterator();
     }
@@ -915,7 +959,7 @@ class WhileStmtNode extends StmtNode {
 }
 
 
-class RepeatStmtNode extends StmtNode {
+class RepeatStmtNode extends StmtNode implements Iterable {
     public RepeatStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myExp = exp;
         myDeclList = dlist;
@@ -933,12 +977,18 @@ class RepeatStmtNode extends StmtNode {
         p.println("}");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
-        ArrayList<ASTnode> nodeList =
-                new ArrayList<>(List.of(myExp, myDeclList, myStmtList));
-        scope.add(new IterationConfig(nodeList, true));
+        {
+            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+            scope.add(new Traverser.Config(nodeList, false));
+        }
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myDeclList, myStmtList));
+            scope.add(new Traverser.Config(nodeList, true));
+        }
 
         return scope.iterator();
     }
@@ -949,7 +999,7 @@ class RepeatStmtNode extends StmtNode {
 }
 
 
-class CallStmtNode extends StmtNode {
+class CallStmtNode extends StmtNode implements Iterable {
     public CallStmtNode(CallExpNode call) {
         myCall = call;
     }
@@ -960,11 +1010,11 @@ class CallStmtNode extends StmtNode {
         p.println(";");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myCall));
-        scope.add(new IterationConfig(nodeList, true));
+        scope.add(new Traverser.Config(nodeList, false));
 
         return scope.iterator();
     }
@@ -973,7 +1023,7 @@ class CallStmtNode extends StmtNode {
 }
 
 
-class ReturnStmtNode extends StmtNode {
+class ReturnStmtNode extends StmtNode implements Iterable {
     public ReturnStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -988,11 +1038,11 @@ class ReturnStmtNode extends StmtNode {
         p.println(";");
     }
 
-    public Iterator<IterationConfig> getChildren() {
-        ArrayList<IterationConfig> scope = new ArrayList<>();
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
 
         ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
-        scope.add(new IterationConfig(nodeList, true));
+        scope.add(new Traverser.Config(nodeList, false));
 
         return scope.iterator();
     }
@@ -1073,19 +1123,21 @@ class FalseNode extends ExpNode {
 }
 
 
-class IdNode extends ExpNode {
+class IdNode extends ExpNode implements Visitable {
     public IdNode(int lineNum, int charNum, String strVal) {
         myLineNum = lineNum;
         myCharNum = charNum;
         myStrVal = strVal;
     }
 
-    // TODO: Changing the unparse method so that every use of an ID has its type
-    // (in parentheses) after its name. (The point of this is to help you to see
-    // whether your name analyzer is working correctly; i.e., does it correctly
-    // match each use of a name to the corresponding declaration, and does it
-    // correctly set the link from the IdNode to the information in the symbol
-    // table.)
+    /**
+     * - change the unparse method so that every use of an ID has its type (in
+     * parentheses) after its name. (The point of this is to help you to see
+     * whether your name analyzer is working correctly; i.e., does it correctly
+     * match each use of a name to the corresponding declaration, and does it
+     * correctly set the link from the IdNode to the information in the symbol
+     * table.)
+     */
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
 
@@ -1101,16 +1153,38 @@ class IdNode extends ExpNode {
         return new int[] {myLineNum, myCharNum};
     }
 
+    public TSym getSymbol() {
+        return this.symbol;
+    }
+
+    /**
+     * Link the current reference with the declaration symbol
+     * 
+     * @param s declaration symbol found matching the name reference
+     */
+    public void setSymbol(TSym s) {
+        this.symbol = s;
+    }
+
+    public void visit(SymTable symbolTable) throws EmptySymTableException {
+        TSym s = symbolTable.lookupGlobal(this.getName());
+        if (s == null)
+            ErrMsg.fatal(this.getPosition(), 2);
+        else
+            setSymbol(s);
+
+    }
+
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
-    // link to table symbol this name node is declared at. (to link the node
-    // with the corresponding symbol-table entry)
+    // link to type symcorresponding to this name node declaration. (to link
+    // the node with the corresponding symbol-table entry)
     private TSym symbol = null;
 }
 
 
-class DotAccessExpNode extends ExpNode {
+class DotAccessExpNode extends ExpNode implements Visitable {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
         myLoc = loc;
         myId = id;
@@ -1123,12 +1197,58 @@ class DotAccessExpNode extends ExpNode {
         myId.unparse(p, 0);
     }
 
+    public IdNode getId() {
+        return myId;
+    }
+
+    /**
+     * Get LHS symbol
+     */
+    private TSym getLHS_symbol(ExpNode lhs) {
+        IdNode id;
+        if (lhs instanceof DotAccessExpNode)
+            id = ((DotAccessExpNode) lhs).getId();
+        else
+            id = ((IdNode) lhs);
+
+        return id.getSymbol();
+    }
+
+    public void visit(SymTable symbolTable) throws EmptySymTableException {
+        ExpNode lhs = myLoc;
+        IdNode rhs = (IdNode) myId;
+
+        // visit first the left expression/Id nodes to fill in the LHS symbols
+        lhs.visit(symbolTable);
+
+        TSym symbol = getLHS_symbol(lhs);
+
+        // if LHS not a StructSym object
+        if (symbol == null) // undeclared
+            return; // do not proceed with fields validation
+        if (symbol.getType() != "struct") {
+            ErrMsg.fatal(((IdNode) lhs).getPosition(), 3);
+            return;
+        }
+
+        // get corresponding struct declaration symbol to validate fields
+        StructSym structSymbol = ((VarSym) symbol).getStructDeclSym();
+        SymTable structField = structSymbol.getField(); // get field table
+        // check RHS in LHS symbol table
+        TSym s = structField.lookupLocal(rhs.getName());
+
+        if (s == null)
+            ErrMsg.fatal(((IdNode) lhs).getPosition(), 4);
+        else
+            rhs.setSymbol(s);
+    }
+
     private ExpNode myLoc;
     private IdNode myId;
 }
 
 
-class AssignNode extends ExpNode {
+class AssignNode extends ExpNode implements Iterable {
     public AssignNode(ExpNode lhs, ExpNode exp) {
         myLhs = lhs;
         myExp = exp;
@@ -1144,12 +1264,24 @@ class AssignNode extends ExpNode {
             p.print(")");
     }
 
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
+
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myLhs, myExp));
+            scope.add(new Traverser.Config(nodeList, false));
+        }
+
+        return scope.iterator();
+    }
+
     private ExpNode myLhs;
     private ExpNode myExp;
 }
 
 
-class CallExpNode extends ExpNode {
+class CallExpNode extends ExpNode implements Iterable {
     public CallExpNode(IdNode name, ExpListNode elist) {
         myId = name;
         myExpList = elist;
@@ -1169,24 +1301,54 @@ class CallExpNode extends ExpNode {
         p.print(")");
     }
 
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
+
+        {
+            ArrayList<ASTnode> nodeList =
+                    new ArrayList<>(List.of(myId, myExpList));
+            scope.add(new Traverser.Config(nodeList, false));
+        }
+
+        return scope.iterator();
+    }
+
     private IdNode myId;
     private ExpListNode myExpList; // possibly null
 }
 
 
-abstract class UnaryExpNode extends ExpNode {
+abstract class UnaryExpNode extends ExpNode implements Iterable {
     public UnaryExpNode(ExpNode exp) {
         myExp = exp;
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+        scope.add(new Traverser.Config(nodeList, false));
+
+        return scope.iterator();
     }
 
     protected ExpNode myExp;
 }
 
 
-abstract class BinaryExpNode extends ExpNode {
+abstract class BinaryExpNode extends ExpNode implements Iterable {
     public BinaryExpNode(ExpNode exp1, ExpNode exp2) {
         myExp1 = exp1;
         myExp2 = exp2;
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> scope = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp1, myExp2));
+        scope.add(new Traverser.Config(nodeList, false));
+
+        return scope.iterator();
     }
 
     protected ExpNode myExp1;
