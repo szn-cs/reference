@@ -9,7 +9,7 @@
 			"name": "Launch P4",
 			"request": "launch",
 			"mainClass": "P4",
-			"args": ["test.cminusminus", "test.out"],
+			"args": ["nameErrors.cminusminus", "test.out"],
 			"projectName": "[cs536, P4] AST name analysis_a51a8050",
 			"cwd": "${workspaceFolder}/src",
 			"classPaths": ["./deps:."],

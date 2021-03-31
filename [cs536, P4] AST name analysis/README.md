@@ -1,7 +1,5 @@
 _Safi Nassar - assignment p4_
 
-# NOTE: This assignment is not complete, unfortunately I was late in this one.
-
 # Usage:
 
 -   `make clean && make testclean && make`
@@ -68,7 +66,7 @@ Executing the test will generate output file of the formated program.
 - [x] Modify the IdNode class in ast.java (by including a new TSym field and by modifying its unparse method). Free to make any changes to ast.java
 - [x] Modify P4.java (an extension of P3.java).
 - [x] Modify the ErrMsg class.
-- [ ] Write two test inputs: nameErrors.cminusminus and test.cminusminus to test your new code.
+- [x] Write two test inputs: nameErrors.cminusminus and test.cminusminus to test your new code.
 - [x] name analyzer will use symbol table's globalLookup method to set IdNode's symbol table link.
 - [x] name analyzer implemented by writing appropriate methods for the different subclasses of ASTnode. Exactly what methods you write is up to you (as long as they do name analysis as specified).
   - [x] Some nodes's methods need to add a new hashtable (scope enter) or remove hashtable (scope exit) from symbol table.
@@ -81,14 +79,14 @@ Executing the test will generate output file of the formated program.
 
 
 ## Submission:
-  - [ ] Create pdf from markdown: `pandoc README.md -o <lastname.firstname.Pn.pdf>`
+  - [x] Create pdf from markdown: `pandoc README.md -o <lastname.firstname.Pn.pdf>`
       - [ ] [generate markdown from javadoc](https://delight-im.github.io/Javadoc-to-Markdown) and remove redundant comments
         or
       - [ ] generate javadoc to extract method headers: `find . -type f -name "*.java" | xargs javadoc -d ../javadoc`
   - [ ] Add headers for each file
-  - [ ] Verify code format
+  - [x] Verify code format
   - [ ] Verify code execution on CSL machines
-- [ ] lastname.firstname.lastname.firstname.P4.zip
+- [x] lastname.firstname.lastname.firstname.P4.zip
 +---+ deps/
 +---+ ast.java
 +---+ cminusminus.cup

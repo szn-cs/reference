@@ -18,7 +18,7 @@ void f() {
 	struct S1 s1; 
 
     x = s2.s1.s1.s1;
-    f(x, y, z, s1, s3, s1.x, s1.x.y, s2.z, s2.y, s2.s, s1.p);
+    f(x, y, z, s1, s3, s1.x, s1.x.y, s2.z, s2.y, s2.s, s2.s.z, s1.p);
     t = z; 
     t.p = z.c;
 

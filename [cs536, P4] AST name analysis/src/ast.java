@@ -1251,7 +1251,7 @@ class DotAccessExpNode extends ExpNode implements Visitable {
         TSym s = structField.lookupLocal(rhs.getName());
 
         if (s == null)
-            ErrMsg.fatal(((IdNode) lhs).getPosition(), 4);
+            ErrMsg.fatal(getLHS_IdNode(lhs).getPosition(), 4);
         else
             rhs.setSymbol(s);
     }
