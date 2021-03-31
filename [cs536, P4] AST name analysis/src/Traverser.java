@@ -27,7 +27,8 @@ public class Traverser {
     public static void traverse(List<? extends ASTnode> nodeList,
             SymTable state) throws EmptySymTableException {
         for (ASTnode n : nodeList)
-            traverse(n, state);
+            if (n != null)
+                traverse(n, state);
     }
 
     /**
@@ -69,7 +70,7 @@ public class Traverser {
             if (config.newScope)
                 state.addScope(); // create new scope for children nodes
 
-            if (!config.list.isEmpty())
+            if (config.list != null && !config.list.isEmpty())
                 traverse(config.list, state);
 
             if (config.newScope)

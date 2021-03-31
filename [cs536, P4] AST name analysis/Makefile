@@ -10,3 +10,10 @@ test:
 
 clean: 
 	cd ./src; make clean; make cleantest
+
+.PHONY:
+# watch files and execute make with `make watch LABEL=<label to execute>`
+# required:
+# -	"cli-watch" npm package
+watch:
+	watch -f ./**/test.cminusminus ./**/nameErrors.cminusminus -r "(cd src; java -cp ./deps:. P4 test.cminusminus test.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"

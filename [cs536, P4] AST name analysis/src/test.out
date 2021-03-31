@@ -1,18 +1,9 @@
-struct Point{
-    int x;
-    int y;
+struct s{
+    int c;
 };
 
-int f(int x, bool b) {
-}
-
-void g() {
-    int a;
-    bool b;
-    struct Point p;
-    p(Point).x(int) = a(int);
-    b(bool) = (a(int) == 3);
-    f(int,bool->int)((a(int) + (p(Point).y(int) * 2)), b(bool));
-    g(->void)();
+void main() {
+    struct s p;
+    p(s).c(int) = 1;
 }
 

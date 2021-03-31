@@ -1044,8 +1044,10 @@ class ReturnStmtNode extends StmtNode implements Iterable {
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> scope = new ArrayList<>();
 
-        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
-        scope.add(new Traverser.Config(nodeList, false));
+        if (myExp != null) {
+            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myExp));
+            scope.add(new Traverser.Config(nodeList, false));
+        }
 
         return scope.iterator();
     }
@@ -1232,7 +1234,7 @@ class DotAccessExpNode extends ExpNode implements Visitable {
         // if LHS not a StructSym object
         if (symbol == null) // undeclared
             return; // do not proceed with fields validation
-        if (symbol.getType() != "struct") {
+        if (!(symbol instanceof VarSym) || symbol.getType() != "struct") {
             ErrMsg.fatal(((IdNode) lhs).getPosition(), 3);
             return;
         }
