@@ -572,6 +572,9 @@ class StructDeclNode extends DeclNode implements Visitable, Iterable {
 
         // create struct fields symbol table
         SymTable fieldST = new SymTable(1); // table with no scopes
+        // link global to the struct local symbol table for providing access to
+        // the main symbol tables chain
+        fieldST.linkScope(symbolTable);
         // iterate over field child nodes and add the to the fields table
         Traverser.traverseConfig(this.getChildren(), fieldST);
         // create the struct symbol

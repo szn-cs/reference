@@ -47,6 +47,16 @@ public class SymTable {
         list.add(0, new HashMap<String, TSym>());
     }
 
+    /**
+     * Add an external hashmap to the scope chain (to end of list)
+     * 
+     * Used for providing access to global variables from a nested struct
+     * SymTable
+     */
+    public void linkScope(SymTable additionalSymTable) {
+        this.list.add(this.list.size(), additionalSymTable.list.get(0));
+    }
+
     public TSym lookupLocal(String name) throws EmptySymTableException {
         if (list.isEmpty()) {
             throw new EmptySymTableException();
