@@ -1,3 +1,47 @@
-
 // nameErrors.cminusminus should contain code with errors detected by the name analyzer. This means that it should include bad and multiply declared names for all of the different kinds of names, and in all of the different places that declarations can appear. It should also include uses of undeclared names in all kinds of statements and expressions as well as bad struct accesses.
 // nameErrors.out should output the expected errors.
+
+int x; bool y;
+bool x; int y;
+struct x { int x; };
+void z; void x;
+
+struct S1 {int x; bool y;}; struct S2 {int x; bool y; struct S1 s;};
+struct S1 {int x; bool y; struct S1 s; int x; void y; struct S1 s; struct S3 s3;};
+struct S1 s1; struct S2 s2;
+struct S1 s1; struct S2 s1; struct S3 s3; struct X s4;
+
+void f() {
+	int x; void x; 
+	struct S1 s1; 
+	struct S2 s2;
+	struct S1 s1; 
+
+    x = s2.s1.s1.s1;
+    f(x, y, z, s1, s3, s1.x, s1.x.y, s2.z, s2.y, s2.s, s1.p);
+    t = z; 
+    t.p = z.c;
+
+    return i;
+}
+int f() { int x; bool y; }
+
+int f2(int x, bool y) { 
+    int x; bool y;
+	a.x = p;
+	y = a; 
+	c.b = k.t;
+}
+int f3() { f3 = f3(f3()); }
+int f4(void x, void y) { return; }
+
+void f5(int x) {
+    if(e){ int x; bool y; struct S1 s;
+        if(e){ int x2; bool y2;struct S1 s;
+            while(e){ int x; bool y; struct S1 s;
+                repeat(e){ int x; bool y;int x; bool y;struct S1 s; }
+            }
+        }
+    } else { int x; bool y;struct S1 s; int x; bool y; void p; }
+    if(x!=z) {}
+}

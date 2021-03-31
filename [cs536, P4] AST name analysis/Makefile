@@ -16,4 +16,4 @@ clean:
 # required:
 # -	"cli-watch" npm package
 watch:
-	watch -f ./**/test.cminusminus ./**/nameErrors.cminusminus -r "(cd src; java -cp ./deps:. P4 test.cminusminus test.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
+	watch -f ./**/nameErrors.cminusminus -r "(cd src; java -cp ./deps:. P4 nameErrors.cminusminus test.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"

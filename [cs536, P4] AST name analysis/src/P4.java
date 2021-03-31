@@ -52,7 +52,8 @@ public class P4 {
             System.out.println("program parsed correctly.");
         } catch (Exception ex) {
             System.err.println("Exception occured during parse: " + ex);
-            System.exit(-1); // exit on syntax error
+            return;
+            // System.exit(-1); // exit on syntax error
         }
 
         rootNode = (ASTnode) root.value;
@@ -62,7 +63,8 @@ public class P4 {
             Traverser.traverse(rootNode); // traverse & visit each node
         } catch (Exception ex) {
             System.err.println("Exception occured during name analyze: " + ex);
-            System.exit(-1); // exit on name analysis error
+            return;
+            // System.exit(-1); // exit on name analysis error
         }
 
         // After that, if there are no errors so far (either scanning, parsing,
@@ -70,7 +72,8 @@ public class P4 {
         if (ErrMsg.errorOccured) {
             System.err.println(
                     "ErrMsg: Errors detected during name analysis; Skipping unparse execution.");
-            System.exit(-1); // exit on semantic analysis
+            return;
+            // System.exit(-1); // exit on semantic analysis
         } else {
             System.out.println("program name-analyzed correctly.");
         }
