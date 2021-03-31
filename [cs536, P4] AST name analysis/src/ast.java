@@ -1210,15 +1210,20 @@ class DotAccessExpNode extends ExpNode implements Visitable {
     }
 
     /**
+     * Get LHS IdNode
+     */
+    private IdNode getLHS_IdNode(ExpNode lhs) {
+        if (lhs instanceof DotAccessExpNode)
+            return ((DotAccessExpNode) lhs).getId();
+        else
+            return ((IdNode) lhs);
+    }
+
+    /**
      * Get LHS symbol
      */
     private TSym getLHS_symbol(ExpNode lhs) {
-        IdNode id;
-        if (lhs instanceof DotAccessExpNode)
-            id = ((DotAccessExpNode) lhs).getId();
-        else
-            id = ((IdNode) lhs);
-
+        IdNode id = getLHS_IdNode(lhs);
         return id.getSymbol();
     }
 
@@ -1235,7 +1240,7 @@ class DotAccessExpNode extends ExpNode implements Visitable {
         if (symbol == null) // undeclared
             return; // do not proceed with fields validation
         if (!(symbol instanceof VarSym) || symbol.getType() != "struct") {
-            ErrMsg.fatal(((IdNode) lhs).getPosition(), 3);
+            ErrMsg.fatal(getLHS_IdNode(lhs).getPosition(), 3);
             return;
         }
 
