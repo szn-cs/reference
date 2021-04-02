@@ -37,7 +37,7 @@ interval.
 
 - xv6 help command: `ctrl+a h`
 - user program defined through makefile UPROGS entry
-- System calls defined in 5 files: syscall.h, syscall.c, sysproc.c, usys.S, user.h
+- System calls defined following files: syscall.h, syscall.c, sysproc.c, proc.c, usys.S, user.h
 - run programs in xv6 concurrently in background: `<user program> &; <user program> &;`
 
 # Todo list:

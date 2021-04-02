@@ -29,3 +29,7 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
+// 📝
+SYSCALL(mencrypt)
+SYSCALL(getpgtable)
+SYSCALL(dump_rawphymem)
