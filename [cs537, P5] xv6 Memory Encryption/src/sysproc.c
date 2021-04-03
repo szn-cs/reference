@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "ptentry.h"
 
 int sys_fork(void) { return fork(); }
 
@@ -64,12 +65,12 @@ int sys_uptime(void) {
     return xticks;
 }
 
-// 📝 TODO:
+// 📝
 int sys_mencrypt(void) {
     char *virtual_addr;
     int len;
 
-    argint(0, &char);
+    argptr(0, (void *)&virtual_addr, sizeof(char *));
     argint(1, &len);
 
     return mencrypt(virtual_addr, len);
@@ -79,7 +80,7 @@ int sys_getpgtable(void) {
     struct pt_entry *entries;
     int num;
 
-    argint(0, &entries);
+    argptr(0, (void *)&entries, sizeof(struct pt_entry *));
     argint(1, &num);
 
     return getpgtable(entries, num);
@@ -89,8 +90,11 @@ int sys_dump_rawphymem(void) {
     uint physical_addr;
     char *buffer;
 
+    // Note that argptr() will do a boundary check, which would cause an error
+    // for the pointer physical_addr. Therefore, when you grab the value of
+    // physical_addr from the stack, use argint() instead of argptr().
     argint(0, &physical_addr);
-    argint(1, &buffer);
+    argptr(1, (void *)&buffer, sizeof(char *));
 
     return dump_rawphymem(physical_addr, buffer);
 }

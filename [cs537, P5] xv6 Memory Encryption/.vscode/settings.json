@@ -28,6 +28,7 @@
         "pstat.h": "c",
         "mmu.h": "c",
         "memlayout.h": "c",
-        "param.h": "c"
+        "param.h": "c",
+        "proc.h": "c"
     }
 }

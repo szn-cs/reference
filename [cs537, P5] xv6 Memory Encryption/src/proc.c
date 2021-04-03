@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "ptentry.h"
 
 struct {
     struct spinlock lock;
@@ -469,6 +470,51 @@ void procdump(void) {
 /* 📝 */
 
 /**
+ * @brief Encrypt ranges of virtual pages
+ *
+ * Example: 4KB page size
+ * - mencrypt(0x3000, 2) = mencrypt(0x3050, 2) ⇒ encrypts [0x3000, 0x5000]
+ *
+ * @param virtual_addr virtual address indicating the starting virtual page
+ * (page associated with the address)
+ * @param len # of pages to encrypt
+ * @return int 0 on success, otherwise -1 on failure.
+ */
+int mencrypt(char *virtual_addr, int len) {
+    if (len == 0)
+        return 0;  // do nothing (short-circuit before any error checking)
+
+    // negative value or a very large value that will let the page range
+    // exceed the upper bound of the user virtual space
+    if (len < 0 /*|| out of range */) goto fail;
+
+    // assumption virtual_addr is not necessarily page-aligned
+
+    // case part or all pages already encypted: Encrypted pages and their
+    // corresponding page table entries should remain unchanged. All the
+    // unencrypted pages should be encrypted
+
+    // case virtual address is an invalid address (e.g., out-of-range value)
+    goto fail;
+
+    // case calling process does not have permission or privilege to access
+    // or modify some pages in the range (either all the pages in the range
+    // are successfully encrypted or none of them is encrypted)
+    goto fail;
+
+fail:
+
+    return -1;
+
+success:
+    /* encrypt virtual addresses ranging from
+        [PGROUNDDOWN(virtual_addr), PGROUNDDOWN(virtual_addr) + len *
+       PGSIZE)
+    */
+    return 0;
+}
+
+/**
      * @brief retreive statistics about the state of the page table
      *
      * pt_entry uses bitfields to conserve space, fields that have a ': 1' next
@@ -513,77 +559,34 @@ int getpgtable(struct pt_entry *entries, int num) {
 }
 
 /**
- * @brief
+ * @brief dump the raw content of one physical page where physical_addr resides
+ (This is very dangerous! We're implementing this syscall only for testing
+ purposes.)
  *
- * @param physical_addr physical_addr is now a uint instead of a char*. You
- must use argint to parse it, and you cannot dereference it until you
- translate it to a kernel virtual memory address. How do you do that?
- * @param buffer
- * @return int
+ * @param physical_addr  (you cannot dereference it until you
+ translate it to a kernel virtual memory address. How do you do that?)
+ *     -    may not be the first address of a page (i.e., may not be page
+ aligned)
+ * @param buffer will be allocated by the user and have the size of PGSIZE
+ * @return int 0 on success, otherwise -1 on any error.
  */
 int dump_rawphymem(uint physical_addr, char *buffer) {
+    // NOTE: not required to do any error handling for buffer parameter
+
     /*
-    allows the user to dump the raw content of one physical page where
-    physical_addr resides (This is very dangerous! We're implementing this
-    syscall only for testing purposes.). The kernel should fill up the
-    buffer with the current content of the page where physical_addr resides
-    -- it should not affect any of the page table entries that might point
-    to this physical page (i.e., it shouldn't modify PTE_P or PTE_E) and it
-    shouldn't do any decryption or encryption.  Note that physical_addr may
-    not be the first address of a page (i.e., may not be page aligned).
-    buffer will be allocated by the user and have the size of PGSIZE. You
-    are not required to do any error handling here. Note that argptr() will
-    do a boundary check, which would cause an error for the pointer
-    physical_addr. Therefore, when you grab the value of physical_addr from
-    the stack, use argint() instead of argptr().
-
-    dump_rawphymem should return 0 on success and -1 on any error.
-    If you do this function right, it will only be a couple of lines of code
-    (see copyout).
+    The kernel should fill up the buffer with the current content of the page
+    where physical_addr resides
+    - it should not affect any of the page table entries that might point
+    to this physical page (i.e., it shouldn't modify PTE_P or PTE_E)
+    - it shouldn't do any decryption or encryption.
     */
-}
 
-/**
- * @brief Encrypt ranges of virtual pages
- *
- * Example: 4KB page size
- * - mencrypt(0x3000, 2) = mencrypt(0x3050, 2) ⇒ encrypts [0x3000, 0x5000]
- *
- * @param virtual_addr virtual address indicating the starting virtual page
- * (page associated with the address)
- * @param len # of pages to encrypt
- * @return int 0 on success, otherwise -1 on failure.
- */
-int mencrypt(char *virtual_addr, int len) {
-    if (len == 0)
-        return 0;  // do nothing (short-circuit before any error checking)
-
-    // negative value or a very large value that will let the page range
-    // exceed the upper bound of the user virtual space
-    if (len < 0 /*|| out of range */) goto fail;
-
-    // assumption virtual_addr is not necessarily page-aligned
-
-    // case part or all pages already encypted: Encrypted pages and their
-    // corresponding page table entries should remain unchanged. All the
-    // unencrypted pages should be encrypted
-
-    // case virtual address is an invalid address (e.g., out-of-range value)
-    goto fail;
-
-    // case calling process does not have permission or privilege to access
-    // or modify some pages in the range (either all the pages in the range
-    // are successfully encrypted or none of them is encrypted)
-    goto fail;
+    // TODO: If you do this function right, it will only be a couple of lines of code
+    // (see copyout).
 
 fail:
-
     return -1;
 
 success:
-    /* encrypt virtual addresses ranging from
-        [PGROUNDDOWN(virtual_addr), PGROUNDDOWN(virtual_addr) + len *
-       PGSIZE)
-    */
     return 0;
 }
