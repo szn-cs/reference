@@ -5,6 +5,7 @@
 - When a child process is created, its initial memory state (including whether a page is encrypted or not), should match that of its parent.
 
 # xv6 specifics: 
+- xv6 uses a two level page table
 - should understand virtual memory layout: index & manipulate page table, grab certain entry from page table, change certain bit in page entry, access physical memory from kernel.
 - xv6 places the kernel in the virtual address space of each process from KERNBASE to KERNBASE + PHYSTOP; which are mapped in physical memory from 0 to PHYSTOP; e.g. virtual address KERNBASE + pa is mapped to physical address pa
 - xv6 is running on emulated x86 hardware: on user VA access, the hardware walks the page tables to find the PTE and grab the corresponding physical address translation. The OS is only involved when there is a page fault (PTE_P bit isn't set).
@@ -13,7 +14,7 @@
 - Files related: 
   - memlayout.h: helps in translation between virtual to physical address.
   - mmu.h: 
-    - PGROUNDUP, PGROUNDDOWN used to calculate a particular virtual address's page.
+    - [x] PGROUNDUP, PGROUNDDOWN used to calculate a particular virtual address's page (first address in the page).
     - format for 32-bit virtual addresses is defined: [10 bits page directory index, 10 bits inner page table index, 12 bits offset within a page]
     - format of PTE: 
       - PTE_ADDR macro -> upper 20 bits address (physical page) stored in PTE; 

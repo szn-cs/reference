@@ -1,3 +1,5 @@
+#include "ptentry.h"
+
 struct stat;
 struct rtcdate;
 
