@@ -548,7 +548,6 @@ pte_t *getPTE(struct MultipageIndex page_i) {
 
     // check other flags for directory page table enteries like permission
     pde = &pgdir[page_i.pd];
-    // TODO: verify if check doesn't conflict with implementations
     if (!IS_BIT(pde, PTE_P) || !IS_BIT(pde, PTE_W) || !IS_BIT(pde, PTE_U))
         goto fail;
 
@@ -578,17 +577,16 @@ struct MultipageIndex pteIterator(struct MultipageIndex page_i,
     page_i.pt = (page_i.pt + nextPageIndex) % NPTENTRIES;
     return page_i;
 
-reverse : {               // iterate to lower index page
+reverse : {               // iterate to a lower index page
     nextPageIndex *= -1;  // remove negative sign
     // offset from table start
     int offsetEntry = page_i.pt - (nextPageIndex % NPTENTRIES);
 
     page_i.pt = (NPTENTRIES + offsetEntry) % NPTENTRIES;
     // calculate offset of the page directory index and decrease accordingly
-    page_i.pd -= nextPageIndex / NPTENTRIES;  //  page steps
-    if (offsetEntry != 0)
-        page_i.pd -=
-            (NPTENTRIES + -offsetEntry) / NPTENTRIES;  // negative offset
+    page_i.pd -= nextPageIndex / NPTENTRIES;  // # of overlaps to previous pages
+    // negative offset the extends to the previous page
+    if (offsetEntry != 0) page_i.pd -= (NPTENTRIES + -offsetEntry) / NPTENTRIES;
 
     return page_i;
 }
