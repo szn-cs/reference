@@ -196,6 +196,6 @@ struct gatedesc {
 struct MultipageIndex {
     int pd;  // page directory index
     int pt;  // page table index
-}
+};
 
 #endif
