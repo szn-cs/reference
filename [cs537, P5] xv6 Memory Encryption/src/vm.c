@@ -384,11 +384,9 @@ int mencrypt(char *va, int len) {
             goto fail;
     }
 
-success:
     // case part or all pages already encypted: Encrypted pages and their
     // corresponding page table entries should remain unchanged. All the
     // unencrypted pages should be encrypted
-
     for (int i = 0; i < len; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, i);
         pte_t *e = getPTE(currentPage_i);  // current pte
@@ -399,8 +397,8 @@ success:
         *e = SET_BIT(e, PTE_E);
         *e = CLEAR_BIT(e, PTE_P);
     }
-
     flushTLB();
+
     return 0;
 
 fail:
@@ -444,13 +442,13 @@ int getpgtable(struct pt_entry *entries, int num) {
     // num, filling up the array starts from the allocated virtual page with
     // the highest page numbers and returns num in this case.
     int i;  // number of elements filled
-    for (i = 0; i < num || pte == 0; ++i) {
+    for (i = 0; i < num; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
         pte = getPTE(currentPage_i);  // get current page table entry
         if (pte == 0) break;          // invalid page encountered
         entries[i].pdx = currentPage_i.pd;
         entries[i].ptx = currentPage_i.pt;
-        entries[i].ppage = PTE_ADDR(*pte);
+        entries[i].ppage = PTE_ADDR(*pte) >> PTXSHIFT;  // as per spec
         entries[i].present = IS_BIT(pte, PTE_P);
         entries[i].writable = IS_BIT(pte, PTE_W);
         entries[i].encrypted = IS_BIT(pte, PTE_E);
