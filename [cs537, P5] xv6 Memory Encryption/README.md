@@ -5,16 +5,15 @@
 - When a child process is created, its initial memory state (including whether a page is encrypted or not), should match that of its parent.
 
 # xv6 specifics: 
-- xv6 uses a two level page table
-- should understand virtual memory layout: index & manipulate page table, grab certain entry from page table, change certain bit in page entry, access physical memory from kernel.
+- xv6 uses a two level page table. Should understand virtual memory layout: index & manipulate page table, grab certain entry from page table, change certain bit in page entry, access physical memory from kernel.
 - xv6 places the kernel in the virtual address space of each process from KERNBASE to KERNBASE + PHYSTOP; which are mapped in physical memory from 0 to PHYSTOP; e.g. virtual address KERNBASE + pa is mapped to physical address pa
 - xv6 is running on emulated x86 hardware: on user VA access, the hardware walks the page tables to find the PTE and grab the corresponding physical address translation. The OS is only involved when there is a page fault (PTE_P bit isn't set).
-  - To allow OS to handle the page access, clear the PTE_P bit when the PTE_E bit is set.
-  - change original code `if (*pte & PTE_P) // Check whether this pde is valid or in-used.` to match the additional meaning of an unset PTE_P, that now could possibly be valid but encrypted. To do this check uva2ka(), copyuvm(), deallocuvm(), freevm() and mappages() in vm.c (e.g. copyuvm() is called when fork() creates a child process. That child process should inherit the encrypted pages, so you'll want to setup the child's page table appropriately.)
+  - [x] To allow OS to handle the page access, clear the PTE_P bit when the PTE_E bit is set.
+  - [x] change original code `if (*pte & PTE_P) // Check whether this pde is valid or in-used.` to match the additional meaning of an unset PTE_P, that now could possibly be valid but encrypted. To do this check uva2ka(), copyuvm(), deallocuvm(), freevm() and mappages() in vm.c (e.g. copyuvm() is called when fork() creates a child process. That child process should inherit the encrypted pages, so you'll want to setup the child's page table appropriately.)
 - Files related: 
   - memlayout.h: helps in translation between virtual to physical address.
   - mmu.h: 
-    - [x] PGROUNDUP, PGROUNDDOWN used to calculate a particular virtual address's page (first address in the page).
+    - PGROUNDUP, PGROUNDDOWN used to calculate a particular virtual address's page (first address in the page).
     - format for 32-bit virtual addresses is defined: [10 bits page directory index, 10 bits inner page table index, 12 bits offset within a page]
     - format of PTE: 
       - PTE_ADDR macro -> upper 20 bits address (physical page) stored in PTE; 
@@ -44,7 +43,6 @@
 
 
 ## submission: 
-- [ ] ~cs537-1/handin/<login>/p5/ontime/src/<xv6 files>
+- [x] ~cs537-1/handin/<login>/p5/ontime/src/<xv6 files>
 - [ ] partners.txt: `cslogin1 wisclogin1 Lastname1 Firstname1`
-- [ ] if slip day: put code in corresponding slip directory.
-- [ ] 
+- [ ] if slip day: put code in corresponding slip directory. 

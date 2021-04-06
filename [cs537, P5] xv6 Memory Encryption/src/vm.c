@@ -634,7 +634,7 @@ pte_t *validateFaultPage(char *faultVA) {
  */
 void decryptPage(pte_t *pte) {
     char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
-    toggleEncryptPageSize(pagePhysicalAddr);
+    toggleEncryptPageSize(pagePhysicalAddr);  // encrypt all addresses in page
 
     // update flags
     *pte = CLEAR_BIT(pte, PTE_E);
@@ -642,9 +642,14 @@ void decryptPage(pte_t *pte) {
     flushTLB();
 }
 
-// get absolute mathematical value
-// source:
-// https://stackoverflow.com/questions/9772348/get-absolute-value-without-using-abs-function-nor-if-statement
+/**
+ * @brief  get absolute mathematical value
+ * source:
+ * https://stackoverflow.com/questions/9772348/get-absolute-value-without-using-abs-function-nor-if-statement
+ *
+ * @param n integer number
+ * @return int absolute value of the integer number
+ */
 int absolute(int n) {
     const int ret[2] = {n, -n};
     return ret[n < 0];
