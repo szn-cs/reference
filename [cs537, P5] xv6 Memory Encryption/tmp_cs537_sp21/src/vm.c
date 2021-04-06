@@ -585,9 +585,7 @@ void toggleEncryptPageSize(char *pagePhysicalAddress) {
     // obtain kernel virtual address to modify the bytes contents
     char *pageKA = (char *)P2V_WO(pagePhysicalAddress);
     // encrypt/decrypt contents of all page bytes
-    for (int i = 0; i < PGSIZE; ++i, ++pageKA) {
-        *pageKA = FLIP_BITS(*pageKA);
-    }
+    for (int i = 0; i < PGSIZE; ++i) *pageKA = FLIP_BITS(*pageKA);
 }
 
 /**
