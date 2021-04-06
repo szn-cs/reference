@@ -2,6 +2,8 @@
 #include "user.h"
 #include "ptentry.h"
 
+#define PGSIZE 4096
+
 /**
  * @brief user program to test the encryption implementation of page addresses
  *
@@ -20,9 +22,15 @@ int main(int argc, char **argv) {
     // // parse arguments
     // x = atoi(argv[1]);
     // y = atoi(argv[3]);
+    char *ptr = sbrk(4000 * PGSIZE);
 
-    char *virtualAddress = (char *)0x2;  // 0x0, 0x1, 0x2
-    mencrypt(virtualAddress, 2);
+    mencrypt(ptr, 1);
+
+    *ptr = 5;
+
+    printf(1, "pte value: %d\n", *ptr);
+
+    *ptr += 3;
 
     exit();
 }

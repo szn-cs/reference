@@ -123,9 +123,9 @@ int wait(void);
 void wakeup(void*);
 void yield(void);
 // 📝
-int mencrypt(char *, int);
-int getpgtable(struct pt_entry *, int);
-int dump_rawphymem(uint, char *);
+int mencrypt(char*, int);
+int getpgtable(struct pt_entry*, int);
+int dump_rawphymem(uint, char*);
 
 // swtch.S
 void swtch(struct context**, struct context*);
@@ -194,3 +194,14 @@ void clearpteu(pde_t* pgdir, char* uva);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
+
+//📝 custom
+struct MultipageIndex getPageIndex(char* va);
+void flushTLB();
+int outOfRange(void* va);
+pte_t* getPTE(struct MultipageIndex page_i);
+struct MultipageIndex pteIterator(struct MultipageIndex page_i,
+                                  int nextPageIndex);
+void toggleEncryptPageSize(char* pagePhysicalAddress);
+pte_t* validateFaultPage(char* faultVA);
+void decryptPage(pte_t* pte);

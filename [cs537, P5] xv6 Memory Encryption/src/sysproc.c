@@ -93,7 +93,7 @@ int sys_dump_rawphymem(void) {
     // Note that argptr() will do a boundary check, which would cause an error
     // for the pointer physical_addr. Therefore, when you grab the value of
     // physical_addr from the stack, use argint() instead of argptr().
-    argint(0, &physical_addr);
+    argint(0, (int *)&physical_addr);
     argptr(1, (void *)&buffer, sizeof(char *));
 
     return dump_rawphymem(physical_addr, buffer);

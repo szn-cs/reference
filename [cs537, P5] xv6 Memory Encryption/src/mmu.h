@@ -95,29 +95,17 @@ struct segdesc {
 // the page
 #define PGROUNDDOWN(a) (((a)) & ~(PGSIZE - 1))
 
-//📝 get the next pages using pointer arithmetic with page size as offset
-#define NEXTPAGE(address, index) ((void *)address + PGSIZE * index)
-
 // Page table/directory entry flags.
 #define PTE_P 0x001   // Present
 #define PTE_W 0x002   // Writeable
 #define PTE_U 0x004   // User
 #define PTE_PS 0x080  // Page Size
-// 📝 9-11 are not in use
-#define PTE_E 0x200  // Encryption flag;  10th position flag
 
 // Address in page table or page directory entry
 #define PTE_ADDR(pte) ((uint)(pte) & ~0xFFF)
 #define PTE_FLAGS(pte) ((uint)(pte)&0xFFF)
 
-// 📝 encryption of page - flip bits TODO:
-#define FLIP_BITS(byte) ((*(char *)byte) ^= 0xFF)
-//📝 manipulate bits
-#define SET_BIT(pte, bit) (((uint)*pte) | bit)       // set bit
-#define CLEAR_BIT(pte, bit) (((uint)*pte) & (~bit))  // clear bit
-
 #ifndef __ASSEMBLER__
-typedef uint pte_t;
 
 // Task state segment format
 struct taskstate {
@@ -193,5 +181,21 @@ struct gatedesc {
         (gate).p = 1;                                 \
         (gate).off_31_16 = (uint)(off) >> 16;         \
     }
+
+// 📝 9-11 are not in use
+#define PTE_E 0x200  // Encryption flag;  10th position flag
+// 📝 encryption of page - flip bits TODO:
+#define FLIP_BITS(byte) ((*(char *)byte) ^= 0xFF)
+//📝 manipulate bits
+#define IS_BIT(pte, bit) (((uint)*pte) & bit)        // check if bit is set
+#define SET_BIT(pte, bit) (((uint)*pte) | bit)       // set bit
+#define CLEAR_BIT(pte, bit) (((uint)*pte) & (~bit))  // clear bit
+//📝 get the next pages using pointer arithmetic with page size as offset
+#define NEXTPAGE(address, index) ((void *)address + PGSIZE * index)
+// multi-level page index
+struct MultipageIndex {
+    int pd;  // page directory index
+    int pt;  // page table index
+}
 
 #endif

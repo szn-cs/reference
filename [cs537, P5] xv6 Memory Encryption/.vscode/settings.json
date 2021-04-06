@@ -30,6 +30,7 @@
         "memlayout.h": "c",
         "param.h": "c",
         "proc.h": "c",
-        "ptentry.h": "c"
+        "ptentry.h": "c",
+        "utility.C": "cpp"
     }
 }

@@ -36,11 +36,11 @@
 # Todo list:
 - [x]  set CPUS = 1 and change the compilation flag from O2 to Og
 - [x]  Download ptentry.h file
-- [ ]  [xv6 book](https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf): page tables, traps, and interrupts of xv6. 
+- [x]  [xv6 book](https://pdos.csail.mit.edu/6.828/2018/xv6/book-rev11.pdf): page tables, traps, and interrupts of xv6. 
   - Chapters 2 and 3
   - xv6 memory layout is Figure 2-2 (Page 31)
   - Figure 2-1 (Page 30) to pick a bit from flags to designate PTE_E. 
-- [ ] Flush the TLB after modifying the page table: e.g. by overwriting the CR3 register (page table base register) to the same value by calling switchuvm() to the same process.
+- [x] Flush the TLB after modifying the page table: e.g. by overwriting the CR3 register (page table base register) to the same value by calling switchuvm() to the same process.
 
 
 ## submission: 

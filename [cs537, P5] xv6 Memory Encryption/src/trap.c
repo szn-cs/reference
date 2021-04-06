@@ -26,21 +26,19 @@ void tvinit(void) {
 void idtinit(void) { lidt(idt, sizeof(idt)); }
 
 // PAGEBREAK: 41
-void trap(struct trapframe *tf) {
+void trap(struct trapframe* tf) {
     if (tf->trapno == T_SYSCALL) {
         if (myproc()->killed) exit();
         myproc()->tf = tf;
         syscall();
         if (myproc()->killed) exit();
         return;
-    } else if (tf->trapno == T_PGFLT
-               /*&& legit page fault TODO:*/) {  // handle page fault
-        uint faultAddress = rcr2();  // read faulty address from cr2 register
-                                     // that is stored during page fault
-
-        // check why page fault happened
-
-        // decryptPage(faultAddress);
+    } else if (tf->trapno == T_PGFLT) {  //📝 handle page fault
+        pte_t* pte;
+        // Faulty virtual address is stored during page fault in cr2
+        char* faultVA = (char*)rcr2();  // read from register cr2
+        if ((pte = validateFaultPage(faultVA)) != 0)
+            return decryptPage(pte);  // validate fault address & decrept page
     }
 
     switch (tf->trapno) {

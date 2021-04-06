@@ -27,11 +27,6 @@ void seginit(void) {
     lgdt(c->gdt, sizeof(c->gdt));
 }
 
-// 📝 Decrypt page memory
-void decryptPage(uint faultAddress) {
-    // after decryption toggle PTE_E & PTE_P bits.
-}
-
 // Return the address of the PTE in page table pgdir
 // that corresponds to virtual address va.  If alloc!=0,
 // create any required page table pages.
@@ -336,66 +331,6 @@ int copyout(pde_t *pgdir, uint va, void *p, uint len) {
 /* 📝 */
 
 /**
- * @brief flush current process TLB after change table entry values
- */
-void flushTLB() { switchuvm(myproc()); }
-
-/** check if virtual address is out of range from current user virtual space */
-int outOfRange(void *va) { return (uint)va >= myproc()->sz; }
-
-/**
- * @brief retrieve page table entry using indexes
- *
- * @param i_pd page directory index
- * @param i_pt page table index
- * @return pte_t* pointer to page table entry, or 0 if page dir not present
- */
-pte_t *getPTE(int i_pd, int i_pt) {
-    pde_t *pgdir = myproc()->pgdir;  // current process page directory
-    pde_t *pde;
-    pte_t *pgtab;
-
-    // TODO: is it required to check other flags for directory page table
-    // enteries like permission ?
-    pde = &pgdir[i_pd];
-    if (*pde & PTE_P)
-        pgtab = (pte_t *)P2V(PTE_ADDR(*pde));
-    else
-        goto fail;
-
-    return &pgtab[i_pt];
-fail:
-    return 0;
-}
-
-/**
- * @brief get next page entry from the multilevel page table
- *
- * @param i_pd page directory index of current state of iterator
- * @param i_pt page table index of current state of iterator
- * @param nextPageIndex # of page table entry beyond the current position
- * @return pte_t* page table entry of the next one, or 0 on fail.
- */
-pte_t *pteIterator(int i_pd, int i_pt, int nextPageIndex) {
-    // calculate indecies of outer & inner page tables using current page #
-    int outer = i_pd + (i_pt + nextPageIndex) / NPTENTRIES,
-        inner = (i_pt + nextPageIndex) % NPTENTRIES;
-    return getPTE(outer, inner);
-}
-
-/**
- * @brief encrypt/decrypt all bytes in a page starting from the beginning
- *
- * @param page_ka
- */
-void toggleEncryptPage(char *pagePhysicalAddress) {
-    // obtain kernel virtual address to modify the bytes contents
-    char *kernelAddress = (char *)P2V(pagePhysicalAddress);
-    // encrypt/decrypt contents of all page bytes
-    for (int i = 0; i < PGSIZE; ++i) FLIP_BITS(kernelAddress);
-}
-
-/**
  * @brief Encrypt ranges of virtual pages
  *
  * encrypt virtual addresses ranging
@@ -414,11 +349,13 @@ int mencrypt(char *va, int len) {
     struct proc *proc;  // current process
     pte_t *pte;  // page table entry (matching input virtual address's page)
     char *va0;   // first virtual address in the corresponding va's page
+    struct MultipageIndex page_i;
 
     proc = myproc();                      // current user process
     va0 = (char *)PGROUNDDOWN((uint)va);  // assuming va could be page-aligned
-    //🐞 assert correctly rounded (NOTE: unnecessary step; only for debugging)
-    if ((uint)va >> PTXSHIFT != (uint)va0 >> PTXSHIFT) goto fail;
+
+    /*🐞 assert correctly rounded (NOTE: unnecessary step; only for debugging)
+    if ((uint)va >> PTXSHIFT != (uint)va0 >> PTXSHIFT) goto fail; */
 
     // case: negative value
     // case: virtual address is an invalid address (e.g., out-of-range value)
@@ -428,18 +365,23 @@ int mencrypt(char *va, int len) {
         goto fail;
 
     // get virtual address's page entry
-    int i_pd = PDX(va0), i_pt = PTX(va0);
-    pte = getPTE(i_pd, i_pt);
-    //🐞 assert pages equal (NOTE: unnecessary step; only for debugging)
-    if (pte != getPTE(PDX(va0), PTX(va0))) goto fail;
+    page_i = getPageIndex(va0);
+    pte = getPTE(page_i);
+
+    /*🐞 assert pages equal (NOTE: unnecessary step; only for debugging)
+    struct MultipageIndex page_i0 = {PDX(va0), PTX(va0)};
+    if (pte != getPTE(page_i0)) goto fail; */
 
     // case: calling process does not have permission or privilege to access
     // or modify some pages in the range (either all the pages in the range
     // are successfully encrypted or none of them is encrypted)
+    if (proc->sz == 0)
+        return 0;  // remove this - only used temporarly for debugging
     for (int i = 0; i < len; ++i) {
-        pte_t *e = pteIterator(i_pd, i_pt, i);
-        int isP = *e & PTE_P, isW = *e & PTE_W, isU = *e & PTE_U;
-        if (!isP || !isW || !isU) goto fail;
+        struct MultipageIndex currentPage_i = pteIterator(page_i, i);
+        pte_t *e = getPTE(currentPage_i);  // current pte
+        if (!e || !IS_BIT(e, PTE_P) || !IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
+            goto fail;
     }
 
 success:
@@ -448,9 +390,11 @@ success:
     // unencrypted pages should be encrypted
 
     for (int i = 0; i < len; ++i) {
-        pte_t *e = pteIterator(i_pd, i_pt, i);
-        if (*e & PTE_E) continue;  // skip encrypted pages
-        toggleEncryptPage((char *)PTE_ADDR(*e));
+        struct MultipageIndex currentPage_i = pteIterator(page_i, i);
+        pte_t *e = getPTE(currentPage_i);  // current pte
+        if (IS_BIT(e, PTE_E)) continue;    // skip encrypted pages
+        char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
+        toggleEncryptPageSize(pagePhysicalAddr);
         // update flags
         *e = SET_BIT(e, PTE_E);
         *e = CLEAR_BIT(e, PTE_P);
@@ -464,48 +408,64 @@ fail:
 }
 
 /**
-     * @brief retreive statistics about the state of the page table
-     *
-     * @param entries array of pt_entries
-     * @param num num elements that should be allocated by the user application
-     and filled up by the kernel
-     * @return int
-     */
+ * @brief retreive statistics about the state of the page table
+ *
+ * kernel should fill up the entries array using the information from the
+ * page table of the currently running process. Only valid (allocated)
+ * virtual pages belong to the user will be considered.
+ *
+ * Example: if one process has allocated 10 virtual pages with page numbers
+ * ranging from 0x0 - 0x9 and page 0x9 is encrypted, then page 0x9 - 0x7 should
+ * be used to fill up the array when num is 3.
+ * The array should look as follows (ppage might be different):
+ *  0: pdx: 0x0, ptx: 0x9, ppage: 0xC3, present: 0, writable: 1, encrypted: 1
+ *  1: pdx: 0x0, ptx: 0x8, ppage: 0xC2, present: 1, writable: 1, encrypted: 0
+ *  2: pdx: 0x0, ptx: 0x7, ppage: 0xC1, present: 1, writable: 1, encrypted: 0
+ *
+ * @param entries array of pt_entries
+ * @param num num elements that should be allocated by the user application
+ and filled up by the kernel
+ * @return int
+ */
 int getpgtable(struct pt_entry *entries, int num) {
-    // pte_t type stored in each page table entry
-    // proc->sz  is the actual size of the vm for a process
-    /* struct pt_entry e;
-    e.encrypted = (pte & PTE_E) ? 1 : 0;
-    */
+    // validate params
+    if (entries == 0 || num < 0) goto fail;
+    if (num == 0) return 0;  // short-circuit for 0 elements
 
-    // kernel should fill up the entries array using the information from
-    // the page table of the currently running process. Only valid
-    // (allocated) virtual pages belong to the user will be considered.
+    struct proc *proc = myproc();  // current process info
+    struct MultipageIndex page_i;  // index in the multipage table
+    pte_t *pte;                    // page table entry
+
+    // identify most top user page
+    char *topVA = (char *)(proc->sz - 1);
+    page_i = getPageIndex(topVA);  // starting page table entry
 
     // When the actual number of valid virtual pages is greater than the
     // num, filling up the array starts from the allocated virtual page with
     // the highest page numbers and returns num in this case.
-
-    // You might find sz field in the proc structure of each process is
-    // useful to identify the most top user page.
-
-    /*
-         For instance, if one process has
-         allocated 10 virtual pages with page numbers ranging from 0x0 - 0x9 and
-         page 0x9 is encrypted,  then page 0x9 - 0x7 should be used to fill up
-        the array when num is 3. The array should look as follows (ppage might
-        be different): 0: pdx: 0x0, ptx: 0x9, ppage: 0xC3, present: 0, writable:
-        1, encrypted: 1 1: pdx: 0x0, ptx: 0x8, ppage: 0xC2, present: 1,
-        writable: 1, encrypted: 0 2: pdx: 0x0, ptx: 0x7, ppage: 0xC1, present:
-        1, writable: 1, encrypted: 0
-        */
+    int i;  // number of elements filled
+    for (i = 0; i < num || pte == 0; ++i) {
+        struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
+        pte = getPTE(currentPage_i);  // get current page table entry
+        if (pte == 0) break;          // invalid page encountered
+        entries[i].pdx = currentPage_i.pd;
+        entries[i].ptx = currentPage_i.pt;
+        entries[i].ppage = PTE_ADDR(*pte);
+        entries[i].present = IS_BIT(pte, PTE_P);
+        entries[i].writable = IS_BIT(pte, PTE_W);
+        entries[i].encrypted = IS_BIT(pte, PTE_E);
+    }
 
     // When the actual number of valid virtual pages is less than or equals
     // to the num, then only fill up the array using those valid virtual
     // pages. Return the actual number of elements that are filled in
-    // entries.  The only error defined for this function is if entries is a
-    // null pointer, in which case you should return -1. Return -1 if you
+    // entries.
+    return i;
+
+fail:  // The only error defined for this function is if entries is a  null
+    // pointer, in which case you should return -1. Return -1 if you
     // encounter any other error, too.
+    return -1;
 }
 
 /**
@@ -513,32 +473,31 @@ int getpgtable(struct pt_entry *entries, int num) {
  (implemented for testing purposes)
  *
  * @param physical_addr  physical address defining the target page to print
- *     -    may not be the first address of a page (i.e., may not be page
- aligned)
+ * NOTE: may not be the first address of a page (i.e., may not be page aligned)
  * @param buffer will be allocated by the user and have the size of PGSIZE
+ * NOTE: not required to do any error handling for buffer parameter
  * @return int 0 on success, otherwise -1 on any error.
  */
 int dump_rawphymem(uint physical_addr, char *buffer) {
-    // NOTE: not required to do any error handling for buffer parameter
+    if (physical_addr >= PHYSTOP) goto fail;  // validate param
 
-    // translate it to a kernel virtual memory address
-    int *x = (int *)&physical_addr;
-    char *a = P2V(x);
+    struct proc *proc = myproc();  // current process info
+    // translate to a kernel virtual memory address
+    char *ka = P2V((char *)physical_addr);  // kernel address
+    ka = (char *)PGROUNDDOWN((uint)ka);     // kernel address at page index 0
 
     /*
-    The kernel should fill up the buffer with the current content of the page
-    where physical_addr resides
-    - it should not affect any of the page table entries that might point
-    to this physical page (i.e., it shouldn't modify PTE_P or PTE_E)
-    - it shouldn't do any decryption or encryption.
-    */
-    // copyout();
+        The kernel should fill up the buffer with the current content of the
+        page where physical_addr resides
+        - it should not affect any of the page table entries that might point
+        to this physical page (i.e., it shouldn't modify PTE_P or PTE_E)
+        - it shouldn't do any decryption or encryption.
+        */
+    if (copyout(proc->pgdir, (uint)ka, buffer, PGSIZE) == -1) goto fail;
+    return 0;
 
 fail:
     return -1;
-
-success:
-    return 0;
 }
 
 // PAGEBREAK!
@@ -547,3 +506,117 @@ success:
 // Blank page.
 // PAGEBREAK!
 // Blank page.
+
+/**
+ * @brief flush current process TLB after change table entry values
+ */
+void flushTLB() { switchuvm(myproc()); }
+
+/** check if virtual address is out of range from current user virtual space */
+int outOfRange(void *va) { return (uint)va >= myproc()->sz; }
+
+/**
+ * @brief get index multipagetable of page corresponding to the virtual address
+ *
+ * @param va virtual address
+ * @return page table index including directory and table indecies.
+ */
+struct MultipageIndex getPageIndex(char *va) {
+    struct MultipageIndex i;
+
+    char *va0 = (char *)PGROUNDDOWN((uint)va);
+    i.pd = PDX(va0);
+    i.pt = PTX(va0);
+
+    return i;
+}
+
+/**
+ * @brief retrieve page table entry using indexes
+ *
+ * @param page_i page directory & table entry index
+ * @return pte_t* pointer to page table entry, or 0 if page dir not present
+ */
+pte_t *getPTE(struct MultipageIndex page_i) {
+    if (page_i.pd < 0 || page_i.pt < 0) goto fail;  // validate param
+
+    pde_t *pgdir = myproc()->pgdir;  // current process page directory
+    pde_t *pde;
+    pte_t *pgtab;
+
+    // check other flags for directory page table enteries like permission
+    pde = &pgdir[page_i.pd];
+    // TODO: verify if check doesn't conflict with implementations
+    if (!IS_BIT(pde, PTE_P) || !IS_BIT(pde, PTE_W) || !IS_BIT(pde, PTE_U))
+        goto fail;
+
+    pgtab = (pte_t *)P2V(PTE_ADDR(*pde));
+    return &pgtab[page_i.pt];
+
+fail:
+    return 0;
+}
+
+/**
+ * @brief get next page entry from the multilevel page table
+ *
+ * @param page_i page directory & table index of current state of iterator
+ * @param nextPageIndex # of page table entry beyond the current position
+ * @return struct MultipageIndex next page entry index. NOTE: can return an
+ * invalid index
+ */
+struct MultipageIndex pteIterator(struct MultipageIndex page_i,
+                                  int nextPageIndex) {
+    // calculate indecies of outer & inner page tables using current page #
+    // outer page table
+    page_i.pd = page_i.pd + (page_i.pt + nextPageIndex) / NPTENTRIES;
+    // inner page table
+    page_i.pt = (page_i.pt + nextPageIndex) % NPTENTRIES;
+    return page_i;
+}
+
+/**
+ * @brief encrypt/decrypt all bytes in a page starting from the beginning
+ *
+ * @param pagePhysicalAddress first physical address of the page
+ */
+void toggleEncryptPageSize(char *pagePhysicalAddress) {
+    // obtain kernel virtual address to modify the bytes contents
+    char *kernelAddress = (char *)P2V(pagePhysicalAddress);
+    // encrypt/decrypt contents of all page bytes
+    for (int i = 0; i < PGSIZE; ++i) FLIP_BITS(kernelAddress);
+}
+
+/**
+ * @brief check if the thrown page fault is a legit encryption fault
+ *
+ * @param faultVA virtual address causing the fault
+ * @return pte_t* page table entry corresponding to the address, or 0 if a non
+ * encryption related fault.
+ */
+pte_t *validateFaultPage(char *faultVA) {
+    struct MultipageIndex page_i = {PDX(faultVA), PTX(faultVA)};
+    pte_t *pte = getPTE(page_i);  // get suspected page table entry
+
+    /* validate legit page fault */
+    if (pte == 0 || IS_BIT(pte, PTE_P) || !IS_BIT(pte, PTE_E) ||
+        !IS_BIT(pte, PTE_W))
+        return 0;
+
+    return pte;
+}
+
+/**
+ * @brief decrypt page addresses and update page entry
+ *
+ * @param pte page table entry associated with the target page
+ */
+void decryptPage(pte_t *pte) {
+    char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
+    toggleEncryptPageSize(pagePhysicalAddr);
+
+    // update flags
+    *pte = CLEAR_BIT(pte, PTE_E);
+    *pte = SET_BIT(pte, PTE_P);
+    flushTLB();
+}
