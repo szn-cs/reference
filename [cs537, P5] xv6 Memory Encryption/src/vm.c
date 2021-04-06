@@ -347,8 +347,8 @@ int mencrypt(char *va, int len) {
     if (len == 0) return 0;  // ignore - short-circuit before any error checking
 
     struct proc *proc;  // current process
-    pte_t *pte;  // page table entry (matching input virtual address's page)
-    char *va0;   // first virtual address in the corresponding va's page
+    // pte_t *pte;  // page table entry (matching input virtual address's page)
+    char *va0;  // first virtual address in the corresponding va's page
     struct MultipageIndex page_i;
 
     proc = myproc();                      // current user process
@@ -366,7 +366,7 @@ int mencrypt(char *va, int len) {
 
     // get virtual address's page entry
     page_i = getPageIndex(va0);
-    pte = getPTE(page_i);
+    // pte = getPTE(page_i);
 
     /*🐞 assert pages equal (NOTE: unnecessary step; only for debugging)
     struct MultipageIndex page_i0 = {PDX(va0), PTX(va0)};
@@ -569,12 +569,29 @@ fail:
  */
 struct MultipageIndex pteIterator(struct MultipageIndex page_i,
                                   int nextPageIndex) {
+    if (nextPageIndex < 0) goto reverse;  // support reverse order
+
     // calculate indecies of outer & inner page tables using current page #
     // outer page table
     page_i.pd = page_i.pd + (page_i.pt + nextPageIndex) / NPTENTRIES;
     // inner page table
     page_i.pt = (page_i.pt + nextPageIndex) % NPTENTRIES;
     return page_i;
+
+reverse : {               // iterate to lower index page
+    nextPageIndex *= -1;  // remove negative sign
+    // offset from table start
+    int offsetEntry = page_i.pt - (nextPageIndex % NPTENTRIES);
+
+    page_i.pt = (NPTENTRIES + offsetEntry) % NPTENTRIES;
+    // calculate offset of the page directory index and decrease accordingly
+    page_i.pd -= nextPageIndex / NPTENTRIES;  //  page steps
+    if (offsetEntry != 0)
+        page_i.pd -=
+            (NPTENTRIES + -offsetEntry) / NPTENTRIES;  // negative offset
+
+    return page_i;
+}
 }
 
 /**
@@ -621,4 +638,12 @@ void decryptPage(pte_t *pte) {
     *pte = CLEAR_BIT(pte, PTE_E);
     *pte = SET_BIT(pte, PTE_P);
     flushTLB();
+}
+
+// get absolute mathematical value
+// source:
+// https://stackoverflow.com/questions/9772348/get-absolute-value-without-using-abs-function-nor-if-statement
+int absolute(int n) {
+    const int ret[2] = {n, -n};
+    return ret[n < 0];
 }

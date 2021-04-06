@@ -205,3 +205,4 @@ struct MultipageIndex pteIterator(struct MultipageIndex page_i,
 void toggleEncryptPageSize(char* pagePhysicalAddress);
 pte_t* validateFaultPage(char* faultVA);
 void decryptPage(pte_t* pte);
+int absolute(int n);
