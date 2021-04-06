@@ -448,10 +448,10 @@ int getpgtable(struct pt_entry *entries, int num) {
         if (pte == 0) break;          // invalid page encountered
         entries[i].pdx = currentPage_i.pd;
         entries[i].ptx = currentPage_i.pt;
-        entries[i].ppage = PTE_ADDR(*pte) >> PTXSHIFT;  // as per spec
-        entries[i].present = IS_BIT(pte, PTE_P);
-        entries[i].writable = IS_BIT(pte, PTE_W);
-        entries[i].encrypted = IS_BIT(pte, PTE_E);
+        entries[i].ppage = (*pte) >> PTXSHIFT;  // as per spec
+        entries[i].present = IS_BIT(pte, PTE_P) ? 1 : 0;
+        entries[i].writable = IS_BIT(pte, PTE_W) ? 1 : 0;
+        entries[i].encrypted = IS_BIT(pte, PTE_E) ? 1 : 0;
     }
 
     // When the actual number of valid virtual pages is less than or equals
@@ -478,11 +478,13 @@ fail:  // The only error defined for this function is if entries is a  null
  */
 int dump_rawphymem(uint physical_addr, char *buffer) {
     if (physical_addr >= PHYSTOP) goto fail;  // validate param
+    char *ka;                                 // kernel virtual address
+    struct proc *proc;                        // current process info
 
-    struct proc *proc = myproc();  // current process info
+    proc = myproc();
     // translate to a kernel virtual memory address
-    char *ka = P2V((char *)physical_addr);  // kernel address
-    ka = (char *)PGROUNDDOWN((uint)ka);     // kernel address at page index 0
+    ka = (char *)P2V_WO(physical_addr);
+    ka = (char *)PGROUNDDOWN((uint)ka);  // kernel address at page index 0
 
     /*
         The kernel should fill up the buffer with the current content of the
@@ -491,7 +493,8 @@ int dump_rawphymem(uint physical_addr, char *buffer) {
         to this physical page (i.e., it shouldn't modify PTE_P or PTE_E)
         - it shouldn't do any decryption or encryption.
         */
-    if (copyout(proc->pgdir, (uint)ka, buffer, PGSIZE) == -1) goto fail;
+    if (copyout(proc->pgdir, (uint)buffer, ka, PGSIZE) == -1) goto fail;
+
     return 0;
 
 fail:
