@@ -380,7 +380,8 @@ int mencrypt(char *va, int len) {
     for (int i = 0; i < len; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, i);
         pte_t *e = getPTE(currentPage_i);  // current pte
-        if (!e || !IS_BIT(e, PTE_P) || !IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
+        if (!e || (!IS_BIT(e, PTE_P) && !IS_BIT(e, PTE_E)) ||
+            !IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
             goto fail;
     }
 
