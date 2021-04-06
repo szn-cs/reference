@@ -391,7 +391,7 @@ int mencrypt(char *va, int len) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, i);
         pte_t *e = getPTE(currentPage_i);  // current pte
         if (IS_BIT(e, PTE_E)) continue;    // skip encrypted pages
-        char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
+        char *pagePhysicalAddr = (char *)PTE_ADDR(*e);
         toggleEncryptPageSize(pagePhysicalAddr);
         // update flags
         *e = SET_BIT(e, PTE_E);
@@ -483,7 +483,7 @@ int dump_rawphymem(uint physical_addr, char *buffer) {
 
     proc = myproc();
     // translate to a kernel virtual memory address
-    ka = (char *)P2V_WO(physical_addr);
+    ka = (char *)P2V((char *)physical_addr);
     ka = (char *)PGROUNDDOWN((uint)ka);  // kernel address at page index 0
 
     /*
@@ -583,11 +583,9 @@ struct MultipageIndex pteIterator(struct MultipageIndex page_i,
  */
 void toggleEncryptPageSize(char *pagePhysicalAddress) {
     // obtain kernel virtual address to modify the bytes contents
-    char *pageKA = (char *)P2V_WO(pagePhysicalAddress);
+    char *pageKA = (char *)P2V(pagePhysicalAddress);
     // encrypt/decrypt contents of all page bytes
-    for (int i = 0; i < PGSIZE; ++i, ++pageKA) {
-        *pageKA = FLIP_BITS(*pageKA);
-    }
+    for (int i = 0; i < PGSIZE; ++i, ++pageKA) *pageKA = FLIP_BITS(*pageKA);
 }
 
 /**

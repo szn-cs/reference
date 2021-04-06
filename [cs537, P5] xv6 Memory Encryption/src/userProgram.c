@@ -13,7 +13,7 @@ static int err(char *msg, ...) {
 }
 
 int main(void) {
-    const uint PAGES_NUM = 1;
+    const uint PAGES_NUM = 10;
     char *buffer = sbrk(PGSIZE * sizeof(char));
     while ((uint)buffer != 0x6000) buffer = sbrk(PGSIZE * sizeof(char));
     // Allocate one pages of space
@@ -42,8 +42,10 @@ int main(void) {
 
             uint expected = ~0xAA;
             uint is_failed = 0;
-            for (int j = 0; j < PGSIZE; j++) {
+            for (int j = 0; j < 1; j++) {
                 if (buffer[j] != (char)expected) {
+                    printf(1, "buffer: 0x%x; expected 0x%x;\n", buffer[j],
+                           expected);
                     is_failed = 1;
                     break;
                 }
@@ -52,7 +54,7 @@ int main(void) {
                 printf(1,
                        "XV6_TEST_OUTPUT wrong content at physical page 0x%x\n",
                        pt_entries[i].ppage * PGSIZE);
-                for (int j = 0; j < PGSIZE; j += 64) {
+                for (int j = 0; j < 1; j += 64) {
                     printf(1, "XV6_TEST_OUTPUT ");
                     for (int k = 0; k < 64; k++) {
                         if (k < 63) {
