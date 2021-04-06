@@ -3,6 +3,7 @@
 #include "stat.h"
 #include "user.h"
 #include "ptentry.h"
+
 #define PGSIZE 4096
 
 static int err(char *msg, ...) {
@@ -11,156 +12,36 @@ static int err(char *msg, ...) {
 }
 
 int main(void) {
-    const uint PAGES_NUM = 4096;
-    char *buffer = sbrk(PGSIZE * sizeof(char));
-    while ((uint)buffer != 0x6000) buffer = sbrk(PGSIZE * sizeof(char));
-    // Allocate NUM pages of space
-    char *ptr = sbrk(PAGES_NUM * PGSIZE);
-    const int entries_num = 128;
-    struct pt_entry pt_entries[entries_num];
-    // Initialize the pages
-    for (int i = 0; i < PAGES_NUM * PGSIZE; i++) ptr[i] = 0xAA;
+    const uint PAGES_NUM = 5;
 
+    // Allocate one pages of space
+    char *ptr = sbrk(PGSIZE * sizeof(char));
+    while ((uint)ptr != 0x6000) ptr = sbrk(PGSIZE * sizeof(char));
+
+    ptr = sbrk(PAGES_NUM * PGSIZE);
+    struct pt_entry pt_entries[PAGES_NUM];
+
+    // Call the mencrypt with len = PAGES_NUM - 1
     if (mencrypt(ptr, PAGES_NUM) != 0)
         err("mencrypt return non-zero value when mencrypt is called on valid "
             "range\n");
 
-    int retval = getpgtable(pt_entries, entries_num);
-    if (retval == entries_num) {
-        for (int i = 0; i < entries_num; i++) {
-            printf(1,
-                   "XV6_TEST_OUTPUT Index %d: pdx: 0x%x, ptx: 0x%x, present: "
-                   "%d, writable: %d, encrypted: %d\n",
-                   i, pt_entries[i].pdx, pt_entries[i].ptx,
-                   pt_entries[i].present, pt_entries[i].writable,
-                   pt_entries[i].encrypted);
+    int pid = fork();
 
-            if (dump_rawphymem((uint)(pt_entries[i].ppage * PGSIZE), buffer) !=
-                0)
-                err("dump_rawphymem return non-zero value\n");
-
-            uint expected = ~0xAA;
-            uint is_failed = 0;
-            for (int j = 0; j < PGSIZE; j++) {
-                if (buffer[j] != (char)expected) {
-                    is_failed = 1;
-                    break;
-                }
-            }
-            if (is_failed) {
+    if (pid == 0) {
+        // Child process goes here
+        if (getpgtable(pt_entries, PAGES_NUM) >= 0) {
+            for (int i = 0; i < PAGES_NUM; i++) {
                 printf(1,
-                       "XV6_TEST_OUTPUT wrong content at physical page 0x%x\n",
-                       pt_entries[i].ppage * PGSIZE);
-                for (int j = 0; j < PGSIZE; j += 64) {
-                    printf(1, "XV6_TEST_OUTPUT ");
-                    for (int k = 0; k < 64; k++) {
-                        if (k < 63) {
-                            printf(1, "0x%x ", (uint)buffer[j + k] & 0xFF);
-                        } else {
-                            printf(1, "0x%x\n", (uint)buffer[j + k] & 0xFF);
-                        }
-                    }
-                }
-                err("physical memory is encrypted incorrectly\n");
+                       "XV6_TEST_OUTPUT Index %d: pdx: 0x%x, ptx: 0x%x, "
+                       "present: %d, writable: %d, encrypted: %d\n",
+                       i, pt_entries[i].pdx, pt_entries[i].ptx,
+                       pt_entries[i].present, pt_entries[i].writable,
+                       pt_entries[i].encrypted);
             }
         }
-    } else {
-        printf(1,
-               "XV6_TEST_OUTPUT: getpgtable returned incorrect value: expected "
-               "%d, got %d\n",
-               entries_num, retval);
     }
 
-    for (int i = 0; i < PAGES_NUM; i++) {
-        ptr[(i + 1) * PGSIZE - 1] = 0xAA;
-    }
-
-    retval = getpgtable(pt_entries, entries_num);
-    if (retval == entries_num) {
-        for (int i = 0; i < entries_num; i++) {
-            printf(1,
-                   "XV6_TEST_OUTPUT Index %d: pdx: 0x%x, ptx: 0x%x, present: "
-                   "%d, writable: %d, encrypted: %d\n",
-                   // printf(1, "XV6_TEST_OUTPUT Index %d: pdx: 0x%x, ptx: 0x%x,
-                   // ppage: 0x%x, present: %d, writable: %d, encrypted: %d\n",
-                   i, pt_entries[i].pdx, pt_entries[i].ptx,
-                   // pt_entries[i].ppage,
-                   pt_entries[i].present, pt_entries[i].writable,
-                   pt_entries[i].encrypted);
-
-            if (dump_rawphymem((uint)(pt_entries[i].ppage * PGSIZE), buffer) !=
-                0)
-                err("dump_rawphymem return non-zero value\n");
-
-            uint expected = 0xAA;
-            uint is_failed = 0;
-            for (int j = 0; j < PGSIZE; j++) {
-                if (buffer[j] != (char)expected) {
-                    is_failed = 1;
-                    break;
-                }
-            }
-            if (is_failed) {
-                printf(1,
-                       "XV6_TEST_OUTPUT wrong content at physical page 0x%x\n",
-                       pt_entries[i].ppage * PGSIZE);
-                for (int j = 0; j < PGSIZE; j += 64) {
-                    printf(1, "XV6_TEST_OUTPUT ");
-                    for (int k = 0; k < 64; k++) {
-                        if (k < 63) {
-                            printf(1, "0x%x ", (uint)buffer[j + k] & 0xFF);
-                        } else {
-                            printf(1, "0x%x\n", (uint)buffer[j + k] & 0xFF);
-                        }
-                    }
-                }
-                err("physical memory is decrypted incorrectly\n");
-            }
-        }
-    } else {
-        printf(1,
-               "XV6_TEST_OUTPUT: getpgtable returned incorrect value: expected "
-               "%d, got %d\n",
-               entries_num, retval);
-    }
+    wait();
     exit();
 }
-
-/*
-#include "types.h"
-#include "user.h"
-#include "ptentry.h"
-
-#define PGSIZE 4096
-
-/**
- * @brief user program to test the encryption implementation of page addresses
- *
- * @param argc argument count
- * @param argv argument vector
- *\/
-int main(int argc, char **argv) {
-    // int y, x;
-
-    // // verify commandline arguments
-    // if (argc != 3) {
-    //     printf(1, "Usage: userProgram <x> <y> ");
-    //     exit();
-    // }
-
-    // // parse arguments
-    // x = atoi(argv[1]);
-    // y = atoi(argv[3]);
-    char *ptr = sbrk(4000 * PGSIZE);
-
-    mencrypt(ptr, 1);
-
-    *ptr = 5;
-
-    printf(1, "pte value: %d\n", *ptr);
-
-    *ptr += 3;
-
-    exit();
-}
-*/

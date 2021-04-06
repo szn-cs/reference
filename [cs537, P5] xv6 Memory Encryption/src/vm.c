@@ -60,8 +60,12 @@ static int mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm) {
     last = (char *)PGROUNDDOWN(((uint)va) + size - 1);
     for (;;) {
         if ((pte = walkpgdir(pgdir, a, 1)) == 0) return -1;
-        if (*pte & PTE_P) panic("remap");
-        *pte = pa | perm | PTE_P;
+        if (*pte & (PTE_P | PTE_E)) panic("remap");
+        if (perm & PTE_E) {
+            *pte = pa | perm | PTE_E;
+        } else {
+            *pte = pa | perm | PTE_P;
+        }
         if (a == last) break;
         a += PGSIZE;
         pa += PGSIZE;
@@ -229,7 +233,7 @@ int deallocuvm(pde_t *pgdir, uint oldsz, uint newsz) {
         pte = walkpgdir(pgdir, (char *)a, 0);
         if (!pte)
             a = PGADDR(PDX(a) + 1, 0, 0) - PGSIZE;
-        else if ((*pte & PTE_P) != 0) {
+        else if ((*pte & (PTE_P | PTE_E)) != 0) {
             pa = PTE_ADDR(*pte);
             if (pa == 0) panic("kfree");
             char *v = P2V(pa);
@@ -248,7 +252,7 @@ void freevm(pde_t *pgdir) {
     if (pgdir == 0) panic("freevm: no pgdir");
     deallocuvm(pgdir, KERNBASE, 0);
     for (i = 0; i < NPDENTRIES; i++) {
-        if (pgdir[i] & PTE_P) {
+        if (pgdir[i] & (PTE_P | PTE_E)) {
             char *v = P2V(PTE_ADDR(pgdir[i]));
             kfree(v);
         }
@@ -278,7 +282,7 @@ pde_t *copyuvm(pde_t *pgdir, uint sz) {
     for (i = 0; i < sz; i += PGSIZE) {
         if ((pte = walkpgdir(pgdir, (void *)i, 0)) == 0)
             panic("copyuvm: pte should exist");
-        if (!(*pte & PTE_P)) panic("copyuvm: page not present");
+        if (!(*pte & (PTE_P | PTE_E))) panic("copyuvm: page not present");
         pa = PTE_ADDR(*pte);
         flags = PTE_FLAGS(*pte);
         if ((mem = kalloc()) == 0) goto bad;
@@ -301,7 +305,7 @@ char *uva2ka(pde_t *pgdir, char *uva) {
     pte_t *pte;
 
     pte = walkpgdir(pgdir, uva, 0);
-    if ((*pte & PTE_P) == 0) return 0;
+    if ((*pte & (PTE_P | PTE_E)) == 0) return 0;
     if ((*pte & PTE_U) == 0) return 0;
     return (char *)P2V(PTE_ADDR(*pte));
 }

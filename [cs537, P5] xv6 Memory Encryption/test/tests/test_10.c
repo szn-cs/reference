@@ -27,11 +27,10 @@ main(void){
 
     if (getpgtable(pt_entries, PAGES_NUM) >= 0) {
         for (int i = 0; i < PAGES_NUM; i++) {
-            printf(1, "XV6_TEST_OUTPUT Index %d: pdx: 0x%x, ptx: 0x%x, ppage: 0x%x, present: %d, writable: %d, encrypted: %d\n", 
+            printf(1, "XV6_TEST_OUTPUT Index %d: pdx: 0x%x, ptx: 0x%x, present: %d, writable: %d, encrypted: %d\n", 
                 i,
                 pt_entries[i].pdx,
                 pt_entries[i].ptx,
-                pt_entries[i].ppage,
                 pt_entries[i].present,
                 pt_entries[i].writable,
                 pt_entries[i].encrypted
