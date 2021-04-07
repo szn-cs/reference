@@ -19,30 +19,54 @@ Executing the test will generate output file of the formated program.
 ---
 
 # Type checking for C--: 
-	• primitive types: int, bool, string, void
-	• Type constructors: struct, functions
-	• Limited coercion: bool cannot be used as int, & vice-versa.
-	• Type errors: 
-		○ Arithmetic operators & relational operators must have int operands. 
-		○ Equality operators (==, !=) & Assignment operator (=) must have same type operands, and cannot be applied to function names, struct names or variables.
-		○ logical operators must have bool operands.
-		○ input/output operators (cin >> x, cout << x) x cannot be function name, struct name or variable
-		○ if condition must be a bool.
-		○ function invocation:
-			§ on non-functions is not allowed 
-			§ not allowed: wrong number of args, wrong types of args, struct or functions not allowed as args.
-			§ must return value of correct type. and not returning value at all or returning the wrong type in a non-void function. 
-	• Type checking implementation: 
-		○ add typeCheck method to AST nodes - walk the AST checking types of sub-expressions.
-		○ for base nodes (e.g. IntLitNode) just return their type.
-		○ for IdNode: lookup the type of the declaration in the symbol table (linked field), and propagate up the type.
-		○ Algorithm:  get LHS & RHS types, check types compatibility for operator, then set the kind of node be a value, then set type of node to be the type of the operation's result.
-		○ function calls: get type of each actual argument, match against the formal argument (check symbol), propagate the return type.
-	• to prevent duplicate error reporting: introduce an internal error type: 
-		○ when type incompatibility is discovered then report the error, and propagate the type up the recursive calling. 
-        ○ when an error type is encountered as an operand: don't re-report an error, only propagate the error type up the calling chain.
+The type checker will determine the type of every expression represented in the abstract-syntax tree and will use that information to identify type errors.
 
-## Tasks
+## Types: 
+- primitive types: int, bool, string, void _(function return type only)_ 
+- Type constructors: struct _(includes name)_, functions _(includes params & return types)_
+
+## Operators: 
+- logical: not, and, or
+- arithmetic: plus, minus, times, divide, unary minus
+- equality: equals, not equals
+- relational: less than (<), greater than (>), less than or equals (<=), greater than or equals (>=)
+- assignment: assign
+
+## Rules:
+- Limited coercion: bool cannot be used as int, & vice-versa.
+- Type errors: 
+  - Arithmetic operators: int operands; int result;
+  - Relational operators: int operands; bool result;
+  - Equality operators (==, !=): same type operands of int, bool; bool result;
+    - (and cannot be applied to function names, struct names or variables.)
+    - NOTE: don't need to worry about equality operators between string literals. 
+  - Assignment operator (=): same type operands (RHS & LHS) of int or bool; result in RHS type;
+    - (and cannot be applied to function names, struct names or variables.)
+  - logical operators & conditions (if, while) must have bool operands.
+  - input/output operators (cin >> x, cout << x): 
+    - cout: int, bool, string literals operands;
+    - cin: int, bool identifier operands; 
+      - NOTE: can be int/bool field accessed using dot operator;
+    - x cannot be function name, struct name or variable.
+  - function invocation: call on function identifier; matching args (formals = actuals) number & types;
+    - struct or functions not allowed as args.
+  - function returns: must return value of corrent type for non-void function;
+    - void function must not have a return statement (even without value).
+  - repeat loop times clause: int operand.
+
+# Tasks
+- [ ] check example files.
+- [ ] Edit P5.java, ast.java.
+- [ ] Write test files.
+- [ ] Type checking implementation: 
+  - add typeCheck method to AST nodes - walk the AST checking types of sub-expressions.
+  - for base nodes (e.g. IntLitNode) just return their type.
+  - for IdNode: lookup the type of the declaration in the symbol table (linked field), and propagate up the type.
+  - Algorithm:  get LHS & RHS types, check types compatibility for operator, then set the kind of node be a value, then set type of node to be the type of the operation's result.
+  - function calls: get type of each actual argument, match against the formal argument (check symbol), propagate the return type.
+- [ ] Cascading errors: to prevent duplicate error reporting, introduce an internal error type (use a special ErrorType for expressions that contain type errors): 
+  - when type incompatibility is discovered then report the error, and propagate the type up the recursive calling. 
+  - when an error type is encountered as an operand: don't re-report an error, only propagate the error type up the calling chain.
 
 
 ## Submission:
@@ -54,3 +78,18 @@ Executing the test will generate output file of the formated program.
   - [ ] Verify code format
   - [ ] Verify code execution on CSL machines
 - [ ] lastname.firstname.lastname.firstname.P5.zip
++---+ deps/
++---+ ast.java
++---+ cminusminus.cup
++---+ cminusminus.jlex
++---+ DuplicateSymException.java
++---+ EmptySymTableException.java
++---+ ErrMsg.java
++---+ Makefile
++---+ P5.java
++---+ Sym.java
++---+ SymTable.java
++---+ Type.java
++---+ typeErrors.cminusminus
++---+ test.cminusminus
++---+ lastname.firstname.lastname.firstname.P5.pdf
