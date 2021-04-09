@@ -35,20 +35,20 @@ The type checker will determine the type of every expression represented in the 
 ## Rules:
 - Limited coercion: bool cannot be used as int, & vice-versa.
 - Type errors: 
-  - Arithmetic operators: int operands; int result;
-  - Relational operators: int operands; bool result;
-  - Equality operators (==, !=): same type operands of int, bool; bool result;
+  - [x] Arithmetic operators: int operands; int result;
+  - [x] Relational operators: int operands; bool result;
+  - [x] Equality operators (==, !=): same type operands of int, bool; bool result;
     - (and cannot be applied to function names, struct names or variables.)
     - NOTE: don't need to worry about equality operators between string literals. 
   - Assignment operator (=): same type operands (RHS & LHS) of int or bool; result in RHS type;
     - (and cannot be applied to function names, struct names or variables.)
-  - logical operators & conditions (if, while) must have bool operands.
+  - [ ] logical operators & conditions (if, while) must have bool operands.
   - input/output operators (cin >> x, cout << x): 
     - cout: int, bool, string literals operands;
     - cin: int, bool identifier operands; 
       - NOTE: can be int/bool field accessed using dot operator;
     - x cannot be function name, struct name or variable.
-  - function invocation: call on function identifier; matching args (formals = actuals) number & types;
+  - [ ] function invocation: call on function identifier; matching args (formals = actuals) types & number;
     - struct or functions not allowed as args.
   - function returns: must return value of corrent type for non-void function;
     - void function must not have a return statement (even without value).

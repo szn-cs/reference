@@ -1,28 +1,34 @@
 import java.util.*;
 
 /**
- * The TSym class defines a symbol-table entry. 
- * Each TSym contains a type (a Type).
+ * The TSym class defines a symbol-table entry. Each TSym contains a type (a
+ * Type).
  */
 public class TSym {
     private Type type;
-    
+
     public TSym(Type type) {
         this.type = type;
     }
-    
+
     public Type getType() {
         return type;
     }
-    
+
+    // get type class
+    public Class<? extends Type> typeClass() {
+        return type.getClass();
+    }
+
     public String toString() {
         return type.toString();
     }
 }
 
+
 /**
- * The FnSym class is a subclass of the TSym class just for functions.
- * The returnType field holds the return type and there are fields to hold
+ * The FnSym class is a subclass of the TSym class just for functions. The
+ * returnType field holds the return type and there are fields to hold
  * information about the parameters.
  */
 class FnSym extends TSym {
@@ -30,7 +36,7 @@ class FnSym extends TSym {
     private Type returnType;
     private int numParams;
     private List<Type> paramTypes;
-    
+
     public FnSym(Type type, int numparams) {
         super(new FnType());
         returnType = type;
@@ -40,9 +46,14 @@ class FnSym extends TSym {
     public void addFormals(List<Type> L) {
         paramTypes = L;
     }
-    
+
     public Type getReturnType() {
         return returnType;
+    }
+
+    // get return type class
+    public Class<? extends Type> returnType() {
+        return returnType.getClass();
     }
 
     public int getNumParams() {
@@ -70,16 +81,16 @@ class FnSym extends TSym {
     }
 }
 
+
 /**
- * The StructSym class is a subclass of the TSym class just for variables 
- * declared to be a struct type. 
- * Each StructSym contains a symbol table to hold information about its 
- * fields.
+ * The StructSym class is a subclass of the TSym class just for variables
+ * declared to be a struct type. Each StructSym contains a symbol table to hold
+ * information about its fields.
  */
 class StructSym extends TSym {
     // new fields
-    private IdNode structType;  // name of the struct type
-    
+    private IdNode structType; // name of the struct type
+
     public StructSym(IdNode id) {
         super(new StructType(id));
         structType = id;
@@ -87,19 +98,19 @@ class StructSym extends TSym {
 
     public IdNode getStructType() {
         return structType;
-    }    
+    }
 }
 
+
 /**
- * The StructDefSym class is a subclass of the TSym class just for the 
- * definition of a struct type. 
- * Each StructDefSym contains a symbol table to hold information about its 
- * fields.
+ * The StructDefSym class is a subclass of the TSym class just for the
+ * definition of a struct type. Each StructDefSym contains a symbol table to
+ * hold information about its fields.
  */
 class StructDefSym extends TSym {
     // new fields
     private SymTable symTab;
-    
+
     public StructDefSym(SymTable table) {
         super(new StructDefType());
         symTab = table;

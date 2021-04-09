@@ -1,6 +1,6 @@
 /**
- * Type class and its subclasses: 
- * ErrorType, IntType, BoolType, VoidType, StringType, FnType, StructType,
+ * Type class and its subclasses: ErrorType, IntType, BoolType, VoidType,
+ * StringType, FnType, StructType,
  */
 abstract public class Type {
 
@@ -14,7 +14,18 @@ abstract public class Type {
      * every subclass must provide a toString method and an equals method
      */
     abstract public String toString();
+
     abstract public boolean equals(Type t);
+
+    /** check if AST node is of matching type */
+    static public boolean is(Traverser.Node n, Class<? extends Type> c) {
+        return n.is(c);
+    };
+
+    /** check if nodes have equal types */
+    static public boolean is(Traverser.Node n1, Traverser.Node n2) {
+        return n1.is(n2);
+    }
 
     /**
      * default methods for "isXXXType"
@@ -34,7 +45,7 @@ abstract public class Type {
     public boolean isVoidType() {
         return false;
     }
-    
+
     public boolean isStringType() {
         return false;
     }
@@ -46,11 +57,12 @@ abstract public class Type {
     public boolean isStructType() {
         return false;
     }
-    
+
     public boolean isStructDefType() {
         return false;
     }
 }
+
 
 // **********************************************************************
 // ErrorType
@@ -68,7 +80,12 @@ class ErrorType extends Type {
     public String toString() {
         return "error";
     }
+
+    static public boolean is(Traverser.Node n) {
+        return n.is(ErrorType.class);
+    };
 }
+
 
 // **********************************************************************
 // IntType
@@ -86,7 +103,13 @@ class IntType extends Type {
     public String toString() {
         return "int";
     }
+
+    static public boolean is(Traverser.Node n) {
+        return n.is(IntType.class);
+    };
+
 }
+
 
 // **********************************************************************
 // BoolType
@@ -104,7 +127,13 @@ class BoolType extends Type {
     public String toString() {
         return "bool";
     }
+
+    static public boolean is(Traverser.Node n) {
+        return n.is(BoolType.class);
+    };
+
 }
+
 
 // **********************************************************************
 // VoidType
@@ -122,7 +151,12 @@ class VoidType extends Type {
     public String toString() {
         return "void";
     }
+
+    static public boolean is(Traverser.Node n) {
+        return n.is(VoidType.class);
+    };
 }
+
 
 // **********************************************************************
 // StringType
@@ -140,7 +174,12 @@ class StringType extends Type {
     public String toString() {
         return "String";
     }
+
+    static public boolean is(Traverser.Node n) {
+        return n.is(StringType.class);
+    };
 }
+
 
 // **********************************************************************
 // FnType
@@ -158,18 +197,24 @@ class FnType extends Type {
     public String toString() {
         return "function";
     }
+
+    static public boolean is(Traverser.Node n) {
+        return n.is(FnType.class);
+    };
+
 }
+
 
 // **********************************************************************
 // StructType
 // **********************************************************************
 class StructType extends Type {
     private IdNode myId;
-    
+
     public StructType(IdNode id) {
         myId = id;
     }
-    
+
     public boolean isStructType() {
         return true;
     }
@@ -181,7 +226,13 @@ class StructType extends Type {
     public String toString() {
         return myId.name();
     }
+
+    static public boolean is(Traverser.Node n) {
+        return n.is(StructType.class);
+    };
+
 }
+
 
 // **********************************************************************
 // StructDefType
@@ -199,4 +250,9 @@ class StructDefType extends Type {
     public String toString() {
         return "struct";
     }
+
+    static public boolean is(Traverser.Node n) {
+        return n.is(StructDefType.class);
+    };
+
 }

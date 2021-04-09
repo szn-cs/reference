@@ -7,6 +7,7 @@ import static java.util.Map.entry;
  * This class is used to generate warning and fatal error messages.
  */
 class ErrMsg {
+    // tracks if a fatal error occured during the execution of the program
     private static boolean err = false;
 
     /**
@@ -20,6 +21,11 @@ class ErrMsg {
         err = true;
         System.err.println(lineNum + ":" + charNum + " ***ERROR*** " + msg);
     }
+
+    static void fatal(int[] position, int msgNum) {
+        fatal(position[0], position[1], message.get(msgNum));
+    }
+
 
     /**
      * Generates a warning message.
@@ -38,10 +44,6 @@ class ErrMsg {
     static boolean getErr() {
         return err;
     }
-
-
-    // tracks if a fatal error occured during the execution of the program
-    // public static boolean errorOccured = false;
 
     public static final HashMap<Integer, String> message =
             new HashMap<>(Map.ofEntries(
@@ -104,7 +106,7 @@ class ErrMsg {
                     entry(7, "Attempt to read a struct variable"),
 
                     /**
-                     * Calling something other than a function; e.g., "x();",
+                     * ✅ Calling something other than a function; e.g., "x();",
                      * where x is not a function name. Note: In this case, you
                      * should not type-check the actual parameters.
                      * 
@@ -113,7 +115,7 @@ class ErrMsg {
                     entry(8, "Attempt to call a non-function"),
 
                     /**
-                     * Calling a function with the wrong number of arguments.
+                     * ✅ Calling a function with the wrong number of arguments.
                      * Note: In this case, you should not type-check the actual
                      * parameters.
                      * 
@@ -122,7 +124,7 @@ class ErrMsg {
                     entry(9, "Function call with wrong number of args"),
 
                     /**
-                     * Calling a function with an argument of the wrong type.
+                     * ✅ Calling a function with an argument of the wrong type.
                      * Note: you should only check for this error if the number
                      * of arguments is correct. If there are several arguments
                      * with the wrong type, you must give an error message for
@@ -159,9 +161,10 @@ class ErrMsg {
                     entry(13, "Bad return value"),
 
                     /**
-                     * Applying an arithmetic operator (+, -, *, /) to an
-                     * operand with type other than int. Note: this includes the
-                     * ++ and -- operators.
+                     * ✅ Applying an arithmetic operator (+, -, *, /) to an
+                     * operand with type other than int.
+                     * 
+                     * ✅ Note: this includes the ++ and -- operators.
                      * 
                      * 1st character of the first identifier or literal in an
                      * operand that is an expression of the wrong type.
@@ -170,7 +173,7 @@ class ErrMsg {
                             "Arithmetic operator applied to non-numeric operand"),
 
                     /**
-                     * Applying a relational operator (<, >, <=, >=) to an
+                     * ✅ Applying a relational operator (<, >, <=, >=) to an
                      * operand with type other than int.
                      * 
                      * 1st character of the first identifier or literal in an
@@ -180,7 +183,7 @@ class ErrMsg {
                             "Relational operator applied to non-numeric operand"),
 
                     /**
-                     * Applying a logical operator (!, &&, ||) to an operand
+                     * ✅ Applying a logical operator (!, &&, ||) to an operand
                      * with type other than bool.
                      * 
                      * 1st character of the first identifier or literal in an
@@ -214,9 +217,11 @@ class ErrMsg {
                     entry(19, "Non-integer expression used as a repeat clause"),
 
                     /**
-                     * Applying an equality operator (==, !=) to operands of two
-                     * different types (e.g., "j == true", where j is of type
-                     * int), or assigning a value of one type to a variable of
+                     * ✅ Applying an equality operator (==, !=) to operands of
+                     * two different types (e.g., "j == true", where j is of
+                     * type int),
+                     * 
+                     * ❌ or assigning a value of one type to a variable of
                      * another type (e.g., "j = true", where j is of type int).
                      * 
                      * 1st character of the first identifier or literal in the
@@ -225,7 +230,7 @@ class ErrMsg {
                     entry(20, "Type mismatch"),
 
                     /**
-                     * Applying an equality operator (==, !=) to void function
+                     * ✅ Applying an equality operator (==, !=) to void function
                      * operands (e.g., "f() == g()", where f and g are functions
                      * whose return type is void).
                      * 
@@ -234,7 +239,7 @@ class ErrMsg {
                     entry(21, "Equality operator applied to void functions"),
 
                     /**
-                     * Comparing two functions for equality, e.g., "f == g" or
+                     * ✅ Comparing two functions for equality, e.g., "f == g" or
                      * "f != g", where f and g are function names.
                      * 
                      * 1st character of the first function name.
@@ -242,7 +247,7 @@ class ErrMsg {
                     entry(22, "Equality operator applied to functions"),
 
                     /**
-                     * Comparing two struct names for equality, e.g., "A == B"
+                     * ✅ Comparing two struct names for equality, e.g., "A == B"
                      * or "A != B", where A and B are the names of struct types.
                      * 
                      * 1st character of the first struct name.
@@ -250,9 +255,9 @@ class ErrMsg {
                     entry(23, "Equality operator applied to struct names"),
 
                     /**
-                     * Comparing two struct variables for equality, e.g., "a ==
-                     * b" or "a != b", where a and a are variables declared to
-                     * be of struct types.
+                     * ✅ Comparing two struct variables for equality, e.g., "a
+                     * == b" or "a != b", where a and b are variables declared
+                     * to be of struct types.
                      * 
                      * 1st character of the first struct variable.
                      */
