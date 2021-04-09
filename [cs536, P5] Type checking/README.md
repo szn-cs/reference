@@ -49,7 +49,6 @@ The type checker will determine the type of every expression represented in the 
       - NOTE: can be int/bool field accessed using dot operator;
     - x cannot be function name, struct name or variable.
   - [ ] function invocation: call on function identifier; matching args (formals = actuals) types & number;
-    - struct or functions not allowed as args.
   - function returns: must return value of corrent type for non-void function;
     - void function must not have a return statement (even without value).
   - repeat loop times clause: int operand.
@@ -63,7 +62,7 @@ The type checker will determine the type of every expression represented in the 
   - for base nodes (e.g. IntLitNode) just return their type.
   - for IdNode: lookup the type of the declaration in the symbol table (linked field), and propagate up the type.
   - Algorithm:  get LHS & RHS types, check types compatibility for operator, then set the kind of node be a value, then set type of node to be the type of the operation's result.
-  - function calls: get type of each actual argument, match against the formal argument (check symbol), propagate the return type.
+  - [x] function calls: get type of each actual argument, match against the formal argument (check symbol), propagate the return type.
 - [ ] Cascading errors: to prevent duplicate error reporting, introduce an internal error type (use a special ErrorType for expressions that contain type errors): 
   - when type incompatibility is discovered then report the error, and propagate the type up the recursive calling. 
   - when an error type is encountered as an operand: don't re-report an error, only propagate the error type up the calling chain.

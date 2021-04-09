@@ -22,12 +22,10 @@ public class Traverser {
      * Traverse a list of ASTnode trees
      */
     public static void traverse(List<? extends ASTnode> nodeList, State state) {
-        if (nodeList == null || nodeList.isEmpty())
-            return;
+        if (nodeList == null || nodeList.isEmpty()) return;
         try {
             for (ASTnode n : nodeList)
-                if (n != null)
-                    traverse(n, state);
+                if (n != null) traverse(n, state);
         } catch (NoSuchElementException e) {
             System.err.println("Unexpected null exception");
             System.exit(-1);
@@ -46,7 +44,6 @@ public class Traverser {
      *                 traverse @
      */
     public static void traverse(Iterator<Config> iterator, State state) {
-
         while (iterator.hasNext()) {
             Config config = iterator.next();
             traverse(config.list, state);
@@ -57,6 +54,8 @@ public class Traverser {
      * Traverse ASTnode tree
      */
     public static void traverse(ASTnode n, State state) {
+        if (n == null) return; // short-circuit
+
         // traverse children
         if (n instanceof Node.Iterable && n.traverseSubtree)
             traverse(((Node.Iterable) n).getChildren(), state);
@@ -68,9 +67,7 @@ public class Traverser {
         // 🐞 print for debug
         // System.out.println(n.toString() + " visited");
         // state.print();
-
     }
-
 
     /**
      * Traversal state - Track states during traversal
@@ -94,7 +91,6 @@ public class Traverser {
             }
         }
     }
-
 
     /**
      * Iteration configurations for list of AST nodes involving scoping
@@ -168,7 +164,4 @@ public class Traverser {
         }
     }
 
-
 }
-
-

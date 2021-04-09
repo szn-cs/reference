@@ -381,13 +381,12 @@ class ExpListNode extends ASTnode implements Traverser.Node.Visitable {
         try {
             typeClass = visit((Traverser.State.TypeList) state);
         } catch (Exception e) {
-            System.err.println("Unexpected null exception");
+            System.err.println("Error: unexpected null exception");
             System.exit(-1);
             return null; // linter complaint
         }
 
         return typeClass;
-
     }
 
     public Class<? extends Type> visit(Traverser.State.TypeList formalState) {
@@ -473,7 +472,6 @@ class VarDeclNode extends DeclNode {
                 System.err.println("Unexpected EmptySymTableException "
                         + " in VarDeclNode.nameAnalysis");
             }
-
 
             // if the name for the struct type is not found,
             // or is not a struct type
@@ -743,8 +741,6 @@ class StructDeclNode extends DeclNode {
                     "Multiply declared identifier");
             badDecl = true;
         }
-
-
 
         if (!badDecl) {
             try { // add entry to symbol table
@@ -1572,13 +1568,11 @@ class AssignNode extends ExpNode implements Traverser.Node.Visitable {
     }
 
     public void unparse(PrintWriter p, int indent) {
-        if (indent != -1)
-            p.print("(");
+        if (indent != -1) p.print("(");
         myLhs.unparse(p, 0);
         p.print(" = ");
         myExp.unparse(p, 0);
-        if (indent != -1)
-            p.print(")");
+        if (indent != -1) p.print(")");
     }
 
     // 2 kids
@@ -1627,7 +1621,7 @@ class CallExpNode extends ExpNode implements Traverser.Node.Visitable {
         // non-function
         if (!FnType.is(myId)) {
             ErrMsg.fatal(getPosition(), 8);
-            return ErrorType.class;
+            return ErrorType.class; // no return type possible
         }
 
         FnSym s = (FnSym) myId.sym(); // must be FnSym
@@ -1641,19 +1635,15 @@ class CallExpNode extends ExpNode implements Traverser.Node.Visitable {
         // param number
         if (myExpList.getNumParams() != formalArgNumber) {
             ErrMsg.fatal(getPosition(), 9);
-            return s.returnType();
+        } else {
+            // actuals type
+            Traverser.traverse(myExpList,
+                    new Traverser.State.TypeList(formalTypeList));
         }
 
-        // actuals type
-        Traverser.traverse(myExpList,
-                new Traverser.State.TypeList(formalTypeList));
-
-        if (ErrorType.is(myExpList))
-            ; // TODO: How should this be handled ? return ErrorType ?
-
+        // always return the return type to allow wrapping expressions checking
         return s.returnType();
     }
-
 
     // 2 kids
     private IdNode myId;
@@ -1737,7 +1727,6 @@ class UnaryMinusNode extends UnaryExpNode implements Traverser.Node.Visitable {
     }
 
 }
-
 
 
 class NotNode extends UnaryExpNode implements Traverser.Node.Visitable {
@@ -1855,7 +1844,6 @@ class DivideNode extends _Arithmetic {
 }
 
 
-
 abstract class _Logical extends BinaryExpNode
         implements Traverser.Node.Visitable {
     public _Logical(ExpNode exp1, ExpNode exp2) {
@@ -1907,7 +1895,6 @@ class OrNode extends _Logical {
         p.print(")");
     }
 }
-
 
 
 abstract class _Equality extends BinaryExpNode
