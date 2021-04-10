@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.*;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.Traverse;
 
 // **********************************************************************
 // The ASTnode class defines the nodes of the abstract-syntax tree that
@@ -928,7 +927,7 @@ class PostIncStmtNode extends StmtNode implements Traverser.Node.Visitable {
 
     public Class<? extends Type> visit(Traverser.State state) {
         if (!ErrorType.is(myExp) && !IntType.is(myExp)) // type mismatch
-            ErrMsg.fatal(exp.getPosition(), 14);
+            ErrMsg.fatal(myExp.getPosition(), 14);
 
         return null; // statement cannot be part of a wrapper expression
     }
@@ -960,7 +959,7 @@ class PostDecStmtNode extends StmtNode implements Traverser.Node.Visitable {
 
     public Class<? extends Type> visit(Traverser.State state) {
         if (!ErrorType.is(myExp) && !IntType.is(myExp)) // type mismatch
-            ErrMsg.fatal(exp.getPosition(), 14);
+            ErrMsg.fatal(myExp.getPosition(), 14);
 
         return null; // statement cannot be part of a wrapper expression
     }
@@ -1672,6 +1671,10 @@ class DotAccessExpNode extends ExpNode
      */
     public int charNum() {
         return myId.charNum();
+    }
+
+    public int[] getPosition() {
+        return new int[] {lineNum(), charNum()};
     }
 
     /**

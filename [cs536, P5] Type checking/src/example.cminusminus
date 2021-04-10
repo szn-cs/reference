@@ -43,3 +43,27 @@ void main() {
     bbb = (aaa + true) && (bbb < true);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+/******************************************************************************/
+// TODO:
+// typeErrors.cminusminus should contain code with errors detected by the type checker. For every type error listed in the table above, you should include an instance of that error for each of the relevant operators, and in each part of a program where the error can occur (e.g., in a top-level statement, in a statement inside a while loop, etc).
+
+// should output error messages to be output.
+
+
+
+
+
+
+
+// Check for assignment expression if lhs & rhs both are void function.

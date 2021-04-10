@@ -55,8 +55,8 @@ The type checker will determine the type of every expression represented in the 
 
 # Tasks
 - [ ] check example files.
-- [x] Edit P5.java, ast.java.
 - [ ] Write test files.
+- [x] Edit P5.java, ast.java.
 - [x] Type checking implementation: 
   - add typeCheck method to AST nodes - walk the AST checking types of sub-expressions.
   - for base nodes (e.g. IntLitNode) just return their type.
