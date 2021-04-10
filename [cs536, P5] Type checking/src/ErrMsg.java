@@ -48,7 +48,7 @@ class ErrMsg {
     public static final HashMap<Integer, String> message =
             new HashMap<>(Map.ofEntries(
                     /**
-                     * Writing a function; e.g., "cout << f", where f is a
+                     * ✅ Writing a function; e.g., "cout << f", where f is a
                      * function name.
                      * 
                      * 1st character of the function name.
@@ -56,24 +56,24 @@ class ErrMsg {
                     entry(1, "Attempt to write a function"),
 
                     /**
-                     * Writing a struct name; e.g., "cout << P", where P is the
-                     * name of a struct type.
+                     * ✅ Writing a struct name; e.g., "cout << P", where P is
+                     * the name of a struct type.
                      * 
                      * 1st character of the struct name.
                      */
                     entry(2, "Attempt to write a struct name"),
 
                     /**
-                     * Writing a struct variable; e.g., "cout << p", where p is
-                     * a variable declared to be of a struct type.
+                     * ✅ Writing a struct variable; e.g., "cout << p", where p
+                     * is a variable declared to be of a struct type.
                      * 
                      * 1st character of the struct variable.
                      */
                     entry(3, "Attempt to write a struct variable"),
 
                     /**
-                     * Writing a void value (note: this can only happen if there
-                     * is an attempt to write the return value from a void
+                     * ✅ Writing a void value (note: this can only happen if
+                     * there is an attempt to write the return value from a void
                      * function); e.g., "cout << f()", where f is a void
                      * function.
                      * 
@@ -82,7 +82,7 @@ class ErrMsg {
                     entry(4, "Attempt to write void"),
 
                     /**
-                     * Reading a function: e.g., "cin >> f", where f is a
+                     * ✅ Reading a function: e.g., "cin >> f", where f is a
                      * function name.
                      * 
                      * 1st character of the function name.
@@ -90,7 +90,7 @@ class ErrMsg {
                     entry(5, "Attempt to read a function"),
 
                     /**
-                     * Reading a struct name; e.g., "cin >> P", where P is the
+                     * ✅ Reading a struct name; e.g., "cin >> P", where P is the
                      * name of a struct type.
                      * 
                      * 1st character of the struct name.
@@ -98,8 +98,8 @@ class ErrMsg {
                     entry(6, "Attempt to read a struct name"),
 
                     /**
-                     * Reading a struct variable; e.g., "cin >> p", where p is a
-                     * variable declared to be of a struct type.
+                     * ✅ Reading a struct variable; e.g., "cin >> p", where p is
+                     * a variable declared to be of a struct type.
                      * 
                      * 1st character of the struct variable.
                      */
@@ -136,7 +136,7 @@ class ErrMsg {
                     entry(10, "Type of actual does not match type of formal"),
 
                     /**
-                     * Returning from a non-void function with a plain return
+                     * ✅ Returning from a non-void function with a plain return
                      * statement (i.e., one that does not return a value).
                      * 
                      * position to report: 0,0
@@ -144,7 +144,7 @@ class ErrMsg {
                     entry(11, "Missing return value"),
 
                     /**
-                     * Returning a value from a void function.
+                     * ✅ Returning a value from a void function.
                      * 
                      * 1st character of the first identifier or literal in the
                      * returned expression.
@@ -152,7 +152,7 @@ class ErrMsg {
                     entry(12, "Return with a value in a void function"),
 
                     /**
-                     * Returning a value of the wrong type from a non-void
+                     * ✅ Returning a value of the wrong type from a non-void
                      * function.
                      * 
                      * 1st character of the first identifier or literal in the
@@ -192,7 +192,7 @@ class ErrMsg {
                     entry(16, "Logical operator applied to non-bool operand"),
 
                     /**
-                     * Using a non-bool expression as the condition of an if.
+                     * ✅ Using a non-bool expression as the condition of an if.
                      * 
                      * 1st character of the first identifier or literal in the
                      * condition.
@@ -200,7 +200,8 @@ class ErrMsg {
                     entry(17, "Non-bool expression used as an if condition"),
 
                     /**
-                     * Using a non-bool expression as the condition of a while.
+                     * ✅ Using a non-bool expression as the condition of a
+                     * while.
                      * 
                      * 1st character of the first identifier or literal in the
                      * condition.
@@ -208,7 +209,7 @@ class ErrMsg {
                     entry(18, "Non-bool expression used as a while condition"),
 
                     /**
-                     * Using a non-integer expression as the times clause of a
+                     * ✅ Using a non-integer expression as the times clause of a
                      * repeat.
                      * 
                      * 1st character of the first identifier or literal in the
@@ -221,7 +222,7 @@ class ErrMsg {
                      * two different types (e.g., "j == true", where j is of
                      * type int),
                      * 
-                     * ❌ or assigning a value of one type to a variable of
+                     * ✅ or assigning a value of one type to a variable of
                      * another type (e.g., "j = true", where j is of type int).
                      * 
                      * 1st character of the first identifier or literal in the
@@ -264,23 +265,23 @@ class ErrMsg {
                     entry(24, "Equality operator applied to struct variables"),
 
                     /**
-                     * Assigning a function to a function; e.g., "f = g;", where
-                     * f and g are function names.
+                     * ✅ Assigning a function to a function; e.g., "f = g;",
+                     * where f and g are function names.
                      * 
                      * 1st character of the first function name.
                      */
                     entry(25, "Function assignment"),
 
                     /**
-                     * Assigning a struct name to a struct name; e.g., "A = B;",
-                     * where A and B are the names of struct types.
+                     * ✅ Assigning a struct name to a struct name; e.g., "A =
+                     * B;", where A and B are the names of struct types.
                      * 
                      * 1st character of the first struct name.
                      */
                     entry(26, "Struct name assignment"),
 
                     /**
-                     * Assigning a struct variable to a struct variable; e.g.,
+                     * ✅ Assigning a struct variable to a struct variable; e.g.,
                      * "a = b;", where a and b are variables declared to be of
                      * struct types.
                      * 

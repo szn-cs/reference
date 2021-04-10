@@ -17,6 +17,11 @@ abstract public class Type {
 
     abstract public boolean equals(Type t);
 
+    // returns the class of the Type instance
+    public Class<? extends Type> classType() {
+        return this.getClass();
+    }
+
     /** check if AST node is of matching type */
     static public boolean is(Traverser.Node n, Class<? extends Type> c) {
         return n.is(c);

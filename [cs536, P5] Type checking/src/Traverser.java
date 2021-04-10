@@ -71,13 +71,13 @@ public class Traverser {
 
     /**
      * Traversal state - Track states during traversal
+     * 
+     * implement if required to access/manipulate shared state during traversal.
      */
     public static class State {
-        // TODO: if required to access/manipulate a shared state during
-        // traversal.
 
         /**
-         * state containg list of Types
+         * state containing list of Types
          * 
          * used for expression list in a function invocation.
          */
@@ -87,9 +87,24 @@ public class Traverser {
             public TypeList(List<Type> l) {
                 // convert to the a list of Type classes
                 for (Type t : l)
-                    typeList.add(t.getClass());
+                    typeList.add(t.classType());
             }
         }
+
+
+        /**
+         * state containing single type
+         * 
+         * used for return statement in a function body
+         */
+        public static class TypeValue extends State {
+            Class<? extends Type> typeValue;
+
+            public TypeValue(Type t) {
+                typeValue = t.classType();
+            }
+        }
+
     }
 
     /**
@@ -118,6 +133,11 @@ public class Traverser {
         public boolean traverseSubtree = true;
         // result type of expression node. Fail if not reset by visiting
         public Class<? extends Type> typeClass = ErrorType.class;
+
+        // getter field
+        public Class<? extends Type> typeClass() {
+            return this.typeClass;
+        }
 
         // check for type match with a Type class
         public boolean is(java.lang.Class<? extends Type> c) {

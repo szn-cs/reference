@@ -41,3 +41,8 @@ return 3+true;    // in a void function: one error for the 2nd operand to +
 ```
 
 */
+
+
+
+
+// Check for assignment expression if lhs & rhs both are void function.

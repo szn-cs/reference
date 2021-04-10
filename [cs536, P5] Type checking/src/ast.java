@@ -211,7 +211,7 @@ class DeclListNode extends ASTnode implements Traverser.Node.Iterable {
 }
 
 
-class FormalsListNode extends ASTnode implements Traverser.Node.Iterable {
+class FormalsListNode extends ASTnode {
     public FormalsListNode(List<FormalDeclNode> S) {
         myFormals = S;
     }
@@ -250,14 +250,6 @@ class FormalsListNode extends ASTnode implements Traverser.Node.Iterable {
         }
     }
 
-    public Iterator<Traverser.Config> getChildren() {
-        ArrayList<Traverser.Config> children = new ArrayList<>();
-
-        children.add(new Traverser.Config(myFormals));
-
-        return children.iterator();
-    }
-
     // list of kids (FormalDeclNodes)
     private List<FormalDeclNode> myFormals;
 }
@@ -285,16 +277,10 @@ class FnBodyNode extends ASTnode implements Traverser.Node.Iterable {
 
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
-
-        {
-            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myDeclList));
-            children.add(new Traverser.Config(nodeList));
-        }
         {
             ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myStmtList));
             children.add(new Traverser.Config(nodeList));
         }
-
         return children.iterator();
     }
 
@@ -339,7 +325,6 @@ class StmtListNode extends ASTnode implements Traverser.Node.Iterable {
 }
 
 
-// ✅
 class ExpListNode extends ASTnode implements Traverser.Node.Visitable {
 
     public ExpListNode(List<ExpNode> S) {
@@ -543,7 +528,7 @@ class VarDeclNode extends DeclNode {
 }
 
 
-class FnDeclNode extends DeclNode {
+class FnDeclNode extends DeclNode implements Traverser.Node.Visitable {
     public FnDeclNode(TypeNode type, IdNode id, FormalsListNode formalList,
             FnBodyNode body) {
         myType = type;
@@ -629,6 +614,15 @@ class FnDeclNode extends DeclNode {
         myBody.unparse(p, indent + 4);
         p.println("}\n");
     }
+
+    public Class<? extends Type> visit(Traverser.State state) {
+        Traverser.traverse(myBody,
+                new Traverser.State.TypeValue(myType.type()));
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+
 
     // 4 kids
     private TypeNode myType;
@@ -880,7 +874,8 @@ abstract class StmtNode extends ASTnode {
 }
 
 
-class AssignStmtNode extends StmtNode {
+
+class AssignStmtNode extends StmtNode implements Traverser.Node.Iterable {
     public AssignStmtNode(AssignNode assign) {
         myAssign = assign;
     }
@@ -899,12 +894,20 @@ class AssignStmtNode extends StmtNode {
         p.println(";");
     }
 
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(List.of(myAssign)));
+
+        return children.iterator();
+    }
+
     // 1 kid
     private AssignNode myAssign;
 }
 
 
-class PostIncStmtNode extends StmtNode {
+class PostIncStmtNode extends StmtNode implements Traverser.Node.Visitable {
     public PostIncStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -923,12 +926,20 @@ class PostIncStmtNode extends StmtNode {
         p.println("++;");
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        if (!ErrorType.is(myExp) && !IntType.is(myExp)) // type mismatch
+            ErrMsg.fatal(exp.getPosition(), 14);
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+
     // 1 kid
     private ExpNode myExp;
 }
 
 
-class PostDecStmtNode extends StmtNode {
+class PostDecStmtNode extends StmtNode implements Traverser.Node.Visitable {
     public PostDecStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -947,12 +958,21 @@ class PostDecStmtNode extends StmtNode {
         p.println("--;");
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        if (!ErrorType.is(myExp) && !IntType.is(myExp)) // type mismatch
+            ErrMsg.fatal(exp.getPosition(), 14);
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
     // 1 kid
     private ExpNode myExp;
 }
 
 
-class ReadStmtNode extends StmtNode {
+
+class ReadStmtNode extends StmtNode
+        implements Traverser.Node.Iterable, Traverser.Node.Visitable {
     public ReadStmtNode(ExpNode e) {
         myExp = e;
     }
@@ -972,12 +992,36 @@ class ReadStmtNode extends StmtNode {
         p.println(";");
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        // function type
+        if (FnType.is(myExp)) ErrMsg.fatal(myExp.getPosition(), 5);
+
+        // struct name
+        if (StructDefType.is(myExp)) ErrMsg.fatal(myExp.getPosition(), 6);
+
+        // struct variable
+        if (StructType.is(myExp)) ErrMsg.fatal(myExp.getPosition(), 7);
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(List.of(myExp)));
+
+        return children.iterator();
+    }
+
+
     // 1 kid (actually can only be an IdNode or an ArrayExpNode)
     private ExpNode myExp;
 }
 
 
-class WriteStmtNode extends StmtNode {
+
+class WriteStmtNode extends StmtNode
+        implements Traverser.Node.Iterable, Traverser.Node.Visitable {
     public WriteStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -997,12 +1041,38 @@ class WriteStmtNode extends StmtNode {
         p.println(";");
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        // function type
+        if (FnType.is(myExp)) ErrMsg.fatal(myExp.getPosition(), 1);
+
+        // struct name
+        if (StructDefType.is(myExp)) ErrMsg.fatal(myExp.getPosition(), 2);
+
+        // struct variable
+        if (StructType.is(myExp)) ErrMsg.fatal(myExp.getPosition(), 3);
+
+        // void function
+        if (VoidType.is(myExp)) ErrMsg.fatal(myExp.getPosition(), 4);
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(List.of(myExp)));
+
+        return children.iterator();
+    }
+
     // 1 kid
     private ExpNode myExp;
 }
 
 
-class IfStmtNode extends StmtNode {
+
+class IfStmtNode extends StmtNode
+        implements Traverser.Node.Iterable, Traverser.Node.Visitable {
     public IfStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myDeclList = dlist;
         myExp = exp;
@@ -1038,6 +1108,22 @@ class IfStmtNode extends StmtNode {
         p.println("}");
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        // cascading error & type mismatch
+        if (!ErrorType.is(myExp) && !BoolType.is(myExp))
+            ErrMsg.fatal(myExp.getPosition(), 17);
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(List.of(myExp, myStmtList)));
+
+        return children.iterator();
+    }
+
     // e kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
@@ -1045,7 +1131,9 @@ class IfStmtNode extends StmtNode {
 }
 
 
-class IfElseStmtNode extends StmtNode {
+
+class IfElseStmtNode extends StmtNode
+        implements Traverser.Node.Iterable, Traverser.Node.Visitable {
     public IfElseStmtNode(ExpNode exp, DeclListNode dlist1, StmtListNode slist1,
             DeclListNode dlist2, StmtListNode slist2) {
         myExp = exp;
@@ -1102,16 +1190,35 @@ class IfElseStmtNode extends StmtNode {
         p.println("}");
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        // cascading error & type mismatch
+        if (!ErrorType.is(myExp) && !BoolType.is(myExp))
+            ErrMsg.fatal(myExp.getPosition(), 17);
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(
+                List.of(myExp, myThenStmtList, myElseStmtList)));
+
+        return children.iterator();
+    }
+
     // 5 kids
     private ExpNode myExp;
     private DeclListNode myThenDeclList;
     private StmtListNode myThenStmtList;
-    private StmtListNode myElseStmtList;
     private DeclListNode myElseDeclList;
+    private StmtListNode myElseStmtList;
 }
 
 
-class WhileStmtNode extends StmtNode {
+
+class WhileStmtNode extends StmtNode
+        implements Traverser.Node.Iterable, Traverser.Node.Visitable {
     public WhileStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myExp = exp;
         myDeclList = dlist;
@@ -1147,6 +1254,22 @@ class WhileStmtNode extends StmtNode {
         p.println("}");
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        // cascading error & type mismatch
+        if (!ErrorType.is(myExp) && !BoolType.is(myExp))
+            ErrMsg.fatal(myExp.getPosition(), 18);
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(List.of(myExp, myStmtList)));
+
+        return children.iterator();
+    }
+
     // 3 kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
@@ -1154,7 +1277,8 @@ class WhileStmtNode extends StmtNode {
 }
 
 
-class RepeatStmtNode extends StmtNode {
+class RepeatStmtNode extends StmtNode
+        implements Traverser.Node.Iterable, Traverser.Node.Visitable {
     public RepeatStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myExp = exp;
         myDeclList = dlist;
@@ -1190,6 +1314,23 @@ class RepeatStmtNode extends StmtNode {
         p.println("}");
     }
 
+
+    public Class<? extends Type> visit(Traverser.State state) {
+        // cascading error & type mismatch
+        if (!ErrorType.is(myExp) && !IntType.is(myExp))
+            ErrMsg.fatal(myExp.getPosition(), 19);
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(List.of(myExp, myStmtList)));
+
+        return children.iterator();
+    }
+
     // 3 kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
@@ -1197,7 +1338,8 @@ class RepeatStmtNode extends StmtNode {
 }
 
 
-class CallStmtNode extends StmtNode {
+
+class CallStmtNode extends StmtNode implements Traverser.Node.Iterable {
     public CallStmtNode(CallExpNode call) {
         myCall = call;
     }
@@ -1216,12 +1358,21 @@ class CallStmtNode extends StmtNode {
         p.println(";");
     }
 
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(List.of(myCall)));
+
+        return children.iterator();
+    }
+
     // 1 kid
     private CallExpNode myCall;
 }
 
 
-class ReturnStmtNode extends StmtNode {
+class ReturnStmtNode extends StmtNode
+        implements Traverser.Node.Iterable, Traverser.Node.Visitable {
     public ReturnStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -1244,6 +1395,56 @@ class ReturnStmtNode extends StmtNode {
             myExp.unparse(p, 0);
         }
         p.println(";");
+    }
+
+    public Class<? extends Type> visit(Traverser.State state) {
+        if (!(state instanceof Traverser.State.TypeValue)) {
+            System.err.println("Error: unsupported state traversal");
+            System.exit(-1);
+        }
+
+        try {
+            visit((Traverser.State.TypeValue) state);
+        } catch (Exception e) {
+            System.err.println("Error: unexpected null exception");
+            System.exit(-1);
+            return null; // linter complaint
+        }
+
+        return null; // statement cannot be part of a wrapper expression
+    }
+
+    public void visit(Traverser.State.TypeValue TypeValueState) {
+        Class<? extends Type> functionReturnType = TypeValueState.typeValue;
+
+        // void function
+        if (functionReturnType == VoidType.class) {
+            if (myExp != null) // with return value
+                ErrMsg.fatal(myExp.getPosition(), 12);
+            return;
+        }
+
+        /* non-void function - no return value */
+        if (myExp == null) {
+            ErrMsg.fatal(new int[] {0, 0}, 11);
+            return;
+        }
+
+        // cascading error
+        if (ErrorType.is(myExp) || ErrorType.class == functionReturnType)
+            return;
+
+        /* non-void function - with returh value */
+        if (!Type.is(myExp, functionReturnType))
+            ErrMsg.fatal(myExp.getPosition(), 13);
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        children.add(new Traverser.Config(List.of(myExp)));
+
+        return children.iterator();
     }
 
     // 1 kid
@@ -1274,9 +1475,15 @@ abstract class ExpNode extends ASTnode implements Position {
 }
 
 
-abstract class _BaseExpNode extends ExpNode {
+abstract class _BaseExpNode extends ExpNode
+        implements Traverser.Node.Visitable {
     public int myLineNum;
     public int myCharNum;
+
+    public _BaseExpNode(int lineNum, int charNum) {
+        myLineNum = lineNum;
+        myCharNum = charNum;
+    }
 
     /**
      * Return the line number for this ID.
@@ -1300,8 +1507,7 @@ abstract class _BaseExpNode extends ExpNode {
 
 class IntLitNode extends _BaseExpNode {
     public IntLitNode(int lineNum, int charNum, int intVal) {
-        myLineNum = lineNum;
-        myCharNum = charNum;
+        super(lineNum, charNum);
         myIntVal = intVal;
     }
 
@@ -1309,19 +1515,27 @@ class IntLitNode extends _BaseExpNode {
         p.print(myIntVal);
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        return IntType.class;
+    }
+
     private int myIntVal;
 }
 
 
+
 class StringLitNode extends _BaseExpNode {
     public StringLitNode(int lineNum, int charNum, String strVal) {
-        myLineNum = lineNum;
-        myCharNum = charNum;
+        super(lineNum, charNum);
         myStrVal = strVal;
     }
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
+    }
+
+    public Class<? extends Type> visit(Traverser.State state) {
+        return StringType.class;
     }
 
     private String myStrVal;
@@ -1330,12 +1544,15 @@ class StringLitNode extends _BaseExpNode {
 
 class TrueNode extends _BaseExpNode {
     public TrueNode(int lineNum, int charNum) {
-        myLineNum = lineNum;
-        myCharNum = charNum;
+        super(lineNum, charNum);
     }
 
     public void unparse(PrintWriter p, int indent) {
         p.print("true");
+    }
+
+    public Class<? extends Type> visit(Traverser.State state) {
+        return BoolType.class;
     }
 
 }
@@ -1343,12 +1560,15 @@ class TrueNode extends _BaseExpNode {
 
 class FalseNode extends _BaseExpNode {
     public FalseNode(int lineNum, int charNum) {
-        myLineNum = lineNum;
-        myCharNum = charNum;
+        super(lineNum, charNum);
     }
 
     public void unparse(PrintWriter p, int indent) {
         p.print("false");
+    }
+
+    public Class<? extends Type> visit(Traverser.State state) {
+        return BoolType.class;
     }
 
 }
@@ -1356,8 +1576,7 @@ class FalseNode extends _BaseExpNode {
 
 class IdNode extends _BaseExpNode {
     public IdNode(int lineNum, int charNum, String strVal) {
-        myLineNum = lineNum;
-        myCharNum = charNum;
+        super(lineNum, charNum);
         myStrVal = strVal;
     }
 
@@ -1409,12 +1628,23 @@ class IdNode extends _BaseExpNode {
         }
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        if (mySym == null) { // name analysis error
+            System.err.println("Error: null symbol encountered");
+            System.exit(-1);
+        }
+
+        return mySym.typeClass();
+    }
+
+
     private String myStrVal;
-    private TSym mySym;
+    private TSym mySym; // symbol of the identifier
 }
 
 
-class DotAccessExpNode extends ExpNode implements Traverser.Node.Visitable {
+class DotAccessExpNode extends ExpNode
+        implements Traverser.Node.Visitable, Traverser.Node.Iterable {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
         myLoc = loc;
         myId = id;
@@ -1544,6 +1774,22 @@ class DotAccessExpNode extends ExpNode implements Traverser.Node.Visitable {
         myId.unparse(p, 0);
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        // NOTE: type errors for fields access are reported during name analysis
+        // part.
+
+        return myId.typeClass(); // type of the field being accessed
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myId));
+        children.add(new Traverser.Config(nodeList));
+
+        return children.iterator();
+    }
+
     // 2 kids
     private ExpNode myLoc;
     private IdNode myId;
@@ -1552,10 +1798,15 @@ class DotAccessExpNode extends ExpNode implements Traverser.Node.Visitable {
 }
 
 
-class AssignNode extends ExpNode implements Traverser.Node.Visitable {
+class AssignNode extends ExpNode
+        implements Traverser.Node.Visitable, Traverser.Node.Iterable {
     public AssignNode(ExpNode lhs, ExpNode exp) {
         myLhs = lhs;
         myExp = exp;
+    }
+
+    public int[] getPosition() {
+        return myLhs.getPosition();
     }
 
     /**
@@ -1575,12 +1826,51 @@ class AssignNode extends ExpNode implements Traverser.Node.Visitable {
         if (indent != -1) p.print(")");
     }
 
+    public Class<? extends Type> visit(Traverser.State state) {
+        boolean e = false; // error flag
+
+        // function
+        if (FnType.is(myLhs) && FnType.is(myExp)) {
+            ErrMsg.fatal(getPosition(), 25);
+            e = true;
+        }
+
+        // struct name
+        if (StructDefType.is(myLhs) && StructDefType.is(myExp)) {
+            ErrMsg.fatal(getPosition(), 26);
+            e = true;
+        }
+
+        // struct variable
+        if (StructType.is(myLhs) && StructType.is(myExp)) {
+            ErrMsg.fatal(getPosition(), 27);
+            e = true;
+        }
+
+        if (ErrorType.is(myLhs) || ErrorType.is(myExp)) // cascading error
+            e = true;
+        // TODO: should add check for only bool or int types ?
+        else if (!Type.is(myLhs, myExp)) { // check mismatch
+            ErrMsg.fatal(getPosition(), 20);
+            e = true;
+        }
+
+        return e ? ErrorType.class : myLhs.typeClass()/* LHS == RHS */;
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myLhs, myExp));
+        children.add(new Traverser.Config(nodeList));
+
+        return children.iterator();
+    }
+
     // 2 kids
     private ExpNode myLhs;
     private ExpNode myExp;
 }
-
-/* ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅ */
 
 
 class CallExpNode extends ExpNode implements Traverser.Node.Visitable {
@@ -1629,11 +1919,13 @@ class CallExpNode extends ExpNode implements Traverser.Node.Visitable {
             System.err.println("Error null symbol");
             System.exit(-1);
         }
+
         int formalArgNumber = s.getNumParams();
+        int actualArgNumber = myExpList != null ? myExpList.getNumParams() : 0;
         List<Type> formalTypeList = s.getParamTypes();
 
         // param number
-        if (myExpList.getNumParams() != formalArgNumber) {
+        if (actualArgNumber != formalArgNumber) {
             ErrMsg.fatal(getPosition(), 9);
         } else {
             // actuals type
