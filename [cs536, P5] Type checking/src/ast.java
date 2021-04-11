@@ -145,7 +145,8 @@ class ProgramNode extends ASTnode implements Traverser.Node.Iterable {
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myDeclList));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myDeclList);
         children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
@@ -190,9 +191,11 @@ class DeclListNode extends ASTnode implements Traverser.Node.Iterable {
             while (it.hasNext()) {
                 ((DeclNode) it.next()).unparse(p, indent);
             }
-        } catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException e) {
             System.err.println(
-                    "unexpected NoSuchElementException in DeclListNode.print");
+                    "unexpected NoSuchElementException in DeclListNode.print; "
+                            + e);
+            e.printStackTrace();
             System.exit(-1);
         }
     }
@@ -277,7 +280,9 @@ class FnBodyNode extends ASTnode implements Traverser.Node.Iterable {
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
         {
-            ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myStmtList));
+            ArrayList<ASTnode> nodeList = new ArrayList<>();
+            nodeList.add(myStmtList);
+
             children.add(new Traverser.Config(nodeList));
         }
         return children.iterator();
@@ -358,14 +363,16 @@ class ExpListNode extends ASTnode implements Traverser.Node.Visitable {
         Class<? extends Type> typeClass;
 
         if (!(state instanceof Traverser.State.TypeList)) {
-            System.err.println("Error: unsupported state traversal");
+            System.err.println("Error: unsupported state traversal;");
+
             System.exit(-1);
         }
 
         try {
             typeClass = visit((Traverser.State.TypeList) state);
         } catch (Exception e) {
-            System.err.println("Error: unexpected null exception");
+            System.err.println("Error: unexpected null exception; " + e);
+            e.printStackTrace();
             System.exit(-1);
             return null; // linter complaint
         }
@@ -452,9 +459,9 @@ class VarDeclNode extends DeclNode {
 
             try {
                 sym = globalTab.lookupGlobal(structId.name());
-            } catch (EmptySymTableException ex) {
+            } catch (EmptySymTableException e) {
                 System.err.println("Unexpected EmptySymTableException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
             }
 
             // if the name for the struct type is not found,
@@ -472,9 +479,9 @@ class VarDeclNode extends DeclNode {
 
         try {
             symCheckMul = symTab.lookupLocal(name);
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in VarDeclNode.nameAnalysis");
+                    + " in VarDeclNode.nameAnalysis; " + e);
         }
 
         if (symCheckMul != null) {
@@ -492,17 +499,20 @@ class VarDeclNode extends DeclNode {
                 }
                 symTab.addDecl(name, sym);
                 myId.link(sym);
-            } catch (DuplicateSymException ex) {
+            } catch (DuplicateSymException e) {
                 System.err.println("Unexpected DuplicateSymException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
-            } catch (EmptySymTableException ex) {
+            } catch (EmptySymTableException e) {
                 System.err.println("Unexpected EmptySymTableException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException e) {
                 System.err.println("Unexpected IllegalArgumentException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
             }
         }
@@ -551,9 +561,9 @@ class FnDeclNode extends DeclNode implements Traverser.Node.Visitable {
 
         try {
             symCheckMul = symTab.lookupLocal(name);
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in VarDeclNode.nameAnalysis");
+                    + " in VarDeclNode.nameAnalysis; " + e);
         }
 
         if (symCheckMul != null) {
@@ -566,17 +576,20 @@ class FnDeclNode extends DeclNode implements Traverser.Node.Visitable {
                 sym = new FnSym(myType.type(), myFormalsList.length());
                 symTab.addDecl(name, sym);
                 myId.link(sym);
-            } catch (DuplicateSymException ex) {
+            } catch (DuplicateSymException e) {
                 System.err.println("Unexpected DuplicateSymException "
-                        + " in FnDeclNode.nameAnalysis");
+                        + " in FnDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
-            } catch (EmptySymTableException ex) {
+            } catch (EmptySymTableException e) {
                 System.err.println("Unexpected EmptySymTableException "
-                        + " in FnDeclNode.nameAnalysis");
+                        + " in FnDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException e) {
                 System.err.println("Unexpected IllegalArgumentException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
             }
         }
@@ -593,9 +606,10 @@ class FnDeclNode extends DeclNode implements Traverser.Node.Visitable {
 
         try {
             symTab.removeScope(); // exit scope
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in FnDeclNode.nameAnalysis");
+                    + " in FnDeclNode.nameAnalysis; " + e);
+            e.printStackTrace();
             System.exit(-1);
         }
 
@@ -658,9 +672,9 @@ class FormalDeclNode extends DeclNode {
 
         try {
             symCheckMul = symTab.lookupLocal(name);
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in VarDeclNode.nameAnalysis");
+                    + " in VarDeclNode.nameAnalysis; " + e);
         }
 
         if (symCheckMul != null) {
@@ -674,17 +688,20 @@ class FormalDeclNode extends DeclNode {
                 sym = new TSym(myType.type());
                 symTab.addDecl(name, sym);
                 myId.link(sym);
-            } catch (DuplicateSymException ex) {
+            } catch (DuplicateSymException e) {
                 System.err.println("Unexpected DuplicateSymException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
-            } catch (EmptySymTableException ex) {
+            } catch (EmptySymTableException e) {
                 System.err.println("Unexpected EmptySymTableException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException e) {
                 System.err.println("Unexpected IllegalArgumentException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
             }
         }
@@ -724,9 +741,9 @@ class StructDeclNode extends DeclNode {
 
         try {
             symCheckMul = symTab.lookupLocal(name);
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in VarDeclNode.nameAnalysis");
+                    + " in VarDeclNode.nameAnalysis; " + e);
         }
 
         if (symCheckMul != null) {
@@ -742,17 +759,20 @@ class StructDeclNode extends DeclNode {
                 StructDefSym sym = new StructDefSym(structSymTab);
                 symTab.addDecl(name, sym);
                 myId.link(sym);
-            } catch (DuplicateSymException ex) {
+            } catch (DuplicateSymException e) {
                 System.err.println("Unexpected DuplicateSymException "
-                        + " in StructDeclNode.nameAnalysis");
+                        + " in StructDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
-            } catch (EmptySymTableException ex) {
+            } catch (EmptySymTableException e) {
                 System.err.println("Unexpected EmptySymTableException "
-                        + " in StructDeclNode.nameAnalysis");
+                        + " in StructDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException e) {
                 System.err.println("Unexpected IllegalArgumentException "
-                        + " in VarDeclNode.nameAnalysis");
+                        + " in VarDeclNode.nameAnalysis; " + e);
+                e.printStackTrace();
                 System.exit(-1);
             }
         }
@@ -896,7 +916,9 @@ class AssignStmtNode extends StmtNode implements Traverser.Node.Iterable {
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(List.of(myAssign)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myAssign);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1007,7 +1029,9 @@ class ReadStmtNode extends StmtNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(List.of(myExp)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1059,7 +1083,9 @@ class WriteStmtNode extends StmtNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(List.of(myExp)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1089,9 +1115,10 @@ class IfStmtNode extends StmtNode
         myStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in IfStmtNode.nameAnalysis");
+                    + " in IfStmtNode.nameAnalysis; " + e);
+            e.printStackTrace();
             System.exit(-1);
         }
     }
@@ -1118,7 +1145,10 @@ class IfStmtNode extends StmtNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(List.of(myExp, myStmtList)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        nodeList.add(myStmtList);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1155,9 +1185,10 @@ class IfElseStmtNode extends StmtNode
         myThenStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in IfStmtNode.nameAnalysis");
+                    + " in IfStmtNode.nameAnalysis; " + e);
+            e.printStackTrace();
             System.exit(-1);
         }
         symTab.addScope();
@@ -1165,9 +1196,10 @@ class IfElseStmtNode extends StmtNode
         myElseStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in IfStmtNode.nameAnalysis");
+                    + " in IfStmtNode.nameAnalysis; " + e);
+            e.printStackTrace();
             System.exit(-1);
         }
     }
@@ -1200,8 +1232,11 @@ class IfElseStmtNode extends StmtNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(
-                List.of(myExp, myThenStmtList, myElseStmtList)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        nodeList.add(myThenStmtList);
+        nodeList.add(myElseStmtList);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1235,9 +1270,10 @@ class WhileStmtNode extends StmtNode
         myStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in IfStmtNode.nameAnalysis");
+                    + " in IfStmtNode.nameAnalysis; " + e);
+            e.printStackTrace();
             System.exit(-1);
         }
     }
@@ -1264,7 +1300,10 @@ class WhileStmtNode extends StmtNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(List.of(myExp, myStmtList)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        nodeList.add(myStmtList);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1295,9 +1334,10 @@ class RepeatStmtNode extends StmtNode
         myStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in IfStmtNode.nameAnalysis");
+                    + " in IfStmtNode.nameAnalysis; " + e);
+            e.printStackTrace();
             System.exit(-1);
         }
     }
@@ -1325,7 +1365,10 @@ class RepeatStmtNode extends StmtNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(List.of(myExp, myStmtList)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        nodeList.add(myStmtList);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1360,7 +1403,9 @@ class CallStmtNode extends StmtNode implements Traverser.Node.Iterable {
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(List.of(myCall)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myCall);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1399,13 +1444,15 @@ class ReturnStmtNode extends StmtNode
     public Class<? extends Type> visit(Traverser.State state) {
         if (!(state instanceof Traverser.State.TypeValue)) {
             System.err.println("Error: unsupported state traversal");
+
             System.exit(-1);
         }
 
         try {
             visit((Traverser.State.TypeValue) state);
         } catch (Exception e) {
-            System.err.println("Error: unexpected null exception");
+            System.err.println("Error: unexpected null exception; " + e);
+            e.printStackTrace();
             System.exit(-1);
             return null; // linter complaint
         }
@@ -1441,7 +1488,9 @@ class ReturnStmtNode extends StmtNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        children.add(new Traverser.Config(List.of(myExp)));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
     }
@@ -1608,9 +1657,10 @@ class IdNode extends _BaseExpNode {
         TSym sym = null;
         try {
             sym = symTab.lookupGlobal(myStrVal);
-        } catch (EmptySymTableException ex) {
+        } catch (EmptySymTableException e) {
             System.err.println("Unexpected EmptySymTableException "
-                    + " in IdNode.nameAnalysis");
+                    + " in IdNode.nameAnalysis; " + e);
+            e.printStackTrace();
             System.exit(-1);
         }
         if (sym == null) {
@@ -1630,6 +1680,7 @@ class IdNode extends _BaseExpNode {
     public Class<? extends Type> visit(Traverser.State state) {
         if (mySym == null) { // name analysis error
             System.err.println("Error: null symbol encountered");
+
             System.exit(-1);
         }
 
@@ -1733,6 +1784,7 @@ class DotAccessExpNode extends ExpNode
                     } else {
                         System.err.println(
                                 "Unexpected TSym type in DotAccessExpNode");
+
                         System.exit(-1);
                     }
                 }
@@ -1742,6 +1794,7 @@ class DotAccessExpNode extends ExpNode
 
         else { // don't know what kind of thing myLoc is
             System.err.println("Unexpected node type in LHS of dot-access");
+
             System.exit(-1);
         }
 
@@ -1749,9 +1802,9 @@ class DotAccessExpNode extends ExpNode
         if (!badAccess) {
             try {
                 sym = structSymTab.lookupGlobal(myId.name()); // lookup
-            } catch (EmptySymTableException ex) {
+            } catch (EmptySymTableException e) {
                 System.err.println("Unexpected EmptySymTableException "
-                        + " in DotAccessExpNode.nameAnalysis");
+                        + " in DotAccessExpNode.nameAnalysis; " + e);
             }
             if (sym == null) { // not found - RHS is not a valid field name
                 ErrMsg.fatal(myId.lineNum(), myId.charNum(),
@@ -1787,7 +1840,8 @@ class DotAccessExpNode extends ExpNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myId));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myId);
         children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
@@ -1864,7 +1918,9 @@ class AssignNode extends ExpNode
     public Iterator<Traverser.Config> getChildren() {
         ArrayList<Traverser.Config> children = new ArrayList<>();
 
-        ArrayList<ASTnode> nodeList = new ArrayList<>(List.of(myLhs, myExp));
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myLhs);
+        nodeList.add(myExp);
         children.add(new Traverser.Config(nodeList));
 
         return children.iterator();
@@ -1920,6 +1976,7 @@ class CallExpNode extends ExpNode implements Traverser.Node.Visitable {
         FnSym s = (FnSym) myId.sym(); // must be FnSym
         if (s == null) {
             System.err.println("Error null symbol");
+
             System.exit(-1);
         }
 

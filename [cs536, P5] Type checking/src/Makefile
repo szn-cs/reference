@@ -67,4 +67,4 @@ clean:
 	rm -f *~ *.class parser.java cminusminus.jlex.java sym.java
 
 cleantest:
-	rm -f test.out
+	rm -f test.out testErr.out

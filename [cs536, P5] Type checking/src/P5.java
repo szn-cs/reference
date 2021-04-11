@@ -5,7 +5,7 @@ import java_cup.runtime.*;
 abstract class functionMachine {
     public FileReader inFile;
     public PrintWriter outFile;
-    public static PrintStream outStream = System.err;
+    public static PrintWriter outStream = new PrintWriter(System.err);
 
     public functionMachine() {
     }
@@ -42,6 +42,7 @@ abstract class functionMachine {
     public void setOutfile(String filename) throws BadOutfileException {
         try {
             outFile = new PrintWriter(filename);
+            ErrMsg.outStream = outFile;
         } catch (FileNotFoundException ex) {
             throw new BadOutfileException(ex, filename);
         }
@@ -171,22 +172,23 @@ class Compiler extends functionMachine {
         Symbol cfgRoot = parseCFG(); // lexical & syntax analysis
 
         ProgramNode astRoot = (ProgramNode) cfgRoot.value;
-        if (ErrMsg.getErr())
-            return Compiler.RESULT_SYNTAX_ERROR;
+        if (ErrMsg.getErr()) return Compiler.RESULT_SYNTAX_ERROR;
 
         astRoot.nameAnalysis(); // semantic name analysis
-        if (ErrMsg.getErr())
-            return Compiler.RESULT_NAME_ERROR;
+        if (ErrMsg.getErr()) return Compiler.RESULT_NAME_ERROR;
 
         /** semantic type analysis */
         try {
             Traverser.traverse(astRoot); // traverse & visit each node
         } catch (Exception e) {
             System.err.println("Exception occured during type analyze: " + e);
+            e.printStackTrace();
             return Compiler.RESULT_OTHER_ERROR;
         }
-        if (ErrMsg.getErr())
+        if (ErrMsg.getErr()) {
+
             return Compiler.RESULT_TYPE_ERROR;
+        }
 
         astRoot.unparse(outFile, 0); // intermediate code generator
         return Compiler.RESULT_CORRECT;
@@ -204,13 +206,13 @@ class Compiler extends functionMachine {
 
         switch (resultCode) {
             case RESULT_SYNTAX_ERROR:
-                pukeAndDie("Syntax error", resultCode);
+                pukeAndDie("Error: Syntax error", resultCode);
             case RESULT_NAME_ERROR:
-                pukeAndDie("Name checking error", resultCode);
+                pukeAndDie("Error: Name checking error", resultCode);
             case RESULT_TYPE_ERROR:
-                pukeAndDie("Type checking error", resultCode);
+                pukeAndDie("Error: Type checking error", resultCode);
             default:
-                pukeAndDie("Type checking error", RESULT_OTHER_ERROR);
+                pukeAndDie("Error: Type checking error", RESULT_OTHER_ERROR);
         }
     }
 

@@ -6,11 +6,11 @@
 	"configurations": [
 		{
 			"type": "java",
-			"name": "Launch P4",
+			"name": "Launch P5",
 			"request": "launch",
-			"mainClass": "P4",
-			"args": ["nameErrors.cminusminus", "test.out"],
-			"projectName": "[cs536, P4] AST name analysis_a51a8050",
+			"mainClass": "P5",
+			"args": ["typeErrors.cminusminus", "testErr.out"],
+			"projectName": "[cs536, P5] Type checking_4077d8fc",
 			"cwd": "${workspaceFolder}/src",
 			"classPaths": ["./deps:."],
 			"preLaunchTask": "build"

@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.*;
 import static java.util.Map.entry;
 
@@ -9,6 +10,7 @@ import static java.util.Map.entry;
 class ErrMsg {
     // tracks if a fatal error occured during the execution of the program
     private static boolean err = false;
+    public static PrintWriter outStream = new PrintWriter(System.err);
 
     /**
      * Generates a fatal error message.
@@ -19,13 +21,12 @@ class ErrMsg {
      */
     static void fatal(int lineNum, int charNum, String msg) {
         err = true;
-        System.err.println(lineNum + ":" + charNum + " ***ERROR*** " + msg);
+        outStream.println(lineNum + ":" + charNum + " ***ERROR*** " + msg);
     }
 
     static void fatal(int[] position, int msgNum) {
         fatal(position[0], position[1], message.get(msgNum));
     }
-
 
     /**
      * Generates a warning message.

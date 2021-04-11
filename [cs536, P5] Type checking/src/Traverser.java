@@ -27,7 +27,8 @@ public class Traverser {
             for (ASTnode n : nodeList)
                 if (n != null) traverse(n, state);
         } catch (NoSuchElementException e) {
-            System.err.println("Unexpected null exception");
+            System.err.println("Unexpected null exception; " + e);
+            e.printStackTrace();
             System.exit(-1);
         }
     }
@@ -56,6 +57,11 @@ public class Traverser {
     public static void traverse(ASTnode n, State state) {
         if (n == null) return; // short-circuit
 
+        // 🐞 print for debug
+        System.out.println(
+                n.getClass().toString() + ": " + n.typeClass().toString());
+        // // System.out.println(state.toString());
+
         // traverse children
         if (n instanceof Node.Iterable && n.traverseSubtree)
             traverse(((Node.Iterable) n).getChildren(), state);
@@ -63,10 +69,6 @@ public class Traverser {
         // visit each node and manipulate the state when needed
         if (n instanceof Node.Visitable)
             n.typeClass = ((Node.Visitable) n).visit(state); // set result type
-
-        // 🐞 print for debug
-        // System.out.println(n.toString() + " visited");
-        // state.print();
     }
 
     /**
@@ -132,7 +134,7 @@ public class Traverser {
         // flag to indicate whether to iterate over child nodes
         public boolean traverseSubtree = true;
         // result type of expression node. Fail if not reset by visiting
-        public Class<? extends Type> typeClass = ErrorType.class;
+        public Class<? extends Type> typeClass = Type.class;
 
         // getter field
         public Class<? extends Type> typeClass() {

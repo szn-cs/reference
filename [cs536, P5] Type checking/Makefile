@@ -15,5 +15,10 @@ clean:
 # watch files and execute make with `make watch LABEL=<label to execute>`
 # required:
 # -	"cli-watch" npm package
+# watch:
+# 	watch -f "./**/typeErrors.cminusminus;./**/test.cminusminus" -r "(cd src; java -cp ./deps:. P5 test.cminusminus test.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
+
 watch:
-	watch -f ./**/nameErrors.cminusminus -r "(cd src; java -cp ./deps:. P4 nameErrors.cminusminus test.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
+	watch -f "./**/typeErrors.cminusminus;./**/test.cminusminus" -r "(cd src; java -cp ./deps:. P5 typeErrors.cminusminus testErr.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
+
+

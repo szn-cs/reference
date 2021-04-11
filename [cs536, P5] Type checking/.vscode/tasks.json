@@ -7,27 +7,27 @@
 			"label": "build",
 			"type": "shell",
 			"command": "make",
-			"options": { "cwd": "${cwd}/src/" }
+			"options": { "cwd": "${cwd}/" }
 		},
 		{
 			"label": "test",
 			"type": "shell",
 			"command": "make test",
-			"options": { "cwd": "${cwd}/src/" },
-			"dependsOn": ["clean", "build"]
+			"options": { "cwd": "${cwd}/" },
+			"dependsOn": [/*"clean",*/ "build"]
 		},
 		{
 			"label": "watch",
 			"type": "shell",
 			"command": "make watch",
-			"options": { "cwd": "${cwd}/src/" },
-			"dependsOn": ["clean", "build"]
+			"options": { "cwd": "${cwd}/" },
+			"dependsOn": [/*"clean",*/ "build"]
 		},
 		{
 			"label": "clean",
 			"type": "shell",
 			"command": "make clean",
-			"options": { "cwd": "${cwd}/src/" },
+			"options": { "cwd": "${cwd}/" },
 			"dependsOn": [""]
 		}
 	]
