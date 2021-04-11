@@ -57,9 +57,8 @@ public class Traverser {
     public static void traverse(ASTnode n, State state) {
         if (n == null) return; // short-circuit
 
-        // 🐞 print for debug
-        System.out.println(
-                n.getClass().toString() + ": " + n.typeClass().toString());
+        // 🐞 print for debug TODO: uncomment
+        System.out.println(n.getClass() + ": " + n.typeClass());
         // // System.out.println(state.toString());
 
         // traverse children
@@ -134,6 +133,7 @@ public class Traverser {
         // flag to indicate whether to iterate over child nodes
         public boolean traverseSubtree = true;
         // result type of expression node. Fail if not reset by visiting
+        // public Class<? extends Type> typeClass = null;
         public Class<? extends Type> typeClass = Type.class;
 
         // getter field
