@@ -22,6 +22,7 @@ class ErrMsg {
     static void fatal(int lineNum, int charNum, String msg) {
         err = true;
         outStream.println(lineNum + ":" + charNum + " ***ERROR*** " + msg);
+        outStream.flush(); // clear buffer immediately
     }
 
     static void fatal(int[] position, int msgNum) {

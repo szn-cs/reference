@@ -1,4 +1,23 @@
-// TODO:
 // test.cminusminus should contain code with no errors that exercises all of the type-check methods that you wrote for the different AST nodes. This means that it should include (good) examples of every kind of statement and expression.
 
-// should output error messages to be output.
+int x; bool b; void f(){} int g(){return 0;} bool h() {return true;} void m(int x, bool b) {}
+
+void t1() {
+    x=x+x-x*x/x;x--;x++;
+    b=x>x;b=x<x;b=x<=x;b=x>=x;
+    b=x==x;b=x!=x;b=b==b;b=b!=b;
+    x=x;b=b;x=g();b=h();
+    cin>>x;cin>>b;cout<<x;cout<<b;cout<<""; 
+    f();g();h();m(x,b);
+    if(b){} if(b){}else{} while(b){} repeat(1){}
+
+    if(b){if(b){while(b){repeat(1){
+        x=x+x-x*x/x;x--;x++;
+        b=x>x;b=x<x;b=x<=x;b=x>=x;
+        b=x==x;b=x!=x;b=b==b;b=b!=b;
+        x=x;b=b;x=g();b=h();
+        cin>>x;cin>>b;cout<<x;cout<<b;cout<<""; 
+        f();g();h();m(x,b);
+        if(b){} if(b){}else{} while(b){} repeat(1){}
+    }}}else{}} 
+}

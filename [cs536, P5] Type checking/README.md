@@ -4,6 +4,8 @@ _Safi Nassar - assignment p5_
 
 -   `make clean && make testclean && make`
 -   `make test`
+-   `diff testErr.expected testErr.out`
+-   `diff test.expected test.out`
 
 Executing the test will generate output file of the formated program.
 
@@ -14,7 +16,7 @@ Executing the test will generate output file of the formated program.
 -   JLex
 
 # Tests documentation:
-
+- use the Linux utility diff to compare your file of error messages with the expected files.
 
 ---
 
@@ -54,8 +56,8 @@ The type checker will determine the type of every expression represented in the 
   - [x] repeat loop times clause: int operand.
 
 # Tasks
-- [ ] check example files.
-- [ ] Write test files.
+- [x] check example files.
+- [x] Write test files.
 - [x] Edit P5.java, ast.java.
 - [x] Type checking implementation: 
   - add typeCheck method to AST nodes - walk the AST checking types of sub-expressions.
@@ -69,14 +71,14 @@ The type checker will determine the type of every expression represented in the 
 
 
 ## Submission:
-  - [ ] Create pdf from markdown: `pandoc README.md -o <lastname.firstname.Pn.pdf>`
+  - [x] Create pdf from markdown: `pandoc README.md -o <lastname.firstname.Pn.pdf>`
       - [ ] [generate markdown from javadoc](https://delight-im.github.io/Javadoc-to-Markdown) and remove redundant comments
         or
       - [ ] generate javadoc to extract method headers: `find . -type f -name "*.java" | xargs javadoc -d ../javadoc`
   - [ ] Add headers for each file
-  - [ ] Verify code format
+  - [x] Verify code format
   - [ ] Verify code execution on CSL machines
-- [ ] lastname.firstname.lastname.firstname.P5.zip
+- [x] lastname.firstname.lastname.firstname.P5.zip
 +---+ deps/
 +---+ ast.java
 +---+ cminusminus.cup

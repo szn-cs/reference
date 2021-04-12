@@ -171,8 +171,9 @@ class Compiler extends functionMachine {
     public int process() {
         Symbol cfgRoot = parseCFG(); // lexical & syntax analysis
 
+        if (cfgRoot == null || ErrMsg.getErr())
+            return Compiler.RESULT_SYNTAX_ERROR;
         ProgramNode astRoot = (ProgramNode) cfgRoot.value;
-        if (ErrMsg.getErr()) return Compiler.RESULT_SYNTAX_ERROR;
 
         astRoot.nameAnalysis(); // semantic name analysis
         if (ErrMsg.getErr()) return Compiler.RESULT_NAME_ERROR;

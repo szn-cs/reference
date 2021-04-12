@@ -394,7 +394,7 @@ class ExpListNode extends ASTnode implements Traverser.Node.Visitable {
 
             // formal match actual type
             if (!Type.is(actual, formalState.typeList.get(i))) {
-                ErrMsg.fatal(actual.getPosition(), 9);
+                ErrMsg.fatal(actual.getPosition(), 10);
                 e = true;
             }
         }
@@ -402,6 +402,15 @@ class ExpListNode extends ASTnode implements Traverser.Node.Visitable {
         // return error or non on success
         return e ? ErrorType.class : Type.class;
     }
+
+    // TODO: check if ExpListNode is used in any other statement than func call
+    // public Iterator<Traverser.Config> getChildren() {
+    // ArrayList<Traverser.Config> children = new ArrayList<>();
+
+    // children.add(new Traverser.Config(myExps));
+
+    // return children.iterator();
+    // }
 
     // list of kids (ExpNodes)
     private List<ExpNode> myExps;
@@ -634,8 +643,6 @@ class FnDeclNode extends DeclNode implements Traverser.Node.Visitable {
 
         return null; // statement cannot be part of a wrapper expression
     }
-
-
 
     // 4 kids
     private TypeNode myType;
@@ -928,7 +935,8 @@ class AssignStmtNode extends StmtNode implements Traverser.Node.Iterable {
 }
 
 
-class PostIncStmtNode extends StmtNode implements Traverser.Node.Visitable {
+class PostIncStmtNode extends StmtNode
+        implements Traverser.Node.Visitable, Traverser.Node.Iterable {
     public PostIncStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -954,13 +962,23 @@ class PostIncStmtNode extends StmtNode implements Traverser.Node.Visitable {
         return null; // statement cannot be part of a wrapper expression
     }
 
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        children.add(new Traverser.Config(nodeList));
+
+        return children.iterator();
+    }
 
     // 1 kid
     private ExpNode myExp;
 }
 
 
-class PostDecStmtNode extends StmtNode implements Traverser.Node.Visitable {
+class PostDecStmtNode extends StmtNode
+        implements Traverser.Node.Visitable, Traverser.Node.Iterable {
     public PostDecStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -984,6 +1002,16 @@ class PostDecStmtNode extends StmtNode implements Traverser.Node.Visitable {
             ErrMsg.fatal(myExp.getPosition(), 14);
 
         return null; // statement cannot be part of a wrapper expression
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        children.add(new Traverser.Config(nodeList));
+
+        return children.iterator();
     }
 
     // 1 kid
@@ -1932,7 +1960,8 @@ class AssignNode extends ExpNode
 }
 
 
-class CallExpNode extends ExpNode implements Traverser.Node.Visitable {
+class CallExpNode extends ExpNode
+        implements Traverser.Node.Visitable, Traverser.Node.Iterable {
     public CallExpNode(IdNode name, ExpListNode elist) {
         myId = name;
         myExpList = elist;
@@ -1997,13 +2026,23 @@ class CallExpNode extends ExpNode implements Traverser.Node.Visitable {
         return s.returnType();
     }
 
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myId);
+        children.add(new Traverser.Config(nodeList));
+
+        return children.iterator();
+    }
+
     // 2 kids
     private IdNode myId;
     private ExpListNode myExpList; // possibly null
 }
 
 
-abstract class UnaryExpNode extends ExpNode {
+abstract class UnaryExpNode extends ExpNode implements Traverser.Node.Iterable {
     public UnaryExpNode(ExpNode exp) {
         myExp = exp;
     }
@@ -2020,12 +2059,23 @@ abstract class UnaryExpNode extends ExpNode {
         return myExp.getPosition();
     }
 
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp);
+        children.add(new Traverser.Config(nodeList));
+
+        return children.iterator();
+    }
+
     // one child
     protected ExpNode myExp;
 }
 
 
-abstract class BinaryExpNode extends ExpNode {
+abstract class BinaryExpNode extends ExpNode
+        implements Traverser.Node.Iterable {
     public BinaryExpNode(ExpNode exp1, ExpNode exp2) {
         myExp1 = exp1;
         myExp2 = exp2;
@@ -2042,6 +2092,17 @@ abstract class BinaryExpNode extends ExpNode {
 
     public int[] getPosition() {
         return myExp1.getPosition();
+    }
+
+    public Iterator<Traverser.Config> getChildren() {
+        ArrayList<Traverser.Config> children = new ArrayList<>();
+
+        ArrayList<ASTnode> nodeList = new ArrayList<>();
+        nodeList.add(myExp1);
+        nodeList.add(myExp2);
+        children.add(new Traverser.Config(nodeList));
+
+        return children.iterator();
     }
 
     // two kids
