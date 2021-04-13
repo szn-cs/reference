@@ -106,6 +106,7 @@ bootblock: bootasm.S bootmain.c
 	$(LD) $(LDFLAGS) -N -e start -Ttext 0x7C00 -o bootblock.o bootasm.o bootmain.o
 	$(OBJDUMP) -S bootblock.o > bootblock.asm
 	$(OBJCOPY) -S -O binary -j .text bootblock.o bootblock
+	chmod +x ./sign.pl
 	./sign.pl bootblock
 
 entryother: entryother.S
@@ -141,6 +142,7 @@ tags: $(OBJS) entryother.S _init
 	etags *.S *.c
 
 vectors.S: vectors.pl
+	chmod +x ./vectors.pl
 	./vectors.pl > vectors.S
 
 ULIB = ulib.o usys.o printf.o umalloc.o
