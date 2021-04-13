@@ -1,0 +1,5 @@
+tests-out
+**/*.o
+source/mysh
+temporary/**
+temporary
