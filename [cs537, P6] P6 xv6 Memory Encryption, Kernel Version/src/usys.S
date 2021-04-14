@@ -29,3 +29,6 @@ SYSCALL(getpid)
 SYSCALL(sbrk)
 SYSCALL(sleep)
 SYSCALL(uptime)
+// 📝
+SYSCALL(getpgtable)
+SYSCALL(dump_rawphymem)
