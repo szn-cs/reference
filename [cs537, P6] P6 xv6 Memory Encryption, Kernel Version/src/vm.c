@@ -338,21 +338,54 @@ int copyout(pde_t *pgdir, uint va, void *p, uint len) {
 /** 📝 statistics **/
 
 /**
- * @brief
+ * @brief retreive stats about the state of the page table - filling entries
+ array using information from the page table of the currently running process,
+ considering only valid virtual  pages.
+ *
+ * NOTE: filling up the array should start from the valid virtual page with the
+ highest page numbers.
  *
  * @param entries array of pt_entries to be filled
  * @param num number elements that should be filled up by the kernel
  * @param wsetOnly whether should filter the results and only output the page
  * table entries for the pages in the working set.
- * @return int
+ * @return int actual number of elements that are filled in entries, otherwise
+ if error encountered return -1
  */
 int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
+    // validate params
     if (wsetOnly != 0 && wsetOnly != 1) goto fail;
+    if (entries == 0 || num < 0) goto fail;
+    if (num == 0) return 0;  // short-circuit for 0 elements
 
-    // fill entries array using information from the page table of the currently
-    // running process, considering only valid virtual  pages.
-    // NOTE: filling up the array should start from the valid virtual page with
-    // the highest page numbers
+    struct proc *proc = myproc();  // current process info
+    struct MultipageIndex page_i;  // index in the multipage table
+    pte_t *pte;                    // page table entry
+
+    // identify top most user page
+    char *topVA = (char *)(proc->sz - 1);
+    page_i = getPageIndex(topVA);  // starting page table entry
+
+    // CASE: When the actual number of valid virtual pages is greater than the
+    // num, filling up the array starts from the allocated virtual page with
+    // the highest page numbers and returns num in this case.
+    // CASE: When the actual number of valid virtual pages is less than or
+    // equals to the num, then only fill up the array using those valid virtual
+    // pages.
+    int i;  // number of elements filled
+    for (i = 0; i < num; ++i) {
+        struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
+        pte = getPTE(currentPage_i);  // get current page table entry
+        if (pte == 0) break;          // invalid page encountered
+        entries[i].pdx = currentPage_i.pd;
+        entries[i].ptx = currentPage_i.pt;
+        entries[i].ppage = (*pte) >> PTXSHIFT;  // as per spec
+        entries[i].present = IS_BIT(pte, PTE_P) ? 1 : 0;
+        entries[i].writable = IS_BIT(pte, PTE_W) ? 1 : 0;
+        entries[i].encrypted = IS_BIT(pte, PTE_E) ? 1 : 0;
+    }
+
+    return i;
 
 fail:
     return -1;
@@ -365,14 +398,36 @@ fail:
  * @param buffer to be filled by kernel with the content of the page where
  * physical_addr resides
  * - Assuming buffer will be allocated by the user and have the size of PGSIZE
- * @return int
+ * @return int 0 on success, otherwise -1 on any error.
  */
 int dump_rawphymem(uint physical_addr, char *buffer) {
     // Note: no need to validate buffer parameter.
+    if (physical_addr >= PHYSTOP) goto fail;  // validate param
 
-    // The buffer might be encrypted, in which case you should decrypt that
-    // page. Either using the buffer's uva for memmove (which copyout does not
-    // do) or touching the buffer using *buffer = *buffer before copyout
+    // TODO: The buffer might be encrypted, in which case you should decrypt
+    // that page. Either using the buffer's uva for memmove (which copyout does
+    // not do) or touching the buffer using *buffer = *buffer before copyout
+
+    char *ka;           // kernel virtual address
+    struct proc *proc;  // current process info
+
+    proc = myproc();
+    // translate to a kernel virtual memory address
+    ka = (char *)P2V((char *)physical_addr);
+    ka = (char *)PGROUNDDOWN((uint)ka);  // kernel address at page index 0
+
+    /*
+        The kernel should fill up the buffer with the current content of the
+        page where physical_addr resides
+        - it should not affect any of the page table entries that might point
+        to this physical page (i.e., it shouldn't modify PTE_P or PTE_E)
+        - it shouldn't do any decryption or encryption.
+    */
+    if (copyout(proc->pgdir, (uint)buffer, ka, PGSIZE) == -1) goto fail;
+
+    return 0;
+fail:
+    return -1;
 }
 
 /** 📝 custom **/
@@ -419,6 +474,83 @@ void clockAlgorithm() {
 void evictPage() {
     // page should be encrypted and the appropriate bits in the PTE should be
     // reset
+}
+
+/**
+ * TODO: implement decryption instead
+ * @brief Encrypt ranges of virtual pages
+ *
+ * encrypt virtual addresses ranging
+ *       [PGROUNDDOWN(va), PGROUNDDOWN(va)+len*PGSIZE)
+ * Example: 4KB page size
+ *      mencrypt(0x3000, 2) = mencrypt(0x3050, 2) ⇒ encrypts [0x3000, 0x5000]
+ *
+ * @param va virtual address indicating the starting virtual page
+ * (page associated with the address)
+ * @param len # of pages to encrypt
+ * @return int 0 on success, otherwise -1 on failure.
+ */
+int mencrypt(char *va, int len) {
+    if (len == 0) return 0;  // ignore - short-circuit before any error checking
+
+    struct proc *proc;  // current process
+    // pte_t *pte;  // page table entry (matching input virtual address's page)
+    char *va0;  // first virtual address in the corresponding va's page
+    struct MultipageIndex page_i;
+
+    proc = myproc();                      // current user process
+    va0 = (char *)PGROUNDDOWN((uint)va);  // assuming va could be page-aligned
+
+    /*🐞 assert correctly rounded (NOTE: unnecessary step; only for debugging)
+    if ((uint)va >> PTXSHIFT != (uint)va0 >> PTXSHIFT) goto fail; */
+
+    // case: negative value
+    // case: virtual address is an invalid address (e.g., out-of-range value)
+    // case: a very large value that will let the page range  exceed the upper
+    // bound of the user virtual space
+    if (len < 0 || outOfRange(va) || outOfRange(NEXTPAGE(va0, len - 1)))
+        goto fail;
+
+    // get virtual address's page entry
+    page_i = getPageIndex(va0);
+    // pte = getPTE(page_i);
+
+    /*🐞 assert pages equal (NOTE: unnecessary step; only for debugging)
+    struct MultipageIndex page_i0 = {PDX(va0), PTX(va0)};
+    if (pte != getPTE(page_i0)) goto fail; */
+
+    // case: calling process does not have permission or privilege to access
+    // or modify some pages in the range (either all the pages in the range
+    // are successfully encrypted or none of them is encrypted)
+    if (proc->sz == 0)
+        return 0;  // remove this - only used temporarly for debugging
+    for (int i = 0; i < len; ++i) {
+        struct MultipageIndex currentPage_i = pteIterator(page_i, i);
+        pte_t *e = getPTE(currentPage_i);  // current pte
+        if (!e || (!IS_BIT(e, PTE_P) && !IS_BIT(e, PTE_E)) ||
+            !IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
+            goto fail;
+    }
+
+    // case part or all pages already encypted: Encrypted pages and their
+    // corresponding page table entries should remain unchanged. All the
+    // unencrypted pages should be encrypted
+    for (int i = 0; i < len; ++i) {
+        struct MultipageIndex currentPage_i = pteIterator(page_i, i);
+        pte_t *e = getPTE(currentPage_i);  // current pte
+        if (IS_BIT(e, PTE_E)) continue;    // skip encrypted pages
+        char *pagePhysicalAddr = (char *)PTE_ADDR(*e);
+        toggleEncryptPageSize(pagePhysicalAddr);
+        // update flags
+        *e = SET_BIT(e, PTE_E);
+        *e = CLEAR_BIT(e, PTE_P);
+    }
+    flushTLB();
+
+    return 0;
+
+fail:
+    return -1;
 }
 
 /**

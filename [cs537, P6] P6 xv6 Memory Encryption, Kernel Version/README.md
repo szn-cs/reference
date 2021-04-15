@@ -37,6 +37,7 @@
     As we mentioned above, the child process should inherit the page table entry flags and clock queue from the parent process. You probably want to check out the fork() function in proc.c and copyuvm() in vm.c. The modification mainly involves copying extra flags and clock queue. If you are using a linked list as the queue, you should do a deep copy instead of just copying the pointer.
 
 - [ ] statistics: implement 2 syscalls.
+- [ ] checkout ring structure implementation in [C interfaces & implementations book](http://www.r-5.org/files/books/computers/languages/c/mod/David_R_Hanson-C_Interfaces_and_Implementations-EN.pdf) chapter 12.
 
 ## submission: 
 - [ ] partners.txt: `cslogin1 wisclogin1 Lastname1 Firstname1`

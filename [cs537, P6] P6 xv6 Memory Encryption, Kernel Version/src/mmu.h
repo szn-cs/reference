@@ -193,8 +193,7 @@ struct gatedesc {
 #define NEXTPAGE(address, index) ((void *)address + PGSIZE * index)
 // multi-level page index
 struct MultipageIndex {
-    int pd;  // page directory index
-    int pt;  // page table index
+    int pd, pt;  // page directory index & page table index
 };
 
 #endif
