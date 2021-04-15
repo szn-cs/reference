@@ -183,6 +183,7 @@ struct gatedesc {
 
 // 📝 9-11 are not in use
 #define PTE_E 0x200  // Encryption flag;  10th position flag
+#define PTE_A 0x020  // page access bit (maintained by hardware)
 // 📝 encryption of page - flip bits
 #define FLIP_BITS(byte) (~((char)(byte)))
 //📝 manipulate bits

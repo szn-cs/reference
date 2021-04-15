@@ -1,4 +1,4 @@
-# xv6 Memory Encryption (Kernel version) - Kernel Memory Encryption Pager
+# Kernel-based xv6 Memory Encryption - Kernel Memory Encryption Pager
 - Topics involved virtual memory system in xv6, page table entries, detect current state page, trap handler to be able to handle the page fault, to implement the clock algorithm of most refenced page.
 - kernel manage page encryption and decryption.
   - [ ] The system will keep a fixed number (represted as N @param.h) of recently-accessed pages for each process stored in cleartext. Minimizing the number of page decryptions/encryptions by keeping each process's working set in cleartext (i.e. PTE_E is 0).
@@ -21,8 +21,10 @@
 - [x] Download `~cs537-1/projects/xv6.tar.gz`
 - [x] Download `~cs537-1/projects/memory-kernel/ptentry.h`
 - [ ] `userProgram` Example user program to test the implementation
+- [ ] Example of clock queue implementation https://github.com/josehu07/CS537-SP2021-DIS/blob/main/w11/clock-example.c
 
-- [ ] Implement the decryption mechanism when an encrypted page is accessed (already done in P5) and init all the user pages as the encrypted state.
+- [ ] Implement the decryption mechanism when an encrypted page is accessed (already done in P5) and init all the user pages (0 to sz) as the encrypted state. 
+    TODO: scan from 0 to sz; and encrypt anything that isn't already encrypted or in the working set. 
     All the user pages are allocated through the function allocuvm() in vm.c, but directly encrypting all the pages in allocuvm() might not work out as you might expect. The reason is that another system call exec will call allocuvm to init those text, data, and stack pages and copy program content (e.g. program text) into it. If you do the encryption inside the allocuvm(), then you probably need to modify other functions like loaduvm() and copyout() to make sure that those pages are decrypted before the content is copied into it. Considering the difficulty you will encounter, we encourage you to do the initial memory encryption in two parts:
       1. Encrypt all the newly-allocated heap pages in growproc(). These pages are allocated by the user through syscall sbrk() which will call growproc().
       2. Encrypt all those pages set up by the exec function at the end of the exec function. These pages include program text, data, and stack pages. These pages are not allocated through growproc() and thus not handle by the first case.
@@ -38,6 +40,7 @@
 
 - [ ] statistics: implement 2 syscalls.
 - [ ] checkout ring structure implementation in [C interfaces & implementations book](http://www.r-5.org/files/books/computers/languages/c/mod/David_R_Hanson-C_Interfaces_and_Implementations-EN.pdf) chapter 12.
+- [ ] Import support for Encrypt bit over from P5 implementation
 
 ## submission: 
 - [ ] partners.txt: `cslogin1 wisclogin1 Lastname1 Firstname1`
