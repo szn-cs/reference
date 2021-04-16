@@ -372,11 +372,15 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
     char *topVA = (char *)(proc->sz - 1);
     page_i = getPageIndex(topVA);  // starting page table entry
 
-    // CASE: When the actual number of valid virtual pages is greater than the
-    // num, filling up the array starts from the allocated virtual page with
-    // the highest page numbers and returns num in this case.
-    // CASE: When the actual number of valid virtual pages is less than or
-    // equals to the num, then only fill up the array using those valid virtual
+    // TODO: filter pages in working set
+    if (wsetOnly)
+        ;
+
+    // CASE: When the actual number of valid virtual pages is greater than
+    // the num, filling up the array starts from the allocated virtual page
+    // with the highest page numbers and returns num in this case. CASE:
+    // When the actual number of valid virtual pages is less than or equals
+    // to the num, then only fill up the array using those valid virtual
     // pages.
     int i;  // number of elements filled
     for (i = 0; i < num; ++i) {

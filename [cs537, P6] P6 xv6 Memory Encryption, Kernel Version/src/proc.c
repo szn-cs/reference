@@ -144,10 +144,11 @@ int growproc(int n) {
     sz = curproc->sz;
     if (n > 0) {
         if ((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0) return -1;
-        // TODO: encrypt all the new pages
+        // TODO: encrypt all the new pages e.g. encrypt (sz, ...)
     } else if (n < 0) {
         if ((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0) return -1;
-        // TODO: remove there deallocated pages from queue.
+        // TODO: remove there deallocated pages from queue. e.g. remove(sz,
+        // sz+n)
     }
     curproc->sz = sz;
 
@@ -169,6 +170,8 @@ int fork(void) {
     if ((np = allocproc()) == 0) {
         return -1;
     }
+
+    // TODO: clear queue of the process
 
     // Copy process state from proc.
     if ((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {

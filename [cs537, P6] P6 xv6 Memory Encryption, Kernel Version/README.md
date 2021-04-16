@@ -20,6 +20,8 @@
 - [x] Download `~cs537-1/tests/p6/run-tests.sh`
 - [x] Download `~cs537-1/projects/xv6.tar.gz`
 - [x] Download `~cs537-1/projects/memory-kernel/ptentry.h`
+- [ ] Download P5 solution `~cs537-1/projects/p5/src/`
+- [ ] Check the spec updates https://piazza.com/class/kjn4sz4kq7t2d2?cid=1023 & updated hints
 - [ ] `userProgram` Example user program to test the implementation
 - [ ] Example of clock queue implementation https://github.com/josehu07/CS537-SP2021-DIS/blob/main/w11/clock-example.c
 
