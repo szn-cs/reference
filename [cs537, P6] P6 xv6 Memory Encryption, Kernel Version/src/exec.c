@@ -85,8 +85,14 @@ int exec(char *path, char **argv) {
     curproc->tf->eip = elf.entry;  // main
     curproc->tf->esp = sp;
 
-    // TODO: clear the clock queue of curproc (i.e. initialize the queue)
-    // TODO: encrypt all the pages;
+    // 📝 clear the clock queue of curproc
+    clock_initialize(&curproc->workingSet);
+    // 📝 encrypt all the pages:
+    // page alignment & count user space pages
+    if (mencrypt(curproc->pgdir, 0, PAGE_COUNT(curproc->sz)) == -1) {
+        cprintf("Error: exec() > mencrypt()");
+        exit();
+    };
 
     switchuvm(curproc);
     freevm(oldpgdir);

@@ -272,7 +272,7 @@ void clearpteu(pde_t *pgdir, char *uva) {
 
 // Given a parent process's page table, create a copy
 // of it for a child.
-// TODO: check & ensure the behavior of: except the child to maintain the exact
+// TODO: check & ensure the behavior of: expect the child to maintain the exact
 // same working set and pgdir flags
 pde_t *copyuvm(pde_t *pgdir, uint sz) {
     pde_t *d;
@@ -372,10 +372,6 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
     char *topVA = (char *)(proc->sz - 1);
     page_i = getPageIndex(topVA);  // starting page table entry
 
-    // TODO: filter pages in working set
-    if (wsetOnly)
-        ;
-
     // CASE: When the actual number of valid virtual pages is greater than
     // the num, filling up the array starts from the allocated virtual page
     // with the highest page numbers and returns num in this case. CASE:
@@ -385,8 +381,13 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
     int i;  // number of elements filled
     for (i = 0; i < num; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
-        pte = getPTE(currentPage_i);  // get current page table entry
-        if (pte == 0) break;          // invalid page encountered
+        // get current page table entry
+        pte = getPTE(proc->pgdir, currentPage_i);
+        if (pte == 0) break;  // invalid page encountered
+
+        // filter pages in working set
+        if (wsetOnly && clock_getIndex(&proc->workingSet, pte) == -1) continue;
+
         entries[i].pdx = currentPage_i.pd;
         entries[i].ptx = currentPage_i.pt;
         entries[i].ppage = (*pte) >> PTXSHIFT;  // as per spec
@@ -411,12 +412,15 @@ fail:
  * @return int 0 on success, otherwise -1 on any error.
  */
 int dump_rawphymem(uint physical_addr, char *buffer) {
+    const int length = PGSIZE;
+
     // Note: no need to validate buffer parameter.
     if (physical_addr >= PHYSTOP) goto fail;  // validate param
 
-    // TODO: The buffer might be encrypted, in which case you should decrypt
+    // The buffer might be encrypted, in which case you should decrypt
     // that page. Either using the buffer's uva for memmove (which copyout does
-    // not do) or touching the buffer using *buffer = *buffer before copyout
+    // not do) or touching the buffer before copyout
+    *buffer = *buffer;  // as per spec
 
     char *ka;           // kernel virtual address
     struct proc *proc;  // current process info
@@ -433,7 +437,7 @@ int dump_rawphymem(uint physical_addr, char *buffer) {
         to this physical page (i.e., it shouldn't modify PTE_P or PTE_E)
         - it shouldn't do any decryption or encryption.
     */
-    if (copyout(proc->pgdir, (uint)buffer, ka, PGSIZE) == -1) goto fail;
+    if (copyout(proc->pgdir, (uint)buffer, ka, length) == -1) goto fail;
 
     return 0;
 fail:
@@ -442,57 +446,26 @@ fail:
 
 /** 📝 custom **/
 
-// When an encrypted page is accessed by the user, a page fault should be
-// triggered.
-void handlePageFault() {
-    if (calling process`s #decrepted pages < N) {
-        // decrypt virtual page and push to tail of clock queue
-    } else {
-        // find victim page to replace
-        victimPage = clockAlgorithm();
-        evict(victimPage);  // evict page
-    }
-}
+/**
+ * @brief insert page into the working set usign eviction policy - Clock
+algorithm (FIFO with second-chance) for picking victim page.
+ *
+ * NOTE: page should be guaranteed not to be already in queue
+ *
+ * @param workingSet
+ * @param pte
+ */
+void pageReplacement(struct clock *workingSet, pte_t *pte) {
+    pte_t *evicted;  // evicted page from clock queue if any
+    if ((evicted = clock_insert(workingSet, pte)) != 0)
+        // page should be encrypted and the appropriate bits in the PTE should
+        // be reset
+        encryptPage(evicted);  // encrypt evicted page
 
-static void clock_insert(struct proc *curproc) { curproc->clock_queue; }
-clock_remove();
-clock_clear();
-clock_print();
-
-// victim policy - Clock algorithm (FIFO with second-chance) for picking victim
-// page.
-void clockAlgorithm() {
-    // (statically) allocate a clock queue for each process - storing all the
-    // virtual pages that are currently decrypted
-
-    // PTE_A (0x020 i.e. sixth bit): reference bit that gets set by x86
-    // hardware to 1 every time a page is accessed.
-    // - This hardware-managed access bit should be cleared by the kernel (in
-    // software) at the appropriate time, while set automatically by hardware on
-    // next access (there is no harm in setting it manually).
-
-    // victim selection: examine the page at the head of the queue.
-    while (victimFound) {
-        // head page has been accessed since it was last enqueued
-        if (head.PTE_A == 1) {
-            //  clear the reference bit (PTE_A) and move the node to the tail of
-            //  the queue
-
-            continue;  // victim selection should proceed to the next page in
-                       // the queue
-        }
-    }
-
-    return victimPage;
-}
-
-void evictPage() {
-    // page should be encrypted and the appropriate bits in the PTE should be
-    // reset
+    decryptPage(pte);  // decrypt inserted virtual page
 }
 
 /**
- * TODO: implement decryption instead
  * @brief Encrypt ranges of virtual pages
  *
  * encrypt virtual addresses ranging
@@ -505,17 +478,14 @@ void evictPage() {
  * @param len # of pages to encrypt
  * @return int 0 on success, otherwise -1 on failure.
  */
-int mencrypt(char *va, int len) {
+int mencrypt(pde_t *pageDirectory, char *va, int len) {
     if (len == 0) return 0;  // ignore - short-circuit before any error checking
 
-    struct proc *proc;  // current process
-    // pte_t *pte;  // page table entry (matching input virtual address's page)
+    struct proc *proc = myproc();  // current user process
     char *va0;  // first virtual address in the corresponding va's page
     struct MultipageIndex page_i;
 
-    proc = myproc();                      // current user process
     va0 = (char *)PGROUNDDOWN((uint)va);  // assuming va could be page-aligned
-
     /*🐞 assert correctly rounded (NOTE: unnecessary step; only for debugging)
     if ((uint)va >> PTXSHIFT != (uint)va0 >> PTXSHIFT) goto fail; */
 
@@ -523,25 +493,24 @@ int mencrypt(char *va, int len) {
     // case: virtual address is an invalid address (e.g., out-of-range value)
     // case: a very large value that will let the page range  exceed the upper
     // bound of the user virtual space
-    if (len < 0 || outOfRange(va) || outOfRange(NEXTPAGE(va0, len - 1)))
+    if (len < 0 || outOfRange(va, proc->sz) ||
+        outOfRange(NEXT_PAGE(va0, len - 1), proc->sz))
         goto fail;
 
     // get virtual address's page entry
     page_i = getPageIndex(va0);
-    // pte = getPTE(page_i);
-
     /*🐞 assert pages equal (NOTE: unnecessary step; only for debugging)
+    // pte_t *pte;  // page table entry (matching input va's page)
+    // pte = getPTE(pageDirectory, page_i);
     struct MultipageIndex page_i0 = {PDX(va0), PTX(va0)};
-    if (pte != getPTE(page_i0)) goto fail; */
+    if (pte != getPTE(pageDirectory, page_i0)) goto fail; */
 
     // case: calling process does not have permission or privilege to access
     // or modify some pages in the range (either all the pages in the range
     // are successfully encrypted or none of them is encrypted)
-    if (proc->sz == 0)
-        return 0;  // remove this - only used temporarly for debugging
     for (int i = 0; i < len; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, i);
-        pte_t *e = getPTE(currentPage_i);  // current pte
+        pte_t *e = getPTE(pageDirectory, currentPage_i);  // current pte
         if (!e || (!IS_BIT(e, PTE_P) && !IS_BIT(e, PTE_E)) ||
             !IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
             goto fail;
@@ -552,15 +521,9 @@ int mencrypt(char *va, int len) {
     // unencrypted pages should be encrypted
     for (int i = 0; i < len; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, i);
-        pte_t *e = getPTE(currentPage_i);  // current pte
-        if (IS_BIT(e, PTE_E)) continue;    // skip encrypted pages
-        char *pagePhysicalAddr = (char *)PTE_ADDR(*e);
-        toggleEncryptPageSize(pagePhysicalAddr);
-        // update flags
-        *e = SET_BIT(e, PTE_E);
-        *e = CLEAR_BIT(e, PTE_P);
+        pte_t *e = getPTE(pageDirectory, currentPage_i);  // current pte
+        encryptPage(e);
     }
-    flushTLB();
 
     return 0;
 
@@ -568,13 +531,8 @@ fail:
     return -1;
 }
 
-/**
- * @brief flush current process TLB after change table entry values
- */
-void flushTLB() { switchuvm(myproc()); }
-
 /** check if virtual address is out of range from current user virtual space */
-int outOfRange(void *va) { return (uint)va >= myproc()->sz; }
+int outOfRange(void *va, uint sz) { return (uint)va >= sz; }
 
 /**
  * @brief get index multipagetable of page corresponding to the virtual address
@@ -593,32 +551,8 @@ struct MultipageIndex getPageIndex(char *va) {
 }
 
 /**
- * @brief retrieve page table entry using indexes
- *
- * @param page_i page directory & table entry index
- * @return pte_t* pointer to page table entry, or 0 if page dir not present
- */
-pte_t *getPTE(struct MultipageIndex page_i) {
-    if (page_i.pd < 0 || page_i.pt < 0) goto fail;  // validate param
-
-    pde_t *pgdir = myproc()->pgdir;  // current process page directory
-    pde_t *pde;
-    pte_t *pgtab;
-
-    // check other flags for directory page table enteries like permission
-    pde = &pgdir[page_i.pd];
-    if (!IS_BIT(pde, PTE_P) || !IS_BIT(pde, PTE_W) || !IS_BIT(pde, PTE_U))
-        goto fail;
-
-    pgtab = (pte_t *)P2V(PTE_ADDR(*pde));
-    return &pgtab[page_i.pt];
-
-fail:
-    return 0;
-}
-
-/**
- * @brief get next page entry from the multilevel page table
+ * @brief get next page entry index in the multilevel page table using page
+ * index arithmetic
  *
  * @param page_i page directory & table index of current state of iterator
  * @param nextPageIndex # of page table entry beyond the current position
@@ -652,6 +586,86 @@ reverse : {               // iterate to a lower index page
 }
 
 /**
+ * @brief retrieve page table entry using indexes
+ *
+ * @param pageDirectory target/current process page directory base kva
+ * @param page_i page directory & table entry index
+ * @return pte_t* pointer to page table entry, or 0 if page dir not present
+ */
+pte_t *getPTE(pde_t *pageDirectory, struct MultipageIndex page_i) {
+    if (page_i.pd < 0 || page_i.pt < 0) goto fail;  // validate param
+
+    pde_t *pde;
+    pte_t *pgtab;
+
+    // check other flags for directory page table enteries like permission
+    pde = &pageDirectory[page_i.pd];
+    if (!IS_BIT(pde, PTE_P) || !IS_BIT(pde, PTE_W) || !IS_BIT(pde, PTE_U))
+        goto fail;
+
+    pgtab = (pte_t *)P2V(PTE_ADDR(*pde));
+    return &pgtab[page_i.pt];
+
+fail:
+    return 0;
+}
+
+/**
+ * @brief check if the thrown page fault is a legit/genuine encryption fault
+ *
+ * @param faultVA virtual address causing the fault
+ * @return pte_t* page table entry corresponding to the address, or 0 if a non
+ * encryption related fault.
+ */
+pte_t *validateFaultPage(pde_t *pageDirectory, char *faultVA) {
+    struct MultipageIndex page_i = {PDX(faultVA), PTX(faultVA)};
+    pte_t *pte =
+        getPTE(pageDirectory, page_i);  // get suspected page table entry
+
+    /* validate legit page fault */
+    if (pte == 0 || IS_BIT(pte, PTE_P) || !IS_BIT(pte, PTE_E) ||
+        !IS_BIT(pte, PTE_W))
+        return 0;
+
+    return pte;
+}
+
+/**
+ * @brief encrypt a single page table entry
+ *
+ * @param pte page table entry associated with the target page
+ * - NOTE: assumes page entry is both valid for current user with permission
+ */
+void encryptPage(pte_t *pte) {
+    if (IS_BIT(pte, PTE_E)) return;  // skip encrypted pages
+
+    char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
+    toggleEncryptPageSize(pagePhysicalAddr);
+    // update flags
+    *pte = SET_BIT(pte, PTE_E);
+    *pte = CLEAR_BIT(pte, PTE_P);
+    flushTLB();  // flush cache after a page entry update
+}
+
+/**
+ * @brief decrypt page addresses and update page entry
+ *
+ * @param pte page table entry associated with the target page
+ * - NOTE: assumes page entry is both valid for current user with permission
+ */
+void decryptPage(pte_t *pte) {
+    if (!IS_BIT(pte, PTE_E)) return;  // skip non-encrypted pages
+
+    char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
+    toggleEncryptPageSize(pagePhysicalAddr);  // encrypt all addresses in page
+
+    // update flags
+    *pte = CLEAR_BIT(pte, PTE_E);
+    *pte = SET_BIT(pte, PTE_P);
+    flushTLB();
+}
+
+/**
  * @brief encrypt/decrypt all bytes in a page starting from the beginning
  *
  * @param pagePhysicalAddress first physical address of the page
@@ -664,38 +678,9 @@ void toggleEncryptPageSize(char *pagePhysicalAddress) {
 }
 
 /**
- * @brief check if the thrown page fault is a legit encryption fault
- *
- * @param faultVA virtual address causing the fault
- * @return pte_t* page table entry corresponding to the address, or 0 if a non
- * encryption related fault.
+ * @brief flush current process TLB after change table entry values
  */
-pte_t *validateFaultPage(char *faultVA) {
-    struct MultipageIndex page_i = {PDX(faultVA), PTX(faultVA)};
-    pte_t *pte = getPTE(page_i);  // get suspected page table entry
-
-    /* validate legit page fault */
-    if (pte == 0 || IS_BIT(pte, PTE_P) || !IS_BIT(pte, PTE_E) ||
-        !IS_BIT(pte, PTE_W))
-        return 0;
-
-    return pte;
-}
-
-/**
- * @brief decrypt page addresses and update page entry
- *
- * @param pte page table entry associated with the target page
- */
-void decryptPage(pte_t *pte) {
-    char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
-    toggleEncryptPageSize(pagePhysicalAddr);  // encrypt all addresses in page
-
-    // update flags
-    *pte = CLEAR_BIT(pte, PTE_E);
-    *pte = SET_BIT(pte, PTE_P);
-    flushTLB();
-}
+void flushTLB() { switchuvm(myproc()); }
 
 /**
  * @brief  get absolute mathematical value
@@ -709,3 +694,97 @@ int absolute(int n) {
     const int ret[2] = {n, -n};
     return ret[n < 0];
 }
+
+/* Clock queue manipulation functions */
+
+// initialize clock structure to an empty state
+void clock_initialize(struct clock *c) {
+    memset((void *)c, 0, sizeof(c));
+    c->capacity = CLOCKSIZE;
+    c->size = 0;
+    c->hand = -1;
+    for (int i = 0; i < c->capacity; i++) c->queue[i].valid = INVALID;
+}
+
+// Insert a page into the clock queue.
+pte_t *clock_insert(struct clock *c, pte_t *pte) {
+    // victim selection: examine the page at the head of the queue for candidate
+    for (;;) {
+        // First advance the hand.
+        c->hand = (c->hand + 1) % c->capacity;
+
+        // TODO: check if this is needed with current implementation
+        // if (c->size < c->capacity) {  // workingSet not full
+        //     // push page to tail of clock queue
+        // }
+
+        // case: empty slot
+        if (c->queue[c->hand].valid == INVALID) {
+            c->queue[c->hand].pte = pte;
+            c->queue[c->hand].valid = VALID;
+            c->size++;
+            return 0;
+        }
+
+        // case: referenced bit is not set, then evict (Page is unused so
+        // replace it)
+        if (!IS_BIT(c->queue[c->hand].pte, PTE_A)) {
+            pte_t *evictedPage = c->queue[c->hand].pte;
+            // Put in the new page.
+            c->queue[c->hand].pte = pte;
+            return evictedPage;
+        }
+
+        // clear referenced bit (PTE_A) of the page in slot and move the
+        // node to the tail of the queue
+        *(c->queue[c->hand].pte) = CLEAR_BIT(c->queue[c->hand].pte, PTE_A);
+    }
+}
+
+// find page table entry
+int clock_getIndex(struct clock *c, pte_t *pte) {
+    for (int i = 0; i < c->size; ++i) {
+        int idx = (c->hand + i) % c->capacity;
+        if (c->queue[idx].pte == pte) return idx;
+    }
+
+    return -1;  // not found
+}
+
+// Removing a page forcefully is tricky because you need to
+// shift things around.
+// This happens at page deallocation.
+void clock_remove(struct clock *c, pte_t *pte) {
+    int prev_tail = c->hand;
+    int match_idx = -1;
+
+    // Search for the matching element.
+    if ((match_idx = clock_getIndex(c, pte)) == -1) return;
+
+    // Shift everything from match_idx+1 to prev_tail to
+    // one slot to the left.
+    for (int idx = match_idx; idx != prev_tail; idx = (idx + 1) % c->capacity) {
+        int next_idx = (idx + 1) % c->capacity;
+        c->queue[idx].pte = c->queue[next_idx].pte;
+        c->queue[idx].valid = c->queue[next_idx].valid;
+    }
+
+    // Clear the element at prev_tail. Set hand to
+    // one entry to the left.
+    c->queue[prev_tail].valid = INVALID;
+    c->hand = c->hand == 0 ? c->capacity - 1 : c->hand - 1;
+}
+
+// Print the clock queue in head->tail orderr, so starting from hand+1.
+// void clk_print(struct clock *c) {
+//     int print_idx = c->hand;
+//     printf("CLK queue: | ");
+//     for (int i = 0; i < c->capacity; ++i) {
+//         print_idx = (print_idx + 1) % c->capacity;
+//         if (c->queue[print_idx].valid != INVALID) {
+//             printf("PTE %1X R %1d | ", c->queue[print_idx].pte,
+//                    (*(c->queue[print_idx].pte) & PTE_A) > 0);
+//         }
+//     }
+//     printf("\n\n");
+// }

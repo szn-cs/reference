@@ -90,6 +90,8 @@ struct segdesc {
 #define PTXSHIFT 12  // offset of PTX in a linear address
 #define PDXSHIFT 22  // offset of PDX in a linear address
 
+// explanation: clears lower bits not multiple of boundary value
+// https://stackoverflow.com/questions/14561402/how-is-this-size-alignment-working
 #define PGROUNDUP(sz) (((sz) + PGSIZE - 1) & ~(PGSIZE - 1))
 #define PGROUNDDOWN(a) (((a)) & ~(PGSIZE - 1))
 
@@ -104,7 +106,6 @@ struct segdesc {
 #define PTE_FLAGS(pte) ((uint)(pte)&0xFFF)
 
 #ifndef __ASSEMBLER__
-typedef uint pte_t;
 
 // Task state segment format
 struct taskstate {
@@ -181,17 +182,24 @@ struct gatedesc {
         (gate).off_31_16 = (uint)(off) >> 16;         \
     }
 
-// 📝 9-11 are not in use
+/* 📝 custom */
+// 9-11 are not in use
 #define PTE_E 0x200  // Encryption flag;  10th position flag
+// - This hardware-managed access bit should be cleared by the kernel (in
+// software) at the appropriate time, while set automatically by hardware on
+// next access (there is no harm in setting it manually).
 #define PTE_A 0x020  // page access bit (maintained by hardware)
-// 📝 encryption of page - flip bits
+// encryption of page - flip bits
 #define FLIP_BITS(byte) (~((char)(byte)))
-//📝 manipulate bits
+// manipulate bits
 #define IS_BIT(pte, bit) (((uint)*pte) & bit)        // check if bit is set
 #define SET_BIT(pte, bit) (((uint)*pte) | bit)       // set bit
 #define CLEAR_BIT(pte, bit) (((uint)*pte) & (~bit))  // clear bit
-//📝 get the next pages using pointer arithmetic with page size as offset
-#define NEXTPAGE(address, index) ((void *)address + PGSIZE * index)
+// get the next pages using pointer arithmetic with page size as offset
+#define NEXT_PAGE(address, index) ((void *)address + PGSIZE * index)
+#define PREVIOUS_PAGE(address, index) ((void *)address - PGSIZE * index)
+// count # of pages till the virtual address's page.
+#define PAGE_COUNT(sz) (PGROUNDDOWN(sz) / PGSIZE + 1)
 // multi-level page index
 struct MultipageIndex {
     int pd, pt;  // page directory index & page table index

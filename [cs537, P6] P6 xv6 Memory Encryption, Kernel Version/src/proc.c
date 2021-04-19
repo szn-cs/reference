@@ -141,15 +141,35 @@ int growproc(int n) {
     uint sz;
     struct proc *curproc = myproc();
 
+    // page align and count number of new pages
+    int pageCount =
+        absolute(PAGE_COUNT(curproc->sz + n) - PAGE_COUNT(curproc->sz));
     sz = curproc->sz;
     if (n > 0) {
         if ((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0) return -1;
-        // TODO: encrypt all the new pages e.g. encrypt (sz, ...)
+
+        // 1st new page address
+        char *pageAddress = NEXT_PAGE((void *)curproc->sz, 1);
+        // 📝 encrypt all the new pages
+        if (mencrypt(curproc->pgdir, pageAddress, pageCount) == -1) {
+            cprintf("Error: growproc() > mencrypt()");
+            exit();
+        };
     } else if (n < 0) {
         if ((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0) return -1;
-        // TODO: remove there deallocated pages from queue. e.g. remove(sz,
-        // sz+n)
+        // 📝 remove deallocated pages from queue.
+        if (pageCount == 0) goto skip;
+        // top starting page
+        struct MultipageIndex page_i = getPageIndex((void *)curproc->sz);
+        for (int i = 1; i <= pageCount; i++) {
+            // current page index
+            struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
+            // get current page table entry
+            pte_t *pte = getPTE(curproc->pgdir, currentPage_i);
+            clock_remove(&curproc->workingSet, pte);
+        }
     }
+skip:
     curproc->sz = sz;
 
     switchuvm(curproc);
@@ -159,8 +179,6 @@ int growproc(int n) {
 // Create a new process copying p as the parent.
 // Sets up stack to return as if from system call.
 // Caller must set state of returned proc to RUNNABLE.
-// TODO: check & ensure the behavior of: except the child to maintain the exact
-// same working set and pgdir flags
 int fork(void) {
     int i, pid;
     struct proc *np;
@@ -171,7 +189,11 @@ int fork(void) {
         return -1;
     }
 
-    // TODO: clear queue of the process
+    // TODO: check & ensure the behavior of: expect the child to maintain the
+    // exact same working set and pgdir flags
+    // 📝 clear queue of the process & copy state from current process
+    clock_initialize(&np->workingSet);
+    memmove(&np->workingSet, &curproc->workingSet, sizeof(curproc->workingSet));
 
     // Copy process state from proc.
     if ((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {

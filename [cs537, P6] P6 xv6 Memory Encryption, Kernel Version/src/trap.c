@@ -34,14 +34,20 @@ void trap(struct trapframe* tf) {
         if (myproc()->killed) exit();
         return;
     } else if (tf->trapno == T_PGFLT) {  //📝 handle page fault
-                                         // TODO:
-        pte_t* pte;
+        pte_t* pte;                      // page table entry of faulty address
+        struct proc* proc = myproc();    // current process info
         // Faulty virtual address is stored during page fault in cr2
         char* faultVA = (char*)rcr2();  // read from register cr2
-        if ((pte = validateFaultPage(faultVA)) != 0)
-            return decryptPage(pte);  // validate fault address & decrept page
+
+        // validate validate fault address (encrypted page is being accessed)
+        if ((pte = validateFaultPage(proc->pgdir, faultVA)) == 0) goto skip;
+
+        // working set update using clock 2nd chance algorithm
+        pageReplacement(&proc->workingSet, pte);
+        return;
     }
 
+skip:
     switch (tf->trapno) {
         case T_IRQ0 + IRQ_TIMER:
             if (cpuid() == 0) {

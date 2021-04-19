@@ -34,6 +34,27 @@ struct context {
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+/* 📝 clock workset related structures */
+typedef struct clockNode {
+    enum valid { VALID, INVALID } valid;  // is node a valid element
+    pte_t *pte;
+    // NOTE: referenced bit = PTE_A of pte
+    // PTE_A (0x020 i.e. sixth bit): reference bit that gets set by x86
+    // hardware to 1 every time a page is accessed.
+} node_t;
+
+// A clock struture is composed of a fixed circular buffer and an index of the
+// current tail (clock hand).
+struct clock {
+    // (statically) allocate a clock queue for each process - storing all the
+    // virtual pages that are currently decrypted    node_t queue[CLOCKSIZE]; //
+    // list of clock nodes
+    node_t queue[CLOCKSIZE];
+    int capacity;  // maximum number of items in the buffer
+    int size;      // number of items in the buffer
+    int hand;      // index points to oldest page node in the queue
+};
+
 // Per-process state
 struct proc {
     uint sz;                     // Size of process memory (bytes)
@@ -49,9 +70,8 @@ struct proc {
     struct file *ofile[NOFILE];  // Open files
     struct inode *cwd;           // Current directory
     char name[16];               // Process name (debugging)
-
     // 📝
-    // TODO: clock_queue
+    struct clock workingSet;  // clock algorithm queue
 };
 
 // Process memory is laid out contiguously, low addresses first:

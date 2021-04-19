@@ -11,6 +11,7 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+struct clock;
 
 // bio.c
 void binit(void);
@@ -195,16 +196,25 @@ void clearpteu(pde_t *pgdir, char *uva);
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
 
 /** 📝 custom **/
+void pageReplacement(struct clock *workingSet, pte_t *pte);
 void handlePageFault();
 void clockAlgorithm();
 void evictPage();
-struct MultipageIndex getPageIndex(char* va);
-void flushTLB();
-int outOfRange(void* va);
-pte_t* getPTE(struct MultipageIndex page_i);
+int mencrypt(pde_t *pageDirectory, char *va, int len);
+struct MultipageIndex getPageIndex(char *va);
+pte_t *getPTE(pde_t *pageDirectory, struct MultipageIndex page_i);
 struct MultipageIndex pteIterator(struct MultipageIndex page_i,
                                   int nextPageIndex);
-void toggleEncryptPageSize(char* pagePhysicalAddress);
-pte_t* validateFaultPage(char* faultVA);
-void decryptPage(pte_t* pte);
+pte_t *validateFaultPage(pde_t *pageDirectory, char *faultVA);
+void encryptPage(pte_t *pte);
+void decryptPage(pte_t *pte);
+void toggleEncryptPageSize(char *pagePhysicalAddress);
+void flushTLB();
+int outOfRange(void *va, uint sz);
 int absolute(int n);
+
+void clock_initialize(struct clock *c);
+pte_t *clock_insert(struct clock *c, pte_t *pte);
+int clock_getIndex(struct clock *c, pte_t *pte);
+void clock_remove(struct clock *c, pte_t *pte);
+void clk_print(struct clock *c);
