@@ -199,7 +199,7 @@ struct gatedesc {
 #define NEXT_PAGE(address, index) ((void *)address + PGSIZE * index)
 #define PREVIOUS_PAGE(address, index) ((void *)address - PGSIZE * index)
 // count # of pages till the virtual address's page.
-#define PAGE_COUNT(sz) (PGROUNDDOWN(sz) / PGSIZE + 1)
+#define PAGE_COUNT(sz) (sz == 0 ? 1 : PGROUNDUP(sz) / PGSIZE)
 // multi-level page index
 struct MultipageIndex {
     int pd, pt;  // page directory index & page table index

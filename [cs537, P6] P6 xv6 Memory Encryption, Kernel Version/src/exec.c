@@ -89,8 +89,9 @@ int exec(char *path, char **argv) {
     clock_initialize(&curproc->workingSet);
     // 📝 encrypt all the pages:
     // page alignment & count user space pages
-    if (mencrypt(curproc->pgdir, 0, PAGE_COUNT(curproc->sz)) == -1) {
-        cprintf("Error: exec() > mencrypt()");
+    if (mencrypt(curproc->pgdir, curproc->sz, 0, PAGE_COUNT(curproc->sz)) ==
+        -1) {
+        cprintf("Error: exec() > mencrypt()\n");
         exit();
     };
 

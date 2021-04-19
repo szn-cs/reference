@@ -148,12 +148,12 @@ int growproc(int n) {
     if (n > 0) {
         if ((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0) return -1;
 
-        // 1st new page address
-        char *pageAddress = NEXT_PAGE((void *)curproc->sz, 1);
+        char *pageAddress = (void *)curproc->sz;  // 1st new page address
         // 📝 encrypt all the new pages
-        if (mencrypt(curproc->pgdir, pageAddress, pageCount) == -1) {
+        if (mencrypt(curproc->pgdir, curproc->sz + n, pageAddress, pageCount) ==
+            -1) {
             cprintf("Error: growproc() > mencrypt()");
-            exit();
+            panic("Memory encryption error");
         };
     } else if (n < 0) {
         if ((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0) return -1;

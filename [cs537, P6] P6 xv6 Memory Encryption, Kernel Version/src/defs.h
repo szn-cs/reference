@@ -200,7 +200,7 @@ void pageReplacement(struct clock *workingSet, pte_t *pte);
 void handlePageFault();
 void clockAlgorithm();
 void evictPage();
-int mencrypt(pde_t *pageDirectory, char *va, int len);
+int mencrypt(pde_t *pageDirectory, uint sz, char *va, int len);
 struct MultipageIndex getPageIndex(char *va);
 pte_t *getPTE(pde_t *pageDirectory, struct MultipageIndex page_i);
 struct MultipageIndex pteIterator(struct MultipageIndex page_i,
@@ -210,7 +210,6 @@ void encryptPage(pte_t *pte);
 void decryptPage(pte_t *pte);
 void toggleEncryptPageSize(char *pagePhysicalAddress);
 void flushTLB();
-int outOfRange(void *va, uint sz);
 int absolute(int n);
 
 void clock_initialize(struct clock *c);

@@ -478,10 +478,12 @@ void pageReplacement(struct clock *workingSet, pte_t *pte) {
  * @param len # of pages to encrypt
  * @return int 0 on success, otherwise -1 on failure.
  */
-int mencrypt(pde_t *pageDirectory, char *va, int len) {
-    if (len == 0) return 0;  // ignore - short-circuit before any error checking
+int mencrypt(pde_t *pageDirectory, uint sz, char *va, int len) {
+    if (len == 0)  // ignore - short-circuit before any error checking
+        return 0;
+    else if (len < 0)  // case: negative value
+        goto fail;
 
-    struct proc *proc = myproc();  // current user process
     char *va0;  // first virtual address in the corresponding va's page
     struct MultipageIndex page_i;
 
@@ -489,32 +491,33 @@ int mencrypt(pde_t *pageDirectory, char *va, int len) {
     /*🐞 assert correctly rounded (NOTE: unnecessary step; only for debugging)
     if ((uint)va >> PTXSHIFT != (uint)va0 >> PTXSHIFT) goto fail; */
 
-    // case: negative value
-    // case: virtual address is an invalid address (e.g., out-of-range value)
+    // check if virtual address is out of range in current user virtual space:
+    // case: virtual address is an invalid address (e.g., out-of-range
+    // value)
     // case: a very large value that will let the page range  exceed the upper
     // bound of the user virtual space
-    if (len < 0 || outOfRange(va, proc->sz) ||
-        outOfRange(NEXT_PAGE(va0, len - 1), proc->sz))
+    if (va < 0 || (uint)va >= sz || (uint)NEXT_PAGE(va0, len - 1) >= sz)
         goto fail;
 
     // get virtual address's page entry
     page_i = getPageIndex(va0);
     /*🐞 assert pages equal (NOTE: unnecessary step; only for debugging)
-    // pte_t *pte;  // page table entry (matching input va's page)
-    // pte = getPTE(pageDirectory, page_i);
-    struct MultipageIndex page_i0 = {PDX(va0), PTX(va0)};
-    if (pte != getPTE(pageDirectory, page_i0)) goto fail; */
+// pte_t *pte;  // page table entry (matching input va's page)
+// pte = getPTE(pageDirectory, page_i);
+struct MultipageIndex page_i0 = {PDX(va0), PTX(va0)};
+if (pte != getPTE(pageDirectory, page_i0)) goto fail; */
 
-    // case: calling process does not have permission or privilege to access
-    // or modify some pages in the range (either all the pages in the range
-    // are successfully encrypted or none of them is encrypted)
-    for (int i = 0; i < len; ++i) {
-        struct MultipageIndex currentPage_i = pteIterator(page_i, i);
-        pte_t *e = getPTE(pageDirectory, currentPage_i);  // current pte
-        if (!e || (!IS_BIT(e, PTE_P) && !IS_BIT(e, PTE_E)) ||
-            !IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
-            goto fail;
-    }
+    // NOTE: un-necessary check as pages handled by kernel before refreshing
+    // user process case: calling process does not have permission or privilege
+    // to  access or modify some pages in the range (either all the pages in the
+    // range are successfully encrypted or none of them is encrypted)
+    // for (int i = 0; i < len; ++i) {
+    //     struct MultipageIndex currentPage_i = pteIterator(page_i, i);
+    //     pte_t *e = getPTE(pageDirectory, currentPage_i);  // current pte
+    //     //  if (!e || !IS_BIT(e, PTE_P) && !IS_BIT(e, PTE_E)) ||
+    //     //     !IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
+    //     //     goto fail;
+    // }
 
     // case part or all pages already encypted: Encrypted pages and their
     // corresponding page table entries should remain unchanged. All the
@@ -522,6 +525,13 @@ int mencrypt(pde_t *pageDirectory, char *va, int len) {
     for (int i = 0; i < len; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, i);
         pte_t *e = getPTE(pageDirectory, currentPage_i);  // current pte
+
+        if (!e) goto fail;
+        // already encrypted
+        if (!IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
+            ;  // ignore as kernel handles encryption before refreshing
+               // process
+
         encryptPage(e);
     }
 
@@ -530,9 +540,6 @@ int mencrypt(pde_t *pageDirectory, char *va, int len) {
 fail:
     return -1;
 }
-
-/** check if virtual address is out of range from current user virtual space */
-int outOfRange(void *va, uint sz) { return (uint)va >= sz; }
 
 /**
  * @brief get index multipagetable of page corresponding to the virtual address
@@ -637,7 +644,8 @@ pte_t *validateFaultPage(pde_t *pageDirectory, char *faultVA) {
  * - NOTE: assumes page entry is both valid for current user with permission
  */
 void encryptPage(pte_t *pte) {
-    if (IS_BIT(pte, PTE_E)) return;  // skip encrypted pages
+    if ((!IS_BIT(pte, PTE_P) && IS_BIT(pte, PTE_E)))
+        return;  // skip encrypted pages
 
     char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
     toggleEncryptPageSize(pagePhysicalAddr);
@@ -732,6 +740,7 @@ pte_t *clock_insert(struct clock *c, pte_t *pte) {
             pte_t *evictedPage = c->queue[c->hand].pte;
             // Put in the new page.
             c->queue[c->hand].pte = pte;
+            c->queue[c->hand].valid = VALID;
             return evictedPage;
         }
 
@@ -761,7 +770,7 @@ void clock_remove(struct clock *c, pte_t *pte) {
     // Search for the matching element.
     if ((match_idx = clock_getIndex(c, pte)) == -1) return;
 
-    // Shift everything from match_idx+1 to prev_tail to
+    // compact - shift everything from match_idx+1 to prev_tail to
     // one slot to the left.
     for (int idx = match_idx; idx != prev_tail; idx = (idx + 1) % c->capacity) {
         int next_idx = (idx + 1) % c->capacity;
@@ -769,8 +778,7 @@ void clock_remove(struct clock *c, pte_t *pte) {
         c->queue[idx].valid = c->queue[next_idx].valid;
     }
 
-    // Clear the element at prev_tail. Set hand to
-    // one entry to the left.
+    // Clear the element at prev_tail. Set hand to one entry to the left.
     c->queue[prev_tail].valid = INVALID;
     c->hand = c->hand == 0 ? c->capacity - 1 : c->hand - 1;
 }
