@@ -166,9 +166,8 @@ int growproc(int n) {
             struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
             // get current page table entry
             pte_t *pte = getPTE(curproc->pgdir, currentPage_i);
-            pte_t *evicted;  // evicted page from clock queue if any
-            if ((evicted = clock_remove(&curproc->workingSet, pte)) != 0)
-                encryptPage(evicted);  // encrypt evicted page
+            if (clock_getIndex(&curproc->workingSet, pte) == -1) continue;
+            clock_remove(&curproc->workingSet, pte);
         }
     }
 skip:
@@ -191,7 +190,7 @@ int fork(void) {
         return -1;
     }
 
-    // TODO: check & ensure the behavior of: expect the child to maintain the
+    // check & ensure the behavior of: expect the child to maintain the
     // exact same working set and pgdir flags
     // 📝 clear queue of the process & copy state from current process
     clock_initialize(&np->workingSet);

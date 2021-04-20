@@ -383,14 +383,16 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
         // get current page table entry
         pte = getPTE(proc->pgdir, currentPage_i);
-        if (pte == 0) break;  // invalid page encountered
+        if (pte == 0) {
+            cprintf("Error: getpgTable() invalid page encountered\n");
+            break;  // invalid page encountered
+        }
 
         // filter pages in working set
-        if (wsetOnly && clock_getIndex(&proc->workingSet, pte) == -1)
-            continue;
-        else
-            count++;
+        if (wsetOnly > 0)
+            if (clock_getIndex(&proc->workingSet, pte) == -1) continue;
 
+        count++;
         entries[i].pdx = currentPage_i.pd;
         entries[i].ptx = currentPage_i.pt;
         entries[i].ppage = (*pte) >> PTXSHIFT;  // as per spec
@@ -488,11 +490,6 @@ pte_t *clock_insert(struct clock *c, pte_t *pte, uint uva) {
         // First advance the hand.
         c->hand = (c->hand + 1) % c->capacity;
 
-        // TODO: check if this is needed with current implementation
-        // if (c->size < c->capacity) {  // workingSet not full
-        //     // push page to tail of clock queue
-        // }
-
         // case: empty slot
         if (c->queue[c->hand].valid == INVALID) {
             c->queue[c->hand].pte = pte;
@@ -521,9 +518,10 @@ pte_t *clock_insert(struct clock *c, pte_t *pte, uint uva) {
 
 // find page table entry
 int clock_getIndex(struct clock *c, pte_t *pte) {
-    for (int i = 0; i < c->size; ++i) {
-        int idx = (c->hand + i) % c->capacity;
-        if (c->queue[idx].pte == pte) return idx;
+    for (int i = 0; i < c->capacity; ++i) {
+        // int idx = (c->hand + i) % c->capacity;
+        if (c->queue[i].valid == INVALID) continue;
+        if (c->queue[i].pte == pte) return i;
     }
 
     return -1;  // not found
@@ -551,6 +549,7 @@ pte_t *clock_remove(struct clock *c, pte_t *pte) {
     // Clear the element at prev_tail. Set hand to one entry to the left.
     c->queue[prev_tail].valid = INVALID;
     c->hand = c->hand == 0 ? c->capacity - 1 : c->hand - 1;
+    c->size--;
     return pte;
 }
 
@@ -616,10 +615,10 @@ if (pte != getPTE(pageDirectory, page_i0)) goto fail; */
         pte_t *e = getPTE(pageDirectory, currentPage_i);  // current pte
 
         if (!e) goto fail;
-        // already encrypted
-        if (!IS_BIT(e, PTE_W) || !IS_BIT(e, PTE_U))
-            ;  // ignore as kernel handles encryption before refreshing
-               // process
+        // skip boundary pages
+        if (!IS_BIT(e, PTE_U))
+            continue;  // ignore as kernel handles encryption before refreshing
+        // process
 
         encryptPage(e);
     }
@@ -735,6 +734,9 @@ pte_t *validateFaultPage(pde_t *pageDirectory, char *faultVA) {
 void encryptPage(pte_t *pte) {
     if ((!IS_BIT(pte, PTE_P) && IS_BIT(pte, PTE_E)))
         return;  // skip encrypted pages
+    // skip boundary pages
+    if (!IS_BIT(pte, PTE_U))
+        return;  // ignore as kernel handles encryption before refreshing
 
     char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
     toggleEncryptPageSize(pagePhysicalAddr);
