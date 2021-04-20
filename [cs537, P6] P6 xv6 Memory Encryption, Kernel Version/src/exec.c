@@ -86,7 +86,9 @@ int exec(char *path, char **argv) {
     curproc->tf->esp = sp;
 
     // 📝 clear the clock queue of curproc
+    // if (curproc->pid < 1)
     clock_initialize(&curproc->workingSet);
+
     // 📝 encrypt all the pages:
     // page alignment & count user space pages
     if (mencrypt(curproc->pgdir, curproc->sz, 0, PAGE_COUNT(curproc->sz)) ==

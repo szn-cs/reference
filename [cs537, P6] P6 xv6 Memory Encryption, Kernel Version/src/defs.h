@@ -196,7 +196,7 @@ void clearpteu(pde_t *pgdir, char *uva);
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
 
 /** 📝 custom **/
-void pageReplacement(struct clock *workingSet, pte_t *pte);
+void pageReplacement(struct clock *workingSet, pte_t *pte, char *uva);
 void handlePageFault();
 void clockAlgorithm();
 void evictPage();
@@ -213,7 +213,7 @@ void flushTLB();
 int absolute(int n);
 
 void clock_initialize(struct clock *c);
-pte_t *clock_insert(struct clock *c, pte_t *pte);
+pte_t *clock_insert(struct clock *c, pte_t *pte, uint uva);
 int clock_getIndex(struct clock *c, pte_t *pte);
-void clock_remove(struct clock *c, pte_t *pte);
+pte_t *clock_remove(struct clock *c, pte_t *pte);
 void clk_print(struct clock *c);

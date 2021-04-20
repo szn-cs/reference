@@ -38,6 +38,7 @@ enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 typedef struct clockNode {
     enum valid { VALID, INVALID } valid;  // is node a valid element
     pte_t *pte;
+    uint uva;  // kept for debugging.
     // NOTE: referenced bit = PTE_A of pte
     // PTE_A (0x020 i.e. sixth bit): reference bit that gets set by x86
     // hardware to 1 every time a page is accessed.

@@ -272,7 +272,7 @@ void clearpteu(pde_t *pgdir, char *uva) {
 
 // Given a parent process's page table, create a copy
 // of it for a child.
-// TODO: check & ensure the behavior of: expect the child to maintain the exact
+// check & ensure the behavior of: expect the child to maintain the exact
 // same working set and pgdir flags
 pde_t *copyuvm(pde_t *pgdir, uint sz) {
     pde_t *d;
@@ -378,15 +378,18 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
     // When the actual number of valid virtual pages is less than or equals
     // to the num, then only fill up the array using those valid virtual
     // pages.
-    int i;  // number of elements filled
-    for (i = 0; i < num; ++i) {
+    int count = 0;  // number of elements filled
+    for (int i = 0; i < num; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
         // get current page table entry
         pte = getPTE(proc->pgdir, currentPage_i);
         if (pte == 0) break;  // invalid page encountered
 
         // filter pages in working set
-        if (wsetOnly && clock_getIndex(&proc->workingSet, pte) == -1) continue;
+        if (wsetOnly && clock_getIndex(&proc->workingSet, pte) == -1)
+            continue;
+        else
+            count++;
 
         entries[i].pdx = currentPage_i.pd;
         entries[i].ptx = currentPage_i.pt;
@@ -394,9 +397,11 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
         entries[i].present = IS_BIT(pte, PTE_P) ? 1 : 0;
         entries[i].writable = IS_BIT(pte, PTE_W) ? 1 : 0;
         entries[i].encrypted = IS_BIT(pte, PTE_E) ? 1 : 0;
+        entries[i].user = IS_BIT(pte, PTE_U) ? 1 : 0;
+        entries[i].ref = IS_BIT(pte, PTE_A) ? 1 : 0;
     }
 
-    return i;
+    return count;
 
 fail:
     return -1;
@@ -455,14 +460,98 @@ algorithm (FIFO with second-chance) for picking victim page.
  * @param workingSet
  * @param pte
  */
-void pageReplacement(struct clock *workingSet, pte_t *pte) {
+void pageReplacement(struct clock *workingSet, pte_t *pte, char *uva) {
+    decryptPage(pte);  // decrypt inserted virtual page
+
     pte_t *evicted;  // evicted page from clock queue if any
-    if ((evicted = clock_insert(workingSet, pte)) != 0)
+    if ((evicted = clock_insert(workingSet, pte, (uint)uva)) != 0)
         // page should be encrypted and the appropriate bits in the PTE should
         // be reset
         encryptPage(evicted);  // encrypt evicted page
+}
 
-    decryptPage(pte);  // decrypt inserted virtual page
+/* Clock queue manipulation functions */
+
+// initialize clock structure to an empty state
+void clock_initialize(struct clock *c) {
+    memset((void *)c, 0, sizeof(c));
+    c->capacity = CLOCKSIZE;
+    c->size = 0;
+    c->hand = -1;
+    for (int i = 0; i < c->capacity; i++) c->queue[i].valid = INVALID;
+}
+
+// Insert a page into the clock queue.
+pte_t *clock_insert(struct clock *c, pte_t *pte, uint uva) {
+    // victim selection: examine the page at the head of the queue for candidate
+    for (;;) {
+        // First advance the hand.
+        c->hand = (c->hand + 1) % c->capacity;
+
+        // TODO: check if this is needed with current implementation
+        // if (c->size < c->capacity) {  // workingSet not full
+        //     // push page to tail of clock queue
+        // }
+
+        // case: empty slot
+        if (c->queue[c->hand].valid == INVALID) {
+            c->queue[c->hand].pte = pte;
+            c->queue[c->hand].uva = uva;
+            c->queue[c->hand].valid = VALID;
+            c->size++;
+            return 0;
+        }
+
+        // case: referenced bit is not set, then evict (Page is unused so
+        // replace it)
+        if (!IS_BIT(c->queue[c->hand].pte, PTE_A)) {
+            pte_t *evictedPage = c->queue[c->hand].pte;
+            // Put in the new page.
+            c->queue[c->hand].pte = pte;
+            c->queue[c->hand].uva = uva;
+            c->queue[c->hand].valid = VALID;
+            return evictedPage;
+        }
+
+        // clear referenced bit (PTE_A) of the page in slot and move the
+        // node to the tail of the queue
+        *(c->queue[c->hand].pte) = CLEAR_BIT(c->queue[c->hand].pte, PTE_A);
+    }
+}
+
+// find page table entry
+int clock_getIndex(struct clock *c, pte_t *pte) {
+    for (int i = 0; i < c->size; ++i) {
+        int idx = (c->hand + i) % c->capacity;
+        if (c->queue[idx].pte == pte) return idx;
+    }
+
+    return -1;  // not found
+}
+
+// Removing a page forcefully is tricky because you need to
+// shift things around.
+// This happens at page deallocation.
+pte_t *clock_remove(struct clock *c, pte_t *pte) {
+    int prev_tail = c->hand;
+    int match_idx = -1;
+
+    // Search for the matching element.
+    if ((match_idx = clock_getIndex(c, pte)) == -1) return 0;
+
+    // compact - shift everything from match_idx+1 to prev_tail to
+    // one slot to the left.
+    for (int idx = match_idx; idx != prev_tail; idx = (idx + 1) % c->capacity) {
+        int next_idx = (idx + 1) % c->capacity;
+        c->queue[idx].pte = c->queue[next_idx].pte;
+        c->queue[idx].uva = c->queue[next_idx].uva;
+        c->queue[idx].valid = c->queue[next_idx].valid;
+    }
+
+    // Clear the element at prev_tail. Set hand to one entry to the left.
+    c->queue[prev_tail].valid = INVALID;
+    c->hand = c->hand == 0 ? c->capacity - 1 : c->hand - 1;
+    return pte;
 }
 
 /**
@@ -650,8 +739,8 @@ void encryptPage(pte_t *pte) {
     char *pagePhysicalAddr = (char *)PTE_ADDR(*pte);
     toggleEncryptPageSize(pagePhysicalAddr);
     // update flags
-    *pte = SET_BIT(pte, PTE_E);
     *pte = CLEAR_BIT(pte, PTE_P);
+    *pte = SET_BIT(pte, PTE_E);
     flushTLB();  // flush cache after a page entry update
 }
 
@@ -702,97 +791,3 @@ int absolute(int n) {
     const int ret[2] = {n, -n};
     return ret[n < 0];
 }
-
-/* Clock queue manipulation functions */
-
-// initialize clock structure to an empty state
-void clock_initialize(struct clock *c) {
-    memset((void *)c, 0, sizeof(c));
-    c->capacity = CLOCKSIZE;
-    c->size = 0;
-    c->hand = -1;
-    for (int i = 0; i < c->capacity; i++) c->queue[i].valid = INVALID;
-}
-
-// Insert a page into the clock queue.
-pte_t *clock_insert(struct clock *c, pte_t *pte) {
-    // victim selection: examine the page at the head of the queue for candidate
-    for (;;) {
-        // First advance the hand.
-        c->hand = (c->hand + 1) % c->capacity;
-
-        // TODO: check if this is needed with current implementation
-        // if (c->size < c->capacity) {  // workingSet not full
-        //     // push page to tail of clock queue
-        // }
-
-        // case: empty slot
-        if (c->queue[c->hand].valid == INVALID) {
-            c->queue[c->hand].pte = pte;
-            c->queue[c->hand].valid = VALID;
-            c->size++;
-            return 0;
-        }
-
-        // case: referenced bit is not set, then evict (Page is unused so
-        // replace it)
-        if (!IS_BIT(c->queue[c->hand].pte, PTE_A)) {
-            pte_t *evictedPage = c->queue[c->hand].pte;
-            // Put in the new page.
-            c->queue[c->hand].pte = pte;
-            c->queue[c->hand].valid = VALID;
-            return evictedPage;
-        }
-
-        // clear referenced bit (PTE_A) of the page in slot and move the
-        // node to the tail of the queue
-        *(c->queue[c->hand].pte) = CLEAR_BIT(c->queue[c->hand].pte, PTE_A);
-    }
-}
-
-// find page table entry
-int clock_getIndex(struct clock *c, pte_t *pte) {
-    for (int i = 0; i < c->size; ++i) {
-        int idx = (c->hand + i) % c->capacity;
-        if (c->queue[idx].pte == pte) return idx;
-    }
-
-    return -1;  // not found
-}
-
-// Removing a page forcefully is tricky because you need to
-// shift things around.
-// This happens at page deallocation.
-void clock_remove(struct clock *c, pte_t *pte) {
-    int prev_tail = c->hand;
-    int match_idx = -1;
-
-    // Search for the matching element.
-    if ((match_idx = clock_getIndex(c, pte)) == -1) return;
-
-    // compact - shift everything from match_idx+1 to prev_tail to
-    // one slot to the left.
-    for (int idx = match_idx; idx != prev_tail; idx = (idx + 1) % c->capacity) {
-        int next_idx = (idx + 1) % c->capacity;
-        c->queue[idx].pte = c->queue[next_idx].pte;
-        c->queue[idx].valid = c->queue[next_idx].valid;
-    }
-
-    // Clear the element at prev_tail. Set hand to one entry to the left.
-    c->queue[prev_tail].valid = INVALID;
-    c->hand = c->hand == 0 ? c->capacity - 1 : c->hand - 1;
-}
-
-// Print the clock queue in head->tail orderr, so starting from hand+1.
-// void clk_print(struct clock *c) {
-//     int print_idx = c->hand;
-//     printf("CLK queue: | ");
-//     for (int i = 0; i < c->capacity; ++i) {
-//         print_idx = (print_idx + 1) % c->capacity;
-//         if (c->queue[print_idx].valid != INVALID) {
-//             printf("PTE %1X R %1d | ", c->queue[print_idx].pte,
-//                    (*(c->queue[print_idx].pte) & PTE_A) > 0);
-//         }
-//     }
-//     printf("\n\n");
-// }

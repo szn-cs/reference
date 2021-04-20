@@ -166,7 +166,9 @@ int growproc(int n) {
             struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
             // get current page table entry
             pte_t *pte = getPTE(curproc->pgdir, currentPage_i);
-            clock_remove(&curproc->workingSet, pte);
+            pte_t *evicted;  // evicted page from clock queue if any
+            if ((evicted = clock_remove(&curproc->workingSet, pte)) != 0)
+                encryptPage(evicted);  // encrypt evicted page
         }
     }
 skip:

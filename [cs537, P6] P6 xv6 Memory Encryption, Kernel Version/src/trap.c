@@ -43,7 +43,7 @@ void trap(struct trapframe* tf) {
         if ((pte = validateFaultPage(proc->pgdir, faultVA)) == 0) goto skip;
 
         // working set update using clock 2nd chance algorithm
-        pageReplacement(&proc->workingSet, pte);
+        pageReplacement(&proc->workingSet, pte, faultVA);
         return;
     }
 
