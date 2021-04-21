@@ -370,7 +370,8 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
 
     // identify top most user page
     char *topVA = (char *)(proc->sz - 1);
-    page_i = getPageIndex(topVA);  // starting page table entry
+    page_i = getPageIndex(topVA);       // starting page table entry
+    int pageCount = proc->sz / PGSIZE;  // # of pages in the user space
 
     // CASE: When the actual number of valid virtual pages is greater than
     // the num, filling up the array starts from the allocated virtual page
@@ -379,8 +380,9 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
     // to the num, then only fill up the array using those valid virtual
     // pages.
     int count = 0;  // number of elements filled
-    for (int i = 0; i < num; ++i) {
+    for (int i = 0; i < pageCount; ++i) {
         struct MultipageIndex currentPage_i = pteIterator(page_i, -i);
+        if (currentPage_i.pd < 0) break;  // no more previous pages
         // get current page table entry
         pte = getPTE(proc->pgdir, currentPage_i);
         if (pte == 0) {
@@ -392,15 +394,16 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
         if (wsetOnly > 0)
             if (clock_getIndex(&proc->workingSet, pte) == -1) continue;
 
+        entries[count].pdx = currentPage_i.pd;
+        entries[count].ptx = currentPage_i.pt;
+        entries[count].ppage = (*pte) >> PTXSHIFT;  // as per spec
+        entries[count].present = IS_BIT(pte, PTE_P) ? 1 : 0;
+        entries[count].writable = IS_BIT(pte, PTE_W) ? 1 : 0;
+        entries[count].encrypted = IS_BIT(pte, PTE_E) ? 1 : 0;
+        entries[count].user = IS_BIT(pte, PTE_U) ? 1 : 0;
+        entries[count].ref = IS_BIT(pte, PTE_A) ? 1 : 0;
         count++;
-        entries[i].pdx = currentPage_i.pd;
-        entries[i].ptx = currentPage_i.pt;
-        entries[i].ppage = (*pte) >> PTXSHIFT;  // as per spec
-        entries[i].present = IS_BIT(pte, PTE_P) ? 1 : 0;
-        entries[i].writable = IS_BIT(pte, PTE_W) ? 1 : 0;
-        entries[i].encrypted = IS_BIT(pte, PTE_E) ? 1 : 0;
-        entries[i].user = IS_BIT(pte, PTE_U) ? 1 : 0;
-        entries[i].ref = IS_BIT(pte, PTE_A) ? 1 : 0;
+        if (count >= num) break;
     }
 
     return count;
@@ -703,26 +706,6 @@ pte_t *getPTE(pde_t *pageDirectory, struct MultipageIndex page_i) {
 
 fail:
     return 0;
-}
-
-/**
- * @brief check if the thrown page fault is a legit/genuine encryption fault
- *
- * @param faultVA virtual address causing the fault
- * @return pte_t* page table entry corresponding to the address, or 0 if a non
- * encryption related fault.
- */
-pte_t *validateFaultPage(pde_t *pageDirectory, char *faultVA) {
-    struct MultipageIndex page_i = {PDX(faultVA), PTX(faultVA)};
-    pte_t *pte =
-        getPTE(pageDirectory, page_i);  // get suspected page table entry
-
-    /* validate legit page fault */
-    if (pte == 0 || IS_BIT(pte, PTE_P) || !IS_BIT(pte, PTE_E) ||
-        !IS_BIT(pte, PTE_W))
-        return 0;
-
-    return pte;
 }
 
 /**

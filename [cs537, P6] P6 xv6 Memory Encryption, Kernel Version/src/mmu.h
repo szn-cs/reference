@@ -202,7 +202,9 @@ struct gatedesc {
 #define PAGE_COUNT(sz) (sz == 0 ? 1 : PGROUNDUP(sz) / PGSIZE)
 // multi-level page index
 struct MultipageIndex {
-    int pd, pt;  // page directory index & page table index
+    // page directory index & page table index
+    int pd;
+    int pt;
 };
 
 #endif

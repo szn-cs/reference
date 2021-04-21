@@ -40,7 +40,17 @@ void trap(struct trapframe* tf) {
         char* faultVA = (char*)rcr2();  // read from register cr2
 
         // validate validate fault address (encrypted page is being accessed)
-        if ((pte = validateFaultPage(proc->pgdir, faultVA)) == 0) goto skip;
+        pde_t* pageDirectory = proc->pgdir;
+
+        // get pte and validate
+        struct MultipageIndex page_i = {PDX(faultVA), PTX(faultVA)};
+        pte = getPTE(pageDirectory, page_i);  // get suspected page table entry
+        /* validate legit page fault */
+        if (pte == 0 || IS_BIT(pte, PTE_P) || !IS_BIT(pte, PTE_E)) {
+            cprintf("Eror: trap > fault va\n");
+            goto skip;
+        };
+        // if (pte == 0) return;
 
         // working set update using clock 2nd chance algorithm
         pageReplacement(&proc->workingSet, pte, faultVA);

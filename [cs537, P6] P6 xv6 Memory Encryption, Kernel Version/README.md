@@ -23,7 +23,7 @@
 - [x] Download P5 solution `~cs537-1/projects/p5/src/`
 - [x] Check the spec updates https://piazza.com/class/kjn4sz4kq7t2d2?cid=1023 & updated hints
 - [x] Example of clock queue implementation https://github.com/josehu07/CS537-SP2021-DIS/blob/main/w11/clock-example.c
-- [ ] `userProgram` Example user program to test the implementation
+- [x] `userProgram` Example user program to test the implementation
 - [x] refactor encryption methods to a generic interface.
 
 - [x] Implement the decryption mechanism when an encrypted page is accessed (already done in P5) and init all the user pages (0 to sz) as the encrypted state. 
