@@ -66,6 +66,9 @@ static int mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm) {
         } else {
             *pte = pa | perm | PTE_P;
         }
+        if (perm & PTE_A) {
+            *pte = pa | perm | PTE_A;
+        }
         if (a == last) break;
         a += PGSIZE;
         pa += PGSIZE;
@@ -385,10 +388,10 @@ int getpgtable(struct pt_entry *entries, int num, int wsetOnly) {
         if (currentPage_i.pd < 0) break;  // no more previous pages
         // get current page table entry
         pte = getPTE(proc->pgdir, currentPage_i);
-        if (pte == 0) {
-            cprintf("Error: getpgTable() invalid page encountered\n");
-            break;  // invalid page encountered
-        }
+        // if (pte == 0) {
+        //     cprintf("Error: getpgTable() invalid page encountered\n");
+        //     break;  // invalid page encountered
+        // }
 
         // filter pages in working set
         if (wsetOnly > 0)

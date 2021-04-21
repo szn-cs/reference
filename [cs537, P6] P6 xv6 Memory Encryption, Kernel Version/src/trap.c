@@ -46,7 +46,7 @@ void trap(struct trapframe* tf) {
         struct MultipageIndex page_i = {PDX(faultVA), PTX(faultVA)};
         pte = getPTE(pageDirectory, page_i);  // get suspected page table entry
         /* validate legit page fault */
-        if (pte == 0 || IS_BIT(pte, PTE_P) || !IS_BIT(pte, PTE_E)) {
+        if (IS_BIT(pte, PTE_P) || !IS_BIT(pte, PTE_E)) {
             cprintf("Eror: trap > fault va\n");
             goto skip;
         };
