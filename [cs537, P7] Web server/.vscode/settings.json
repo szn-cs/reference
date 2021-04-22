@@ -1,0 +1,36 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#546327",
+        "activityBar.activeBorder": "#489bb7",
+        "activityBar.background": "#546327",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#489bb7",
+        "activityBarBadge.foreground": "#15202b",
+        "statusBar.background": "#546327",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#738835",
+        "titleBar.activeBackground": "#546327",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#54632799",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "peacock.remoteColor": "#738835",
+    "files.associations": {
+        "*.config.json": "jsonc",
+        "*.jlex": "lex",
+        "types.h": "c",
+        "defs.h": "c",
+        "stat.h": "c",
+        "user.h": "c",
+        "alias.h": "c",
+        "spinlock.h": "c",
+        "pstat.h": "c",
+        "mmu.h": "c",
+        "memlayout.h": "c",
+        "param.h": "c",
+        "proc.h": "c",
+        "ptentry.h": "c",
+        "utility.C": "cpp"
+    }
+}
