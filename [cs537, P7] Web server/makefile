@@ -1,19 +1,13 @@
-CC = gcc 
-
-# strict compilcation
-# -Werror
-FLAG = -Wall  -g
-
-# exit qemu using ctrl+A X
-
-# compile xv6
 .PHONE:
-qemu-nox:
-	cd ./src && make qemu-nox
+all:
+	cd ./src && make all
 
 .PHONE:
-qemu-nox-gdb: 
-	cd ./src && make qemu-nox-gdb
+server:
+	cd ./src && make server
+
+client:
+	cd ./src && make client
 
 .PHONY: clean
 clean:
@@ -41,5 +35,4 @@ test-list:
 # -	"cli-watch" npm package
 watch:
 	watch -f ./**/*.c -r "make test-all && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
-	
 

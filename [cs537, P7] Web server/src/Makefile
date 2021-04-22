@@ -6,7 +6,7 @@ SERVER_OBJS = server.o request.o helper.o
 CLIENT_OBJS = client.o helper.o
 
 CC = gcc
-CFLAGS = -g -Werror -Wall -Wno-format-overflow -Wno-restrict
+CFLAGS = -g -Werror -Wall -Wno-format-overflow -Wno-restrict -lrt 
 
 LIBS = -lpthread 
 
@@ -14,11 +14,16 @@ LIBS = -lpthread
 
 all: server client output.cgi
 
+# create just the server program
 server: $(SERVER_OBJS)
 	$(CC) $(CFLAGS) -o server $(SERVER_OBJS) $(LIBS)
 
 client: $(CLIENT_OBJS)
 	$(CC) $(CFLAGS) -o client $(CLIENT_OBJS) $(LIBS)
+
+# TODO: compile statistics process executables
+# stat_process: 
+
 
 output.cgi: output.c
 	$(CC) $(CFLAGS) -o output.cgi output.c
