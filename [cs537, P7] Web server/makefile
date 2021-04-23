@@ -1,8 +1,8 @@
-.PHONE:
+.PHONY:
 all:
 	cd ./src && make all
 
-.PHONE:
+.PHONY:
 server:
 	cd ./src && make server
 
@@ -12,6 +12,15 @@ client:
 .PHONY: clean
 clean:
 	cd src && make clean
+
+.PHONY:
+runServer: 
+	cd src && ./server 8080 1 1 x
+
+.PHONY:
+runClient: 
+	cd src && ./client localhost 8080 /
+
 
 .PHONY:
 test-all:
