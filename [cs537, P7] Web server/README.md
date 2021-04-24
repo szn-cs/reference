@@ -28,16 +28,16 @@
 - [x] Will need to modify Makefile to compile, create, and clean stat_process.
 - [x] download `~cs537-1/tests/p7`
 - [x] download `~cs537-1/projects/web-server`
-- [ ] On CS labs: specify port numbers that are greater than about 2000 to avoid active ports. & use CS department VPN https://csl.cs.wisc.edu/docs/csl/2019-11-14-globalprotect-department-vpn/
-- [ ] write wrapper functions for the new system routines that you call for error checking error codes.
-- [ ] handle paramter for # of threads to create.
-- [ ] Use condition variables, not spin-waiting techniques.
-- [ ] The web server forks a new process for each CGI process that it runs. This code shouldn't be modified.
+- [x] On CS labs: specify port numbers that are greater than about 2000 to avoid active ports. & use CS department VPN https://csl.cs.wisc.edu/docs/csl/2019-11-14-globalprotect-department-vpn/
+- [x] handle paramter for # of threads to create.
+- [x] Use condition variables, not spin-waiting techniques.
 - [x] include proper headers to use shm_open() and mmap(). To use shm_open(), you need to use -lrt during compilation. 
   - rt is a library for real-time-related routines; 
   - prefix with -l is to tell the compiler that you want to link with this library.
-- [ ] Netcat utility allows you to send data over the connection at the exact time you want to. Helps in testing the buffer implementation.
+- [x] Netcat utility allows you to send data over the connection at the exact time you want to. Helps in testing the buffer implementation.
   - e.g. `nc localhost 8080 -C` → `GET / HTTP/1.0` + 2x enter
+- [ ] write wrapper functions for the new system routines that you call for error checking error codes.
+- [ ] The web server forks a new process for each CGI process that it runs. This code shouldn't be modified.
 - [ ] ensure that your web-server threads do not modify each other's data in the shared segment. 
 
 

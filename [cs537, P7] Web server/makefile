@@ -34,6 +34,10 @@ test-help:
 test-list: 
 	./test/list-tests.sh
 
+.PHONY: 
+clean-test: 
+	-rm -r tester tests tests-out
+
 # .PHONY:
 # valgrind: 
 # 	valgrind -v --show-reachable=yes --leak-check=full ./<executable> -f dictionary odd

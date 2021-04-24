@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
     int port, threads, buffers;
     char *shm_name;
     getargs(&port, &threads, &buffers, &shm_name, argc, argv);  // get args
-    if (threads < 1 || buffers < 1) goto fail;  // validate argument
+    if (threads < 1 || buffers < 1 || port < 1) goto fail;  // validate argument
 
     // initialize structures
     initializeWorker(&worker, threads);

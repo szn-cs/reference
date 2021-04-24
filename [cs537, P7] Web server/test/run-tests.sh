@@ -5,13 +5,15 @@
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 TESTS_PATH="${DIR}/"
 
-if [ "$TESTS_PATH" != $(pwd) ]; then
+if [ "$TESTS_PATH" != "$(pwd)" ]; then
     rm -rf ./tests
     rm -rf ./tester
 fi
 
 rm -rf ./tests-out
 
+# echo "$TESTS_PATH"
+# echo $(pwd)
 cp -rf "$TESTS_PATH/tests" ./tests
 cp -rf "$TESTS_PATH/tester" ./tester
 

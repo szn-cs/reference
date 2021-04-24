@@ -43,7 +43,7 @@
 			"dependsOn": ["compile"]
 		},
 		{
-			"label": "test",
+			"label": "clean",
 			"command": "make",
 			"args": ["clean"],
 			"options": {

@@ -51,8 +51,16 @@ class Tester:
 
     def run_server(self, threads: int, buffers: int) -> subprocess.Popen:
         # Run server; expect the server not fail
-        self.server_proc = subprocess.Popen(["./server", f"{self.port}", f"{threads}", f"{buffers}", self.shm_name],
+        self.server_proc = subprocess.Popen(["./src/server", f"{self.port}", f"{threads}", f"{buffers}", self.shm_name],
                                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                            
+        # self.server_proc = subprocess.Popen(["./src/server", f"8080", f"{threads}", f"{buffers}", self.shm_name],
+        #                                     stdout=1, stderr=1)
+        # print("the commandline is {}".format(self.server_proc.args))
+        # cwd = os.getcwd()
+        # print("\n", cwd)
+
+
         time.sleep(0.5)  # give the server some time to start
         if not self.isServerAlive():  # the server process exits
             raise TestFailure(
@@ -66,7 +74,7 @@ class Tester:
         self.server_proc.send_signal(signal.SIGINT)
 
     def run_stat(self, threads: int) -> subprocess.Popen:
-        self.stat_proc = subprocess.Popen(["./stat_process", self.shm_name, "50", f"{threads}"])
+        self.stat_proc = subprocess.Popen(["./src/stat_process", self.shm_name, "50", f"{threads}"])
         return self.stat_proc
 
     def kill_stat(self) -> None:

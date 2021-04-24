@@ -1,24 +1,3 @@
-/*
- * To run, try:
- *      client www.cs.wisc.edu 80 /
- *
- * Sends one HTTP request to the specified HTTP server.
- * Prints out the HTTP response.
- *
- * CS537: For testing your server, you will want to modify this client.
- * For example:
- *
- * You may want to make this multi-threaded so that you can
- * send many requests simultaneously to the server.
- *
- * You may also want to be able to request different URIs;
- * you may want to get more URIs from the command line
- * or read the list from a file.
- *
- * When we test your server, we will be using modifications to this client.
- *
- */
-
 #include "helper.h"
 
 /*
@@ -67,9 +46,6 @@ void clientPrint(int fd) {
     }
 }
 
-// TODO: change this code so that it can send simultaneous requests to your
-// server. At a minimum, you will want to run multiple copies of this client.
-
 /**
  * @brief A very, very primitive HTTP client. supports routines for the very
  * simple web client
@@ -91,7 +67,19 @@ int main(int argc, char *argv[]) {
     /* Open a single connection to the specified host and port */
     clientfd = Open_clientfd(host, port);
 
+    /**
+     * TODO:
+     * You may want to make this multi-threaded so that you can
+     * send many requests simultaneously to the server.
+     *
+     * You may also want to be able to request different URIs;
+     * you may want to get more URIs from the command line
+     * or read the list from a file.
+     */
+
+    // Sends one HTTP request to the specified HTTP
     clientSend(clientfd, filename);
+    //  server.*Prints out the HTTP response.
     clientPrint(clientfd);
 
     Close(clientfd);
