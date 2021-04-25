@@ -140,7 +140,7 @@ void requestServeStatic(int fd, char *filename, int filesize) {
 }
 
 // handle a request
-void requestHandle(int fd) {
+int requestHandle(int fd) {
     int is_static;
     struct stat sbuf;
     char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
@@ -156,7 +156,7 @@ void requestHandle(int fd) {
     if (strcasecmp(method, "GET")) {
         requestError(fd, method, "501", "Not Implemented",
                      "CS537 Server does not implement this method");
-        return;
+        return -1;
     }
     requestReadhdrs(&rio);
 
@@ -164,14 +164,14 @@ void requestHandle(int fd) {
     if (stat(filename, &sbuf) < 0) {
         requestError(fd, filename, "404", "Not found",
                      "CS537 Server could not find this file");
-        return;
+        return -1;
     }
 
     if (is_static) {
         if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
             requestError(fd, filename, "403", "Forbidden",
                          "CS537 Server could not read this file");
-            return;
+            return -1;
         }
         requestServeStatic(fd, filename, sbuf.st_size);
 
@@ -183,7 +183,7 @@ void requestHandle(int fd) {
         if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
             requestError(fd, filename, "403", "Forbidden",
                          "CS537 Server could not run this CGI program");
-            return;
+            return -1;
         }
         requestServeDynamic(fd, filename, cgiargs);
 
@@ -191,4 +191,6 @@ void requestHandle(int fd) {
         // CS537 (Part B): Account for a dynamic request...
         //
     }
+
+    return is_static;
 }

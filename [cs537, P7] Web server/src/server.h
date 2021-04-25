@@ -1,11 +1,7 @@
-#include <pthread.h>
-
 #ifndef __SERVER_H__
 
-typedef int FileDescriptor;
-
-// maximum number of supported simultaneous connections
-#define CONNECTION_MAX 32
+#include <pthread.h>
+#include "./definition.h"
 
 // work producer-consumer buffer holding file descriptors
 struct ProducerConsumer {
@@ -27,8 +23,17 @@ struct ThreadPool {
   int size;
 };
 
-void initializeWorker(struct ThreadPool *w, int capacity);
-void initializeWork(struct ProducerConsumer *w, int capacityLimit);
-void getargs(int *port, int *threads, int *buffers, char **shm_name, int argc,
-             char *argv[]);
+// user for argument passing
+struct ThreadArgument {
+  int threadIndex;
+  struct ProducerConsumer *work;
+};
+
+static void sigintHandler(int signum);
+static void initializeSHM(slot_t **shm, char *shm_name);
+static void initializeWorker(struct ThreadPool *w, int capacity);
+static void initializeWork(struct ProducerConsumer *w, int capacityLimit);
+static void getargs(int *port, int *threads, int *buffers, char **shm_name,
+                    int argc, char *argv[]);
+
 #endif
