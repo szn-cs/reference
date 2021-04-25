@@ -1,3 +1,9 @@
+/**
+ * @file server.c
+ * @brief runs a multithreaded simple server
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #ifndef __SERVER_H__
 
 #include <pthread.h>

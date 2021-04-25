@@ -1,3 +1,9 @@
+/**
+ * @file server.c
+ * @brief runs a multithreaded simple server
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -15,14 +21,24 @@ static struct ProducerConsumer work;  // connections file descriptors buffer
 static slot_t *shm;                   // pointer to shared memory segement
 static char *shm_name;                // shared memory name
 
-// put work
+/**
+ * @brief put work
+ *
+ * @param buffer file descriptor queue to store the work
+ * @param value new file descriptor to add
+ */
 void put(struct ProducerConsumer *buffer, FileDescriptor value) {
     buffer->list[buffer->fill_i] = value;
     buffer->fill_i = (buffer->fill_i + 1) % buffer->capacity;
     buffer->size++;
 }
 
-// get work
+/**
+ * @brief get work
+ *
+ * @param buffer file descriptors of work to be retrived
+ * @return FileDescriptor connection file descriptor to handle requests
+ */
 FileDescriptor get(struct ProducerConsumer *buffer) {
     FileDescriptor fd = buffer->list[buffer->use_i];
     buffer->use_i = (buffer->use_i + 1) % buffer->capacity;
@@ -30,7 +46,12 @@ FileDescriptor get(struct ProducerConsumer *buffer) {
     return fd;
 }
 
-// consumer function
+/**
+ * @brief consumer function
+ *
+ * @param arg passing pointer for required callback function
+ * @return void* irrelavent
+ */
 static void *workerConsumer(void *arg) {
     // extract arguments
     struct ProducerConsumer *work = ((struct ThreadArgument *)arg)->work;
@@ -72,7 +93,11 @@ consume : {
     return NULL;  // no information needed to be passed to main thread.
 }
 
-// producer function
+/**
+ * @brief producer function
+ *
+ * @param work structure holding queue and information on current work
+ */
 static void serverProducer(struct ProducerConsumer *work) {
     FileDescriptor fd;
     struct sockaddr_in clientaddr;
