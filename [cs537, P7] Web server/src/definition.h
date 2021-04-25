@@ -1,3 +1,8 @@
+/**
+ * @file definition.h
+ * @brief typedefs, struct definitions, and constant variables
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
 
 #ifndef __DEFINITION_H__
 

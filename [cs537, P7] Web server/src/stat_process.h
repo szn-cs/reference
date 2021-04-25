@@ -1,3 +1,9 @@
+/**
+ * @file stat_process.h
+ * @brief header declarations
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #include <pthread.h>
 
 #ifndef __STAT_H__

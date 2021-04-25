@@ -1,3 +1,9 @@
+/**
+ * @file stat_process.c
+ * @brief reads and prints statistics on specific intervals
+ * @copyright Copyright (c) 2021 by Safi Nassar
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
