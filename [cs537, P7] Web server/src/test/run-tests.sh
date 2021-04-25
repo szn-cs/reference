@@ -28,7 +28,7 @@ make clean
 make all
 
 for expected in server client stat_process output.cgi; do
-    if [ ! -f "$TESTS_PATH/../src/$expected" ]; then
+    if [ ! -f "$TESTS_PATH/../$expected" ]; then
         echo "*** ERROR: $expected not built by make command"
         exit 1
     fi

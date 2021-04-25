@@ -26,7 +26,7 @@ static long PAGESIZE;  // memory page size
  */
 int main(int argc, char *argv[]) {
     // NOTE: platform specific call (4096)
-    PAGESIZE = getpagesize() || sysconf(_SC_PAGESIZE);
+    PAGESIZE = getpagesize();
 
     /** argumenrs handling **/
     int sleeptime_ms, num_threads;

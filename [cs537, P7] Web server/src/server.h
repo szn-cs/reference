@@ -5,7 +5,7 @@
 
 // work producer-consumer buffer holding file descriptors
 struct ProducerConsumer {
-  FileDescriptor list[CONNECTION_MAX];
+  FileDescriptor *list;
   int capacity;  // actual requested capacity
   int size;      // elements count
   int fill_i;    // fill pointer index
@@ -18,7 +18,7 @@ struct ProducerConsumer {
 
 // worker threads
 struct ThreadPool {
-  pthread_t *list;  // dynamically allocated list of threads
+  pthread_t list[THREADS_MAX];  // dynamically allocated list of threads
   int capacity;
   int size;
 };

@@ -119,7 +119,7 @@ produce:
  */
 int main(int argc, char *argv[]) {
     // NOTE: platform specific call (4096)
-    PAGESIZE = getpagesize() || sysconf(_SC_PAGESIZE);
+    PAGESIZE = getpagesize();
 
     // register signal handler
     if (signal(SIGINT, &sigintHandler) == SIG_ERR) {
@@ -159,7 +159,7 @@ fail:
 
 // clean up structures & shared memory
 static void sigintHandler(int signum) {
-    free(worker.list);
+    free(work.list);
 
     if (munmap((void *)shm, PAGESIZE) == -1) goto fail;
 
@@ -182,12 +182,12 @@ static void initializeSHM(slot_t **shm, char *shm_name) {
     if ((shm_fd = shm_open(shm_name, O_RDWR | O_CREAT, 0660)) == -1) goto fail;
 
     // set size of shared segment and clear it
-    if (ftruncate(shm_fd, PAGESIZE) == -1) goto fail;
+    if (ftruncate(shm_fd, (int)PAGESIZE) == -1) goto fail;
 
     // map shared memory into user address space [shm_ptr, shm_ptr + PAGESIZE)
     // (MAP_SHARED: allows sharing with other processes)
-    void *shm_ptr =
-        mmap(NULL, PAGESIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+    void *shm_ptr = mmap(NULL, (int)PAGESIZE, PROT_READ | PROT_WRITE,
+                         MAP_SHARED, shm_fd, 0);
     if (shm_ptr == MAP_FAILED) goto fail;
 
     // cast into an array of slots
@@ -199,12 +199,12 @@ fail:
     exit(1);
 }
 
-// initialize worker buffer data structure
-static void initializeWorker(struct ThreadPool *w, int capacity) {
-    if (capacity > 32) {  // exceeds supported worker number
-        fprintf(stderr, "Error: # of threads argument exceeds max supported");
-        exit(1);
-    }
+// initialize work buffer data structure
+static void initializeWork(struct ProducerConsumer *w, int capacity) {
+    // if (capacity > CONNECTION_MAX) {  // exceeds supported worker number
+    //     fprintf(stderr, "Error: # of threads argument exceeds max
+    //     supported"); exit(1);
+    // }
 
     if ((w->list = calloc(capacity, sizeof(FileDescriptor))) == NULL) {
         fprintf(stderr, "Error: memory allocation failed");
@@ -212,23 +212,23 @@ static void initializeWorker(struct ThreadPool *w, int capacity) {
     }
     w->capacity = capacity;
     w->size = 0;
-}
-
-// initialize work buffer data structure
-static void initializeWork(struct ProducerConsumer *w, int capacityLimit) {
-    if (capacityLimit > CONNECTION_MAX) {  // must not exceed maximum number
-        fprintf(stderr, "Error: buffer argument exceeds max connections");
-        exit(1);
-    }
-
-    w->capacity = capacityLimit;  // limit statically allocated buffer
-    w->size = 0;
     w->fill_i = 0;
     w->use_i = 0;
 
     pthread_mutex_init(&w->mutex, NULL);
     pthread_cond_init(&w->fill_cv, NULL);
     pthread_cond_init(&w->empty_cv, NULL);
+}
+
+// initialize worker buffer data structure
+static void initializeWorker(struct ThreadPool *w, int capacityLimit) {
+    if (capacityLimit > THREADS_MAX) {  // must not exceed maximum number
+        fprintf(stderr, "Error: buffer argument exceeds max connections");
+        exit(1);
+    }
+
+    w->capacity = capacityLimit;  // limit statically allocated buffer
+    w->size = 0;
 }
 
 // Parse arguments

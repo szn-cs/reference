@@ -38,9 +38,10 @@
   - e.g. `nc localhost 8080 -C` → `GET / HTTP/1.0` + 2x enter
 - [ ] write wrapper functions for the new system routines that you call for error checking error codes.
 - [ ] The web server forks a new process for each CGI process that it runs. This code shouldn't be modified.
-- [ ] ensure that your web-server threads do not modify each other's data in the shared segment. 
+- [x] ensure that your web-server threads do not modify each other's data in the shared segment. 
 
 
 ## submission: 
 - [ ] partners.txt: `cslogin1 wisclogin1 Lastname1 Firstname1`
 - [ ] `~cs537-1/handin/<login>/p7/ontime/<web server files>`
+- [ ] exclude test directory from submission

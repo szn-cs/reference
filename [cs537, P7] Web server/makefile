@@ -21,22 +21,21 @@ runServer:
 runClient: 
 	cd src && ./client localhost 8080 /
 
-
 .PHONY:
 test-all:
-	./test/run-tests.sh -c -v
+	(cd src && ./test/run-tests.sh -c -v)
 
 .PHONY:
 test-help:
-	./test/run-tests.sh -h
+	./src/test/run-tests.sh -h
 
 .PHONY:
 test-list: 
-	./test/list-tests.sh
+	./src/test/list-tests.sh
 
 .PHONY: 
 clean-test: 
-	-rm -r tester tests tests-out
+	(cd src && rm -r tester tests tests-out)
 
 # .PHONY:
 # valgrind: 
