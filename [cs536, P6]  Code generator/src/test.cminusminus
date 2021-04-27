@@ -1,3 +1,10 @@
+bool p; 
+int j; 
+
+void f() {
+    int x;
+}
+
 int main(int x, bool y) {
     int t; 
     bool c; 

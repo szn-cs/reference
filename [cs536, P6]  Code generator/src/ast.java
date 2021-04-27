@@ -137,6 +137,9 @@ class ProgramNode extends ASTnode {
         SymTable symTab = new SymTable();
         myDeclList.nameAnalysis(symTab);
 
+        // augment with scope acccess field (global / local)
+        myDeclList.setAccessScope(TSym.AccessScope.GLOBAL);
+
         // check if main function exist
         TSym mainSymbol = null;
         try {
@@ -180,6 +183,12 @@ class DeclListNode extends ASTnode {
      */
     public void nameAnalysis(SymTable symTab) {
         nameAnalysis(symTab, symTab);
+    }
+
+    // set global/local attribute for each declaration node in this list
+    public void setAccessScope(TSym.AccessScope s) {
+        for (DeclNode node : myDecls)
+            node.myId.sym().setScope(s);
     }
 
     /**
@@ -408,6 +417,12 @@ abstract class DeclNode extends ASTnode {
 
     // default version of typeCheck for non-function decls
     public void typeCheck() {}
+
+    public void unparseScopeAccess(PrintWriter p, int indent) {
+        p.print((myId.sym().isGlobal() ? "global" : "local") + " ");
+    }
+
+    public IdNode myId; // id name
 }
 
 
@@ -510,6 +525,7 @@ class VarDeclNode extends DeclNode {
 
     public void unparse(PrintWriter p, int indent) {
         addIndentation(p, indent);
+        super.unparseScopeAccess(p, indent);
         myType.unparse(p, 0);
         p.print(" ");
         p.print(myId.name());
@@ -518,7 +534,6 @@ class VarDeclNode extends DeclNode {
 
     // 3 kids
     private TypeNode myType;
-    private IdNode myId;
     private int mySize; // use value NOT_STRUCT if this is not a struct type
 
     public static int NOT_STRUCT = -1;
@@ -608,6 +623,7 @@ class FnDeclNode extends DeclNode {
 
     public void unparse(PrintWriter p, int indent) {
         addIndentation(p, indent);
+        super.unparseScopeAccess(p, indent);
         myType.unparse(p, 0);
         p.print(" ");
         p.print(myId.name());
@@ -620,7 +636,6 @@ class FnDeclNode extends DeclNode {
 
     // 4 kids
     private TypeNode myType;
-    private IdNode myId;
     private FormalsListNode myFormalsList;
     private FnBodyNode myBody;
 }
@@ -688,6 +703,7 @@ class FormalDeclNode extends DeclNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+        super.unparseScopeAccess(p, indent);
         myType.unparse(p, 0);
         p.print(" ");
         p.print(myId.name());
@@ -695,7 +711,6 @@ class FormalDeclNode extends DeclNode {
 
     // 2 kids
     private TypeNode myType;
-    private IdNode myId;
 }
 
 
@@ -769,7 +784,6 @@ class StructDeclNode extends DeclNode {
     }
 
     // 2 kids
-    private IdNode myId;
     private DeclListNode myDeclList;
 }
 

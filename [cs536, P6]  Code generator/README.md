@@ -46,6 +46,7 @@ Executing the test will generate output file of the formated program.
 
         ```
 - [x] Add to name analyzer or type checker wheather the program contians a function named main.
+- [x] Add global / local differentiation
 - [ ] Add a new "offset" field to the TSym class (or to the appropriate subclass(es) of TSym). Change the name analyzer to compute offsets for each function's parameters and local variables (i.e., where in the function's Activation Record they will be stored at runtime) and to fill in the new offset field. 
 
 

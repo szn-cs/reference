@@ -6,8 +6,16 @@ import java.util.*;
  */
 public class TSym {
     private Type type;
-    private int offset = 0; // offset of param or local (each scalar variable
-                            // requires 4 bytes of storage for int & 8 double)
+    // offset of param or local (each scalar variable requires 4 bytes of
+    // storage for int & 8 double)
+    private int offset = 0;
+
+    // declaration scope: local or global
+    public enum AccessScope {
+        LOCAL, GLOBAL
+    };
+
+    private AccessScope scope = AccessScope.LOCAL; // defaults to local
 
     public TSym(Type type) {
         this.type = type;
@@ -23,6 +31,22 @@ public class TSym {
 
     public void setOffset(int offset) {
         this.offset = offset;
+    }
+
+    public AccessScope getScope() {
+        return scope;
+    }
+
+    public void setScope(AccessScope scope) {
+        this.scope = scope;
+    }
+
+    public boolean isGlobal() {
+        return (scope == AccessScope.GLOBAL) ? true : false;
+    }
+
+    public boolean isLocal() {
+        return (scope == AccessScope.LOCAL) ? true : false;
     }
 
     public String toString() {
