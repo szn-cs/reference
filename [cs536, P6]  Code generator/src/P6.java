@@ -22,6 +22,7 @@ public class P6 {
     public static final int RESULT_SYNTAX_ERROR = 1;
     public static final int RESULT_TYPE_ERROR = 2;
     public static final int RESULT_NAME_ANALYSIS_ERROR = 3;
+    public static final int RESULT_CODE_GENERATION_ERROR = 4;
     public static final int RESULT_OTHER_ERROR = -1;
 
     /**
@@ -45,14 +46,6 @@ public class P6 {
             pukeAndDie(msg);
         }
 
-        // setup code generator target file
-        try {
-            Codegen.p = new PrintWriter(args[1]);
-        } catch (FileNotFoundException e) {
-            pukeAndDie(e.getMessage());
-            e.printStackTrace();
-        }
-
         try {
             setInfile(args[0]);
             setOutfile(args[1]);
@@ -61,6 +54,15 @@ public class P6 {
         } catch (BadOutfileException e) {
             pukeAndDie(e.getMessage());
         }
+
+        // setup code generator target file
+        // try {
+        Codegen.p = outFile; // new PrintWriter(args[1]);
+        // } catch (FileNotFoundException e) {
+        // pukeAndDie(e.getMessage());
+        // e.printStackTrace();
+        // }
+
     }
 
     /**
@@ -147,6 +149,7 @@ public class P6 {
             parser P = new parser(new Yylex(inFile));
             return P.parse();
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -155,23 +158,23 @@ public class P6 {
         Symbol cfgRoot = parseCFG();
 
         ProgramNode astRoot = (ProgramNode) cfgRoot.value;
-        if (ErrMsg.getErr()) {
-            return P6.RESULT_SYNTAX_ERROR;
-        }
+        if (ErrMsg.getErr()) return P6.RESULT_SYNTAX_ERROR;
 
         astRoot.nameAnalysis(); // perform name analysis
-        if (ErrMsg.getErr()) {
-            return P6.RESULT_NAME_ANALYSIS_ERROR;
-        }
+        if (ErrMsg.getErr()) return P6.RESULT_NAME_ANALYSIS_ERROR;
 
         astRoot.typeCheck();
-        if (ErrMsg.getErr()) {
-            return P6.RESULT_TYPE_ERROR;
-        }
+        if (ErrMsg.getErr()) return P6.RESULT_TYPE_ERROR;
 
-        //////////////////////////
-        // TODO: Calling codeGen //
-        //////////////////////////
+        try {
+            astRoot.codeGen();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return P6.RESULT_OTHER_ERROR;
+        }
+        if (ErrMsg.getErr()) return P6.RESULT_CODE_GENERATION_ERROR;
+
+        astRoot.unparse(this.outFile, 0); // TODO: 🐞 remove this line
 
         return P6.RESULT_CORRECT;
     }
@@ -186,12 +189,14 @@ public class P6 {
         switch (resultCode) {
             case RESULT_SYNTAX_ERROR:
                 pukeAndDie("Syntax error", resultCode);
-            case RESULT_TYPE_ERROR:
-                pukeAndDie("Type checking error", resultCode);
             case RESULT_NAME_ANALYSIS_ERROR:
                 pukeAndDie("Name analysis error", resultCode);
+            case RESULT_TYPE_ERROR:
+                pukeAndDie("Type checking error", resultCode);
+            case RESULT_CODE_GENERATION_ERROR:
+                pukeAndDie("Code generation error", resultCode);
             default:
-                pukeAndDie("Type checking error", RESULT_OTHER_ERROR);
+                pukeAndDie("Unexpected error encountered", RESULT_OTHER_ERROR);
         }
     }
 
@@ -226,7 +231,14 @@ public class P6 {
     }
 
     public static void main(String[] args) {
-        P6 instance = new P6(args);
+        P6 instance = null; // compiler runner
+
+        try {
+            instance = new P6(args);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         instance.run();
     }
 }

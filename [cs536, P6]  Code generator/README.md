@@ -4,8 +4,7 @@ _Safi Nassar - assignment p6_
 
 -   `make clean && make testclean && make`
 -   `make test`
--   `diff testErr.expected testErr.out`
--   `diff test.expected test.out`
+-   `diff test.expected.s test.s`
 
 Executing the test will generate output file of the formated program.
 
@@ -15,15 +14,16 @@ Executing the test will generate output file of the formated program.
 -   Java Cup
 -   JLex
 -   LLVM
--   SPIM interpreter: for testing generated MIPS code http://pages.cs.wisc.edu/~larus/spim.html
+-   SPIM interpreter: for testing generated MIPS code http://pages.cs.wisc.edu/~larus/spim.html https://shawnzhong.github.io/JsSpim/
 
 # Tests documentation:
 - use the Linux utility diff to compare your file of error messages with the expected files.
+- use SPIM tool to verify assembly correct execution.
 
 ---
 
 # MIPS architecture assembly code generation for C--: 
-- Not required code generation for: 
+- [x] Not required code generation for: 
   - structs or anything struct-related (like dot-accesses)
   - repeat statement
 - Use Codegen.java class for generating template code.
@@ -32,13 +32,23 @@ Executing the test will generate output file of the formated program.
 
 # Tasks: 
 - [ ] write codeGen method for various types of AST nodes.
-- [ ] main program: 
-  - [ ] compiler phase errors. 
-  - [ ] code generator should wirte code to file named by 2nd cli arg.
-  - [ ] remove unparse call and reporting.
+- [x] main program: 
+  - [x] compiler phase errors. 
+  - [x] code generator should wirte code to file named by 2nd cli arg.
+  - [x] remove unparse call and reporting.
   - [x] initialize Codegen class's PrintWriter p with output file.
-- [ ] 
-- [ ] 
+- [ ] To allow SPIM simulator to recognize main function:
+  - [ ] add `__start:` to main preamble on line after `main:`
+  - [ ] function exit for main: instead of `jr $ra` issue a syscall to exit with: 
+        ```
+        li $v0, 10
+        syscall
+
+        ```
+- [x] Add to name analyzer or type checker wheather the program contians a function named main.
+- [ ] Add a new "offset" field to the TSym class (or to the appropriate subclass(es) of TSym). Change the name analyzer to compute offsets for each function's parameters and local variables (i.e., where in the function's Activation Record they will be stored at runtime) and to fill in the new offset field. 
+
+
 
 ## Submission:
   - [ ] Create pdf from markdown: `pandoc README.md -o <lastname.firstname.Pn.pdf>`

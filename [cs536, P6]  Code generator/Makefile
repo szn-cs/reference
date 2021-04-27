@@ -8,10 +8,6 @@ compile:
 test: 
 	cd ./src; make test
 
-diff: 
-	cd ./src; diff test.expected test.out
-	cd ./src; diff testErr.expected testErr.out
-
 clean: 
 	cd ./src; make clean; make cleantest
 
@@ -19,11 +15,7 @@ clean:
 # watch files and execute make with `make watch LABEL=<label to execute>`
 # required:
 # -	"cli-watch" npm package
-# watch:
-# 	watch -f "./**/typeErrors.cminusminus;./**/test.cminusminus" -r "(cd src; java -cp ./deps:. P5 test.cminusminus test.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
-# watch:
-# 	watch -f "./**/typeErrors.cminusminus;./**/test.cminusminus" -r "(cd src; java -cp ./deps:. P5 typeErrors.cminusminus testErr.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
 watch:
-	watch -f "./**/typeErrors.cminusminus;./**/test.cminusminus" -r "(cd src; java -cp ./deps:. P5 typeErrors.cminusminus testErr.out; java -cp ./deps:. P5 test.cminusminus test.out) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
+	watch -f "./**/test.cminusminus" -r "(cd src; java -cp ./deps:. P6 test.cminusminus test.s;) && echo '\n\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n\n'"
 
 

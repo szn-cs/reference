@@ -1,0 +1,10 @@
+int main(int x, bool y) {
+    int t; 
+    bool c; 
+
+    t = 1; 
+    c = true;
+
+    return t;
+    
+}

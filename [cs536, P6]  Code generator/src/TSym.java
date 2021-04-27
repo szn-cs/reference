@@ -1,11 +1,13 @@
 import java.util.*;
 
 /**
- * The TSym class defines a symbol-table entry.
- * Each TSym contains a type (a Type).
+ * The TSym class defines a symbol-table entry. Each TSym contains a type (a
+ * Type).
  */
 public class TSym {
     private Type type;
+    private int offset = 0; // offset of param or local (each scalar variable
+                            // requires 4 bytes of storage for int & 8 double)
 
     public TSym(Type type) {
         this.type = type;
@@ -15,14 +17,23 @@ public class TSym {
         return type;
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
     public String toString() {
         return type.toString();
     }
 }
 
+
 /**
- * The FnSym class is a subclass of the TSym class just for functions.
- * The returnType field holds the return type and there are fields to hold
+ * The FnSym class is a subclass of the TSym class just for functions. The
+ * returnType field holds the return type and there are fields to hold
  * information about the parameters.
  */
 class FnSym extends TSym {
@@ -70,15 +81,15 @@ class FnSym extends TSym {
     }
 }
 
+
 /**
  * The StructSym class is a subclass of the TSym class just for variables
- * declared to be a struct type.
- * Each StructSym contains a symbol table to hold information about its
- * fields.
+ * declared to be a struct type. Each StructSym contains a symbol table to hold
+ * information about its fields.
  */
 class StructSym extends TSym {
     // new fields
-    private IdNode structType;  // name of the struct type
+    private IdNode structType; // name of the struct type
 
     public StructSym(IdNode id) {
         super(new StructType(id));
@@ -90,11 +101,11 @@ class StructSym extends TSym {
     }
 }
 
+
 /**
  * The StructDefSym class is a subclass of the TSym class just for the
- * definition of a struct type.
- * Each StructDefSym contains a symbol table to hold information about its
- * fields.
+ * definition of a struct type. Each StructDefSym contains a symbol table to
+ * hold information about its fields.
  */
 class StructDefSym extends TSym {
     // new fields
