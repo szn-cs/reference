@@ -1099,6 +1099,8 @@ class ReadStmtNode extends StmtNode {
 
 
 class WriteStmtNode extends StmtNode {
+    private Type expressionType; // type of expression being written
+
     public WriteStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -1136,6 +1138,14 @@ class WriteStmtNode extends StmtNode {
             ErrMsg.fatal(myExp.lineNum(), myExp.charNum(),
                     "Attempt to write void");
         }
+
+        expressionType = type;
+    }
+
+    public void codeGen() {
+        // TODO: use expressionType to generate the appropriate code
+        // for
+        // each type
     }
 
     public void unparse(PrintWriter p, int indent) {

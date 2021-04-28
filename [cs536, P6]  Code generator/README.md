@@ -26,8 +26,14 @@ Executing the test will generate output file of the formated program.
 - [x] Not required code generation for: 
   - structs or anything struct-related (like dot-accesses)
   - repeat statement
-- Use Codegen.java class for generating template code.
-- 
+- Semantic clarifications: 
+  - All parameters should be passed by value.
+  - and/or operators (&& and ||) are short circuited (right operands are only evaluated if necessary). 
+    - If the left operand of "&&" evaluates to false, then the right operand is not evaluated (and the value of the whole expression is false); similarly, if the left operand of "||" evaluates to true, then the right operand is not evaluated (and the value of the whole expression is true).
+    - for all of the other binary operators, both operands are always evaluated.
+  - Use Codegen.java class for generating template code.
+  - In C-- (as in C++ and Java), two string literals are considered equal if they contain the same sequence of characters. (e.g. "abc" == "abc" is true)
+  - Boolean values should be output as 1 for true and 0 for false. Boolean values should also be input using 1 for true and 0 for false.
 
 
 # Tasks: 
@@ -47,6 +53,7 @@ Executing the test will generate output file of the formated program.
 - [x] Add to name analyzer or type checker wheather the program contians a function named main.
 - [x] Add global / local differentiation
 - [x] Add a new "offset" field to the TSym class (or to the appropriate subclass(es) of TSym). Change the name analyzer to compute offsets for each function's parameters and local variables (i.e., where in the function's Activation Record they will be stored at runtime) and to fill in the new offset field. 
+- [x] WriteStmtNode field for holding type of expression being written. 
 - [ ] Implement code generation for each of the following: 
   - global variable declarations, function entry, and function exit (write a test program that just declares some global variables and a main function that does nothing)
   - int and bool literals (just push the value onto the stack), string literals, and WriteStmtNode
