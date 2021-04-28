@@ -1,17 +1,16 @@
-bool p; 
-int j; 
 
-void f() {
-    int x;
-}
 
-int main(int x, bool y) {
-    int t; 
-    bool c; 
-
-    t = 1; 
-    c = true;
-
-    return t;
-    
-}
+#### Example for checking offset, global/local, params/locals size calculations
+# bool p; 
+# int j; 
+# void f() { int x; }
+# int main(int x, bool y) {
+#     int t; bool c; 
+#     t = 1; c = true;
+#     if(true) { int t;
+#         if(true) { int c; } else { bool c; 
+#             while(true) { bool c; int p; }
+#         }
+#     }
+#     return t;
+# }

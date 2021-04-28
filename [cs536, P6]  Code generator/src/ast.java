@@ -117,6 +117,12 @@ abstract class ASTnode {
     }
 }
 
+
+// for Statement AST nodes with variable declarations
+abstract interface Declaration {
+    abstract List<DeclNode> getDeclarationList();
+}
+
 // **********************************************************************
 // ProgramNode, DeclListNode, FormalsListNode, FnBodyNode,
 // StmtListNode, ExpListNode
@@ -229,7 +235,7 @@ class DeclListNode extends ASTnode {
     }
 
     // list of kids (DeclNodes)
-    private List<DeclNode> myDecls;
+    public List<DeclNode> myDecls;
 }
 
 
@@ -247,9 +253,7 @@ class FormalsListNode extends ASTnode {
         List<Type> typeList = new LinkedList<Type>();
         for (FormalDeclNode node : myFormals) {
             TSym sym = node.nameAnalysis(symTab);
-            if (sym != null) {
-                typeList.add(sym.getType());
-            }
+            if (sym != null) typeList.add(sym.getType());
         }
         return typeList;
     }
@@ -273,11 +277,14 @@ class FormalsListNode extends ASTnode {
     }
 
     // list of kids (FormalDeclNodes)
-    private List<FormalDeclNode> myFormals;
+    public List<FormalDeclNode> myFormals;
 }
 
 
 class FnBodyNode extends ASTnode {
+    public int offset; // $fp offset of locals
+    public int localCount = 0; // total number of local declarations
+
     public FnBodyNode(DeclListNode declList, StmtListNode stmtList) {
         myDeclList = declList;
         myStmtList = stmtList;
@@ -290,6 +297,28 @@ class FnBodyNode extends ASTnode {
     public void nameAnalysis(SymTable symTab) {
         myDeclList.nameAnalysis(symTab);
         myStmtList.nameAnalysis(symTab);
+
+        ArrayList<DeclNode> declarationList = new ArrayList<>();
+
+        // immediate declarations offset calculation
+        declarationList.addAll(myDeclList.myDecls);
+        // nested declarations offset calculation
+        for (StmtNode s : myStmtList.myStmts) {
+            if (!(s instanceof Declaration)) continue; // skip non declarations
+            declarationList.addAll(((Declaration) s).getDeclarationList());
+        }
+
+        // calculate locals offset
+        for (DeclNode node : declarationList) {
+            if (!(node instanceof VarDeclNode)) continue; // ignore struct
+            TSym s = node.myId.sym(); // local
+            if (s == null) continue;
+
+            s.setOffset(offset);
+            offset -= 4;
+            localCount++;
+        }
+
     }
 
     /**
@@ -342,7 +371,7 @@ class StmtListNode extends ASTnode {
     }
 
     // list of kids (StmtNodes)
-    private List<StmtNode> myStmts;
+    public List<StmtNode> myStmts;
 }
 
 
@@ -524,8 +553,12 @@ class VarDeclNode extends DeclNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+        TSym s = myId.sym();
+
         addIndentation(p, indent);
         super.unparseScopeAccess(p, indent);
+        if (s.isLocal()) p.print("[offset: " + s.getOffset() + "] ");
+
         myType.unparse(p, 0);
         p.print(" ");
         p.print(myId.name());
@@ -560,6 +593,9 @@ class FnDeclNode extends DeclNode {
         String name = myId.name();
         FnSym sym = null;
         TSym symCheckMul = null;
+        /** offset calculation */
+        int metadataSize = 8; // return address & control link size
+        int parameterSize = 0, localSize; // total params size and local size
 
         try {
             symCheckMul = symTab.lookupLocal(name);
@@ -597,11 +633,25 @@ class FnDeclNode extends DeclNode {
 
         // process the formals
         List<Type> typeList = myFormalsList.nameAnalysis(symTab);
-        if (sym != null) {
-            sym.addFormals(typeList);
+        if (sym != null) sym.addFormals(typeList);
+
+        // formals $fp offset calculation
+        {
+            int offset = 0; // initial offset
+            for (FormalDeclNode node : myFormalsList.myFormals) {
+                TSym s = node.myId.sym(); // formal
+                if (s == null) continue;
+
+                s.setOffset(offset);
+                parameterSize += 4; // int/bool bytes increment
+                offset = -parameterSize;
+            }
         }
 
+        // locals $fp offset
+        myBody.offset = -(parameterSize + metadataSize); // set initial offset
         myBody.nameAnalysis(symTab); // process the function body
+        localSize = 4 * myBody.localCount; // calculate size of locals
 
         try {
             symTab.removeScope(); // exit scope
@@ -610,6 +660,10 @@ class FnDeclNode extends DeclNode {
                     + " in FnDeclNode.nameAnalysis");
             System.exit(-1);
         }
+
+        // set function symbol details
+        sym.setParameterSize(parameterSize);
+        sym.setLocalSize(localSize);
 
         return null;
     }
@@ -622,8 +676,14 @@ class FnDeclNode extends DeclNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+        FnSym s = (FnSym) myId.sym();
+
         addIndentation(p, indent);
+
         super.unparseScopeAccess(p, indent);
+        p.print("[params: " + s.getParameterSize() + ", locals: "
+                + s.getLocalSize() + "] ");
+
         myType.unparse(p, 0);
         p.print(" ");
         p.print(myId.name());
@@ -703,7 +763,11 @@ class FormalDeclNode extends DeclNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+        TSym s = myId.sym();
+
         super.unparseScopeAccess(p, indent);
+        if (s.isLocal()) p.print("[offset: " + s.getOffset() + "] ");
+
         myType.unparse(p, 0);
         p.print(" ");
         p.print(myId.name());
@@ -1086,11 +1150,23 @@ class WriteStmtNode extends StmtNode {
 }
 
 
-class IfStmtNode extends StmtNode {
+class IfStmtNode extends StmtNode implements Declaration {
     public IfStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myDeclList = dlist;
         myExp = exp;
         myStmtList = slist;
+    }
+
+    public List<DeclNode> getDeclarationList() {
+        // add immediate declarations
+        ArrayList<DeclNode> l = new ArrayList<>(myDeclList.myDecls);
+        // add nested declarations
+        for (StmtNode s : myStmtList.myStmts) {
+            if (!(s instanceof Declaration)) continue; // skip non declarations
+            l.addAll(((Declaration) s).getDeclarationList());
+        }
+
+        return l;
     }
 
     /**
@@ -1143,7 +1219,7 @@ class IfStmtNode extends StmtNode {
 }
 
 
-class IfElseStmtNode extends StmtNode {
+class IfElseStmtNode extends StmtNode implements Declaration {
     public IfElseStmtNode(ExpNode exp, DeclListNode dlist1, StmtListNode slist1,
             DeclListNode dlist2, StmtListNode slist2) {
         myExp = exp;
@@ -1151,6 +1227,23 @@ class IfElseStmtNode extends StmtNode {
         myThenStmtList = slist1;
         myElseDeclList = dlist2;
         myElseStmtList = slist2;
+    }
+
+    public List<DeclNode> getDeclarationList() {
+        ArrayList<DeclNode> l = new ArrayList<>();
+        // add immediate and nested declarations in order
+        l.addAll(myThenDeclList.myDecls);
+        for (StmtNode s : myThenStmtList.myStmts) {
+            if (!(s instanceof Declaration)) continue; // skip non declarations
+            l.addAll(((Declaration) s).getDeclarationList());
+        }
+        l.addAll(myElseDeclList.myDecls);
+        for (StmtNode s : myElseStmtList.myStmts) {
+            if (!(s instanceof Declaration)) continue; // skip non declarations
+            l.addAll(((Declaration) s).getDeclarationList());
+        }
+
+        return l;
     }
 
     /**
@@ -1219,16 +1312,28 @@ class IfElseStmtNode extends StmtNode {
     private ExpNode myExp;
     private DeclListNode myThenDeclList;
     private StmtListNode myThenStmtList;
-    private StmtListNode myElseStmtList;
     private DeclListNode myElseDeclList;
+    private StmtListNode myElseStmtList;
 }
 
 
-class WhileStmtNode extends StmtNode {
+class WhileStmtNode extends StmtNode implements Declaration {
     public WhileStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myExp = exp;
         myDeclList = dlist;
         myStmtList = slist;
+    }
+
+    public List<DeclNode> getDeclarationList() {
+        // add immediate declarations
+        ArrayList<DeclNode> l = new ArrayList<>(myDeclList.myDecls);
+        // add nested declarations
+        for (StmtNode s : myStmtList.myStmts) {
+            if (!(s instanceof Declaration)) continue; // skip non declarations
+            l.addAll(((Declaration) s).getDeclarationList());
+        }
+
+        return l;
     }
 
     /**

@@ -6,7 +6,7 @@ import java.util.*;
  */
 public class TSym {
     private Type type;
-    // offset of param or local (each scalar variable requires 4 bytes of
+    // $fp offset of param or local (each scalar variable requires 4 bytes of
     // storage for int & 8 double)
     private int offset = 0;
 
@@ -65,6 +65,9 @@ class FnSym extends TSym {
     private Type returnType;
     private int numParams;
     private List<Type> paramTypes;
+    private int parameterSize; // formals size
+    private int localSize; // locals size
+
 
     public FnSym(Type type, int numparams) {
         super(new FnType());
@@ -86,6 +89,22 @@ class FnSym extends TSym {
 
     public List<Type> getParamTypes() {
         return paramTypes;
+    }
+
+    public int getParameterSize() {
+        return parameterSize;
+    }
+
+    public int getLocalSize() {
+        return localSize;
+    }
+
+    public void setParameterSize(int parameterSize) {
+        this.parameterSize = parameterSize;
+    }
+
+    public void setLocalSize(int localSize) {
+        this.localSize = localSize;
     }
 
     public String toString() {

@@ -174,7 +174,7 @@ public class P6 {
         }
         if (ErrMsg.getErr()) return P6.RESULT_CODE_GENERATION_ERROR;
 
-        astRoot.unparse(this.outFile, 0); // TODO: 🐞 remove this line
+        // astRoot.unparse(this.outFile, 0); // 🐞 for debugging
 
         return P6.RESULT_CORRECT;
     }
