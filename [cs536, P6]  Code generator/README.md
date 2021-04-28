@@ -32,20 +32,21 @@ Executing the test will generate output file of the formated program.
     - If the left operand of "&&" evaluates to false, then the right operand is not evaluated (and the value of the whole expression is false); similarly, if the left operand of "||" evaluates to true, then the right operand is not evaluated (and the value of the whole expression is true).
     - for all of the other binary operators, both operands are always evaluated.
   - Use Codegen.java class for generating template code.
-  - In C-- (as in C++ and Java), two string literals are considered equal if they contain the same sequence of characters. (e.g. "abc" == "abc" is true)
+  - [NOT REQUIRED] ~In C-- (as in C++ and Java), two string literals are considered equal if they contain the same sequence of characters. (e.g. "abc" == "abc" is true)~
+  - `seq` opcode useful for ints and bools comparison
   - Boolean values should be output as 1 for true and 0 for false. Boolean values should also be input using 1 for true and 0 for false.
 
 
 # Tasks: 
-- [ ] write codeGen method for various types of AST nodes.
+- [x] write codeGen method for various types of AST nodes.
 - [x] main program: 
   - [x] compiler phase errors. 
   - [x] code generator should wirte code to file named by 2nd cli arg.
   - [x] remove unparse call and reporting.
   - [x] initialize Codegen class's PrintWriter p with output file.
-- [ ] To allow SPIM simulator to recognize main function:
+- [x] To allow SPIM simulator to recognize main function:
   - [NOTE REQUIED ANYMORE] ~add `__start:` to main preamble on line after `main:`~
-  - [ ] function exit for main: instead of `jr $ra` issue a syscall to exit with: 
+  - [x] function exit for main: instead of `jr $ra` issue a syscall to exit with: 
         ```
         li $v0, 10
         syscall
@@ -54,8 +55,9 @@ Executing the test will generate output file of the formated program.
 - [x] Add global / local differentiation
 - [x] Add a new "offset" field to the TSym class (or to the appropriate subclass(es) of TSym). Change the name analyzer to compute offsets for each function's parameters and local variables (i.e., where in the function's Activation Record they will be stored at runtime) and to fill in the new offset field. 
 - [x] WriteStmtNode field for holding type of expression being written. 
+- [ ]  test code generation for the other kinds of statements and the expressions by writing a program that computes and prints a value
 - Implement code generation for each of the following: 
-  - [ ] global variable declarations, function entry, and function exit
+  - [x] global variable declarations, function entry, and function exit
   - [ ] int and bool literals (just push the value onto the stack), string literals, and WriteStmtNode
   - [ ] IdNode (code that pushes the value of the id onto the stack, and code that pushes the address of the id onto the stack) and assignments of the form id=literal and id=id (test by assigning then writing)
   - [ ] expressions other than calls

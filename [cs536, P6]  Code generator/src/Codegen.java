@@ -25,6 +25,11 @@ public class Codegen {
     // file into which generated code is written
     public static PrintWriter p = null;
 
+    // comment types
+    public static enum Comment {
+        BLOCK, LINE
+    };
+
     // values of true and false
     public static final String TRUE = "1";
     public static final String FALSE = "0";
@@ -54,13 +59,27 @@ public class Codegen {
     // **********************************************************************
     // **********************************************************************
 
+    public static void sectionComment(String comment, Comment t) {
+        switch (t) {
+            case BLOCK:
+                p.print("\n########################\n");
+                p.print("# " + comment);
+                p.print("\n########################");
+                break;
+            case LINE:
+                p.print("#———" + comment + "———————————————");
+                break;
+        }
+        p.println();
+    }
+
     // **********************************************************************
     // generateWithComment
     // given: op code, comment, and 0 to 3 string args
     // do: write nicely formatted code (ending with new line)
     // **********************************************************************
-    public static void generateWithComment(String opcode, String comment,
-            String arg1, String arg2, String arg3) {
+    public static void generateWithComment(String opcode, String arg1,
+            String arg2, String arg3, String comment) {
         int space = MAXLEN - opcode.length() + 2;
 
         p.print("\t" + opcode);
@@ -73,22 +92,22 @@ public class Codegen {
                 if (arg3 != "") p.print(", " + arg3);
             }
         }
-        if (comment != null && comment != "") p.print("\t\t#" + comment);
+        if (comment != null && comment != "") p.print("\t\t# " + comment);
         p.println();
     }
 
-    public static void generateWithComment(String opcode, String comment,
-            String arg1, String arg2) {
-        generateWithComment(opcode, comment, arg1, arg2, "");
+    public static void generateWithComment(String opcode, String arg1,
+            String arg2, String comment) {
+        generateWithComment(opcode, arg1, arg2, "", comment);
     }
 
-    public static void generateWithComment(String opcode, String comment,
-            String arg1) {
-        generateWithComment(opcode, comment, arg1, "", "");
+    public static void generateWithComment(String opcode, String arg1,
+            String comment) {
+        generateWithComment(opcode, arg1, "", "", comment);
     }
 
     public static void generateWithComment(String opcode, String comment) {
-        generateWithComment(opcode, comment, "", "", "");
+        generateWithComment(opcode, "", "", "", comment);
     }
 
     // **********************************************************************
@@ -169,7 +188,7 @@ public class Codegen {
         for (int k = 1; k <= space; k++)
             p.print(" ");
         p.print(arg1 + ", " + arg3 + "(" + arg2 + ")");
-        if (comment != null && comment != "") p.print("\t#" + comment);
+        if (comment != null && comment != "") p.print("\t# " + comment);
         p.println();
     }
 

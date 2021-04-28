@@ -104,6 +104,7 @@ import java.util.*;
 
 // for Statement AST nodes with variable declarations
 abstract interface Declaration {
+    // get list of all declarations recursively
     abstract List<DeclNode> getDeclarationList();
 }
 
@@ -111,6 +112,13 @@ abstract interface Declaration {
 // for AST nodes with codeGen method
 abstract interface CodeGeneration {
     abstract void codeGen();
+}
+
+
+// used to retrieve nested statements
+abstract interface Statement {
+    // get list of all statements recursively
+    abstract List<StmtNode> getStatementList();
 }
 
 // **********************************************************************
@@ -350,7 +358,7 @@ class FnBodyNode extends ASTnode {
 
     // 2 kids
     private DeclListNode myDeclList;
-    private StmtListNode myStmtList;
+    public StmtListNode myStmtList;
 }
 
 
@@ -589,7 +597,7 @@ class VarDeclNode extends DeclNode implements CodeGeneration {
         }
 
         Codegen.generate(".data");
-        Codegen.generateWithComment(".align 2", " align on a word boundary");
+        Codegen.generateWithComment(".align 2", "align on a word boundary");
         String l = "_" + myId.name();
         String i = String.valueOf(getSize());
         Codegen.generateLabeled(l, ".space ", i, null);
@@ -614,7 +622,7 @@ class VarDeclNode extends DeclNode implements CodeGeneration {
 }
 
 
-class FnDeclNode extends DeclNode implements CodeGeneration {
+class FnDeclNode extends DeclNode implements CodeGeneration, Statement {
     public FnDeclNode(TypeNode type, IdNode id, FormalsListNode formalList,
             FnBodyNode body) {
         myType = type;
@@ -622,6 +630,15 @@ class FnDeclNode extends DeclNode implements CodeGeneration {
         myFormalsList = formalList;
         myBody = body;
     }
+
+    public List<StmtNode> getStatementList() {
+        ArrayList<StmtNode> l = new ArrayList<>(myBody.myStmtList.myStmts);
+        for (StmtNode node : myBody.myStmtList.myStmts)
+            if (node instanceof Statement)
+                l.addAll(((Statement) node).getStatementList());
+        return l;
+    }
+
 
     /**
      * nameAnalysis Given a symbol table symTab, do: if this name has already
@@ -635,7 +652,7 @@ class FnDeclNode extends DeclNode implements CodeGeneration {
         FnSym sym = null;
         TSym symCheckMul = null;
         /** offset calculation */
-        int metadataSize = 8; // return address & control link size
+        int controlSize = 8; // return address & control link size
         int parameterSize = 0, localSize; // total params size and local size
 
         try {
@@ -690,7 +707,7 @@ class FnDeclNode extends DeclNode implements CodeGeneration {
         }
 
         // locals $fp offset
-        myBody.offset = -(parameterSize + metadataSize); // set initial offset
+        myBody.offset = -(parameterSize + controlSize); // set initial offset
         myBody.nameAnalysis(symTab); // process the function body
         localSize = 4 * myBody.localCount; // calculate size of locals
 
@@ -736,8 +753,74 @@ class FnDeclNode extends DeclNode implements CodeGeneration {
     }
 
     public void codeGen() {
-        TSym s = myId.sym();
-        // TODO:
+        FnSym s = (FnSym) myId.sym();
+        String funcLabel = myId.name(); // function label ("main" or _<name>)
+        int localSize = s.getLocalSize();
+        int formalSize = s.getParameterSize();
+        int controlSize = 8; // return address & control link
+        int offsetRA = -(formalSize); // return address offset
+        int offsetControlLink = -(formalSize + 4); // old $fp offset
+        String epilogueLabel = Codegen.nextLabel(); // return statement label
+
+        // preamble
+        Codegen.sectionComment("⨍\t" + funcLabel, Codegen.Comment.BLOCK);
+        {
+            if (!funcLabel.equals("main")) // other functions
+                funcLabel = "_" + funcLabel;
+            Codegen.generate(".text");
+            if (funcLabel.equals("main")) Codegen.generate(".global main");
+            Codegen.generateLabeled(funcLabel, "", null);
+        }
+
+        // entry (AR)
+        Codegen.sectionComment("Entry", Codegen.Comment.LINE);
+        {
+            Codegen.genPush(Codegen.RA); // push return address
+            Codegen.genPush(Codegen.FP); // push control link
+            // set $fp: return from top of stack to AR base (addition)
+            Codegen.generate("addu", Codegen.FP, Codegen.SP,
+                    formalSize + controlSize);
+            // push space for local variables: subtract locals size
+            Codegen.generate("subu", Codegen.SP, Codegen.SP, localSize);
+        }
+
+        // body (statements)
+        {
+            Codegen.sectionComment("Body", Codegen.Comment.LINE);
+            // set epiloguwLabel for return statement instaces of this function
+            List<StmtNode> l = getStatementList();
+            for (StmtNode node : l)
+                if (node instanceof ReturnStmtNode)
+                    ((ReturnStmtNode) node).epilogueLabel = epilogueLabel;
+
+            // code generation for statements only (not declarations)
+            for (StmtNode node : myBody.myStmtList.myStmts) {
+                if (node == null) continue; // make sure no nulls
+
+                node.codeGen();
+            }
+        }
+
+        // exit (restore stack & return to caller)
+        Codegen.sectionComment("Exit", Codegen.Comment.LINE);
+        {
+            Codegen.generateLabeled(epilogueLabel, "", "epilogue");
+            // load return address
+            Codegen.generate("lw", Codegen.RA, Codegen.FP, offsetRA);
+            // save current $fp for updating $sp later
+            Codegen.generate("move", Codegen.T0, Codegen.FP);
+            // restore old $fp
+            Codegen.generate("lw", Codegen.FP, Codegen.FP, offsetControlLink);
+            // restore stack pointer
+            Codegen.generate("move", Codegen.SP, Codegen.T0);
+            // return i.e. jump to return address
+            if (!funcLabel.equals("main")) { // required for SPIM
+                Codegen.generate("li", Codegen.V0, 10);
+                Codegen.generate("syscall");
+            } else {
+                Codegen.generate("jr", Codegen.RA);
+            }
+        }
     }
 
     // 4 kids
@@ -987,7 +1070,7 @@ class StructNode extends TypeNode {
 // **********************************************************************
 
 
-abstract class StmtNode extends ASTnode {
+abstract class StmtNode extends ASTnode implements CodeGeneration {
     abstract public void nameAnalysis(SymTable symTab);
 
     abstract public void typeCheck(Type retType);
@@ -1018,6 +1101,10 @@ class AssignStmtNode extends StmtNode {
         addIndentation(p, indent);
         myAssign.unparse(p, -1); // no parentheses
         p.println(";");
+    }
+
+    public void codeGen() {
+        // TODO:
     }
 
     // 1 kid
@@ -1056,6 +1143,10 @@ class PostIncStmtNode extends StmtNode {
         p.println("++;");
     }
 
+    public void codeGen() {
+        // TODO:
+    }
+
     // 1 kid
     private ExpNode myExp;
 }
@@ -1090,6 +1181,10 @@ class PostDecStmtNode extends StmtNode {
         addIndentation(p, indent);
         myExp.unparse(p, 0);
         p.println("--;");
+    }
+
+    public void codeGen() {
+        // TODO:
     }
 
     // 1 kid
@@ -1137,6 +1232,10 @@ class ReadStmtNode extends StmtNode {
         p.print("cin >> ");
         myExp.unparse(p, 0);
         p.println(";");
+    }
+
+    public void codeGen() {
+        // TODO:
     }
 
     // 1 kid (actually can only be an IdNode or an ArrayExpNode)
@@ -1189,9 +1288,12 @@ class WriteStmtNode extends StmtNode {
     }
 
     public void codeGen() {
-        // TODO: use expressionType to generate the appropriate code
-        // for
-        // each type
+        // TODO: Add string case check
+        // generate the appropriate code for each type
+        assert (!expressionType.isBoolType() && !expressionType
+                .isIntType()) : "Error: unsupported write type";
+
+
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -1206,7 +1308,7 @@ class WriteStmtNode extends StmtNode {
 }
 
 
-class IfStmtNode extends StmtNode implements Declaration {
+class IfStmtNode extends StmtNode implements Declaration, Statement {
     public IfStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myDeclList = dlist;
         myExp = exp;
@@ -1220,6 +1322,20 @@ class IfStmtNode extends StmtNode implements Declaration {
         for (StmtNode s : myStmtList.myStmts) {
             if (!(s instanceof Declaration)) continue; // skip non declarations
             l.addAll(((Declaration) s).getDeclarationList());
+        }
+
+        return l;
+    }
+
+    public List<StmtNode> getStatementList() {
+        ArrayList<StmtNode> l = new ArrayList<>();
+
+        // add immediate declarations
+        l.addAll(myStmtList.myStmts);
+        // add nested declarations
+        for (StmtNode s : myStmtList.myStmts) {
+            if (!(s instanceof Statement)) continue; // skip non declarations
+            l.addAll(((Statement) s).getStatementList());
         }
 
         return l;
@@ -1268,6 +1384,10 @@ class IfStmtNode extends StmtNode implements Declaration {
         p.println("}");
     }
 
+    public void codeGen() {
+        // TODO:
+    }
+
     // e kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
@@ -1275,7 +1395,7 @@ class IfStmtNode extends StmtNode implements Declaration {
 }
 
 
-class IfElseStmtNode extends StmtNode implements Declaration {
+class IfElseStmtNode extends StmtNode implements Declaration, Statement {
     public IfElseStmtNode(ExpNode exp, DeclListNode dlist1, StmtListNode slist1,
             DeclListNode dlist2, StmtListNode slist2) {
         myExp = exp;
@@ -1297,6 +1417,28 @@ class IfElseStmtNode extends StmtNode implements Declaration {
         for (StmtNode s : myElseStmtList.myStmts) {
             if (!(s instanceof Declaration)) continue; // skip non declarations
             l.addAll(((Declaration) s).getDeclarationList());
+        }
+
+        return l;
+    }
+
+    public List<StmtNode> getStatementList() {
+        ArrayList<StmtNode> l = new ArrayList<>();
+
+        // add immediate declarations
+        l.addAll(myThenStmtList.myStmts);
+        // add nested declarations
+        for (StmtNode s : myThenStmtList.myStmts) {
+            if (!(s instanceof Statement)) continue; // skip non declarations
+            l.addAll(((Statement) s).getStatementList());
+        }
+
+        // add immediate declarations
+        l.addAll(myElseStmtList.myStmts);
+        // add nested declarations
+        for (StmtNode s : myElseStmtList.myStmts) {
+            if (!(s instanceof Statement)) continue; // skip non declarations
+            l.addAll(((Statement) s).getStatementList());
         }
 
         return l;
@@ -1364,6 +1506,10 @@ class IfElseStmtNode extends StmtNode implements Declaration {
         p.println("}");
     }
 
+    public void codeGen() {
+        // TODO:
+    }
+
     // 5 kids
     private ExpNode myExp;
     private DeclListNode myThenDeclList;
@@ -1373,7 +1519,7 @@ class IfElseStmtNode extends StmtNode implements Declaration {
 }
 
 
-class WhileStmtNode extends StmtNode implements Declaration {
+class WhileStmtNode extends StmtNode implements Declaration, Statement {
     public WhileStmtNode(ExpNode exp, DeclListNode dlist, StmtListNode slist) {
         myExp = exp;
         myDeclList = dlist;
@@ -1388,7 +1534,17 @@ class WhileStmtNode extends StmtNode implements Declaration {
             if (!(s instanceof Declaration)) continue; // skip non declarations
             l.addAll(((Declaration) s).getDeclarationList());
         }
+        return l;
+    }
 
+    public List<StmtNode> getStatementList() {
+        // add immediate declarations
+        ArrayList<StmtNode> l = new ArrayList<>(myStmtList.myStmts);
+        // add nested declarations
+        for (StmtNode s : myStmtList.myStmts) {
+            if (!(s instanceof Statement)) continue; // skip non declarations
+            l.addAll(((Statement) s).getStatementList());
+        }
         return l;
     }
 
@@ -1433,6 +1589,10 @@ class WhileStmtNode extends StmtNode implements Declaration {
         myStmtList.unparse(p, indent + 4);
         addIndentation(p, indent);
         p.println("}");
+    }
+
+    public void codeGen() {
+        // TODO:
     }
 
     // 3 kids
@@ -1493,6 +1653,10 @@ class RepeatStmtNode extends StmtNode {
         p.println("}");
     }
 
+    public void codeGen() {
+        // ignore repeat statemnt (as per spec)
+    }
+
     // 3 kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
@@ -1526,12 +1690,18 @@ class CallStmtNode extends StmtNode {
         p.println(";");
     }
 
+    public void codeGen() {
+        // TODO:
+    }
+
     // 1 kid
     private CallExpNode myCall;
 }
 
 
 class ReturnStmtNode extends StmtNode {
+    public String epilogueLabel; // corresponding function epilogue
+
     public ReturnStmtNode(ExpNode exp) {
         myExp = exp;
     }
@@ -1581,6 +1751,19 @@ class ReturnStmtNode extends StmtNode {
             myExp.unparse(p, 0);
         }
         p.println(";");
+    }
+
+    public void codeGen() {
+        assert epilogueLabel != null : "Error: epilogueLabel for return statement must be set";
+
+        // TODO: uncomment
+        // myExp.codeGen(); // pushes evaluation into stack
+
+        // pop the value from stack into appropriate register (V0 or F0)
+        // NOTE: double values are unsupported.s
+        Codegen.genPop(Codegen.V0);
+
+        Codegen.generateWithComment("j", epilogueLabel, "epilogue");
     }
 
     // 1 kid
