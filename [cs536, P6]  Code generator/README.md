@@ -54,13 +54,13 @@ Executing the test will generate output file of the formated program.
 - [x] Add global / local differentiation
 - [x] Add a new "offset" field to the TSym class (or to the appropriate subclass(es) of TSym). Change the name analyzer to compute offsets for each function's parameters and local variables (i.e., where in the function's Activation Record they will be stored at runtime) and to fill in the new offset field. 
 - [x] WriteStmtNode field for holding type of expression being written. 
-- [ ] Implement code generation for each of the following: 
-  - global variable declarations, function entry, and function exit (write a test program that just declares some global variables and a main function that does nothing)
-  - int and bool literals (just push the value onto the stack), string literals, and WriteStmtNode
-  - IdNode (code that pushes the value of the id onto the stack, and code that pushes the address of the id onto the stack) and assignments of the form id=literal and id=id (test by assigning then writing)
-  - expressions other than calls
-  - statements other than calls and returns
-  - call statements and expressions, return statements (to implement a function call, you will need a third code-generation method for the IdNode class: one that is called only for a function name and that generates a jump-and-link instruction)
+- Implement code generation for each of the following: 
+  - [ ] global variable declarations, function entry, and function exit
+  - [ ] int and bool literals (just push the value onto the stack), string literals, and WriteStmtNode
+  - [ ] IdNode (code that pushes the value of the id onto the stack, and code that pushes the address of the id onto the stack) and assignments of the form id=literal and id=id (test by assigning then writing)
+  - [ ] expressions other than calls
+  - [ ] statements other than calls and returns
+  - [ ] call statements and expressions, return statements (to implement a function call, you will need a third code-generation method for the IdNode class: one that is called only for a function name and that generates a jump-and-link instruction)
 
 
 

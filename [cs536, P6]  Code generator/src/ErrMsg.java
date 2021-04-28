@@ -55,5 +55,9 @@ class ErrMsg {
         return err;
     }
 
+    static void setErr() {
+        err = true;
+    }
+
 
 }

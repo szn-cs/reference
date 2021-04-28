@@ -73,7 +73,7 @@ public class Codegen {
                 if (arg3 != "") p.print(", " + arg3);
             }
         }
-        if (comment != "") p.print("\t\t#" + comment);
+        if (comment != null && comment != "") p.print("\t\t#" + comment);
         p.println();
     }
 
@@ -169,7 +169,7 @@ public class Codegen {
         for (int k = 1; k <= space; k++)
             p.print(" ");
         p.print(arg1 + ", " + arg3 + "(" + arg2 + ")");
-        if (comment != "") p.print("\t#" + comment);
+        if (comment != null && comment != "") p.print("\t#" + comment);
         p.println();
     }
 
@@ -183,8 +183,8 @@ public class Codegen {
     // given: label, op code, comment, and arg
     // do: write nicely formatted code (ending with new line)
     // **********************************************************************
-    public static void generateLabeled(String label, String opcode,
-            String comment, String arg1) {
+    public static void generateLabeled(String label, String opcode, String arg1,
+            String comment) {
         int space = MAXLEN - opcode.length() + 2;
 
         p.print(label + ":");
@@ -194,13 +194,28 @@ public class Codegen {
                 p.print(" ");
             p.print(arg1);
         }
-        if (comment != "") p.print("\t# " + comment);
+        if (comment != null && comment != "") p.print("\t# " + comment);
         p.println();
     }
 
     public static void generateLabeled(String label, String opcode,
             String comment) {
-        generateLabeled(label, opcode, comment, "");
+        generateLabeled(label, opcode, "", comment);
+    }
+
+    // **********************************************************************
+    // genLabel
+    // given: label L and comment (comment may be empty)
+    // generate: L: # comment
+    // **********************************************************************
+    public static void genLabel(String label, String comment) {
+        p.print(label + ":");
+        if (comment != null && comment != "") p.print("\t\t" + "# " + comment);
+        p.println();
+    }
+
+    public static void genLabel(String label) {
+        genLabel(label, "");
     }
 
     // **********************************************************************
@@ -219,21 +234,6 @@ public class Codegen {
     public static void genPop(String s) {
         generateIndexed("lw", s, SP, 4, "POP");
         generate("addu", SP, SP, 4);
-    }
-
-    // **********************************************************************
-    // genLabel
-    // given: label L and comment (comment may be empty)
-    // generate: L: # comment
-    // **********************************************************************
-    public static void genLabel(String label, String comment) {
-        p.print(label + ":");
-        if (comment != "") p.print("\t\t" + "# " + comment);
-        p.println();
-    }
-
-    public static void genLabel(String label) {
-        genLabel(label, "");
     }
 
     // **********************************************************************

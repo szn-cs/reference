@@ -102,9 +102,21 @@ import java.util.*;
 //
 // **********************************************************************
 
+// for Statement AST nodes with variable declarations
+abstract interface Declaration {
+    abstract List<DeclNode> getDeclarationList();
+}
+
+
+// for AST nodes with codeGen method
+abstract interface CodeGeneration {
+    abstract void codeGen();
+}
+
 // **********************************************************************
 // %%%ASTnode class (base class for all other kinds of nodes)
 // **********************************************************************
+
 
 abstract class ASTnode {
     // every subclass must provide an unparse operation
@@ -117,19 +129,13 @@ abstract class ASTnode {
     }
 }
 
-
-// for Statement AST nodes with variable declarations
-abstract interface Declaration {
-    abstract List<DeclNode> getDeclarationList();
-}
-
 // **********************************************************************
 // ProgramNode, DeclListNode, FormalsListNode, FnBodyNode,
 // StmtListNode, ExpListNode
 // **********************************************************************
 
 
-class ProgramNode extends ASTnode {
+class ProgramNode extends ASTnode implements CodeGeneration {
     public ProgramNode(DeclListNode L) {
         myDeclList = L;
     }
@@ -170,7 +176,7 @@ class ProgramNode extends ASTnode {
     }
 
     public void codeGen() {
-
+        myDeclList.codeGen();
     }
 
     // 1 kid
@@ -178,7 +184,7 @@ class ProgramNode extends ASTnode {
 }
 
 
-class DeclListNode extends ASTnode {
+class DeclListNode extends ASTnode implements CodeGeneration {
     public DeclListNode(List<DeclNode> S) {
         myDecls = S;
     }
@@ -231,6 +237,15 @@ class DeclListNode extends ASTnode {
             System.err.println(
                     "unexpected NoSuchElementException in DeclListNode.print");
             System.exit(-1);
+        }
+    }
+
+    public void codeGen() {
+        for (DeclNode node : myDecls) {
+            // skip struct
+            if (!(node instanceof VarDeclNode) && !(node instanceof FnDeclNode))
+                continue;
+            ((CodeGeneration) node).codeGen();
         }
     }
 
@@ -455,7 +470,7 @@ abstract class DeclNode extends ASTnode {
 }
 
 
-class VarDeclNode extends DeclNode {
+class VarDeclNode extends DeclNode implements CodeGeneration {
     public VarDeclNode(TypeNode type, IdNode id, int size) {
         myType = type;
         myId = id;
@@ -565,6 +580,32 @@ class VarDeclNode extends DeclNode {
         p.println(";");
     }
 
+    public void codeGen() {
+        TSym s = myId.sym();
+        if (!s.isGlobal()) {
+            System.err.println("Error: codeGen shouldn't be handling locals");
+            ErrMsg.setErr();
+            return;
+        }
+
+        Codegen.generate(".data");
+        Codegen.generateWithComment(".align 2", " align on a word boundary");
+        String l = "_" + myId.name();
+        String i = String.valueOf(getSize());
+        Codegen.generateLabeled(l, ".space ", i, null);
+    }
+
+    public int getSize() {
+        if (mySize > -1) return mySize; // struct
+
+        // only int and bool size supported (no double definition)
+        if (myType.type().isBoolType() || myType.type().isIntType()) return 4;
+
+        System.err.println("Error: unsupported variable type encountered");
+        ErrMsg.setErr();
+        return -1;
+    }
+
     // 3 kids
     private TypeNode myType;
     private int mySize; // use value NOT_STRUCT if this is not a struct type
@@ -573,7 +614,7 @@ class VarDeclNode extends DeclNode {
 }
 
 
-class FnDeclNode extends DeclNode {
+class FnDeclNode extends DeclNode implements CodeGeneration {
     public FnDeclNode(TypeNode type, IdNode id, FormalsListNode formalList,
             FnBodyNode body) {
         myType = type;
@@ -692,6 +733,11 @@ class FnDeclNode extends DeclNode {
         p.println(") {");
         myBody.unparse(p, indent + 4);
         p.println("}\n");
+    }
+
+    public void codeGen() {
+        TSym s = myId.sym();
+        // TODO:
     }
 
     // 4 kids
