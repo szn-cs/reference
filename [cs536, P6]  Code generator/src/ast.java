@@ -1210,7 +1210,17 @@ class PostDecStmtNode extends StmtNode {
     }
 
     public void codeGen() {
-        // TODO:
+        assert myExp instanceof IdNode : "unexpected post increment type";
+        IdNode myExp = (IdNode) this.myExp;
+
+        myExp.codeGen(); // T0: value onto stack
+        myExp.genAddr(); // T1: address onto stack
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform instruction (T0 = T0 + 1)
+        G.generate("sub", G.T0, G.T0, 1);
+        G.generateIndexed("sw", G.T0, G.T1, 0); // store into address location
     }
 
     // 1 kid
@@ -1272,8 +1282,9 @@ class ReadStmtNode extends StmtNode {
         G.generate("syscall");
 
         // store value to IdNode's address
-        // TODO:
-
+        myExp.genAddr(); // push variable address to stack
+        G.genPop(G.T0);
+        G.generateIndexed("sw", G.V0, G.T0, 0);
     }
 
     // 1 kid (actually can only be an IdNode or an ArrayExpNode)
@@ -1782,9 +1793,12 @@ class CallStmtNode extends StmtNode {
     }
 
     public void codeGen() {
-        // TODO:
         // generate jump-and-link insrtuction using label of function
+        myCall.codeGen();
+        // ignore value when function invocation used as a statement
+        G.genPop(G.T0); // pop vaue pushed by CallExpNode
     }
+
 
     // 1 kid
     private CallExpNode myCall;
