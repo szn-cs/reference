@@ -4,8 +4,6 @@ _Safi Nassar - assignment p6_
 
 -   `make clean && make testclean && make`
 -   `make test`
--   Run the generated assembly program to test results with the expected input: e.g. run `testExample.s` with input shown in `testExample.expectedResult` 
-    -   (or use `diff test.expected.s test.s`)
 
 Executing the test will generate output file of the formated program.
 
@@ -18,8 +16,8 @@ Executing the test will generate output file of the formated program.
 -   SPIM interpreter: for testing generated MIPS code http://pages.cs.wisc.edu/~larus/spim.html https://shawnzhong.github.io/JsSpim/
 
 # Tests documentation:
-- use the Linux utility diff to compare your file of error messages with the expected files.
-- use SPIM tool to verify assembly correct execution.
+- use SPIM tool to verify assembly correct execution. Run the generated assembly program to test results with the expected input: e.g. run `testExample.s` with input shown in `testExample.expectedResult` 
+- use the Linux utility diff to compare your file of error messages with the expected files. (e.g. `diff test.expected.s test.s`)
 
 ---
 
@@ -67,14 +65,15 @@ Executing the test will generate output file of the formated program.
 
 
 ## Submission:
-  - [ ] Create pdf from markdown: `pandoc README.md -o <lastname.firstname.Pn.pdf>`
+  - [x] Create pdf from markdown: `pandoc README.md -o <lastname.firstname.Pn.pdf>`
       - [ ] [generate markdown from javadoc](https://delight-im.github.io/Javadoc-to-Markdown) and remove redundant comments
         or
       - [ ] generate javadoc to extract method headers: `find . -type f -name "*.java" | xargs javadoc -d ../javadoc`
   - [ ] Add headers for each file
-  - [ ] Verify code format
+  - [x] Verify code format
   - [ ] Verify code execution on CSL machines
-- [ ] lastname.firstname.lastname.firstname.P6.zip
+- [x] lastname.firstname.lastname.firstname.P6.zip
+  - `tar -czvf src.tar.gz ./src`
 +---+ deps/
 +---+ ast.java
 +---+ cminusminus.cup
