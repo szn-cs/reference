@@ -56,6 +56,7 @@ EmptySymTableException.class: EmptySymTableException.java
 #
 test:
 	java -cp $(CP) P6 test.cminusminus test.s
+	java -cp $(CP) P6 testExample.cminusminus testExample.s
 # diff test.expected.s test.s
 
 ###
