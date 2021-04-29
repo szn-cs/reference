@@ -101,6 +101,11 @@ public class G {
     }
 
     public static void generateWithComment(String opcode, String arg1,
+            String arg2, int arg3, String comment) {
+        generateWithComment(opcode, arg1, arg2, String.valueOf(arg3), comment);
+    }
+
+    public static void generateWithComment(String opcode, String arg1,
             String arg2, String comment) {
         generateWithComment(opcode, arg1, arg2, "", comment);
     }

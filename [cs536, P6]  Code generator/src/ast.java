@@ -2670,9 +2670,15 @@ class NotNode extends UnaryExpNode implements Condition {
     }
 
     public void codeGen() {
-        // use `seq` opcode instead of `not` (in order to use 0/1 boolean
-        // represnetation)
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp.codeGen();
+
+        // perform operation
+        G.genPop(G.T0);
+        G.generateWithComment("xori", G.T0, G.T0, 1, "flip bits");
+        G.genPush(G.T0); // push result onto stack
     }
+
 }
 
 // **********************************************************************
@@ -2797,6 +2803,11 @@ abstract class EqualityExpNode extends BinaryExpNode implements Condition {
 
         return retType;
     }
+
+    // TODO:
+    // use `seq` opcode instead of `not` (in order to use 0/1 boolean
+    // represnetation)
+
 }
 
 
