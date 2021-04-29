@@ -1160,7 +1160,17 @@ class PostIncStmtNode extends StmtNode {
     }
 
     public void codeGen() {
-        // TODO:
+        assert myExp instanceof IdNode : "unexpected post increment type";
+        IdNode myExp = (IdNode) this.myExp;
+
+        myExp.codeGen(); // T0: value onto stack
+        myExp.genAddr(); // T1: address onto stack
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform instruction (T0 = T0 + 1)
+        G.generate("add", G.T0, G.T0, 1);
+        G.generateIndexed("sw", G.T0, G.T1, 0); // store into address location
     }
 
     // 1 kid
