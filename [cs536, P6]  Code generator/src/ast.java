@@ -2568,7 +2568,7 @@ class CallExpNode extends ExpNode implements Condition {
 
     public void codeGen() {
         final String functionLabel =
-                (!myId.name().equals("main") ? "" : "_") + myId.name();
+                (myId.name().equals("main") ? "" : "_") + myId.name();
 
         // evaluate arguments & push to stack
         if (myExpList != null) myExpList.codeGen();
