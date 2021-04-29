@@ -47,6 +47,7 @@ public class G {
     public static final String A0 = "$a0";
     public static final String T0 = "$t0";
     public static final String T1 = "$t1";
+    public static final String ZERO = "$zero"; // value zero
 
 
     // for pretty printing generated code

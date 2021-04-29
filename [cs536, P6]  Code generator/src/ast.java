@@ -2549,14 +2549,6 @@ abstract class UnaryExpNode extends ExpNode {
         myExp.nameAnalysis(symTab);
     }
 
-    public void codeGen() {
-        // evaluate operands into stack
-        myExp.codeGen();
-
-
-
-    }
-
     // one child
     protected ExpNode myExp;
 }
@@ -2633,6 +2625,16 @@ class UnaryMinusNode extends UnaryExpNode {
         myExp.unparse(p, 0);
         p.print(")");
     }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp.codeGen();
+
+        // perform operation
+        G.genPop(G.T0);
+        G.generateWithComment("sub", G.T0, G.ZERO, G.T0, "negate value");
+        G.genPush(G.T0); // push result onto stack
+    }
 }
 
 
@@ -2665,6 +2667,11 @@ class NotNode extends UnaryExpNode implements Condition {
         p.print("(!");
         myExp.unparse(p, 0);
         p.print(")");
+    }
+
+    public void codeGen() {
+        // use `seq` opcode instead of `not` (in order to use 0/1 boolean
+        // represnetation)
     }
 }
 
@@ -2838,6 +2845,23 @@ class PlusNode extends ArithmeticExpNode {
         p.print(" + ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+
+    public void codeGen() {
+        // TODO:
+        // step 1: evaluate both operands
+        myExp1.codeGen();
+        myExp2.codeGen();
+
+        // step 2: pop values in T0 and T1
+        genPop(T1, 4);
+        genPop(T0, 4);
+
+        // step 3: do the addition (T0 = T0 + T1)
+        generate("add", T0, T0, T1);
+
+        // step 4: push result
+        genPush(T0, 4);
     }
 }
 
