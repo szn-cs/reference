@@ -190,6 +190,7 @@ class ProgramNode extends ASTnode implements CodeGeneration {
     }
 
     public void codeGen() {
+        if (myDeclList == null) return;
         myDeclList.codeGen();
     }
 
@@ -255,6 +256,8 @@ class DeclListNode extends ASTnode implements CodeGeneration {
     }
 
     public void codeGen() {
+        if (myDecls == null) return;
+
         for (DeclNode node : myDecls) {
             // skip struct
             if (!(node instanceof VarDeclNode) && !(node instanceof FnDeclNode))
@@ -400,6 +403,8 @@ class StmtListNode extends ASTnode implements CodeGeneration {
     }
 
     public void codeGen() {
+        if (myStmts == null) return;
+
         for (StmtNode node : myStmts)
             // make sure no nulls
             if (node != null) node.codeGen();
@@ -465,6 +470,8 @@ class ExpListNode extends ASTnode {
     }
 
     public void codeGen() {
+        if (myExps == null) return;
+
         for (ExpNode node : myExps)
             // make sure no nulls
             if (node != null) node.codeGen();
@@ -812,7 +819,7 @@ class FnDeclNode extends DeclNode implements CodeGeneration, Statement {
                     ((ReturnStmtNode) node).epilogueLabel = epilogueLabel;
 
             // code generation for statements only (not declarations)
-            myBody.myStmtList.codeGen();
+            if (myBody.myStmtList != null) myBody.myStmtList.codeGen();
         }
 
         // exit (restore stack & return to caller)
@@ -1449,7 +1456,7 @@ class IfStmtNode extends StmtNode implements Declaration, Statement {
 
         myExp.genJumpCode(trueLabel, doneLabel); // evaluate condition & jump
         G.genLabel(trueLabel, "case: true"); // true case
-        myStmtList.codeGen();
+        if (myStmtList != null) myStmtList.codeGen();
         G.genLabel(doneLabel, "case: false"); // false case
     }
 
@@ -1584,12 +1591,12 @@ class IfElseStmtNode extends StmtNode implements Declaration, Statement {
 
         // case: true
         G.genLabel(trueLabel, "case: true");
-        myThenStmtList.codeGen();
+        if (myThenStmtList != null) myThenStmtList.codeGen();
         G.generateWithComment("b", doneLabel, "jump: done");
 
         // case: false
         G.genLabel(falseLabel, "case: false");
-        myElseStmtList.codeGen();
+        if (myElseStmtList != null) myElseStmtList.codeGen();
 
         G.genLabel(doneLabel, "done branching"); // done
     }
@@ -1690,7 +1697,7 @@ class WhileStmtNode extends StmtNode implements Declaration, Statement {
 
         // true case
         G.genLabel(trueLabel, "case: true");
-        myStmtList.codeGen();
+        if (myStmtList != null) myStmtList.codeGen();
         G.generateWithComment("b", whileLabel, "jump back: while");
 
         // false case (done with while)

@@ -169,6 +169,7 @@ public class P6 {
         try {
             astRoot.codeGen();
         } catch (Exception e) {
+            System.err.print(e.getMessage());
             e.printStackTrace();
             return P6.RESULT_OTHER_ERROR;
         }
