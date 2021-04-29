@@ -2019,6 +2019,9 @@ class TrueNode extends ExpNode implements Condition {
         G.genPush(G.T0);
     }
 
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        G.generate("b", trueLabel);
+    }
 
     private int myLineNum;
     private int myCharNum;
@@ -2059,6 +2062,10 @@ class FalseNode extends ExpNode implements Condition {
     public void codeGen() {
         G.generate("li", G.T0, G.FALSE);
         G.genPush(G.T0);
+    }
+
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        G.generate("b", falseLabel);
     }
 
     private int myLineNum;
@@ -2171,6 +2178,19 @@ class IdNode extends ExpNode implements Condition {
                     "variable: " + name());
 
         G.genPush(G.T0); // push value onto stack
+    }
+
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        assert mySym.getType()
+                .isBoolType() : "unexpected variable type for condition";
+
+        // retrieve variable value
+        genAddr(); // get address onto stack
+        G.genPop(G.T0);
+        G.generateIndexed("lw", G.T0, G.T0, 0, "load value"); // get value
+
+        G.generate("beq", G.T0, G.ZERO, falseLabel);
+        G.generate("b", trueLabel);
     }
 
     private int myLineNum;
@@ -2422,6 +2442,13 @@ class AssignNode extends ExpNode implements Condition {
         G.genPush(G.T1); // keep a copy of value onto stack
     }
 
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        this.codeGen(); // evaluate expression onto stack
+
+        G.genPop(G.T0);
+        G.generate("beq", G.T0, G.FALSE, falseLabel);
+        G.generate("b", trueLabel);
+    }
 
     // 2 kids
     private ExpNode myLhs;
@@ -2512,6 +2539,14 @@ class CallExpNode extends ExpNode implements Condition {
         G.generateWithComment("jal", functionLabel, "call");
         // handle return value (pushing value will not cause issue for void)
         G.genPush(G.V0);
+    }
+
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        this.codeGen(); // evaluate expression onto stack
+
+        G.genPop(G.T0);
+        G.generate("beq", G.T0, G.FALSE, falseLabel);
+        G.generate("b", trueLabel);
     }
 
     // 2 kids
@@ -2679,6 +2714,12 @@ class NotNode extends UnaryExpNode implements Condition {
         G.genPush(G.T0); // push result onto stack
     }
 
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        assert myExp instanceof Condition : "unexpected condition expression type";
+        Condition myExp = (Condition) this.myExp;
+
+        myExp.genJumpCode(falseLabel, trueLabel); // reverse logic
+    }
 }
 
 // **********************************************************************
@@ -2804,6 +2845,13 @@ abstract class EqualityExpNode extends BinaryExpNode implements Condition {
         return retType;
     }
 
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        this.codeGen(); // evaluate expression onto stack
+
+        G.genPop(G.T0);
+        G.generate("beq", G.T0, G.FALSE, falseLabel);
+        G.generate("b", trueLabel);
+    }
 }
 
 
@@ -2837,6 +2885,14 @@ abstract class RelationalExpNode extends BinaryExpNode implements Condition {
         }
 
         return retType;
+    }
+
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        this.codeGen(); // evaluate expression onto stack
+
+        G.genPop(G.T0);
+        G.generate("beq", G.T0, G.FALSE, falseLabel);
+        G.generate("b", trueLabel);
     }
 }
 
@@ -2968,6 +3024,41 @@ class AndNode extends LogicalExpNode {
         p.print(")");
     }
 
+    public void codeGen() {
+        String doneLabel = G.nextLabel();
+
+        myExp1.codeGen(); // evaluate left operand
+
+        // branch
+        G.generateIndexed("lw", G.T0, G.SP, 4, "LOAD");
+        G.generate("beq", G.T0, G.FALSE, doneLabel);
+
+        // case: true (resutl depends on right operand)
+        G.genPop(G.T0);
+        myExp2.codeGen();
+        // G.genPop(G.T1);
+        // perform insrtuction (T0 = T0 && T1)
+        // G.generate("and", G.T0, G.T0, G.T1);
+        // G.genPush(G.T0); // push result onto stack
+
+        // case: false
+        // leave value of left operand on stack
+        G.genLabel(doneLabel);
+    }
+
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        assert myExp1 instanceof Condition
+                && myExp2 instanceof Condition : "unsupported expression in place of condition";
+        Condition myExp1 = (Condition) this.myExp1;
+        Condition myExp2 = (Condition) this.myExp2;
+
+        String secondEvaluationLabel = G.nextLabel();
+        myExp1.genJumpCode(secondEvaluationLabel, falseLabel);
+        // evaluate second operand
+        G.genLabel(secondEvaluationLabel);
+        myExp2.genJumpCode(trueLabel, falseLabel);
+    }
+
 }
 
 
@@ -2983,6 +3074,41 @@ class OrNode extends LogicalExpNode {
         p.print(" || ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+
+    public void codeGen() {
+        String doneLabel = G.nextLabel();
+
+        myExp1.codeGen(); // evaluate left operand
+
+        // branch
+        G.generateIndexed("lw", G.T0, G.SP, 4, "LOAD");
+        G.generate("beq", G.T0, G.TRUE, doneLabel);
+
+        // case: false (resutl depends on right operand)
+        G.genPop(G.T0);
+        myExp2.codeGen();
+        // G.genPop(G.T1);
+        // perform insrtuction (T0 = T0 || T1)
+        // G.generate("or", G.T0, G.T0, G.T1);
+        // G.genPush(G.T0); // push result onto stack
+
+        // case: true
+        // leave value of left operand on stack
+        G.genLabel(doneLabel);
+    }
+
+    public void genJumpCode(String trueLabel, String falseLabel) {
+        assert myExp1 instanceof Condition
+                && myExp2 instanceof Condition : "unsupported expression in place of condition";
+        Condition myExp1 = (Condition) this.myExp1;
+        Condition myExp2 = (Condition) this.myExp2;
+
+        String secondEvaluationLabel = G.nextLabel();
+        myExp1.genJumpCode(trueLabel, secondEvaluationLabel);
+        // evaluate second operand
+        G.genLabel(secondEvaluationLabel);
+        myExp2.genJumpCode(trueLabel, falseLabel);
     }
 
 }
