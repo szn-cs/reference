@@ -121,6 +121,12 @@ abstract interface Statement {
     abstract List<StmtNode> getStatementList();
 }
 
+
+// for expressions that can be used as conditions
+abstract interface Condition {
+    abstract void genJumpCode(String trueLabel, String doneLabel);
+}
+
 // **********************************************************************
 // %%%ASTnode class (base class for all other kinds of nodes)
 // **********************************************************************
@@ -362,7 +368,7 @@ class FnBodyNode extends ASTnode {
 }
 
 
-class StmtListNode extends ASTnode {
+class StmtListNode extends ASTnode implements CodeGeneration {
     public StmtListNode(List<StmtNode> S) {
         myStmts = S;
     }
@@ -391,6 +397,12 @@ class StmtListNode extends ASTnode {
         while (it.hasNext()) {
             it.next().unparse(p, indent);
         }
+    }
+
+    public void codeGen() {
+        for (StmtNode node : myStmts)
+            // make sure no nulls
+            if (node != null) node.codeGen();
     }
 
     // list of kids (StmtNodes)
@@ -450,6 +462,12 @@ class ExpListNode extends ASTnode {
                 it.next().unparse(p, indent);
             }
         }
+    }
+
+    public void codeGen() {
+        for (ExpNode node : myExps)
+            // make sure no nulls
+            if (node != null) node.codeGen();
     }
 
     // list of kids (ExpNodes)
@@ -590,17 +608,19 @@ class VarDeclNode extends DeclNode implements CodeGeneration {
 
     public void codeGen() {
         TSym s = myId.sym();
+
         if (!s.isGlobal()) {
             System.err.println("Error: codeGen shouldn't be handling locals");
             ErrMsg.setErr();
             return;
         }
 
-        Codegen.generate(".data");
-        Codegen.generateWithComment(".align 2", "align on a word boundary");
+        // global variable:
+        G.generate(".data");
+        G.generateWithComment(".align 2", "align on a word boundary");
         String l = "_" + myId.name();
         String i = String.valueOf(getSize());
-        Codegen.generateLabeled(l, ".space ", i, null);
+        G.generateLabeled(l, ".space ", i, null);
     }
 
     public int getSize() {
@@ -754,39 +774,37 @@ class FnDeclNode extends DeclNode implements CodeGeneration, Statement {
 
     public void codeGen() {
         FnSym s = (FnSym) myId.sym();
-        String funcLabel = myId.name(); // function label ("main" or _<name>)
+        String funcLabel = // function label ("main" or _<name>)
+                (myId.name().equals("main") ? "" : "_") + myId.name();
         int localSize = s.getLocalSize();
         int formalSize = s.getParameterSize();
         int controlSize = 8; // return address & control link
         int offsetRA = -(formalSize); // return address offset
         int offsetControlLink = -(formalSize + 4); // old $fp offset
-        String epilogueLabel = Codegen.nextLabel(); // return statement label
+        String epilogueLabel = G.nextLabel(); // return statement label
 
         // preamble
-        Codegen.sectionComment("⨍\t" + funcLabel, Codegen.Comment.BLOCK);
+        G.sectionComment("⨍\t" + myId.name(), G.Comment.BLOCK);
         {
-            if (!funcLabel.equals("main")) // other functions
-                funcLabel = "_" + funcLabel;
-            Codegen.generate(".text");
-            if (funcLabel.equals("main")) Codegen.generate(".global main");
-            Codegen.generateLabeled(funcLabel, "", null);
+            G.generate(".text");
+            if (funcLabel.equals("main")) G.generate(".global main");
+            G.generateLabeled(funcLabel, "", null);
         }
 
         // entry (AR)
-        Codegen.sectionComment("Entry", Codegen.Comment.LINE);
+        G.sectionComment("Entry", G.Comment.LINE);
         {
-            Codegen.genPush(Codegen.RA); // push return address
-            Codegen.genPush(Codegen.FP); // push control link
+            G.genPush(G.RA); // push return address
+            G.genPush(G.FP); // push control link
             // set $fp: return from top of stack to AR base (addition)
-            Codegen.generate("addu", Codegen.FP, Codegen.SP,
-                    formalSize + controlSize);
+            G.generate("addu", G.FP, G.SP, formalSize + controlSize);
             // push space for local variables: subtract locals size
-            Codegen.generate("subu", Codegen.SP, Codegen.SP, localSize);
+            G.generate("subu", G.SP, G.SP, localSize);
         }
 
         // body (statements)
         {
-            Codegen.sectionComment("Body", Codegen.Comment.LINE);
+            G.sectionComment("Body", G.Comment.LINE);
             // set epiloguwLabel for return statement instaces of this function
             List<StmtNode> l = getStatementList();
             for (StmtNode node : l)
@@ -794,31 +812,27 @@ class FnDeclNode extends DeclNode implements CodeGeneration, Statement {
                     ((ReturnStmtNode) node).epilogueLabel = epilogueLabel;
 
             // code generation for statements only (not declarations)
-            for (StmtNode node : myBody.myStmtList.myStmts) {
-                if (node == null) continue; // make sure no nulls
-
-                node.codeGen();
-            }
+            myBody.myStmtList.codeGen();
         }
 
         // exit (restore stack & return to caller)
-        Codegen.sectionComment("Exit", Codegen.Comment.LINE);
+        G.sectionComment("Exit", G.Comment.LINE);
         {
-            Codegen.generateLabeled(epilogueLabel, "", "epilogue");
+            G.generateLabeled(epilogueLabel, "", "epilogue");
             // load return address
-            Codegen.generate("lw", Codegen.RA, Codegen.FP, offsetRA);
+            G.generate("lw", G.RA, G.FP, offsetRA);
             // save current $fp for updating $sp later
-            Codegen.generate("move", Codegen.T0, Codegen.FP);
+            G.generate("move", G.T0, G.FP);
             // restore old $fp
-            Codegen.generate("lw", Codegen.FP, Codegen.FP, offsetControlLink);
+            G.generate("lw", G.FP, G.FP, offsetControlLink);
             // restore stack pointer
-            Codegen.generate("move", Codegen.SP, Codegen.T0);
+            G.generate("move", G.SP, G.T0);
             // return i.e. jump to return address
             if (!funcLabel.equals("main")) { // required for SPIM
-                Codegen.generate("li", Codegen.V0, 10);
-                Codegen.generate("syscall");
+                G.generate("li", G.V0, 10);
+                G.generate("syscall");
             } else {
-                Codegen.generate("jr", Codegen.RA);
+                G.generate("jr", G.RA);
             }
         }
     }
@@ -1104,7 +1118,9 @@ class AssignStmtNode extends StmtNode {
     }
 
     public void codeGen() {
-        // TODO:
+        myAssign.codeGen();
+        // ignore value when assignment used as a statement
+        G.genPop(G.T0); // pop vaue pushed by AssignNode
     }
 
     // 1 kid
@@ -1235,7 +1251,19 @@ class ReadStmtNode extends StmtNode {
     }
 
     public void codeGen() {
+        assert myExp instanceof IdNode : "unsupported read input node type";
+        IdNode myExp = (IdNode) this.myExp;
+        TSym s = myExp.sym();
+        assert s.getType().isIntType()
+                || s.getType().isBoolType() : "unsupported read variable type";
+
+        // read value
+        G.generateWithComment("li", G.V0, 5, "read integer");
+        G.generate("syscall");
+
+        // store value to IdNode's address
         // TODO:
+
     }
 
     // 1 kid (actually can only be an IdNode or an ArrayExpNode)
@@ -1288,12 +1316,18 @@ class WriteStmtNode extends StmtNode {
     }
 
     public void codeGen() {
-        // TODO: Add string case check
         // generate the appropriate code for each type
-        assert (!expressionType.isBoolType() && !expressionType
-                .isIntType()) : "Error: unsupported write type";
+        assert (expressionType.isBoolType() || expressionType.isIntType()
+                || expressionType.isStringType()) : "unsupported write type";
 
-
+        myExp.codeGen(); // evaluate leaving value on the stack
+        G.genPop(G.A0); // pop the top-of-stack value
+        // set syscall register register
+        if (expressionType.isStringType())
+            G.generate("li", G.V0, 4);
+        else
+            G.generate("li", G.V0, 1);
+        G.generateWithComment("syscall", "write");
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -1385,7 +1419,17 @@ class IfStmtNode extends StmtNode implements Declaration, Statement {
     }
 
     public void codeGen() {
-        // TODO:
+        // NOTE: using the control-flow method for branching statement
+        assert myExp instanceof Condition : "unexpected condition node type";
+        Condition myExp = (Condition) this.myExp; // cast to appropriate type
+
+        String trueLabel = G.nextLabel();
+        String doneLabel = G.nextLabel();
+
+        myExp.genJumpCode(trueLabel, doneLabel); // evaluate condition & jump
+        G.genLabel(trueLabel, "case: true"); // true case
+        myStmtList.codeGen();
+        G.genLabel(doneLabel, "case: false"); // false case
     }
 
     // e kids
@@ -1507,7 +1551,26 @@ class IfElseStmtNode extends StmtNode implements Declaration, Statement {
     }
 
     public void codeGen() {
-        // TODO:
+        // NOTE: using the control-flow method for branching statement
+        assert myExp instanceof Condition : "unexpected condition node type";
+        Condition myExp = (Condition) this.myExp; // cast to appropriate type
+
+        String trueLabel = G.nextLabel();
+        String falseLabel = G.nextLabel();
+        String doneLabel = G.nextLabel();
+
+        myExp.genJumpCode(trueLabel, falseLabel); // evaluate condition & jump
+
+        // case: true
+        G.genLabel(trueLabel, "case: true");
+        myThenStmtList.codeGen();
+        G.generateWithComment("b", doneLabel, "jump: done");
+
+        // case: false
+        G.genLabel(falseLabel, "case: false");
+        myElseStmtList.codeGen();
+
+        G.genLabel(doneLabel, "done branching"); // done
     }
 
     // 5 kids
@@ -1592,7 +1655,25 @@ class WhileStmtNode extends StmtNode implements Declaration, Statement {
     }
 
     public void codeGen() {
-        // TODO:
+        // NOTE: using the control-flow method for branching statement
+        assert myExp instanceof Condition : "unexpected condition node type";
+        Condition myExp = (Condition) this.myExp; // cast to appropriate type
+
+        String whileLabel = G.nextLabel();
+        String trueLabel = G.nextLabel();
+        String doneLabel = G.nextLabel();
+
+        G.genLabel(whileLabel, "while block:"); // start of while block
+
+        myExp.genJumpCode(trueLabel, doneLabel); // evaluate condition & jump
+
+        // true case
+        G.genLabel(trueLabel, "case: true");
+        myStmtList.codeGen();
+        G.generateWithComment("b", whileLabel, "jump back: while");
+
+        // false case (done with while)
+        G.genLabel(doneLabel, "case: false");
     }
 
     // 3 kids
@@ -1692,6 +1773,7 @@ class CallStmtNode extends StmtNode {
 
     public void codeGen() {
         // TODO:
+        // generate jump-and-link insrtuction using label of function
     }
 
     // 1 kid
@@ -1756,14 +1838,15 @@ class ReturnStmtNode extends StmtNode {
     public void codeGen() {
         assert epilogueLabel != null : "Error: epilogueLabel for return statement must be set";
 
-        // TODO: uncomment
-        // myExp.codeGen(); // pushes evaluation into stack
+        if (myExp != null) {
+            myExp.codeGen(); // pushes evaluation into stack
 
-        // pop the value from stack into appropriate register (V0 or F0)
-        // NOTE: double values are unsupported.s
-        Codegen.genPop(Codegen.V0);
+            // pop the value from stack into appropriate register (V0 or F0)
+            // NOTE: double values are unsupported.s
+            G.genPop(G.V0);
+        }
 
-        Codegen.generateWithComment("j", epilogueLabel, "epilogue");
+        G.generateWithComment("b", epilogueLabel, "jump: epilogue");
     }
 
     // 1 kid
@@ -1775,7 +1858,7 @@ class ReturnStmtNode extends StmtNode {
 // **********************************************************************
 
 
-abstract class ExpNode extends ASTnode {
+abstract class ExpNode extends ASTnode implements CodeGeneration {
     /**
      * Default version for nodes with no names
      */
@@ -1821,6 +1904,12 @@ class IntLitNode extends ExpNode {
         p.print(myIntVal);
     }
 
+    public void codeGen() {
+        // push value onto stack
+        G.generate("li", G.T0, myIntVal);
+        G.genPush(G.T0);
+    }
+
     private int myLineNum;
     private int myCharNum;
     private int myIntVal;
@@ -1859,13 +1948,42 @@ class StringLitNode extends ExpNode {
         p.print(myStrVal);
     }
 
+    /**
+     * generate a label for the string literal or retieve a existing equivalent
+     * 
+     * @return true if new label generated, otherwise false for existing equiv.
+     */
+    private boolean generateLabel() {
+        if (!G.stringMap.containsKey(myStrVal)) {
+            G.stringMap.put(myStrVal, G.nextLabel());
+            return true;
+        }
+        return false;
+    }
+
+    public void codeGen() {
+        boolean isNewString = generateLabel();
+        String stringLabel = G.stringMap.get(myStrVal);
+
+        // store string in static data area
+        if (isNewString) {
+            G.generate(".data");
+            G.generateLabeled(stringLabel, ".asciiz ", myStrVal, "string");
+            G.generate(".text"); // reset memory segment
+        }
+
+        // push address of string literal onto stack
+        G.generate("la", G.T0, stringLabel);
+        G.genPush(G.T0);
+    }
+
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
 }
 
 
-class TrueNode extends ExpNode {
+class TrueNode extends ExpNode implements Condition {
     public TrueNode(int lineNum, int charNum) {
         myLineNum = lineNum;
         myCharNum = charNum;
@@ -1896,12 +2014,18 @@ class TrueNode extends ExpNode {
         p.print("true");
     }
 
+    public void codeGen() {
+        G.generate("li", G.T0, G.TRUE);
+        G.genPush(G.T0);
+    }
+
+
     private int myLineNum;
     private int myCharNum;
 }
 
 
-class FalseNode extends ExpNode {
+class FalseNode extends ExpNode implements Condition {
     public FalseNode(int lineNum, int charNum) {
         myLineNum = lineNum;
         myCharNum = charNum;
@@ -1932,12 +2056,17 @@ class FalseNode extends ExpNode {
         p.print("false");
     }
 
+    public void codeGen() {
+        G.generate("li", G.T0, G.FALSE);
+        G.genPush(G.T0);
+    }
+
     private int myLineNum;
     private int myCharNum;
 }
 
 
-class IdNode extends ExpNode {
+class IdNode extends ExpNode implements Condition {
     public IdNode(int lineNum, int charNum, String strVal) {
         myLineNum = lineNum;
         myCharNum = charNum;
@@ -2021,6 +2150,29 @@ class IdNode extends ExpNode {
         }
     }
 
+    // fetch identifier's value onto stack
+    public void codeGen() {
+        // fetch current value (either from static data area or current AR)
+        if (mySym.isGlobal())
+            G.generate("lw", G.T0, "_" + name());
+        else
+            G.generateIndexed("lw", G.T0, G.FP, mySym.getOffset(),
+                    "variable: " + name());
+
+        G.genPush(G.T0); // push value onto stack
+    }
+
+    // fetch identifier's address onto stack
+    public void genAddr() {
+        if (mySym.isGlobal())
+            G.generate("la", G.T0, "_" + name());
+        else
+            G.generateIndexed("la", G.T0, G.FP, mySym.getOffset(),
+                    "variable: " + name());
+
+        G.genPush(G.T0); // push value onto stack
+    }
+
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
@@ -2028,6 +2180,7 @@ class IdNode extends ExpNode {
 }
 
 
+// ❌ NOT REQUIRED
 class DotAccessExpNode extends ExpNode {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
         myLoc = loc;
@@ -2167,6 +2320,10 @@ class DotAccessExpNode extends ExpNode {
         myId.unparse(p, 0);
     }
 
+    public void codeGen() {
+        // ignore struct related statemnts (as per spec)
+    }
+
     // 2 kids
     private ExpNode myLoc;
     private IdNode myId;
@@ -2175,7 +2332,7 @@ class DotAccessExpNode extends ExpNode {
 }
 
 
-class AssignNode extends ExpNode {
+class AssignNode extends ExpNode implements Condition {
     public AssignNode(ExpNode lhs, ExpNode exp) {
         myLhs = lhs;
         myExp = exp;
@@ -2250,13 +2407,29 @@ class AssignNode extends ExpNode {
         if (indent != -1) p.print(")");
     }
 
+    public void codeGen() {
+        assert myLhs instanceof IdNode : "expected LHS to be of type IdNode";
+        IdNode myLhs = (IdNode) this.myLhs;
+
+        myExp.codeGen(); // evaluate RHS value onto stack
+        myLhs.genAddr(); // push LHS address onto stack
+
+        // Store the value into the address
+        G.genPop(G.T0); // address`
+        G.genPop(G.T1); // value
+        G.generateIndexed("sw", G.T1, G.T0, 0, "assign to address");
+
+        G.genPush(G.T1); // keep a copy of value onto stack
+    }
+
+
     // 2 kids
     private ExpNode myLhs;
     private ExpNode myExp;
 }
 
 
-class CallExpNode extends ExpNode {
+class CallExpNode extends ExpNode implements Condition {
     public CallExpNode(IdNode name, ExpListNode elist) {
         myId = name;
         myExpList = elist;
@@ -2329,6 +2502,18 @@ class CallExpNode extends ExpNode {
         p.print(")");
     }
 
+    public void codeGen() {
+        final String functionLabel =
+                (!myId.name().equals("main") ? "" : "_") + myId.name();
+
+        // evaluate arguments & push to stack
+        if (myExpList != null) myExpList.codeGen();
+        // jump-and-link using appropriate label for target function
+        G.generateWithComment("jal", functionLabel, "call");
+        // handle return value (pushing value will not cause issue for void)
+        G.genPush(G.V0);
+    }
+
     // 2 kids
     private IdNode myId;
     private ExpListNode myExpList; // possibly null
@@ -2362,6 +2547,14 @@ abstract class UnaryExpNode extends ExpNode {
      */
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
+    }
+
+    public void codeGen() {
+        // evaluate operands into stack
+        myExp.codeGen();
+
+
+
     }
 
     // one child
@@ -2443,7 +2636,7 @@ class UnaryMinusNode extends UnaryExpNode {
 }
 
 
-class NotNode extends UnaryExpNode {
+class NotNode extends UnaryExpNode implements Condition {
     public NotNode(ExpNode exp) {
         super(exp);
     }
@@ -2514,7 +2707,7 @@ abstract class ArithmeticExpNode extends BinaryExpNode {
 }
 
 
-abstract class LogicalExpNode extends BinaryExpNode {
+abstract class LogicalExpNode extends BinaryExpNode implements Condition {
     public LogicalExpNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
@@ -2548,7 +2741,7 @@ abstract class LogicalExpNode extends BinaryExpNode {
 }
 
 
-abstract class EqualityExpNode extends BinaryExpNode {
+abstract class EqualityExpNode extends BinaryExpNode implements Condition {
     public EqualityExpNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
@@ -2600,7 +2793,7 @@ abstract class EqualityExpNode extends BinaryExpNode {
 }
 
 
-abstract class RelationalExpNode extends BinaryExpNode {
+abstract class RelationalExpNode extends BinaryExpNode implements Condition {
     public RelationalExpNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
@@ -2695,6 +2888,7 @@ class DivideNode extends ArithmeticExpNode {
 }
 
 
+// Short-circuited operator
 class AndNode extends LogicalExpNode {
     public AndNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
@@ -2710,6 +2904,7 @@ class AndNode extends LogicalExpNode {
 }
 
 
+// Short-circuited operator
 class OrNode extends LogicalExpNode {
     public OrNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);

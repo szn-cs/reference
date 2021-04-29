@@ -57,7 +57,7 @@ public class P6 {
 
         // setup code generator target file
         // try {
-        Codegen.p = outFile; // new PrintWriter(args[1]);
+        G.p = outFile; // new PrintWriter(args[1]);
         // } catch (FileNotFoundException e) {
         // pukeAndDie(e.getMessage());
         // e.printStackTrace();
@@ -110,9 +110,9 @@ public class P6 {
             outFile.flush();
             outFile.close();
         }
-        if (Codegen.p != null) {
-            Codegen.p.flush();
-            Codegen.p.close();
+        if (G.p != null) {
+            G.p.flush();
+            G.p.close();
         }
     }
 

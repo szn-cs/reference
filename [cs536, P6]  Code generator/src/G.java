@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.*;
 
 // **********************************************************************
 // The Codegen class provides constants and operations useful for code
@@ -21,7 +22,7 @@ import java.io.*;
 //
 // **********************************************************************
 
-public class Codegen {
+public class G {
     // file into which generated code is written
     public static PrintWriter p = null;
 
@@ -29,6 +30,9 @@ public class Codegen {
     public static enum Comment {
         BLOCK, LINE
     };
+
+    // string key-value map (for tracking duplicate global strings)
+    public static Map<String, String> stringMap = new HashMap<String, String>();
 
     // values of true and false
     public static final String TRUE = "1";
@@ -47,7 +51,6 @@ public class Codegen {
 
     // for pretty printing generated code
     private static final int MAXLEN = 4;
-
 
     // for generating labels
     private static int currLabel = 0;
@@ -99,6 +102,11 @@ public class Codegen {
     public static void generateWithComment(String opcode, String arg1,
             String arg2, String comment) {
         generateWithComment(opcode, arg1, arg2, "", comment);
+    }
+
+    public static void generateWithComment(String opcode, String arg1, int arg2,
+            String comment) {
+        generateWithComment(opcode, arg1, String.valueOf(arg2), "", comment);
     }
 
     public static void generateWithComment(String opcode, String arg1,
