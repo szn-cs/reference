@@ -268,8 +268,7 @@ _multiplyTwoNumbers:
 	move  $t0, $fp
 	lw    $fp, -12($fp)
 	move  $sp, $t0
-	li    $v0, 10
-	syscall
+	jr    $ra
 
 ########################
 # ⨍	doFactorialRecur
@@ -353,8 +352,7 @@ _doFactorialRecur:
 	move  $t0, $fp
 	lw    $fp, -8($fp)
 	move  $sp, $t0
-	li    $v0, 10
-	syscall
+	jr    $ra
 
 ########################
 # ⨍	doFactorialItr
@@ -478,8 +476,7 @@ _doFactorialItr:
 	move  $t0, $fp
 	lw    $fp, -8($fp)
 	move  $sp, $t0
-	li    $v0, 10
-	syscall
+	jr    $ra
 
 ########################
 # ⨍	isDone
@@ -556,8 +553,7 @@ _isDone:
 	move  $t0, $fp
 	lw    $fp, -8($fp)
 	move  $sp, $t0
-	li    $v0, 10
-	syscall
+	jr    $ra
 
 ########################
 # ⨍	loopTilDone
@@ -600,7 +596,7 @@ _loopTilDone:
 	li    $v0, 4
 	syscall		# write
 	.data
-.L27:	.asciiz "Enter a number to take the factorial of, -1 to exit: "	# string
+.L27:	.asciiz "Enter a number to take the factorial of, -1 to exit: \n"	# string
 	.text
 	la    $t0, .L27
 	sw    $t0, 0($sp)	# PUSH
@@ -866,8 +862,7 @@ _loopTilDone:
 	move  $t0, $fp
 	lw    $fp, -4($fp)
 	move  $sp, $t0
-	li    $v0, 10
-	syscall
+	jr    $ra
 
 ########################
 # ⨍	main
@@ -930,4 +925,5 @@ main:
 	move  $t0, $fp
 	lw    $fp, -4($fp)
 	move  $sp, $t0
-	jr    $ra
+	li    $v0, 10		# exit
+	syscall

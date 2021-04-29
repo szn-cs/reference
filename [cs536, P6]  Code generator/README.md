@@ -4,7 +4,8 @@ _Safi Nassar - assignment p6_
 
 -   `make clean && make testclean && make`
 -   `make test`
--   `diff test.expected.s test.s` or run the assembly program to test results
+-   Run the generated assembly program to test results with the expected input: e.g. run `testExample.s` with input shown in `testExample.expectedResult` 
+    -   (or use `diff test.expected.s test.s`)
 
 Executing the test will generate output file of the formated program.
 

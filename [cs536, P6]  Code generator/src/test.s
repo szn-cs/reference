@@ -40,7 +40,8 @@ main:
 	move  $t0, $fp
 	lw    $fp, -8($fp)
 	move  $sp, $t0
-	jr    $ra
+	li    $v0, 10		# exit
+	syscall
 
 ########################
 # ⨍	f
@@ -76,5 +77,4 @@ _f:
 	move  $t0, $fp
 	lw    $fp, -12($fp)
 	move  $sp, $t0
-	li    $v0, 10
-	syscall
+	jr    $ra
