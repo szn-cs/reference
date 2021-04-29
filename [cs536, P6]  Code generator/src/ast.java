@@ -2804,10 +2804,6 @@ abstract class EqualityExpNode extends BinaryExpNode implements Condition {
         return retType;
     }
 
-    // TODO:
-    // use `seq` opcode instead of `not` (in order to use 0/1 boolean
-    // represnetation)
-
 }
 
 
@@ -2850,6 +2846,10 @@ class PlusNode extends ArithmeticExpNode {
         super(exp1, exp2);
     }
 
+    public String getInstruction() {
+        return "";
+    }
+
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
         myExp1.unparse(p, 0);
@@ -2859,20 +2859,15 @@ class PlusNode extends ArithmeticExpNode {
     }
 
     public void codeGen() {
-        // TODO:
-        // step 1: evaluate both operands
-        myExp1.codeGen();
-        myExp2.codeGen();
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
 
-        // step 2: pop values in T0 and T1
-        genPop(T1, 4);
-        genPop(T0, 4);
-
-        // step 3: do the addition (T0 = T0 + T1)
-        generate("add", T0, T0, T1);
-
-        // step 4: push result
-        genPush(T0, 4);
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 + T1)
+        G.generateWithComment("add", G.T0, G.T0, G.T1, "arithmetic");
+        G.genPush(G.T0); // push result onto stack
     }
 }
 
@@ -2888,6 +2883,18 @@ class MinusNode extends ArithmeticExpNode {
         p.print(" - ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 - T1)
+        G.generateWithComment("sub", G.T0, G.T0, G.T1, "arithmetic");
+        G.genPush(G.T0); // push result onto stack
     }
 }
 
@@ -2905,6 +2912,18 @@ class TimesNode extends ArithmeticExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 * T1)
+        G.generateWithComment("mulo", G.T0, G.T0, G.T1, "arithmetic");
+        G.genPush(G.T0); // push result onto stack
+    }
 }
 
 
@@ -2919,6 +2938,18 @@ class DivideNode extends ArithmeticExpNode {
         p.print(" / ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 / T1)
+        G.generateWithComment("div", G.T0, G.T0, G.T1, "arithmetic");
+        G.genPush(G.T0); // push result onto stack
     }
 }
 
@@ -2936,6 +2967,7 @@ class AndNode extends LogicalExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+
 }
 
 
@@ -2952,6 +2984,7 @@ class OrNode extends LogicalExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+
 }
 
 
@@ -2966,6 +2999,18 @@ class EqualsNode extends EqualityExpNode {
         p.print(" == ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 == T1)
+        G.generateWithComment("seq", G.T0, G.T0, G.T1, "equality");
+        G.genPush(G.T0); // push result onto stack
     }
 }
 
@@ -2982,6 +3027,18 @@ class NotEqualsNode extends EqualityExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 != T1)
+        G.generateWithComment("sne", G.T0, G.T0, G.T1, "equality");
+        G.genPush(G.T0); // push result onto stack
+    }
 }
 
 
@@ -2996,6 +3053,18 @@ class LessNode extends RelationalExpNode {
         p.print(" < ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 < T1)
+        G.generateWithComment("slt", G.T0, G.T0, G.T1, "relational");
+        G.genPush(G.T0); // push result onto stack
     }
 }
 
@@ -3012,6 +3081,18 @@ class GreaterNode extends RelationalExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 > T1)
+        G.generateWithComment("sgt", G.T0, G.T0, G.T1, "relational");
+        G.genPush(G.T0); // push result onto stack
+    }
 }
 
 
@@ -3026,6 +3107,18 @@ class LessEqNode extends RelationalExpNode {
         p.print(" <= ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 <= T1)
+        G.generateWithComment("sle", G.T0, G.T0, G.T1, "relational");
+        G.genPush(G.T0); // push result onto stack
     }
 }
 
@@ -3042,4 +3135,17 @@ class GreaterEqNode extends RelationalExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+
+    public void codeGen() {
+        // evaluate operands into stack (for 2 operands: right will be on top)
+        myExp1.codeGen(); // push T0
+        myExp2.codeGen(); // push T1
+
+        G.genPop(G.T1);
+        G.genPop(G.T0);
+        // perform operation (T0 = T0 >= T1)
+        G.generateWithComment("sge", G.T0, G.T0, G.T1, "relational");
+        G.genPush(G.T0); // push result onto stack
+    }
+
 }
