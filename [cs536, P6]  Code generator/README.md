@@ -4,7 +4,7 @@ _Safi Nassar - assignment p6_
 
 -   `make clean && make testclean && make`
 -   `make test`
--   `diff test.expected.s test.s`
+-   `diff test.expected.s test.s` or run the assembly program to test results
 
 Executing the test will generate output file of the formated program.
 

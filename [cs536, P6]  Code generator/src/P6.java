@@ -149,6 +149,7 @@ public class P6 {
             parser P = new parser(new Yylex(inFile));
             return P.parse();
         } catch (Exception e) {
+            System.err.print(e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -156,6 +157,7 @@ public class P6 {
 
     public int process() {
         Symbol cfgRoot = parseCFG();
+        if (cfgRoot == null) return P6.RESULT_OTHER_ERROR;
 
         ProgramNode astRoot = (ProgramNode) cfgRoot.value;
         if (ErrMsg.getErr()) return P6.RESULT_SYNTAX_ERROR;
@@ -197,7 +199,8 @@ public class P6 {
             case RESULT_CODE_GENERATION_ERROR:
                 pukeAndDie("Code generation error", resultCode);
             default:
-                pukeAndDie("Unexpected error encountered", RESULT_OTHER_ERROR);
+                pukeAndDie("Other Error: Unexpected error encountered",
+                        RESULT_OTHER_ERROR);
         }
     }
 
