@@ -835,8 +835,8 @@ class FnDeclNode extends DeclNode implements CodeGeneration, Statement {
             // restore stack pointer
             G.generate("move", G.SP, G.T0);
             // return i.e. jump to return address
-            if (!funcLabel.equals("main")) { // required for SPIM
-                G.generate("li", G.V0, 10);
+            if (funcLabel.equals("main")) { // required for SPIM
+                G.generateWithComment("li", G.V0, 10, "exit");
                 G.generate("syscall");
             } else {
                 G.generate("jr", G.RA);
