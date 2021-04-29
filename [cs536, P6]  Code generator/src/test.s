@@ -38,7 +38,7 @@ main:
 .L0:		# epilogue
 	lw    $ra, -4($fp)
 	move  $t0, $fp
-	lw    $fp, $fp, -8
+	lw    $fp, -8($fp)
 	move  $sp, $t0
 	jr    $ra
 
@@ -74,7 +74,7 @@ _f:
 .L3:		# epilogue
 	lw    $ra, -8($fp)
 	move  $t0, $fp
-	lw    $fp, $fp, -12
+	lw    $fp, -12($fp)
 	move  $sp, $t0
 	li    $v0, 10
 	syscall
