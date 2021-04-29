@@ -6,17 +6,18 @@ _x:	.space 4
 _y:	.space 4
 
 ########################
-# ⨍	f
+# ⨍	main
 ########################
 	.text
-_f:	
+	.globl main
+main:	
 #———Entry———————————————
 	sw    $ra, 0($sp)	# PUSH
 	subu  $sp, $sp, 4
 	sw    $fp, 0($sp)	# PUSH
 	subu  $sp, $sp, 4
-	addu  $fp, $sp, 16
-	subu  $sp, $sp, 8
+	addu  $fp, $sp, 12
+	subu  $sp, $sp, 4
 #———Body———————————————
 	b     .L1
 .L1:		# case: true
@@ -35,31 +36,45 @@ _f:
 	b     .L0		# jump: epilogue
 #———Exit———————————————
 .L0:		# epilogue
-	lw    $ra, $fp, -8
+	lw    $ra, -4($fp)
 	move  $t0, $fp
-	lw    $fp, $fp, -12
+	lw    $fp, $fp, -8
 	move  $sp, $t0
-	li    $v0, 10
-	syscall
+	jr    $ra
 
 ########################
-# ⨍	main
+# ⨍	f
 ########################
 	.text
-	.global main
-main:	
+_f:	
 #———Entry———————————————
 	sw    $ra, 0($sp)	# PUSH
 	subu  $sp, $sp, 4
 	sw    $fp, 0($sp)	# PUSH
 	subu  $sp, $sp, 4
-	addu  $fp, $sp, 8
-	subu  $sp, $sp, 0
+	addu  $fp, $sp, 16
+	subu  $sp, $sp, 8
 #———Body———————————————
+	b     .L4
+.L4:		# case: true
+	li    $t0, 1
+	sw    $t0, 0($sp)	# PUSH
+	subu  $sp, $sp, 4
+	lw    $v0, 4($sp)	# POP
+	addu  $sp, $sp, 4
+	b     .L3		# jump: epilogue
+.L5:		# case: false
+	li    $t0, 0
+	sw    $t0, 0($sp)	# PUSH
+	subu  $sp, $sp, 4
+	lw    $v0, 4($sp)	# POP
+	addu  $sp, $sp, 4
+	b     .L3		# jump: epilogue
 #———Exit———————————————
 .L3:		# epilogue
-	lw    $ra, $fp, 0
+	lw    $ra, -8($fp)
 	move  $t0, $fp
-	lw    $fp, $fp, -4
+	lw    $fp, $fp, -12
 	move  $sp, $t0
-	jr    $ra
+	li    $v0, 10
+	syscall

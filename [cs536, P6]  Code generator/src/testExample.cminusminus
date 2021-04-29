@@ -1,108 +1,108 @@
 ### Example form Piazza with expected result - https://piazza.com/class/kkg8vpmtem865y?cid=428
 int numValidInputs;
 
-int multiplyTwoNumbers(int num1, int num2) {
-  int result1;
-  int result2;
-  int undefVar;
-  
-  result1 = num1 * num2;
-  result2 = num2 * num1;
-  
-  # test some conditionals
-  if(result1 == result2 && result1 <= result2 && result1 >= result2) {
-   if(result2 == result1 && result2 <= result1 && result2 >= result1) {
-     if(result1 == result1 || undefVar < -1) { # test short circuiting
-      return result1;
-     } else {
-      return -1;
-     }
-   } else {
-     return -1;
-   }
-  } else {
-   return -1;
-  }
-}
-
-int doFactorialRecur(int num) {
-  if(num <= 1) {
-   return 1;
-  } else {
-   return multiplyTwoNumbers(num, doFactorialRecur(num - 1)); # test recursive nesting
-  }
-  return -1;
-}
-
-int doFactorialItr(int num) {
-  int i;
-  int prod;
-  
-  i = 1;
-  prod = 1;
-  while (i < num) {
-   i = i + 1;
-   prod = multiplyTwoNumbers(prod, i); # test nesting
-  }
-  
-  return prod;
-}
-
-bool isDone(int num) {
-  bool finished;
-  finished = num == -1;
-  num = -999; # test pass by value
-  return finished;
-}
-
-void loopTilDone() {
-  int num;
-
-  cout << "(";
-  cout << numValidInputs;
-  cout << ") ";
-  cout << "Enter a number to take the factorial of, -1 to exit: ";
-  cin >> num;
-  while(!isDone(num)) {
-   int recurAns;
-   int itrAns;
-    
-   if(num < -1) {
-     cout << "You entered a number less than -1, please try a different number.\n";
-     loopTilDone();
-     return; # test cheap re-run.
-   }
-    
-   recurAns = doFactorialRecur(num);
-   itrAns = doFactorialItr(num);
-    
-   cout << "The recursive answer is ";
-   cout << recurAns;
-   cout << ".\n";
-    
-   cout << "The iterative answer is ";
-   cout << itrAns;
-   cout << ".\n";
-    
-   if(recurAns == itrAns) {
-     cout << "These answers match.\n";
-   } else {
-     cout << "These answers do NOT match.\n";
-   }
-    
-   numValidInputs = numValidInputs + 1;
-   cout << "(";
-   cout << numValidInputs;
-   cout << ") ";
-   cout << "Enter a number to take the factorial of, -1 to exit: ";
-   cin >> num;
-  }
-}
+#    int multiplyTwoNumbers(int num1, int num2) {
+#    int result1;
+#    int result2;
+#    int undefVar;
+#    
+#    result1 = num1 * num2;
+#    result2 = num2 * num1;
+#    
+#    # test some conditionals
+#    if(result1 == result2 && result1 <= result2 && result1 >= result2) {
+#    if(result2 == result1 && result2 <= result1 && result2 >= result1) {
+#        if(result1 == result1 || undefVar < -1) { # test short circuiting
+#        return result1;
+#        } else {
+#        return -1;
+#        }
+#    } else {
+#        return -1;
+#    }
+#    } else {
+#    return -1;
+#    }
+#    }
+#
+#    int doFactorialRecur(int num) {
+#    if(num <= 1) {
+#    return 1;
+#    } else {
+#    return multiplyTwoNumbers(num, doFactorialRecur(num - 1)); # test recursive nesting
+#    }
+#    return -1;
+#    }
+#
+#    int doFactorialItr(int num) {
+#    int i;
+#    int prod;
+#    
+#    i = 1;
+#    prod = 1;
+#    while (i < num) {
+#    i = i + 1;
+#    prod = multiplyTwoNumbers(prod, i); # test nesting
+#    }
+#    
+#    return prod;
+#    }
+#
+#    bool isDone(int num) {
+#    bool finished;
+#    finished = num == -1;
+#    num = -999; # test pass by value
+#    return finished;
+#    }
+#
+#    void loopTilDone() {
+#    int num;
+#
+#    cout << "(";
+#    cout << numValidInputs;
+#    cout << ") ";
+#    cout << "Enter a number to take the factorial of, -1 to exit: ";
+#    cin >> num;
+#    while(!isDone(num)) {
+#    int recurAns;
+#    int itrAns;
+#        
+#    if(num < -1) {
+#        cout << "You entered a number less than -1, please try a different number.\n";
+#        loopTilDone();
+#        return; # test cheap re-run.
+#    }
+#        
+#    recurAns = doFactorialRecur(num);
+#    itrAns = doFactorialItr(num);
+#        
+#    cout << "The recursive answer is ";
+#    cout << recurAns;
+#    cout << ".\n";
+#        
+#    cout << "The iterative answer is ";
+#    cout << itrAns;
+#    cout << ".\n";
+#        
+#    if(recurAns == itrAns) {
+#        cout << "These answers match.\n";
+#    } else {
+#        cout << "These answers do NOT match.\n";
+#    }
+#        
+#    numValidInputs = numValidInputs + 1;
+#    cout << "(";
+#    cout << numValidInputs;
+#    cout << ") ";
+#    cout << "Enter a number to take the factorial of, -1 to exit: ";
+#    cin >> num;
+#    }
+#    }
 
 void main() {
   numValidInputs = 1;
   cout << "Program is starting...\n";
-  loopTilDone();
+#  loopTilDone();
   cout << "Program is terminating...\n";
   return;
 }

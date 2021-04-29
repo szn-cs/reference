@@ -794,7 +794,7 @@ class FnDeclNode extends DeclNode implements CodeGeneration, Statement {
         G.sectionComment("⨍\t" + myId.name(), G.Comment.BLOCK);
         {
             G.generate(".text");
-            if (funcLabel.equals("main")) G.generate(".global main");
+            if (funcLabel.equals("main")) G.generate(".globl main");
             G.generateLabeled(funcLabel, "", null);
         }
 
@@ -827,11 +827,11 @@ class FnDeclNode extends DeclNode implements CodeGeneration, Statement {
         {
             G.generateLabeled(epilogueLabel, "", "epilogue");
             // load return address
-            G.generate("lw", G.RA, G.FP, offsetRA);
+            G.generateIndexed("lw", G.RA, G.FP, offsetRA);
             // save current $fp for updating $sp later
             G.generate("move", G.T0, G.FP);
             // restore old $fp
-            G.generate("lw", G.FP, G.FP, offsetControlLink);
+            G.generateIndexed("lw", G.FP, G.FP, offsetControlLink);
             // restore stack pointer
             G.generate("move", G.SP, G.T0);
             // return i.e. jump to return address
@@ -2191,9 +2191,12 @@ class IdNode extends ExpNode implements Condition {
     // fetch identifier's value onto stack
     public void codeGen() {
         // fetch current value (either from static data area or current AR)
-        if (mySym.isGlobal())
-            G.generate("lw", G.T0, "_" + name());
-        else
+        if (mySym.isGlobal()) {
+            String funcLabel = // function label ("main" or _<name>)
+                    (this.name().equals("main") ? "" : "_") + this.name();
+            G.generate("lw", G.T0, funcLabel);
+
+        } else
             G.generateIndexed("lw", G.T0, G.FP, mySym.getOffset(),
                     "variable: " + name());
 
@@ -2202,9 +2205,12 @@ class IdNode extends ExpNode implements Condition {
 
     // fetch identifier's address onto stack
     public void genAddr() {
-        if (mySym.isGlobal())
-            G.generate("la", G.T0, "_" + name());
-        else
+        if (mySym.isGlobal()) {
+            String funcLabel = // function label ("main" or _<name>)
+                    (this.name().equals("main") ? "" : "_") + this.name();
+
+            G.generate("la", G.T0, funcLabel);
+        } else
             G.generateIndexed("la", G.T0, G.FP, mySym.getOffset(),
                     "variable: " + name());
 
