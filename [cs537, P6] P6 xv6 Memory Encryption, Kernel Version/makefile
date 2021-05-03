@@ -18,6 +18,7 @@ qemu-nox-gdb:
 .PHONY: clean
 clean:
 	cd src && make clean
+	rm -r ./tests ./tests-out;
 
 .PHONY:
 test-all:

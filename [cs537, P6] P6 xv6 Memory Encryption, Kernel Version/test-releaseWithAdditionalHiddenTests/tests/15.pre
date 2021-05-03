@@ -1,0 +1,6 @@
+rm -rf src/param_old.h;
+mv src/param.h src/param_old.h;
+sed -E 's/((^|(\t| ))*CLOCKSIZE)(\t| )*[^ ]*/\3CLOCKSIZE\t16/' src/param_old.h > src/param.h;
+make -f Makefile.test clean > /dev/null 2>&1;
+make -f Makefile.test xv6.img > /dev/null 2>&1;
+make -f Makefile.test fs.img > /dev/null 2>&1;
