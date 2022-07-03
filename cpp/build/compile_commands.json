@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/unixuser/code/computerScience-exercise/cpp/build",
+  "command": "/usr/bin/g++   -g -std=gnu++2a -o CMakeFiles/cppProject.dir/main.cpp.o -c /home/unixuser/code/computerScience-exercise/cpp/main.cpp",
+  "file": "/home/unixuser/code/computerScience-exercise/cpp/main.cpp"
+}
+]
