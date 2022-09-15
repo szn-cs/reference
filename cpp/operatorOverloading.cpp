@@ -1,4 +1,5 @@
 #include <cassert>
+#include <compare>
 #include <iostream>
 
 class C2;
@@ -55,6 +56,30 @@ class C {
   // Functor (call operator overloading)
   void operator()(int x) { /* ... */
   }
+
+  // comparison operator
+  bool operator<=(const C& other) const;
+
+  /** Comparison 3-way operator - some latest version of C++ 20 implementation
+   * support it.
+   * Using std::partial_ordering because _x is a double which support it.
+
+  std::partial_ordering C::operator<=>(const C& right) const {
+    if (this->_x > right._x)
+      return std::partial_ordering::greater;
+    else if (this->_x == right._x)
+      return std::partial_ordering::equivalent;
+    else if (this->_x < right._x)
+      return std::partial_ordering::less;
+    else
+      return std::partial_ordering::unordered;
+  }
+
+  bool C::operator==(const C& right) const {
+    return (this->_x == right._x);
+  }
+
+  */
 
  private:
   double _x{};
