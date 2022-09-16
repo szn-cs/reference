@@ -29,3 +29,5 @@ mv Gentoo-AMD64-root_fs.bz2 root_fs
 sudo ./linux mem=256m
 # log in root with no password
 
+# if issues arise clear up build 
+make mrproper
