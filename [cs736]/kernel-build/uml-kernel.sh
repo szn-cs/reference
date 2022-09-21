@@ -1,9 +1,11 @@
+docker_tag=myuserindocker/kernel-development:init-v1
+
 host$:
 
   # docker pull gcc
   (cd ./kernel-build/docker && chmod 755 ./build.sh && ./build.sh)
   # update: /etc/default/grub with: GRUB_CMDLINE_LINUX_DEFAULT="rootflags=uquota,pquota"
-  docker run --privileged --name kernel -it myuserindocker/kernel-development:init /bin/bash # (required specific changes to apply): --storage-opt size=120G
+  docker run --privileged --name kernel -it $docker_tag  /bin/bash # (required specific changes to apply): --storage-opt size=120G
   # docker exec -it kernel /bin/bash
 
 
@@ -21,6 +23,10 @@ container$:
   docker commit <container-id> myuserindocker/kernel-development:built
   # docker run --privileged --name kernel -it myuserindocker/kernel-development:built /bin/bash
 
+  # fix error: "PROT_EXEC mmap in /dev/shm/...failed: Operation not permitted"
+  mkdir /tmp/uml; chown root.root /tmp/uml; chmod 777 /tmp/uml; 
+  export TMPDIR=/tmp/uml
+
   # create additional FS
   FS=fs; MNT=mount_$FS; 
   mkdir -p ~/$MNT
@@ -30,7 +36,7 @@ container$:
 
   # Run (username: root)
   ROOT_DISK=root_fs; FS_DISK=fs; 
-  ./kernel/linux ubd0=$ROOT_DISK rootfstype=ext4 rw mem=128M init=/bin/sh ubd1=$FS_DISK umid=kernel 
+  ./kernel/linux root=/dev/root rootfstype=hostfs ubd0=$ROOT_DISK rw mem=128M init=/bin/sh ubd1=$FS_DISK umid=kernel 
 
 #############################################################################
 
@@ -45,7 +51,6 @@ uml$:
 
   # exit gracefully
   halt -f
-
 
 
 #############################################################################

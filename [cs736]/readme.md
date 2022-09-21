@@ -9,7 +9,11 @@
 - https://hanez.org/howto-user-mode-linux.html
 - https://wiki.archlinux.org/title/User-mode_Linux
 - https://wiki.gentoo.org/wiki/User-mode_Linux/Guide
-- 
+- 🌟 https://www.ime.usp.br/~baroni/docs/uml-en.html
+- https://webcache.googleusercontent.com/search?q=cache:w9TB9WO0-LEJ:https://sudonull.com/post/25569-How-to-start-using-User-Mode-in-Linux-ITSumma-Blog&cd=19&hl=en&ct=clnk&gl=fr
+- https://caiorss.github.io/C-Cpp-Notes/Linux-unix-system-programming.html 
+- https://webcache.googleusercontent.com/search?q=cache:w9TB9WO0-LEJ:https://sudonull.com/post/25569-How-to-start-using-User-Mode-in-Linux-ITSumma-Blog&cd=19&hl=en&ct=clnk&gl=fr
+  - https://github.com/safizn/fork-kernel-dev-setup-1/blob/master/runlinux.sh
 
 ## adpater for VPN and Hyper-V [NOTE: none solutions worked ~! ]
 - Setup Hyper-V VM + VPN networkng: https://win10.guru/hyper-v-virtual-machine-use-host-vpn-connection/

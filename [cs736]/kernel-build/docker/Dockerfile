@@ -1,20 +1,24 @@
 # gcc environment
-FROM gcc:latest
+FROM gcc:latest 
+
+ARG kernel_url="https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.19.9.tar.xz"
+ARG root_fs_url="http://fs.devloop.org.uk/filesystems/Gentoo/Gentoo-x86-root_fs.bz2"
+ARG dependencies="gcc clang make bash ld flex bison pahole fdformat depmod e2fsck fsck.jfs reiserfsck xfs_db mksquashfs btrfsck pccardctl quota pppd showmount ps udevd grub mcelog iptables openssl bc sphinx-build epio build-essential dwarves python3 libncurses-dev flex bison libssl-dev bc libelf-dev gcc cpio linux-headers-generic"
+ENV kernel_url=${kernel_url}
+ENV root_fs_url=${root_fs_url}
+ENV dependencies=${dependencies}
 
 # dependencies
-RUN apt update && \
-    PKG="gcc clang make bash id flex bison pahole fdformat depmod e2fsck fsck.jfs reiserfsck xfs_db mksquashfs btrfsck pccardctl quota pppd showmount ps udevd grub mcelog iptables openssl bc sphinx-build epio build-essential dwarves python3 libncurses-dev flex bison libssl-dev bc libelf-dev gcc clang make bash ld flex bison pahole fdformat depmod e2fsck fsck.jfs reiserfsck xfs_db mksquashfs btrfsck pccardctl quota pppd showmount ps udevd grub mcelog iptables openssl bc sphinx cpio" && \
-    for i in $PKG; do apt install -y $i; done && \
-    apt update && apt upgrade && apt autoremove; exit 0
-  
-#---------- Download
-RUN mkdir -p ~/vm && mkdir -p ~/vm/download && cd ~/vm && \
-    wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.19.9.tar.xz && \
-    wget http://fs.devloop.org.uk/filesystems/Gentoo/Gentoo-AMD64-root_fs.bz2 && \
-    cd ~/vm && ls -al; cp ./Gentoo-AMD64-root_fs.bz2 ~/vm/download && cp ./linux-5.19.9.tar.xz ~/vm/download && \
-    cd ~/vm && tar xvf linux-5.19.9.tar.xz && mv linux-5.19.9 kernel && \
-    bunzip2 Gentoo-AMD64-root_fs.bz2 && mv Gentoo-AMD64-root_fs root_fs &&\ 
-    rm -rf ~/vm/*.tar.xz ~/vm/*.bz2
-  
+RUN   apt update && apt upgrade \
+  &&  for i in $dependencies; do apt install -y $i; done \
+  &&  apt update && apt upgrade \
+  &&  apt autoremove; exit 0
 
-CMD ["/bin/bash"]
+WORKDIR /root/
+
+#---------- Download
+RUN   wget $kernel_url -O kernel.tar.xz && tar xf kernel.tar.xz \
+  &&  wget $root_fs_url -O root_fs.bz2 && bunzip2 -d root_fs.bz2 \
+  &&  rm -rf ./*.tar.xz ./*.bz2; exit 0; 
+  
+CMD ["/bin/bash;", "echo \"\n1. kernel \n2. root_fs\""]
