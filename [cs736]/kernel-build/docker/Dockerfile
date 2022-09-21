@@ -17,7 +17,7 @@ RUN   apt update && apt upgrade \
 WORKDIR /root/
 
 #---------- Download
-RUN   wget $kernel_url -O kernel.tar.xz && tar xf kernel.tar.xz \
+RUN   wget $kernel_url -O kernel.tar.xz && tar xf kernel.tar.xz -C ./kernel \
   &&  wget $root_fs_url -O root_fs.bz2 && bunzip2 -d root_fs.bz2 \
   &&  rm -rf ./*.tar.xz ./*.bz2; exit 0; 
   
