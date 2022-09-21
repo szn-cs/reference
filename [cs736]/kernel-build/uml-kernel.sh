@@ -45,7 +45,7 @@ container$:
   }
 
   setupFS1() {
-    # Alpine FS
+    # Alpine FS http://dl-cdn.alpinelinux.org/alpine/latest-stable/main/x86_64/
     curl -LO http://dl-cdn.alpinelinux.org/alpine/latest-stable/main/x86_64/apk-tools-static-2.12.9-r3.apk && tar -xvf apk-tools-static-2.12.9-r3.apk -C /mnt/uml
     /mnt/uml/sbin/apk.static --repository http://dl-cdn.alpinelinux.org/alpine/v3.13/main/ --update-cache --allow-untrusted --root /mnt/uml --initdb add alpine-base 
 
