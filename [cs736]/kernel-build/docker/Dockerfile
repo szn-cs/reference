@@ -3,9 +3,9 @@ FROM gcc:latest
 
 # dependencies
 RUN apt update && \
-    PKG="gcc clang make bash id flex bison pahole fdformat depmod e2fsck fsck.jfs reiserfsck xfs_db mksquashfs btrfsck pccardctl quota pppd showmount ps udevd grub mcelog iptables openssl bc sphinx-build epio build-essential dwarves python3 libncurses-dev flex bison libssl-dev bc libelf-dev gcc clang make bash ld flex bison pahole fdformat depmod e2fsck fsck.jfs reiserfsck xfs_db mksquashfs btrfsck pccardctl quota pppd showmount ps udevd grub mcelog iptables openssl bc sphinx cpio python2 g++ make nano vim" && \
+    PKG="gcc clang make bash id flex bison pahole fdformat depmod e2fsck fsck.jfs reiserfsck xfs_db mksquashfs btrfsck pccardctl quota pppd showmount ps udevd grub mcelog iptables openssl bc sphinx-build epio build-essential dwarves python3 libncurses-dev flex bison libssl-dev bc libelf-dev gcc clang make bash ld flex bison pahole fdformat depmod e2fsck fsck.jfs reiserfsck xfs_db mksquashfs btrfsck pccardctl quota pppd showmount ps udevd grub mcelog iptables openssl bc sphinx cpio" && \
     for i in $PKG; do apt install -y $i; done && \
-    apt update && apt upgrade && apt autoremove
+    apt update && apt upgrade && apt autoremove; exit 0
   
 #---------- Download
 RUN mkdir -p ~/vm && mkdir -p ~/vm/download && cd ~/vm && \
