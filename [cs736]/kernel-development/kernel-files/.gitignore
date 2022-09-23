@@ -1,0 +1,4 @@
+# this directory serves as a volume to the container with kernel & root_fs files as expected input.
+
+linux
+root_fs

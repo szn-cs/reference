@@ -1,6 +1,6 @@
 # linux kernel hacking
 -	Linux Kernel https://kernel.org/
-- Disk image to boot kernel from http://fs.devloop.org.uk/   Gentoo
+- List of disk image to boot kernel from http://fs.devloop.org.uk/   Gentoo
 - required system tools: https://docs.kernel.org/process/changes.html#changes 
 - User-Mode Linux (UML): run Linux as process http://user-mode-linux.sourceforge.net/source.html
   - http://user-mode-linux.sourceforge.net/
@@ -14,6 +14,9 @@
 - https://caiorss.github.io/C-Cpp-Notes/Linux-unix-system-programming.html 
 - https://webcache.googleusercontent.com/search?q=cache:w9TB9WO0-LEJ:https://sudonull.com/post/25569-How-to-start-using-User-Mode-in-Linux-ITSumma-Blog&cd=19&hl=en&ct=clnk&gl=fr
   - https://github.com/safizn/fork-kernel-dev-setup-1/blob/master/runlinux.sh
+- UML how to http://uml.devloop.org.uk/howto.html
+- add sys call https://imada.sdu.dk/~jamik/dm510-19/system-call.html
+
 
 ## adpater for VPN and Hyper-V [NOTE: none solutions worked ~! ]
 - Setup Hyper-V VM + VPN networkng: https://win10.guru/hyper-v-virtual-machine-use-host-vpn-connection/
