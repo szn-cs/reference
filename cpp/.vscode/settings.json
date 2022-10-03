@@ -16,7 +16,8 @@
     "titleBar.activeBackground": "#18372a",
     "titleBar.activeForeground": "#e7e7e7",
     "titleBar.inactiveBackground": "#18372a99",
-    "titleBar.inactiveForeground": "#e7e7e799"
+    "titleBar.inactiveForeground": "#e7e7e799",
+    "commandCenter.border": "#e7e7e799"
   },
 	"peacock.color": "#3f2b01",
 	"peacock.remoteColor": "#285a45",
@@ -26,6 +27,7 @@
 		"*.jlex": "lex",
 		"functional": "cpp",
 		"ostream": "cpp",
-		"limits": "cpp"
+		"limits": "cpp",
+		"iostream": "cpp"
 	}
 }
