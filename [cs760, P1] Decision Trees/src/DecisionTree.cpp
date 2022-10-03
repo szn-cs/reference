@@ -4,7 +4,7 @@
 
 using namespace std;
 
-template <typename T = double>
+template <typename T = float>
 class DataInstance {
 public:
   DataInstance(T feature1, T feature2, bool label) {

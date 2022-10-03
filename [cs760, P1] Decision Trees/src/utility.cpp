@@ -33,7 +33,7 @@ vector<string> readFileLines(string path) {
   return lines;
 }
 
-template <typename T>
+template <typename T = float>
 vector<DataInstance<T>> readLineValues(vector<string> lines) {
   vector<DataInstance<T>> instanceList{};
 
@@ -43,17 +43,18 @@ vector<DataInstance<T>> readLineValues(vector<string> lines) {
 
     // TODO: NOTE: double precision issue - istringstream converts some doubles to close values with long decimal value
     istringstream ls(l); // line stream
-    ls >> feature1;
-    ls >> feature2;
+    ls >> setprecision(6) >> fixed >> feature1;
+    ls >> setprecision(6) >> fixed >> feature2;
     ls >> label;
 
-    // {
-    //   assert(is_same<T, double>::value || is_same<T, int>::value);
-    //   if (is_same<T, double>::value)
-    //     feature1 = stod(l);
-    //   else if (is_same<T, int>::value)
-    //     feature1 = stoi(l);
-    // }
+    {
+      // assert(is_same<T, double>::value || is_same<T, int>::value);
+      // if (is_same<T, double>::value)
+      // feature1 = stod(l);
+      // feature2 = stod(l);
+      // else if (is_same<T, int>::value)
+      //   feature1 = stoi(l);
+    }
 
     instanceList.push_back(DataInstance<T>(feature1, feature2, label));
   }

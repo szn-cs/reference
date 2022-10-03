@@ -10,11 +10,15 @@ using namespace std;
 using namespace utility;
 
 inline int run() {
-  DataSet<double> D1 = readData<double>("../dataset/D1.txt");
-  DataSet<double> D2 = readData<double>("../dataset/D2.txt");
+
+  // Note; using float to match the data set accuracy needed, precision of 6 digits
+  DataSet<float> D1 = readData<float>("../dataset/D1.txt");
+  DataSet<float> D2 = readData<float>("../dataset/D2.txt");
   DataSet<int> D3leaves = readData<int>("../dataset/D3leaves.txt");
-  DataSet<double> Dbig = readData<double>("../dataset/Dbig.txt");
-  DataSet<double> Druns = readData<double>("../dataset/Druns.txt");
+  DataSet<float> Dbig = readData<float>("../dataset/Dbig.txt");
+  DataSet<float> Druns = readData<float>("../dataset/Druns.txt");
+
+  cout << setprecision(20) << fixed << D1.list[174].input[1] << endl;
 
   return 0;
 }
