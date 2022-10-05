@@ -5,12 +5,15 @@
 #include <string>
 
 #include "utility.cpp"
+#include "DecisionTree.cpp"
 
 using namespace std;
 using namespace utility;
 
 inline int run() {
+  cout << setprecision(6) << fixed;
 
+  // load data sets:
   // Note; using float to match the data set accuracy needed, precision of 6 digits
   DataSet<float> D1 = readData<float>("../dataset/D1.txt");
   DataSet<float> D2 = readData<float>("../dataset/D2.txt");
@@ -18,7 +21,9 @@ inline int run() {
   DataSet<float> Dbig = readData<float>("../dataset/Dbig.txt");
   DataSet<float> Druns = readData<float>("../dataset/Druns.txt");
 
-  // cout << setprecision(20) << fixed << D1.list[174].input[1] << endl;
+  // create decision trees:
+  DecisionTree t1{D1};
+  t1.findBestCandidateFeatureSplit();
 
   return 0;
 }

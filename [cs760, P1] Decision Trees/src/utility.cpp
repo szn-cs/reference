@@ -41,20 +41,12 @@ vector<DataInstance<T>> readLineValues(vector<string> lines) {
     T feature1{}, feature2{};
     bool label{};
 
-    // TODO: NOTE: double precision issue - istringstream converts some doubles to close values with long decimal value
+    // NOTE: some values cannot be represented precisely as double/float
     istringstream ls(l); // line stream
     ls >> setprecision(6) >> fixed >> feature1;
     ls >> setprecision(6) >> fixed >> feature2;
     ls >> label;
-
-    {
-      // assert(is_same<T, double>::value || is_same<T, int>::value);
-      // if (is_same<T, double>::value)
-      // feature1 = stod(l);
-      // feature2 = stod(l);
-      // else if (is_same<T, int>::value)
-      //   feature1 = stoi(l);
-    }
+    // cout << setprecision(20) << fixed << l.list[174].input[1] << endl;
 
     instanceList.push_back(DataInstance<T>(feature1, feature2, label));
   }
