@@ -67,4 +67,9 @@ DataSet<T> readData(string path) {
   vector<DataInstance<T>> l = readLineValues<T>(readFileLines(path));
   return DataSet<T>(l);
 }
+
+bool compareDouble(double a, double b, const double EPSILON = 0.000001 /* according to the dataset value precision */) {
+  return fabs(a - b) < EPSILON;
+}
+
 }; // namespace utility

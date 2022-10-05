@@ -18,7 +18,7 @@ inline int run() {
   DataSet<float> Dbig = readData<float>("../dataset/Dbig.txt");
   DataSet<float> Druns = readData<float>("../dataset/Druns.txt");
 
-  cout << setprecision(20) << fixed << D1.list[174].input[1] << endl;
+  // cout << setprecision(20) << fixed << D1.list[174].input[1] << endl;
 
   return 0;
 }

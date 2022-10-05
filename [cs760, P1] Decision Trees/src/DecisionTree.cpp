@@ -26,3 +26,6 @@ public:
 public:
   vector<DataInstance<T>> list{};
 };
+
+int pickFeatureWithMostDiscriminatoryPower() {
+}
