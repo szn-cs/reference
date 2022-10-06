@@ -1,18 +1,7 @@
-// Binary Tree in C++
-#include <bits/stdc++.h>
-#include <stdlib.h>
-#include <iostream>
-
-#include "DecisionTree.h"
-
-using namespace std;
 
 template <typename T>
-class Node {
+class example {
 public:
-  Node() = default;
-  Node(NodeData<T> data) : data(data){};
-
   // // Traverse Preorder
   // void traversePreOrder(shared_ptr<Node> temp) {
   //   cout << " " << temp->data;
@@ -33,13 +22,6 @@ public:
   //   traversePostOrder(temp->right);
   //   cout << " " << temp->data;
   // }
-
-  void test();
-
-public:
-  NodeData<T> data{};
-  shared_ptr<Node<T>> left{nullptr};
-  shared_ptr<Node<T>> right{nullptr};
 };
 
 // template <>

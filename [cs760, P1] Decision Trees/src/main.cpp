@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 
-#include "utility.cpp"
-#include "DecisionTree.cpp"
+#include "utility.h"
+#include "DecisionTree.h"
 
 using namespace std;
 using namespace utility;
@@ -15,15 +15,15 @@ inline int run() {
 
   // load data sets:
   // Note; using float to match the data set accuracy needed, precision of 6 digits
-  DataSet<float> D1 = readData<float>("../dataset/D1.txt");
-  DataSet<float> D2 = readData<float>("../dataset/D2.txt");
-  DataSet<int> D3leaves = readData<int>("../dataset/D3leaves.txt");
-  DataSet<float> Dbig = readData<float>("../dataset/Dbig.txt");
-  DataSet<float> Druns = readData<float>("../dataset/Druns.txt");
+  const DataSet<float> D1 = readData<float>("../dataset/D1.txt");
+  const DataSet<float> D2 = readData<float>("../dataset/D2.txt");
+  const DataSet<int> D3leaves = readData<int>("../dataset/D3leaves.txt");
+  const DataSet<float> Dbig = readData<float>("../dataset/Dbig.txt");
+  const DataSet<float> Druns = readData<float>("../dataset/Druns.txt");
 
   // create decision trees:
-  DecisionTree t1{D1};
-  t1.findBestCandidateFeatureSplit();
+  DecisionTree<float> t1{D1};
+  t1.createDecisionTreeLearner();
 
   return 0;
 }

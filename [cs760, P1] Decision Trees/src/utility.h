@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bits/stdc++.h>
-#include "DecisionTree.cpp"
+#include "DecisionTree.h"
 
 using namespace std;
 
@@ -57,7 +57,7 @@ vector<DataInstance<T>> readLineValues(vector<string> lines) {
 template <typename T>
 DataSet<T> readData(string path) {
   vector<DataInstance<T>> l = readLineValues<T>(readFileLines(path));
-  return DataSet<T>(l);
+  return DataSet<T>{l};
 }
 
 bool compareDouble(double a, double b, const double EPSILON = 0.000001 /* according to the dataset value precision */) {
