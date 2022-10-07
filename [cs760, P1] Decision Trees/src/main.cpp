@@ -7,7 +7,6 @@
 
 #include "utility.h"
 #include "DecisionTree.h"
-#include "matplotlibcpp.h" // plotting
 
 using namespace std;
 using namespace utility;
@@ -57,17 +56,14 @@ inline int run() {
   //   t4.createDecisionTreeLearner();
   // }
 
-  { // ✅
-    DecisionTree<float> t5{D2};
-    t5.createDecisionTreeLearner();
-  }
+  // { // ✅
+  //   DecisionTree<float> t5{D2};
+  //   t5.createDecisionTreeLearner();
+  // }
 
-  { // plot library https://github.com/lava/matplotlib-cpp
-    namespace plt = matplotlibcpp;
-    plt::plot({1, 10, 10, 10});
-    // plt::show();
-    plt::legend();
-    plt::save("../output/basic.png");
+  { // plots dots
+    D1.plotData("1", "r*");
+    D2.plotData("2", "b*");
   }
 
   return 0;
