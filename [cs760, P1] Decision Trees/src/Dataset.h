@@ -27,6 +27,24 @@ public:
   DataSet() = default;
   DataSet(vector<DataInstance<T>> list, int numberOfFeatures = 2) : list(list), numberOfFeatures(numberOfFeatures) {}
 
+  bool getMajorityLabel() {
+    if (list.empty())
+      return true;
+
+    // count labels of true and false
+    map<bool, int> countLabel{};
+    for (DataInstance<T> i : list) {
+      countLabel[i.output]++;
+    }
+    // check majority label
+    auto comparison = countLabel[true] <=> countLabel[false];
+    // If ans is less than zero
+    if (comparison > 0 || comparison == 0)
+      return true;
+    else
+      return false;
+  }
+
 public:
   vector<DataInstance<T>> list{};
   int numberOfFeatures{}; // # of features is fixed for the examples given.

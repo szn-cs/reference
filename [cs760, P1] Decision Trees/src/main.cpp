@@ -21,6 +21,9 @@ inline int run() {
   const DataSet<float> Dbig = readData<float>("../dataset/Dbig.txt");
   const DataSet<float> Druns = readData<float>("../dataset/Druns.txt");
 
+  // TODO: testing requires extension of implementation
+  // const DataSet<string> Data_test = readData<string>("../dataset/test.txt");
+
   // create decision trees:
   DecisionTree<float> t1{D1};
   t1.createDecisionTreeLearner();

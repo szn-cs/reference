@@ -19,7 +19,7 @@ public:
   /*
     Probability of each array element - returns a map for each unique value with its probability
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static map<T, R> calculateProbability(const vector<T>& Y) {
     // count # of times the value (# of outcomes in event) occurs
     map<T, int> cMap{}; // # of repetitions of each unique value
@@ -38,12 +38,12 @@ public:
     Joint probability (for dependent events A, B)
     P(A ∩ B) = P(A) * P(B)
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateJointProbability(R probability_A, R probability_B) {
     return probability_A * probability_B;
   }
 
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateJointProbability(long outcomesOfEventA, long outcomesOfEventB, long totalPossibleOutcomes) {
     return InfoGain::calculateJointProbability<T, R>(
         InfoGain::calculateProbability<T, R>(outcomesOfEventA, totalPossibleOutcomes),
@@ -54,7 +54,7 @@ public:
     Shanon Entropy
     H(Y) = (-1) Σ of yϵY[ P(y) log_2(P(y))  ]
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateEntropy(const vector<T>& Y /* values list of a particular feature */) {
     map<T, R> pMap = InfoGain::calculateProbability<T, R>(Y);
 
@@ -68,13 +68,13 @@ public:
     return entropy;
   }
 
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateEntropy(const vector<DataInstance<T>>& Y) {
     vector<bool> tmp{};
     for (DataInstance instance : Y)
-      if (instance.output == 0)
+      if (instance.output == false)
         tmp.push_back(0);
-      else if (instance.output == 1)
+      else if (instance.output == true)
         tmp.push_back(1);
       else
         throw std::runtime_error("⚫ Unqualified value detected");
@@ -86,7 +86,7 @@ public:
     Joint Entropy
     H(Y, X) = (-1) Σ of xϵX[ Σ of yϵY[ P(y, x) log_2(P(y, x))  ] ]
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateJointEntropy(const vector<T>& Y, const vector<T>& X) {
     R entropy{0.0}; // used for outer summation
 
@@ -111,7 +111,7 @@ public:
     Conditional Entropy
     Entropy(Y|X) = H(Y,X) - H(X)
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateConditionalEntropy(const vector<T>& Y, const vector<T>& X) {
     return InfoGain::calculateJointEntropy<T, R>(Y, X) - InfoGain::calculateEntropy<T, R>(X);
   }
@@ -120,7 +120,7 @@ public:
     information gain
     I(Y, X) = H(Y) - H(Y|X)
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateInformationGain(const vector<T>& Y, const vector<T>& X) {
     return InfoGain::calculateEntropy<T, R>(Y) - InfoGain::calculateConditionalEntropy<T, R>(Y, X);
   }
@@ -129,7 +129,7 @@ public:
     information gain - specific case for binary labels (left/right child splits)
     InfoGain(D, A) = H(Parent) - [weighted sum of] H(children)
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateInformationGain(const vector<DataInstance<T>>& parentSet, const vector<DataInstance<T>>& leftSubset, const vector<DataInstance<T>>& rightSubset) {
     R entropyParent = InfoGain::calculateEntropy<T, R>(parentSet);
     R entropyLeftChild = InfoGain::calculateEntropy<T, R>(leftSubset);
@@ -145,7 +145,7 @@ public:
     information gain ratio
     I(Y, X) / H(X)
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateInformationGainRatio(const vector<T>& Y, const vector<T>& X) {
     return InfoGain::calculateInformationGain<T, R>(Y, X) / InfoGain::calculateEntropy<T, R>(X);
   }
@@ -154,15 +154,17 @@ public:
     information gain ratio - specific for binary case
     I(Y, X) / H(X)
   */
-  template <typename T = float, typename R = T /* accuracy of Entropy calculation */>
+  template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateInformationGainRatio(const vector<DataInstance<T>>& parentSet, const vector<DataInstance<T>>& leftSubset, const vector<DataInstance<T>>& rightSubset) {
     R infoGain = calculateInformationGain<T, R>(parentSet, leftSubset, rightSubset);
+    if (infoGain == 0.0)
+      return 0.0;
 
     R leftProportion = static_cast<double>(leftSubset.size()) / static_cast<double>(parentSet.size());
     R rightProportion = static_cast<double>(rightSubset.size()) / static_cast<double>(parentSet.size());
-    R splitEntropy{};
-    splitEntropy -= (leftProportion)*log2(leftProportion);
-    splitEntropy -= (rightProportion)*log2(rightProportion);
+    R splitEntropy{0.0};
+    splitEntropy -= (leftProportion == 0.0) ? 0 : (leftProportion)*log2(leftProportion);
+    splitEntropy -= (rightProportion == 0.0) ? 0 : (rightProportion)*log2(rightProportion);
     return infoGain / splitEntropy;
   }
 };
