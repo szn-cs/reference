@@ -27,7 +27,7 @@ public:
   DataSet() = default;
   DataSet(vector<DataInstance<T>> list, int numberOfFeatures = 2) : list(list), numberOfFeatures(numberOfFeatures) {}
 
-  bool getMajorityLabel() {
+  bool getMajorityLabel() const {
     if (list.empty())
       return true;
 
@@ -43,6 +43,13 @@ public:
       return true;
     else
       return false;
+  }
+
+  tuple<int, int> countBinaryLabel() const {
+    int positiveCount{}, negativeCount{};
+    for (DataInstance instance : list)
+      (instance.output == true) ? positiveCount++ : negativeCount++;
+    return make_tuple(positiveCount, negativeCount);
   }
 
 public:

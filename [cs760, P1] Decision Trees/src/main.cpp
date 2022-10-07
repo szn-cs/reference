@@ -25,8 +25,27 @@ inline int run() {
   // const DataSet<string> Data_test = readData<string>("../dataset/test.txt");
 
   // create decision trees:
-  DecisionTree<float> t1{D1};
-  t1.createDecisionTreeLearner();
+
+  // { // ✅
+  //     DecisionTree<float> t1{D1};
+  //     t1.createDecisionTreeLearner();
+  // }
+
+  // { // ✅
+  //   const DataSet<int> refuseToSplitDataset = readData<int>("../dataset/refuseToSplitDataset.txt");
+  //   DecisionTree<int> t2{refuseToSplitDataset};
+  //   t2.createDecisionTreeLearner();
+  // }
+
+  // { // ✅
+  //   DecisionTree<float> t1{Druns};
+  //   t1.createDecisionTreeLearner();
+  // }
+
+  {
+    DecisionTree<int> t3{D3leaves};
+    t3.createDecisionTreeLearner();
+  }
 
   return 0;
 }

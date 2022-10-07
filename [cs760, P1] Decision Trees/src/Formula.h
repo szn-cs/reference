@@ -135,10 +135,18 @@ public:
     R entropyLeftChild = InfoGain::calculateEntropy<T, R>(leftSubset);
     R entropyRightChild = InfoGain::calculateEntropy<T, R>(rightSubset);
 
+    // printf("\n[Entropy(parent)=");
+    // cout << entropyParent << "\t";
+    // printf("Entropy(leftChild)=");
+    // cout << entropyLeftChild << "\t";
+    // printf("Entropy(rightChild)=");
+    // cout << entropyRightChild << "]";
+
     R weightedEntropyLeftChild = (static_cast<double>(leftSubset.size()) / static_cast<double>(parentSet.size())) * entropyLeftChild;
     R weightedEntropyRightChild = (static_cast<double>(rightSubset.size()) / static_cast<double>(parentSet.size())) * entropyRightChild;
     R sumOfWeightedChildrenEntropy = weightedEntropyLeftChild + weightedEntropyRightChild;
-    return entropyParent - sumOfWeightedChildrenEntropy;
+    R infoGain = entropyParent - sumOfWeightedChildrenEntropy;
+    return infoGain;
   }
 
   /*
@@ -147,7 +155,9 @@ public:
   */
   template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
   static R calculateInformationGainRatio(const vector<T>& Y, const vector<T>& X) {
-    return InfoGain::calculateInformationGain<T, R>(Y, X) / InfoGain::calculateEntropy<T, R>(X);
+    R infoGain = InfoGain::calculateInformationGain<T, R>(Y, X);
+    R entropy = InfoGain::calculateEntropy<T, R>(X); // TODO: should be information split. Use overloaded function instead for correct results
+    return infoGain / entropy;
   }
 
   /*
@@ -155,16 +165,19 @@ public:
     I(Y, X) / H(X)
   */
   template <typename T = float, typename R = double /* accuracy of Entropy calculation */>
-  static R calculateInformationGainRatio(const vector<DataInstance<T>>& parentSet, const vector<DataInstance<T>>& leftSubset, const vector<DataInstance<T>>& rightSubset) {
+  static tuple<R, R> calculateInformationGainRatio(const vector<DataInstance<T>>& parentSet, const vector<DataInstance<T>>& leftSubset, const vector<DataInstance<T>>& rightSubset) {
     R infoGain = calculateInformationGain<T, R>(parentSet, leftSubset, rightSubset);
     if (infoGain == 0.0)
-      return 0.0;
+      return make_tuple(0.0, 0.0);
 
     R leftProportion = static_cast<double>(leftSubset.size()) / static_cast<double>(parentSet.size());
     R rightProportion = static_cast<double>(rightSubset.size()) / static_cast<double>(parentSet.size());
     R splitEntropy{0.0};
     splitEntropy -= (leftProportion == 0.0) ? 0 : (leftProportion)*log2(leftProportion);
     splitEntropy -= (rightProportion == 0.0) ? 0 : (rightProportion)*log2(rightProportion);
-    return infoGain / splitEntropy;
+
+    R gainRatio = infoGain / splitEntropy;
+
+    return make_tuple(gainRatio, infoGain);
   }
 };

@@ -15,18 +15,25 @@ public:
     for (int i = 0; i < dataset.numberOfFeatures; i++)
       candidateFeature.insert(i);
   };
-  DecisionTree(vector<DataInstance<T>>& instanceList, unordered_set<int> candidateFeature) : dataset(DataSet{instanceList}), candidateFeature(candidateFeature) {
+  DecisionTree(vector<DataInstance<T>>& instanceList, set<int> candidateFeature) : dataset(DataSet{instanceList}), candidateFeature(candidateFeature) {
   }
-  DecisionTree(DataSet<T>& dataset, unordered_set<int> candidateFeature) : dataset(dataset), candidateFeature(candidateFeature) {}
+  DecisionTree(DataSet<T>& dataset, set<int> candidateFeature) : dataset(dataset), candidateFeature(candidateFeature) {}
 
   /* returns threshold (equivalent to attribute of a feature) taht maximizes gain ratio */
-  tuple<T, double> findBestCandidateThresholdSplit(int feature /*feature being investigated*/) {
+  tuple<T, double, double> findBestCandidateThresholdSplit(int feature /*feature being investigated*/) {
     T c_best{};
     double gainRatio_max{};
+    double gainInfo_corresponding{};
 
-    // 1. loop over each value of a particular feature
+    // create set of unique candidate thresholds
+    set<T> candidateThreshold;
     for (DataInstance instance : dataset.list) {
       T c = instance.input[feature]; // candidate threshold
+      candidateThreshold.insert(c);
+    }
+
+    // 1. loop over each value of a particular feature
+    for (T c : candidateThreshold) {
 
       // 2. split into 2 subsets using value as threshold
       vector<DataInstance<T>> leftSubset{}, rightSubset{};
@@ -40,40 +47,49 @@ public:
       }
 
       // 3. Calculate Information gain of binary labels incurred by the split.
-      double gainRatio{};
-      gainRatio = InfoGain::calculateInformationGainRatio<T, double>(dataset.list, leftSubset, rightSubset);
+      auto [gainRatio, infoGain] = InfoGain::calculateInformationGainRatio<T, double>(dataset.list, leftSubset, rightSubset);
+
+      // printf("\nFeature=%u ", feature);
+      // cout << "Threshold=" << c << "\t";
+      // cout << "GainRatio=" << gainRatio << "\t";
+      // cout << "InfoGain=" << infoGain << endl;
 
       // 4. pick threshold that maximizes the gain ratio
       if (gainRatio > gainRatio_max) {
         c_best = c;
         gainRatio_max = gainRatio;
+        gainInfo_corresponding = infoGain;
       }
     }
 
-    return make_tuple(c_best, gainRatio_max);
+    return make_tuple(c_best, gainRatio_max, gainInfo_corresponding);
   }
 
   // feature with most discriminatory power
   tuple<int, T, double> findBestCandidateFeatureSplit() {
     // 1. get best threshold/attribute split of each feature
-    map<int, tuple<T, double>> featureBestThresholdMap{};
+    map<int, tuple<T, double, double>> featureBestThresholdMap{};
     for (int feature : candidateFeature) {
-      const auto [c, gainRatio] = findBestCandidateThresholdSplit(feature);
-      featureBestThresholdMap[feature] = make_tuple(c, gainRatio);
+      const auto [c, gainRatio, infoGain] = findBestCandidateThresholdSplit(feature);
+      featureBestThresholdMap[feature] = make_tuple(c, gainRatio, infoGain);
     }
 
     // 2. get best feature to split on
     T feature_best{};
     T c_max{};              // threshold maximizing gain ratio
     double gainRatio_max{}; // maximum gain ratio accross features
+    double infoGain_corresponding{};
     for (const auto& [feature, featureTuple] : featureBestThresholdMap) {
-      const auto& [c, gainRatio] = featureTuple;
+      const auto& [c, gainRatio, infoGain] = featureTuple;
       if (c > c_max) {
         feature_best = feature;
         c_max = c;
         gainRatio_max = gainRatio;
+        infoGain_corresponding = infoGain;
       }
     }
+
+    cout << "infoGain=" << infoGain_corresponding << "\t ";
 
     return make_tuple(feature_best, c_max, gainRatio_max);
   }
@@ -118,14 +134,23 @@ public:
         splitFeature = feature;
         splitThreshold = threshold;
         // remove used feature
-        unordered_set<int> candidateFeaturesRemaining = candidateFeature;
+        set<int> candidateFeaturesRemaining = candidateFeature;
         candidateFeaturesRemaining.erase(candidateFeaturesRemaining.find(feature));
         // create subtress & set state
         leftSubtree = make_shared<DecisionTree<T>>(leftSubset, candidateFeaturesRemaining);
         rightSubtree = make_shared<DecisionTree<T>>(rightSubset, candidateFeaturesRemaining);
 
+        {
+          auto [positive, negative] = dataset.countBinaryLabel();
+          printf("Feature=%u ", feature);
+          cout << "Threshold=" << threshold << " ";
+          cout << "GainRatio=" << maxGainRatio << "\t";
+          cout << "[+:" << positive << " , -:" << negative << "]" << endl;
+        }
         // recursive call
+        cout << "LEFT" << endl;
         leftSubtree->createDecisionTreeLearner();
+        cout << "RIGHT" << endl;
         rightSubtree->createDecisionTreeLearner();
 
         return make_tuple(leftSubtree, rightSubtree);
@@ -133,7 +158,12 @@ public:
     }
 
   LEAF : {
+
     this->markLeaf();
+    cout << std::boolalpha;
+    cout << "Leaf with label: " << this->getMajorityLabel()
+         << endl;
+
     return make_tuple(nullptr, nullptr);
   }
   }
@@ -151,8 +181,8 @@ public:
   }
 
 public:
-  const DataSet<T> dataset{};            // dataset considered for split in this subtree level
-  unordered_set<int> candidateFeature{}; // keep track of features that are not used yet (column indicies).
+  const DataSet<T> dataset{};  // dataset considered for split in this subtree level
+  set<int> candidateFeature{}; // keep track of features that are not used yet (column indicies).
 
   int splitFeature{-1};                       // feature chosen to split the node by.
   T splitThreshold{static_cast<T>(INFINITY)}; // threshold to split numeric values on.
