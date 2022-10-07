@@ -2,6 +2,9 @@
 - Numpy and pyplot stuff are allowed.
 - θ = 9
 
+## Requirements: 
+- `pip3 install matplotlib numpy`
+- `apt install python3-numpy`
 
 
 ## Examples: 
@@ -11,5 +14,10 @@
 - https://github.com/Craigacp/MIToolbox formulas in C
 - https://github.com/kzahedi/entropy formulas in C++
 - https://datascience.stackexchange.com/questions/58565/conditional-entropy-calculation-in-python-hyx
+- Plot library https://matplotlib-cpp.readthedocs.io/en/latest/ 
+  - https://github.com/lava/matplotlib-cpp
+  - https://www.youtube.com/watch?v=sAuM2PwGNfA
+  - https://levelup.gitconnected.com/plotting-data-in-c-84960b63ce92
+- 
 
 

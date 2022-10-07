@@ -3,12 +3,17 @@
 #include <cassert>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "utility.h"
 #include "DecisionTree.h"
+#include "matplotlibcpp.h" // plotting
 
 using namespace std;
 using namespace utility;
+
+namespace plt = matplotlibcpp;
+using namespace std;
 
 inline int run() {
   cout << setprecision(6) << fixed;
@@ -52,12 +57,17 @@ inline int run() {
   //   t4.createDecisionTreeLearner();
   // }
 
-  // { // ✅
-  //   DecisionTree<float> t5{D2};
-  //   t5.createDecisionTreeLearner();
-  // }
+  { // ✅
+    DecisionTree<float> t5{D2};
+    t5.createDecisionTreeLearner();
+  }
 
   { // plot library https://github.com/lava/matplotlib-cpp
+    namespace plt = matplotlibcpp;
+    plt::plot({1, 10, 10, 10});
+    // plt::show();
+    plt::legend();
+    plt::save("../output/basic.png");
   }
 
   return 0;
