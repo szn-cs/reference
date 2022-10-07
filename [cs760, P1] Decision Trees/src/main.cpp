@@ -14,7 +14,7 @@ inline int run() {
   cout << setprecision(6) << fixed;
 
   // load data sets:
-  // Note; using float to match the data set accuracy needed, precision of 6 digits
+  // Note: using float to match the data set accuracy needed, precision of 6 digits
   const DataSet<float> D1 = readData<float>("../dataset/D1.txt");
   const DataSet<float> D2 = readData<float>("../dataset/D2.txt");
   const DataSet<int> D3leaves = readData<int>("../dataset/D3leaves.txt");
@@ -42,9 +42,22 @@ inline int run() {
   //   t1.createDecisionTreeLearner();
   // }
 
-  {
-    DecisionTree<int> t3{D3leaves};
-    t3.createDecisionTreeLearner();
+  // { // ✅
+  //   DecisionTree<int> t3{D3leaves};
+  //   t3.createDecisionTreeLearner();
+  // }
+
+  // { // ✅
+  //   DecisionTree<float> t4{D1};
+  //   t4.createDecisionTreeLearner();
+  // }
+
+  // { // ✅
+  //   DecisionTree<float> t5{D2};
+  //   t5.createDecisionTreeLearner();
+  // }
+
+  { // plot library https://github.com/lava/matplotlib-cpp
   }
 
   return 0;

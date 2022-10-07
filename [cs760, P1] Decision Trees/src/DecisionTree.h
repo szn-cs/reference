@@ -160,10 +160,12 @@ public:
   LEAF : {
 
     this->markLeaf();
-    cout << std::boolalpha;
-    cout << "Leaf with label: " << this->getMajorityLabel()
-         << endl;
-
+    {
+      auto [positive, negative] = dataset.countBinaryLabel();
+      cout << std::boolalpha;
+      cout << "Leaf with label: " << this->getMajorityLabel() << "\t";
+      cout << "[+:" << positive << " , -:" << negative << "]" << endl;
+    }
     return make_tuple(nullptr, nullptr);
   }
   }
