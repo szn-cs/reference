@@ -16,3 +16,5 @@ ls /usr/bin
 
 # user info
 uname -mrs
+
+tree .
