@@ -1,10 +1,10 @@
-PWD /home/unixuser/code/cs760-latex-hw
+PWD /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document
 INPUT /etc/texmf/web2c/texmf.cnf
 INPUT /usr/share/texmf/web2c/texmf.cnf
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.tex
-OUTPUT /home/unixuser/code/cs760-latex-hw/hw3.log
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.tex
+OUTPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.log
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -1036,8 +1036,8 @@ INPUT /usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries
 INPUT /usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryplotmarks.code.tex
 INPUT /usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/pgflibraryplotmarks.code.tex
 INPUT /usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/pgflibraryplotmarks.code.tex
-INPUT /home/unixuser/code/cs760-latex-hw/roc1.dat
-INPUT /home/unixuser/code/cs760-latex-hw/roc1.dat
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/roc1.dat
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/roc1.dat
 INPUT /usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 INPUT /usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 INPUT /usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ptm.fd
@@ -1055,10 +1055,10 @@ INPUT /usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.aux
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.aux
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.aux
-OUTPUT /home/unixuser/code/cs760-latex-hw/hw3.aux
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.aux
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.aux
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.aux
+OUTPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.aux
 INPUT /usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -1101,18 +1101,18 @@ INPUT /usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.st
 INPUT /usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 INPUT /usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 INPUT /usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-OUTPUT /home/unixuser/code/cs760-latex-hw/hw3.pdf
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-OUTPUT /home/unixuser/code/cs760-latex-hw/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+OUTPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.pdf
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+OUTPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr7t.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmrc7t.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr7t.tfm
@@ -1174,34 +1174,39 @@ INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmb7t.vf
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb8r.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr7t.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr7t.tfm
-INPUT /home/unixuser/code/cs760-latex-hw/roc1.dat
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/roc1.dat
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx5.tfm
-INPUT /home/unixuser/code/cs760-latex-hw/implementation1_expected_result.png
-INPUT /home/unixuser/code/cs760-latex-hw/implementation1_expected_result.png
-INPUT /home/unixuser/code/cs760-latex-hw/implementation1_expected_result.png
-INPUT /home/unixuser/code/cs760-latex-hw/implementation1_expected_result.png
-INPUT /home/unixuser/code/cs760-latex-hw/implementation1_expected_result.png
-INPUT /home/unixuser/code/cs760-latex-hw/email_head.png
-INPUT /home/unixuser/code/cs760-latex-hw/email_head.png
-INPUT /home/unixuser/code/cs760-latex-hw/email_head.png
-INPUT /home/unixuser/code/cs760-latex-hw/email_head.png
-INPUT /home/unixuser/code/cs760-latex-hw/email_head.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/implementation1_expected_result.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/implementation1_expected_result.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/implementation1_expected_result.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/implementation1_expected_result.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/implementation1_expected_result.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/1.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/1.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/1.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/1.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/1.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/email_head.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/email_head.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/email_head.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/email_head.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/email_head.png
 INPUT /usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 INPUT /usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 INPUT /usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 INPUT /usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr8c.tfm
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/roc.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/roc.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/roc.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/roc.png
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/roc.png
 INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmr8c.vf
-INPUT /home/unixuser/code/cs760-latex-hw/roc.png
-INPUT /home/unixuser/code/cs760-latex-hw/roc.png
-INPUT /home/unixuser/code/cs760-latex-hw/roc.png
-INPUT /home/unixuser/code/cs760-latex-hw/roc.png
-INPUT /home/unixuser/code/cs760-latex-hw/roc.png
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.aux
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
-INPUT /home/unixuser/code/cs760-latex-hw/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.aux
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
+INPUT /home/unixuser/code/computerScience-exercise/[cs760, HW3] Linear Regression /document/hw3.out
 INPUT /usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb
