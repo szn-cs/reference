@@ -3,4 +3,4 @@
 ./temporary/*
 
 # Windows WSL
-:Zone.Identifier
+**/*:Zone.Identifier
