@@ -18,3 +18,8 @@ ls /usr/bin
 uname -mrs
 
 tree .
+
+tmux
+
+git log
+glods # alias to git log with specific options
