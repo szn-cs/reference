@@ -1,4 +1,5 @@
 # General to-do lists: 
+- [ ] Switch to using git submodules for each of the projects.
 
 ## cs536: 
 - [ ] MIPS and Spim http://www.youtube.com/playlist?list=PLYbkk0SELNlwTDg1LISzYwunPWqflEkM4
