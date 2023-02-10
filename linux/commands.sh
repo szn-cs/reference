@@ -23,3 +23,11 @@ tmux
 
 git log
 glods # alias to git log with specific options
+
+# Here document (Heredoc)  https://www.tecmint.com/use-heredoc-in-shell-scripting/
+x() {
+  cat << EOF > file.txt
+  something
+  EOF
+
+}

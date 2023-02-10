@@ -8,6 +8,7 @@ file
 chmod
 chown
 ls -al | grep x
+ll
 mount
 umount
 "x" >file.txt
