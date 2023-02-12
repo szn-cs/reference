@@ -20,6 +20,9 @@ uname -mrs
 
 alias ll="ls -alh"
 tree .
+## search for pattern inside files 
+grep -rnw '/path/to/somewhere/' -e 'pattern'
+
 
 tmux
 
