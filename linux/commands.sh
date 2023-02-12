@@ -35,3 +35,10 @@ x() {
   EOF
 
 }
+
+
+
+## navigate directories using stack method
+pushd
+popd
+
