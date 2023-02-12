@@ -1,1 +1,0 @@
-getnumsyscallsgood test: call link() an unlink()

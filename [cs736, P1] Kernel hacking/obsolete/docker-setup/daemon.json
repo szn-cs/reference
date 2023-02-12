@@ -1,3 +1,0 @@
-{
-  "storage-driver": "vfs" // avoids problems with mounting filesystems in UML
-}

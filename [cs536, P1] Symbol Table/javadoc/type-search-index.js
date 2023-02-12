@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"<Unnamed>","l":"DuplicateSymException"},{"p":"<Unnamed>","l":"EmptySymTableException"},{"p":"<Unnamed>","l":"P1"},{"p":"<Unnamed>","l":"Sym"},{"p":"<Unnamed>","l":"SymTable"}]

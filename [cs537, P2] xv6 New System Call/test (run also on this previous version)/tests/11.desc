@@ -1,1 +1,0 @@
-getnumsyscallsgood test: call mkdir() and chdir()

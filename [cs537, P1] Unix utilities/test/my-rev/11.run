@@ -1,1 +1,0 @@
-./my-rev -f tests-tmp/my-rev/11.in 2> /dev/null

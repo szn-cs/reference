@@ -1,9 +1,0 @@
-bin/*.out
-
-# latex intermediate files: 
-.log
-.out
-.files.fdb_latexmk
-.dvi
-.aux
-.synctex.gz

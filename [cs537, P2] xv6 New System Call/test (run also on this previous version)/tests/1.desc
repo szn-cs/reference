@@ -1,1 +1,0 @@
-getnumsyscalls test: only call getpid()
