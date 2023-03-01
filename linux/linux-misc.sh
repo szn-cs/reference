@@ -30,6 +30,7 @@ lsblk
 apt list --installed
 
 # change owner of all files recuresively from root to specific user.
+USER=<user>
 sudo find ~ -user root -exec sudo chown $USER: {} +
 
 # remove all commit messages while keeping the changes (no changed files will be deleted)

@@ -1,0 +1,3 @@
+- version: python3 
+- package manager: pip3
+- packages: pytest
