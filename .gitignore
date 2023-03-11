@@ -4,3 +4,7 @@
 
 # Windows WSL
 **/*:Zone.Identifier
+
+
+# RUST
+target/ 
