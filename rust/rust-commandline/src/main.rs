@@ -1,23 +1,28 @@
 use std::env;
 use std::fs;
-use std::path;
+
+struct Config {
+    pattern: String,
+    filename: String,
+}
 
 fn main() {
-    // parse arguments
     let arguments: Vec<String> = env::args().collect();
-    let (_pattern, filename) = parse_config(&arguments);
+    let config: Config = parse_config(&arguments);
 
-    let path = path::Path::new(filename);
-    let contents: String = fs::read_to_string(path).expect("Unable to read file.");
+    println!("arguemtns are: {}, {}", &config.pattern, &config.filename);
 
-    println!("Contents: {}", contents);
+    let contents: String =
+        fs::read_to_string(&config.filename).expect("File should have been able to be read");
+
+    println!("File contents are: \n{}", contents);
 }
 
-fn parse_config(arguments: &[String]) -> (&str, &str) {
-    let pattern = &arguments[1];
-    let filename = &arguments[2];
+fn parse_config(args: &[String]) -> Config {
+    let pattern: String = args[1].clone();
+    let filename: String = args[2].clone();
 
-    (pattern, filename)
+    Config { pattern, filename }
 }
 
-// https://doc.rust-lang.org/book/ch12-03-improving-error-handling-and-modularity.html#grouping-configuration-values
+// TODO: Next https://doc.rust-lang.org/book/ch12-03-improving-error-handling-and-modularity.html#creating-a-constructor-for-config
