@@ -16,6 +16,8 @@ echo "append-x" >>file.txt
 vi file.txt
 nano file.txt
 jobs
+kill $(jobs -p)  # remove all background jobs
+kill -l # print list of kernel -> process signal names
 uname -a
 df -hT
 sudo /bin/sh
@@ -38,3 +40,8 @@ git reset --soft HEAD^
 
 # finds files that are larger than 10M
 find ./ -type f -size +10M
+
+
+#### TOOLS 
+# neovim
+
