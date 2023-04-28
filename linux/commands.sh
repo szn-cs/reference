@@ -30,6 +30,9 @@ git log
 alias glods="git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset' --date=short"
 glods # alias to git log with specific options
 
+man -k strcmp
+man -w strcmp
+man 3 strcmp
 
 # Here document (Heredoc)  https://www.tecmint.com/use-heredoc-in-shell-scripting/
 x() {

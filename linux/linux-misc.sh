@@ -16,8 +16,10 @@ echo "append-x" >>file.txt
 vi file.txt
 nano file.txt
 jobs
+ps -al
 kill $(jobs -p)  # remove all background jobs
 kill -l # print list of kernel -> process signal names
+kill -9 <PID>
 uname -a
 df -hT
 sudo /bin/sh
