@@ -10,3 +10,7 @@ target_compile_features(cppProject PUBLIC cxx_std_20)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
+
+
+# list of functions
+# https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-targets
