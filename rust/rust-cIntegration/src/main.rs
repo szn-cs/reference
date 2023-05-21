@@ -8,4 +8,4 @@ fn main() {
     println!("Rust execution.");
     let r  = unsafe { add(2., 13.) };
     println!("Rust value is: {}", r);
-}
+} 

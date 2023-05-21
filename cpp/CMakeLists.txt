@@ -14,3 +14,4 @@ include(CPack)
 
 # list of functions
 # https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-targets
+# https://stackoverflow.com/questions/8774593/cmake-link-to-external-library
