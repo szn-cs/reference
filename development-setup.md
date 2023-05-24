@@ -1,0 +1,1 @@
+- windowing gestures linux https://www.omglinux.com/customize-gnome-touchpad-gestures/
