@@ -1,3 +1,9 @@
+- setup Codium https://github.com/VSCodium/vscodium/blob/master/DOCS.md#extensions-marketplace
+- https://vscode.dev/
+- fix wsl in Codium https://github.com/VSCodium/vscodium/issues/1265
+- disable battery https://superuser.com/questions/125228/disable-power-management-in-fedora-12 
+
+
 
 
 # Codium hide notificaitons toast 

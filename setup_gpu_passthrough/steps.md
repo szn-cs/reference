@@ -1,9 +1,3 @@
-- setup Codium https://github.com/VSCodium/vscodium/blob/master/DOCS.md#extensions-marketplace
-- https://vscode.dev/
-- fix wsl in Codium https://github.com/VSCodium/vscodium/issues/1265
-- disable battery https://superuser.com/questions/125228/disable-power-management-in-fedora-12 
-
-
 ### VM: 
 - OVMF + QEMU: passthrough GPU/CPU 
     - Requires support for (1) VT-d virtualiztion (2) IOMMU motherboard/BIOS option. 
@@ -17,14 +11,6 @@
 ```
 - check iommu https://gist.github.com/Misairu-G/616f7b2756c488148b7309addc940b28?permalink_comment_id=3096989
 - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/app-iommu
-```
-    lspcii
-    lspci -vv -n
-    dmesg | grep -i iommu
-    virsh nodedev-list pci
-    find /sys/kernel/iommu_groups/ -type l
-    cat /proc/cmdline
-```
 - https://wiki.gentoo.org/wiki/GPU_passthrough_with_libvirt_qemu_kvm
 -  `lspci | grep VGA`
 - `for a in /sys/kernel/iommu_groups/*; do find $a -type l; done | sort --version-sort`

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "Please be patient. This may take a couple seconds."
 
-
+echo_iommu_full() {
+	echo "Please be patient. This may take a couple seconds."
 
 	#Initializing the list of all IOMMU groups
 	GROUP=`find /sys/kernel/iommu_groups/ -type l | cut -d '/' -f 5,7 --output-delimiter='-'`
@@ -51,3 +51,13 @@ echo "Please be patient. This may take a couple seconds."
 
 	#The output is sorted numerically based on the second space-separated field.
 	done | sort -nk2
+}
+
+echo_iommu() { 
+	lspcii
+    lspci -vv -n
+    dmesg | grep -i iommu
+    virsh nodedev-list pci
+    find /sys/kernel/iommu_groups/ -type l
+    cat /proc/cmdline
+}
