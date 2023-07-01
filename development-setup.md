@@ -1,2 +1,0 @@
-- extensions store linux: extensions gnome
-- windowing gestures linux https://www.omglinux.com/customize-gnome-touchpad-gestures/

@@ -60,4 +60,20 @@ echo_iommu() {
     virsh nodedev-list pci
     find /sys/kernel/iommu_groups/ -type l
     cat /proc/cmdline
+	lscpu | grep -i virtualization
+	lspci | grep VGA
+	lspci -nn | grep -i vga
+	lspci | grep NVIDIA
+	lspci -s 01:00.
+}
+
+check_iommu_enabled() { 
+	#!/bin/bash
+	shopt -s nullglob
+	for g in $(find /sys/kernel/iommu_groups/* -maxdepth 0 -type d | sort -V); do
+		echo "IOMMU Group ${g##*/}:"
+		for d in $g/devices/*; do
+			echo -e "\t$(lspci -nns ${d##*/})"
+		done;
+	done;
 }
