@@ -8,6 +8,8 @@
 - Enable Kernel IOMMU: ```
     sudo grubby --update-kernel=ALL --args=“intel_iommu=on”
     sudo grubby --update-kernel=ALL --remove-args=“intel_iommu”
+    sudo cat /etc/default/grub
+    grub2-mkconfig -o /boot/grub2/grub.cfg
 ```
 - check iommu https://gist.github.com/Misairu-G/616f7b2756c488148b7309addc940b28?permalink_comment_id=3096989
 - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/app-iommu
