@@ -1,13 +1,19 @@
-use std::env;
-use std::fs;
-mod lib;
-use lib::Config;
+use std::process; 
+use std::env; 
+// use minigrep::Config; 
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let config = Config::new(&args);
-    println!("string1 {} string2 {}", config.search, config.path);
+    let args: Vec<String> = env::args().collect(); 
 
-    let content = fs::read_to_string(config.path).expect("Not able to read file.");
-    println!("{}", content);
+    // parse arguments
+    let config = config::build(&args).unwrap_or_else(|err| { 
+        eprintln!("Problem parsing the arguments: {err}"); 
+        process::exit(1); 
+    });
+
+    // execute search
+    if let Err(e) = minigrep::run(config) { 
+        eprintln!("App error: {e}"); 
+        process::exit(1); 
+    } 
 }
