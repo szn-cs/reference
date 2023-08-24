@@ -1,6 +1,13 @@
 ## current systems config file
 zcat /proc/config.gz
 
+compgen # output all possible bash commands
+man compgen
+CTRL+D # END-OF-FILE message terminate input stream
+CTRL+C # terminate regardless of input/output
+cat; 
+echo $? # print exit code of previous command
+/usr/share/doc # additional tool documentations regardless of man or info documentation sources.
 pwd
 whoami
 cd -

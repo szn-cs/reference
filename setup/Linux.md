@@ -4,3 +4,4 @@
 - starship prompt
 - nvim & NvChad + custom font (Operator patched)
 - git & gh setup
+- gpu passthrough & VM
