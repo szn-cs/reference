@@ -22,6 +22,24 @@ Unsafe uses FFI to interface with safe rust.
 `rustup +nightly-2022-01-21 component add miri`
 `cargo +nightly miri test`
 
+extra-strict mode experimental feature : 
+`MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly-2022-01-21 miri test`
+
 --- 
+
+concept of nested reborrows (stack of borrows). Only one live pointer on the top of the stack at any given time (with exclusive mutable access). 
+raw pointers of other raw pointers to the same value share the same borrow. 
+
+--- 
+
+array initialization: 
+```rust
+    let a : [i32; 10] = [0; 10]; 
+    println!("{:?}", &a[..])
+```
+
+--- 
+
+
 
 
