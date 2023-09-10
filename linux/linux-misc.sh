@@ -39,6 +39,10 @@ tar
 bunzip2
 lsblk
 apt list --installed
+ssh-keygen -t ed25519 -C "some_comment" # generate ssh keys
+chattr +i ~/somefile # 
+
+
 
 # change owner of all files recuresively from root to specific user.
 USER=<user>
