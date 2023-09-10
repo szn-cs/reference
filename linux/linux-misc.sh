@@ -34,7 +34,6 @@ sudo /bin/bash
 su x-user
 wget
 curl
-rsync
 tar
 bunzip2
 lsblk
@@ -42,6 +41,8 @@ apt list --installed
 ssh-keygen -t ed25519 -C "some_comment" # generate ssh keys
 chattr +i ~/somefile # 
 
+scp
+rsync
 
 
 # change owner of all files recuresively from root to specific user.
@@ -57,4 +58,65 @@ find ./ -type f -size +10M
 
 #### TOOLS 
 # neovim
+
+
+
+# Compression 
+
+tar -cf /path/to/dest.tar /path/to/src-directory # Creating a tar file
+tar -cf /path/to/dest.tar /path/to/src-directory1 /path/to/src-directory2 # Creating a tar file of multiple directories
+tar -czf /path/to/dest.tar.gz /path/to/src-directory # Compressing a directory with gZip
+tar -xf /path/to/src.tar # Extracting a tar file
+
+
+# Other 
+# linux version
+lsb_release -a
+cat /etc/debian_version
+
+# Update packages
+sudo apt update
+sudo apt upgrade
+sudo apt full-upgrade
+sudo apt --purge autoremove
+
+#package sources
+/etc/apt/sources.list
+
+# apt installed packages
+ls /usr/bin
+
+# user info
+uname -mrs
+
+
+alias ll="ls -alh"
+tree .
+## search for pattern inside files 
+grep -rnw '/path/to/somewhere/' -e 'pattern'
+
+
+tmux
+
+git log
+alias glods="git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset' --date=short"
+glods # alias to git log with specific options
+
+man -k strcmp
+man -w strcmp
+man 3 strcmp
+
+# Here document (Heredoc)  https://www.tecmint.com/use-heredoc-in-shell-scripting/
+x() {
+  cat << EOF > file.txt
+  something
+  EOF
+
+}
+
+
+
+## navigate directories using stack method
+pushd
+popd
 
