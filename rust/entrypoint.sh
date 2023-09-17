@@ -8,7 +8,10 @@ MIRIFLAGS="-Zmiri-tag-raw-pointers" cargo +nightly miri run
 ### 
 
 rustup doc 
+rustup doc --std
+
 
 ### 
 
-    
+cargo clippy
+cargo fmt

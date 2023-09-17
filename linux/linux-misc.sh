@@ -39,7 +39,11 @@ bunzip2
 lsblk
 apt list --installed
 ssh-keygen -t ed25519 -C "some_comment" # generate ssh keys
-chattr +i ~/somefile # 
+ssh-copy-id username@euler.wacc.wisc.edu # adds ssh to remote machine 
+chattr +i ~/somefile 
+### Setup ssh key login https://unix.stackexchange.com/questions/4484/ssh-prompts-for-password-despite-ssh-copy-id
+
+less somefile.txt
 
 scp
 rsync
