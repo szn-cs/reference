@@ -15,3 +15,8 @@ rustup doc --std
 
 cargo clippy
 cargo fmt
+
+### 
+
+# rust toolchain installed in ~/.rustup
+find ~/.rustup/ -name rust-lld
