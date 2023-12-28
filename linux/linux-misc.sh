@@ -58,7 +58,7 @@ git reset --soft HEAD^
 
 # finds files that are larger than 10M
 find ./ -type f -size +10M
-
+find ~/<directory> -name <filename> 
 
 #### TOOLS 
 # neovim
@@ -99,12 +99,14 @@ tree .
 ## search for pattern inside files 
 grep -rnw '/path/to/somewhere/' -e 'pattern'
 
+watch -n 12 --differences=cumulative “cat /folder/file.txt | grep status”
 
 tmux
 
 git log
 alias glods="git log --graph --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset' --date=short"
 glods # alias to git log with specific options
+git submodule update --remote
 
 man -k strcmp
 man -w strcmp
