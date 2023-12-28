@@ -47,4 +47,6 @@ array initialization:
 - image: write image files from array pixel values; 
 - num: deal with complex numbers; 
 - crossbeam: scoped thread creation primitives; 
+- text-colorizer 
+- regex 
 - 
