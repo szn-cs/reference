@@ -20,3 +20,7 @@ cargo fmt
 
 # rust toolchain installed in ~/.rustup
 find ~/.rustup/ -name rust-lld
+
+## 
+
+cargo watch -q -c -x "run -q"
