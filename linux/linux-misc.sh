@@ -43,6 +43,9 @@ ssh-copy-id username@euler.wacc.wisc.edu # adds ssh to remote machine
 chattr +i ~/somefile 
 ### Setup ssh key login https://unix.stackexchange.com/questions/4484/ssh-prompts-for-password-despite-ssh-copy-id
 
+echo "123" | tee ./new_file.txt
+
+
 less somefile.txt
 
 scp
@@ -112,6 +115,16 @@ man -k strcmp
 man -w strcmp
 man 3 strcmp
 
+## navigate directories using stack method
+pushd
+popd
+
+
+
+ldd <executable> # lists binary dependencies
+
+telnet
+
 # Here document (Heredoc)  https://www.tecmint.com/use-heredoc-in-shell-scripting/
 x() {
   cat << EOF > file.txt
@@ -121,8 +134,4 @@ x() {
 }
 
 
-
-## navigate directories using stack method
-pushd
-popd
 
