@@ -42,6 +42,15 @@ ssh-keygen -t ed25519 -C "some_comment" # generate ssh keys
 ssh-copy-id username@euler.wacc.wisc.edu # adds ssh to remote machine 
 chattr +i ~/somefile 
 ### Setup ssh key login https://unix.stackexchange.com/questions/4484/ssh-prompts-for-password-despite-ssh-copy-id
+netstat -nlt 
+
+temporary_directory=$(mktemp -d) # useful for automation scripts with ephemeral files or directories. 
+
+{
+  test 2 == \
+  $(kustomize build $DEMO_HOME | grep -A 2 ".*Ref" | grep "test-" | wc -l); \
+  echo $?    
+}
 
 echo "123" | tee ./new_file.txt
 
