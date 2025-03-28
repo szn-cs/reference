@@ -72,6 +72,8 @@ git reset --soft HEAD^
 find ./ -type f -size +10M
 find ~/<directory> -name <filename> 
 
+ls -a **/file.txt | sort
+
 #### TOOLS 
 # neovim
 
