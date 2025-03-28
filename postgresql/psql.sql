@@ -160,6 +160,92 @@ INSERT INTO ex_domain (street, city, postal_code) VALUES
 ('456 Elm St', 'Shelbyville', '12345-6789'),
 ('789 Oak St', 'Capital City', '1234');
 
+
+-- NULL (unknown value)
+-- opt for default to be NOT NULL check constraint
+CREATE TABLE ex_null (
+    name TEXT NOT NULL,
+    price DECIMAL NOT NULL CHECK (price > 0)
+); 
+
+-- unique constraint
+CREATE TABLE ex_unique (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- IDENTITY is NOT NULL & UNIQUE
+    product_number TEXT CONSTRAINT must_be_unique UNIQUE, -- unique constraint
+    product_name TEXT UNIQUE NULLS NOT DISTINCT -- treat NULLS as unique
+);
+INSERT INTO ex_unique VALUES (DEFAULT, '1234', 'B'), (DEFAULT, '1234', 'A'); -- violates unique constraint
+INSERT INTO ex_unique VALUES (DEFAULT, NULL, 'A'), (DEFAULT, NULL, 'B'); -- NULLs by default are distinct
+INSERT INTO ex_unique VALUES (DEFAULT, 'A', NULL), (DEFAULT, 'B', NULL); -- NULL treated as equal
+-- table contraint 
+CREATE TABLE ex_unique_combination_unique (
+    product_number TEXT, 
+    product_name TEXT, 
+    CONSTRAINT unique_product_number_name UNIQUE (product_number, product_name) -- unique constraint on multiple columns
+);
+
+-- EXCLUSION CONSTRAINTS
+CREATE EXTENSION IF NOT EXISTS btree_gist; -- GIST index for exclusion constraint for INTEGER values (adds functionality to allow strict equality checks)
+CREATE TABLE ex_exclusion (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    room_num INTEGER,
+    reservation_period TSRANGE, 
+    EXCLUDE USING GIST (room_num WITH =, reservation_period WITH &&) -- check for overlapping ranges (checked on insertion with all other periods in the column)
+); 
+INSERT INTO ex_exclusion VALUES 
+    (DEFAULT, 1, '[2024-01-01 00:00:00, 2024-01-02 02:00:00)'), 
+    (DEFAULT, 2, '[2024-01-01 00:00:00, 2024-01-02 02:00:00)'); 
+INSERT INTO ex_exclusion VALUES 
+    (DEFAULT, 2, '[2024-01-02 01:30:00, 2024-01-03 05:00:00)'); -- violates exclusion constraint
+
+-- partial exclusion constraints
+CREATE TABLE ex_exclusion_partial (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    room_num INTEGER,
+    booking_status TEXT, 
+    reservation_period TSRANGE, 
+    EXCLUDE USING GIST (room_num WITH =, reservation_period WITH &&) WHERE (booking_status != 'cancelled')
+); 
+INSERT INTO ex_exclusion_partial VALUES 
+    (DEFAULT, 2, 'cancelled', '[2024-01-01 00:00:00, 2024-01-02 02:00:00)'),
+    (DEFAULT, 2, 'confirmed', '[2024-01-02 01:30:00, 2024-01-03 05:00:00)'); 
+INSERT INTO ex_exclusion VALUES s
+    (DEFAULT, 2, 'confirmed', '[2024-01-02 01:30:00, 2024-01-03 05:00:00)');
+
+-- FOREIGN KEY CONSTRAINTS (enforces referential integrity between tables)
+CREATE TABLE states (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name TEXT
+);
+CREATE TABLE cities (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    state_id BIGINT REFERENCES states(id),
+    name TEXT
+);
+INSERT INTO states (name) VALUES
+('Illinois'),
+('California'),
+('Texas');
+INSERT INTO cities (state_id, name) VALUES
+(1, 'Chicago'),
+(1, 'Springfield'),
+(2, 'Los Angeles'),
+(3, 'Houston');
+INSERT INTO cities (state_id, name) VALUES (5, 'New York'); -- violates foreign key constraint
+
+CREATE TABLE cities_composite_foreign_key_and_action_on_delete (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    state_id BIGINT,
+    name TEXT
+    -- NO ACTION allows the check to be deffered in a transaction, while RESTRICT does not allow it
+    FOREIGN KEY (id,state_id) REFERENCES states(id,id) ON DELETE NO ACTION, -- just an example
+    FOREIGN KEY (id,state_id) REFERENCES states(id,id) ON DELETE RESTRICT, -- just an exampleC
+    -- cascading is dangerous as it can result in deleting large number of records across tables if containts are intertwined
+    -- to avoid this, use ON DELETE SET NULL or ON DELETE SET DEFAULT which can be later cleaned up
+    FOREIGN KEY (id,state_id) REFERENCES states(id,id) ON DELETE CASCADE, -- just an example
+);
+
+--- --- --- --- ---
 -- character sets and collations (defines behavior of comparison - relationship between characters)
 -- can apply specific encoding for specific columns or per operations, in addition to the database encoding configured
 \l+ -- database encoding
@@ -530,12 +616,58 @@ INSERT INTO ex_bits (bit3, bitv) VALUES
 (B'111', B'10101010101010101010101010101010');
 
 --- --- --- --- --- 
+-- Ranges metadata type (with bounded/unbounded lower & upper bounds): INT4RANGE, INT8RANGE, NUMRANGE, DATERANGE, TSRANGE, TSTZRANGE
+-- INT4MULTIRANGE, INT8MULTIRANGE, NUMMULTIRANGE, DATEMULTIRANGE, TSMULTIRANGE, TSTZMULTIRANGE
+-- e.g. checking for room reservation conflicts
+SELECT '[1,5]'::int4range, -- discrete step range -- [1,6) represented internally same as [1,5]
+     '[1,5]'::numrange; -- continuous range including fractions -- [1,6) is not equal to [1,5] for continuous values
+SELECT '[1,5)'::numrange, numrange(1,5,'[)'), '(,)'::numrange, 'empty'::tsrange;
+CREATE TABLE ex_range ( 
+    int_range INT4RANGE, 
+    date_range DATERANGE,
+    num_range NUMRANGE, 
+    ts_range TSRANGE
+); 
+INSERT INTO ex_range (int_range, date_range, num_range, ts_range) VALUES 
+( '[2,7)', '[2022-01-01, 2022-03-01)', '[10.0, 20.0)', '[2022-01-01 00:00:00, 2022-03-01 08:00:00)' ),
+( '[4,8]', '[2023-02-01, 2023-02-15)', '(1.1, 3.3)', '[2023-02-01 09:00:00, 2023-02-15 11:59:59)' ),
+( '(-2,2]', '[2025-05-01, 2025-05-31]', '[100.0, 500.0]', '[2025-05-01 06:00:00, 2025-05-31 18:30:00]' ),
+( '[10,12)', '[2024-06-01, 2024-07-01)', '[0.5, 1.5)', '[2024-06-01 12:00:00, 2024-07-01 23:59:59)' ); 
+SELECT * FROM ex_range WHERE int_range @> 3; -- check if the range contains the value
+SELECT * FROM ex_range WHERE int_range && '[5,6]'; -- check if the ranges overlap
+SELECT INT4RANGE(10,20, '[]') * INT4RANGE(15,25, '[]'); -- intersection of two ranges
 
+SELECT upper(int4range(10,20,'[]')), upper_inc(int4range(10,20,'[]')); 
+SELECT upper(numrange(10,20,'[)')), upper_inc(numrange(10,20,'[)')); -- upper, upper_inc representation of continuous range
+SELECT lower(int4range(10,20,'[]')), lower_inc(int4range(10,20,'[]'));
+
+-- multirange
+SELECT '{[1,5), [7,10)}'::int4multirange @> 8; -- multirange of two ranges
+
+--- --- --- --- --- 
+-- Composite types (has its infrequent usecases but mostly the alternatives are better - discrete columns, JSONB, or separate tables)
+CREATE TYPE address AS ( 
+    number TEXT, 
+    street TEXT, 
+    city TEXT,
+    state TEXT,
+    postal TEXT
+);
+SELECT ROW('123', 'Main St', 'Springfield', 'IL', '62704')::address, ('123', 'Main St', 'Springfield', 'IL', '62704')::address;
+
+CREATE TABLE ex_composite ( 
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+    addr address 
+); 
+INSERT INTO ex_composite (addr) VALUES 
+(('123', 'Main St', 'Springfield', 'IL', '62704')), 
+(('456', 'Elm St', 'Shelbyville', 'IL', '62705'));
+SELECT * FROM ex_composite; 
+SELECT id, addr.number FROM ex_composite; -- ERROR! address is treated as table, use (address).number instead
+SELECT id, (addr).number FROM ex_composite; 
 
 --- --- --- --- --- 
 
-
 --- --- --- --- --- 
-
-
+--- --- --- --- --- 
 --- --- --- --- --- 
