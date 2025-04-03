@@ -1,6 +1,8 @@
 -- 
 -- SQL can be run in pgadmin4 interface or psql command
 -- https://www.postgresql.org/docs/current/reference.html
+-- https://www.postgresql.org/docs/current/bookindex.html
+-- https://www.postgresql.org/docs/current/sql.html
 -- https://www.postgresql.org/docs/17/runtime-config-client.html
 -- https://neon.tech/postgresql/postgresql-cheat-sheet
 
@@ -801,10 +803,15 @@ EXPLAIN (format json) SELECT * FROM users where (email = 'aaron.francis@example.
 EXPLAIN SELECT * FROM users WHERE email < 'b' LIMIT 10; -- shows low cost bc of unit
 EXPLAIN SELECT * FROM users WHERE email < 'b' ORDER BY last_name LIMIT 10; -- cost is back up again because it required ordering of all the retieved rows 
 EXPLAIN ANALYZE SELECT * FROM users WHERE email < 'b' ORDER BY last_name LIMIT 10; -- runs query and measures the costs in ms
+EXPLAIN (ANALYZE, COSTS OFF) SELECT * FROM users WHERE email < 'b' ORDER BY last_name LIMIT 10; -- runs query and measures the costs in ms
 
 --- --- --- --- --- 
 -- Query 
 -- unqualified join -> cross-join (cartesian join; x * y rows)
+SELECT users.id, users.first_name, bookmarks.id, bookmarks.url FROM users CROSS JOIN bookmarks LIMIT 10; -- cross join with size = users size x bookmarks size
+SELECT users.id, users.first_name, bookmarks.id, bookmarks.url FROM users, bookmarks LIMIT 10; -- alternate syntax
+SELECT upper(letter) || number FROM letters CROSS JOIN numbers; -- produce a concatenated result {letter}{number}
+SELECT (chr(l) || n) AS Code FROM generate_series(1, 100) AS numbers(n) CROSS JOIN generate_series(65, 90) AS letters(l);
 
 -- qualified join -> inner join (only matching rows; default type of join)
 SELECT users.id, users.first_name, bookmarks.id, bookmarks.url FROM users INNER JOIN bookmarks ON users.id = bookmarks.user_id LIMIT 10; -- inner join
@@ -818,6 +825,167 @@ SELECT * FROM users JOIN bookmarks ON USING(user_id) LIMIT 10;  -- requires both
 -- OUTER JOIN (LEFT, RIGHT, FULL)
 SELECT users.id, users.first_name, bookmarks.id, bookmarks.url FROM users LEFT JOIN bookmarks ON users.id = bookmarks.user_id LIMIT 10;
 SELECT users.id, users.first_name, bookmarks.id, bookmarks.url FROM users LEFT JOIN bookmarks ON users.id = bookmarks.user_id WHERE bookmarks.user_id is NULL LIMIT 10;
+
+--- joining on a subquery result
+SELECT * FROM users LEFT JOIN bookmarks ON users.id = bookmarks.user_id WHERE bookmarks.user_id is NULL LIMIT 10;
+CREATE INDEX bookmarks_secure_url ON bookmarks(user_id, (starts_with(url, 'https'))); -- using a function reference filter the table
+EXPLAIN SELECT * FROM bookmarks WHERE (starts_with(url, 'https')) is TRUE LIMIT 10;  -- by itself will not do an index scan 
+EXPLAIN SELECT users.id, first_name, url FROM users LEFT JOIN ( -- join on subquery
+    SELECT * FROM bookmarks WHERE starts_with(url, 'https') IS TRUE -- when used within a join, both user_id and starts_with portion of the index will be used. 
+) AS bookmarks_secure ON users.id = bookmarks_secure.user_id LIMIT 100; 
+
+--- LATERAL qualifier (for every row in the pre-seeding table run the subquery and use its result set; expensive because it runs the subquery for every row in the pre-seeding table)
+-- there are more performant approaches to lateral join
+SELECT users.id, first_name, url FROM users LEFT JOIN LATERAL (
+    SELECT * FROM bookmarks WHERE users.id = bookmarks.user_id ORDER BY users.id DESC LIMIT 1
+) AS most_recent_bookmark ON TRUE WHERE most_recent_bookmark.id IS NULL LIMIT 10;
+SELECT users.id, first_name, url FROM users INNER JOIN LATERAL (
+    SELECT * FROM bookmarks WHERE users.id = bookmarks.user_id ORDER BY users.id DESC LIMIT 1
+) AS most_recent_bookmark ON TRUE LIMIT 10;
+
+---- ---- ---- ----
+
+--- put two set generating function side-by-side
+SELECT * FROM generate_series(1, 10) AS a, generate_series(101, 120) AS b; -- cross join will produce a cartesian product (not what we intend for putting two set generating functions side-by-side)
+SELECT * FROM rows FROM (
+    generate_series(1, 10), 
+    generate_series(101, 120)
+) AS combined_table(s1, s2) WHERE s1 IS NOT NULL;
+SELECT day_date::DATE, day_of_year FROM rows FROM (
+    generate_series('2025-01-01'::DATE, '2025-12-31', '1 day'::interval),
+    generate_series(1, 380)
+) AS day_of_year(day_date, day_of_year) WHERE day_date IS NOT NULL; 
+
+-- lined-up without ordinality
+SELECT * FROM rows FROM (
+    UNNEST(ARRAY[101, 102, 103]), 
+    UNNEST(ARRAY['Computer', 'Car', 'Machine']), 
+    UNNEST(ARRAY[999.99, 499.49, 299.99])
+) AS combined(product_id, product_name, price);
+
+--- filling gaps in a result sequence (using left join of geenrate series)
+SELECT sale_date, sum(amount) FROM sales GROUP BY sale_date ORDER_BY sale_date ASC; -- data may procude gaps in the results for non existing sale_dates
+SELECT 
+    all_dates.sale_date::DATE, 
+    coalesce(total_amount, 0) -- will pick the first non-null value (if total_amount is null wll pick 0)
+FROM generate_series('2024-01-01'::DATE, '2024-1-31'::DATE, '1 day'::interval) AS month_dates(sale_date) LEFT JOIN (
+    SELECT sale_date, sum(amount) as total_amount FROM sales GROUP BY sale_date
+) AS sales ON sales.sale_date = all_dates.sale_date; 
+
+--- use subquery to filter data from table based on related data from related table (filter table based on subquery results)
+SELECT user_id, count(*) FROM bookmarks GROUP BY user_id HAVING count(*) > 16; -- (get users that have > 16 bookmarks) -- HAVING is like WHERE but operates after GROUP BY operation
+-- (full query: get users that have > 16 bookmarks) -- NOTE: this query will be optimized as a semi-join (and not executed in 2 completely separate stages); named `semi` because no data is taken from the subquery table)
+SELECT * FROM users WHERE id IN ( 
+    SELECT user_id, count(*) FROM bookmarks GROUP BY user_id HAVING count(*) > 16
+); 
+-- equivalent join
+SELECT users.id, first_name, last_name, bookmarks.count FROM users INNER JOIN (
+    SELECT user_id, count(*) as count FROM bookmarks GROUP BY user_id HAVING count(*) > 16
+) AS bookmarks ON users.id = bookmarks.user_id ORDER BY bookmarks.count;
+EXPLAIN (ANALYZE, COSTS OFF) SELECT users.id, first_name, last_name, bookmarks.count FROM users INNER JOIN (
+    SELECT user_id, count(*) as count FROM bookmarks GROUP BY user_id HAVING count(*) > 16
+) AS bookmarks ON users.id = bookmarks.user_id ORDER BY bookmarks.count; -- `loops` section of the query execution measurement shows the # of times the subquery was run
+
+-- where exists 
+SELECT * FROM users WHERE EXISTS ( -- for every user will run the subquery and short-circuit on the first instance found (while WHERE IN  will do a semi-join)
+    SELECT 1 FROM bookmarks WHERE users.id = bookmarks.user_id AND starts_with(url, 'https') 
+);
+
+-- issue with 'not in'
+SELECT * FROM users WHERE id NOT IN (
+    VALUES (1), (2), (NULL) -- NULL value will cause the entire query to return no results
+);
+
+-- WHERE value IN (checks if value exists in subquery result; can optimize as semi-join) vs WHERE EXISTS (checks which rows satisfy condition; executes subquery on every row)
+
+--- --- --- --- --- 
+-- combine/merge queries into a single list
+SELECT 1 UNION SELECT 2; -- must have same number of columns and data type; deduplicates results;
+SELECT 1 UNION ALL SELECT 1; -- ALL modifier will avoid deduplicate results; more performant (doesn't have to compare to avoid duplicates)
+
+SELECT true as active, * FROM users 
+UNION
+SELECT false, * FROM users_deleted_archive; -- allows to query both tables at once
+
+SELECT generate_series(1, 5)
+INTERSECT ALL 
+(
+    SELECT generate_series(3, 7) 
+    UNION ALL 
+    SELECT generate_series(10, 15)
+);
+
+
+SELECT generate_series(3, 11) -- get all series except where it overlaps with the target series
+EXCEPT ALL 
+SELECT generate_series(10, 15);
+
+--- --- --- --- --- 
+-- set generating functions
+SELECT generate_series('2024-01-01'::date, '2024-12-31'::date, '3 day'::INTERVAL)::DATE AS date; 
+SELECT generate_series(1, 100, 3)::INT AS number;
+SELECT UNNEST(ARRAY[1, 2, 3, 4, 5]) AS tag_name;
+SELECT ordinality, element FROM UNNEST(ARRAY['first', 'second', 'third']) WITH ORDINALITY AS table_name(element, ordinality); 
+SELECT * FROM jsonb_to_recordset('[
+    {"id": 1, "name": "Alice", "email": "alice@example.com"},
+    {"id": 2, "name": "Bob", "email": "bob@example.com"},
+    {"id": 3, "name": "Charlie", "email": "charlie@example.com"}
+]'::jsonb) AS table_name(id INT, name TEXT, email TEXT); 
+SELECT regexp_matches('The quick brown fox jumps over the lazy dog', '\m\w{4}\M', 'g') AS match; 
+SELECT m[1] AS name, m[2] AS age FROM (SELECT regexp_matches('NAME: Alice, Age: 40; Name: bob, Age: 33', 'Name: (\w+), Age: (\d+)', 'g') AS m) AS sub; 
+
+--- --- --- --- --- 
+-- creating index for a foreign key (in the child table); The pateny table's primary key is enforced by an index, but the child is not covered.
+CREATE TABLE states (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+    name TEXT
+); 
+CREATE TABLE cities ( 
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+    state_id BIGINT REFERENCES states(id), 
+    name TEXT
+); 
+SELECT * FROM pg_indexes WHERE tablename = 'states'; -- index exists on primary key
+SELECT * FROM pg_indexes WHERE tablename = 'cities'; -- index exists on primary key, but no index on foreign key 
+
+SELECT * FROM pg_indexes WHERE tablename = 'bookmarks'; -- index exists on primary key, but no index on foreign key 
+EXPLAIN SELECT * FROM users INNER JOIN bookmarks ON bookmarks.user_id = users.id WHERE users.id < 100; -- relies on sequential scan to find matching user_id in bookmarks table
+CREATE INDEX idx_bookmarks_user_id ON bookmarks(user_id, additional_field_index_1, additional_field_index_2); -- accomplishes join with index scans effectively; take advantange of composite index for allowing index filtering on the right of the join column field;  
+
+
+---- ---- ---- ---- ----
+---------------------------- extensive notes reached @ 75.-Grouping; after which shallow notes are recorded
+--- topics for grouping: group by grouping sets, group by rollup, group by cube; can be used in 'window' section too 
+--- topics for window (preserves all rows and gains additional info, unlike aggregation or grouping which loses row info filtering them out) functions using `over` keyword and partition by; frames (rows, groups, range) within a partition of window; window preceding and following; lead and lag function to peak ahead and behind for values; 
+--- topics for CTEs (Common Table Expressions; allows for refactoring and breaking large queries into manageable parts): `with` keyword;  postgresql can optimize queries that rely on CTEs by deciding when to materialize the temporary tables.
+--- topics for recursive CTEs: `with recursive` keyword with anchor condition and recursive statement of `union all`; recursive CTEs can be used to simplify the application logic;
+--- NULL handling topics: `is distinct from`; `coalesce`; `NULL FIRST`; `nullif`; `where {id} not in` returns nothing if null exist; 
+--- ROW VALUE SYNTAX topics: cursor (key-set) based pagination pattern; EXTRACT keyword; 
+--- VIEWS (a named query stored in database; CTE but the query gets stored for later execution and reference; underlying query will have to run to produce the data) topics: CREATE VIEW; 
+
+SHOW search_path; 
+CREATE SCHEMA views; 
+SET search_path = views,public; -- find table name in views then in public
+CREATE VIEW views.users AS (
+    SELECT * FROM public.users 
+    UNION ALL 
+    SELECT * FROM public.users_archive
+);
+EXPLAIN SELECT * FROM users; -- references views.users
+EXPLAIN SELECT * FROM public.users; 
+
+--- materialized views (the results are written to the disk; may be stale data until the view is refereshed): `create materialized view`, `alter maeterialized view`, `refresh materialized view`; 
+--- upsert (insert or update; `INSERT ... ON CONFLICT`);
+--- returning keyword;
+ 
+--- text search using limited vanilla postgresql: LIKE/ILIKE operators with wildcard operator (slow for long content); text search with ts_vector, ts_query (support a DSL for rules), ts_rank with customization of rank weights (relavence), and matching operator `@@`; plainto_tsquery, phraseto_tsquery, websearch_to_tsquery (similar to syntax supported by web search engines; user friendly); use language in to_tsvector, setwright; GIN index over ts_vectors; ts_headline to highlight matching in postgresql; 
+
+--- JSON topics: does JSON have strict schema? is it used as a blob or querying always the fields? indexing into JSON blob is supported; JSON (compact & slower; reasonable usage is when json origianl order is important & exact representation which is rarely the case; or if it will be sent to the user and never operated on;) vs. JSONB (stores json parsed on disk; takes more space & overhead; more performant in binary representation; removes whitespace, rearranges keys, deduplicates fields;); `is json`; `jsonb_build_object`, `to_json`, `jsonb_build_array`, `jsonb_build_array`, json_agg(row_to_json()); `->` & `->>` & `#>` extract operator (returns NULL if doesn't exist), jsonb_path_query (implements standard query path) `$.status` with unquote `#>> '{}'`; `@>` & `<@` containment check operator, `?` & `?|` & `?&` existence operator; expand to recordset table `jsonb_each`, `jsonb_each_text`, `jsonb_to_recordset` with lateral qualifier vs creating EAV style table; in-place updates of json `jsonb_set` + `json_scalar`, remove field  `-`, jsonb_insert; 
+--- index json topics: functional straight index BTree index on result of expression vs index over a generated column BTree index (under the hood both are performant; choosing approach is a matter of preference; but generated column requires querying the newly generated column) vs GIN index (used to index entire json blob; much better for containment and existence operator queries; performance overhead for large json; larger size index) with json_ops or json_path_ops options (smaller with less supported operations); 
+
+--- pgvector extension topics (store vector embeddings and query against them): OpenAI to generate embeddings, `<->` operator to find related, sematic search on embeddings (creating embeddings for search query and use `<->` to order results of related content embeddings); `<->` L2 operator, `<=>` Cosine operator, `<+>` L1 operator, Inner product `<=>` (choosing depending on model used and their recommendation and testing it against the data);
+--- index vectors: HNSW (higher quality/accuracy but requires more resources and query time) vs IVF-flat index (query with vectors indexes will perform an spproximate nearest neighbours search; speeds up queries over accuracy tradeoff); 
+
 
 --- --- --- --- --- 
 
