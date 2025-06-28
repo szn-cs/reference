@@ -24,3 +24,8 @@ find ~/.rustup/ -name rust-lld
 ## 
 
 cargo watch -q -c -x "run -q"
+
+
+### 
+
+cargo tree --format "{p} {f}"

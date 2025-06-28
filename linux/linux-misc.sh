@@ -144,5 +144,25 @@ x() {
 
 }
 
+# show bridges/switches including virtual
+brctrl show 
 
+# control current swap usage
+cat /proc/swaps
+swapon --show
+sudo swapoff -a # moves all swaps to memory
+sudo swapon -a # re-enable swap
 
+# increase swap (zram)
+zramctl
+sudo nano /etc/systemd/zram-generator.conf
+# ```
+# [zram0]
+# zram-size = 16384
+# ```
+# refresh zram allocation
+sudo swapoff -a
+sudo swapon -a
+
+# system resources
+htop 

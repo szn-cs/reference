@@ -49,4 +49,7 @@ array initialization:
 - crossbeam: scoped thread creation primitives; 
 - text-colorizer 
 - regex 
-- 
+
+
+# Notes: 
+- concept of runtime-guareded mutability for multiple references: Rust provides runtime-checked interior mutability types (Mutex, RefCell, RwLock) as a controlled, explicit escape hatch for these specific scenarios. These types encapsulate the "unsafe" operations (like manipulating raw pointers or atomically swapping state) but provide a safe API on top, moving the "guarantees" from compile-time to runtime.
