@@ -1,0 +1,3 @@
+- [[Random ideas]]
+- [[Cross-platform Full-stack Complete-control software]]
+- [[Tech Stack]]
