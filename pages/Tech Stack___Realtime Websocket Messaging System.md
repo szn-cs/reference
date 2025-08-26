@@ -1,0 +1,15 @@
+- Dedicated streaming / realtime notifications scalable services
+- ### Solutions:
+	- Rust **Async-graphql** crate with grpahql subscriptions.
+		- Scalability?
+	- https://github.com/deepstreamIO/deepstream.io
+		- TS
+	- https://github.com/dunglas/mercure
+		- GoLang
+	- https://github.com/nats-io/nats-server
+		- GoLang
+	- NATS / NATS JetStream
+	- Apache Pulsar https://github.com/apache/pulsar
+		- TODO {{video https://www.youtube.com/watch?v=VD7y5h4AtgM}}
+	- Redis Streams with WebSocket Layer (Tungstenite + Tokio)
+	-

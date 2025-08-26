@@ -1,3 +1,6 @@
-- [[Random ideas]]
-- [[Cross-platform Full-stack Complete-control software]]
+- [[Product ideas]]
 - [[Tech Stack]]
+- [[Study]]
+- ---
+- [[course]]
+	- [[success stories]]

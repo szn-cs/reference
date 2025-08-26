@@ -1,0 +1,132 @@
+# IAM /OIDC  Kubernetes
+collapsed:: true
+	- implementation for OAuth2 and OpenID Connect in Kubernetes:
+		- considerations
+			- which supports 2FA ?
+			- which provide customized UI ?
+			- which provide user management?
+			- how easily integratible with Kubernetes is it ?
+			- Check CNCF; Check awesome-xyz lists
+		- ~~Zitadel ~~[GitHub - zitadel/zitadel: ZITADEL - Identity infrastructure, simplified for you.](https://github.com/zitadel/zitadel): limits number of logins per day for free tier
+		- [GitHub - authelia/authelia: The Single Sign-On Multi-Factor portal for web apps, now OpenID Certified™](https://github.com/authelia/authelia)
+			- popular, kubernets native, NGINX/gateway support, more modern
+		- [GitHub - keycloak/keycloak: Open Source Identity and Access Management For Modern Applications and Services](https://github.com/keycloak/keycloak)
+			- feature rich, with dashboard for management, heavy resource hungry; comprehensive thus unnecessarily complex.
+			- multiple instances for redundancy requires replication of whole instance (heavy).
+			- writing providers and integrations are messy.
+		- ~~Dex~~: [GitHub - dexidp/dex: OpenID Connect (OIDC) identity and OAuth 2.0 provider with pluggable connectors](https://github.com/dexidp/dex): connector to other identity providers (central hub; not a fully-fledged user management system).
+			- simple, lightweight, designed for k8s, relies on an upstream identity provider
+		- Ory stack - Hydra [GitHub - ory/hydra: The only web-scale, fully customizable OpenID Certified™ OpenID Connect and OAuth2 Provider in the world. Become an OpenID Connect and OAuth2 Provider over night. Written in Go,...](https://github.com/ory/hydra?tab=readme-ov-file#what-is-ory-hydra) or [GitHub - ory/kratos: Headless cloud-native authentication and identity management written in Go. Scales to a billion+ users. Replace Homegrown, Auth0, Okta, Firebase with better UX and DX. Passkeys...](https://github.com/ory/kratos)
+			- [Ory Kratos Helm Chart](https://k8s.ory.sh/helm/kratos.html)[Ory](https://github.com/ory)
+			- standard compliant, popular, Kubernetes support, no graphical dashboard - all through API
+			- Spins up fast with only what you need from the features.
+			- provides building blocks as open source but glue code and user interface must be implemented separately.
+			- Hydra provides basic authorization capabilities that can be extended with integration to Keto.
+			- UI for Kratos [GitHub - ory/kratos-selfservice-ui-node](https://github.com/ory/kratos-selfservice-ui-node?tab=readme-ov-file)
+			- [ORY Helm Charts](https://k8s.ory.sh/helm/)
+			- [Introduction | Ory](https://www.ory.sh/docs/ecosystem/projects)
+			- Hydra Outh2 client automatic creation [GitHub - ory/hydra-maester: Kuberenetes CRD Controller for Ory Hydra. Maintained by the community, not an official Ory project!](https://github.com/ory/hydra-maester)
+			- [GitHub - dfoxg/kratos-admin-ui: A simple Admin-Interface for ory/kratos](https://github.com/dfoxg/kratos-admin-ui)
+			- [GitHub - MarkusThielker/next-ory: ☄️ An easy-to-use starting point to self-host Ory Kratos with Ory Hydra and Ory Keto, Next.js authentication UI and admin dashboard (work in progress) styled with ...](https://github.com/markusthielker/next-ory)
+			- [GitHub - ory/hydra-login-consent-node: This is an ExpressJS reference implementation for the ORY Hydra User Login and Consent interface written in TypeScript and ExpressJS.](https://github.com/ory/hydra-login-consent-node?tab=readme-ov-file#overview)
+			- Terraform provider [GitHub - svrakitin/terraform-provider-hydra: Terraform provider for ory/hydra](https://github.com/svrakitin/terraform-provider-hydra)
+		- authentik: focused on usability; has security issues (relies also on python; enterprise tier);
+		- ~~Pinniped~~
+		- [GitHub - oauth2-proxy/oauth2-proxy: A reverse proxy that provides authentication with Google, Azure, OpenID Connect and many more identity providers.](https://github.com/oauth2-proxy/oauth2-proxy) (not featureful enough, basic delegated OIDC solution)
+		- Istio (rolls an additional envoy Ingress controller; Cilium overlaps with functionality; Istio does provide better support currently for external authorization - this is set to change soon with Cillium Gateway API and feature improvements; Istio uses Ingress or its own Gateway kind version jot standard and not Gateway API; Istio can work together with cilium but adds complexity);
+			- [Integration with Istio — Cilium 1.19.0-dev documentation](https://docs.cilium.io/en/latest/network/servicemesh/istio/)
+	- [topics] OPA authorization policy external authorization webhook supported by Kubernetes api server; Istio;
+		- [choose this when support lands for Gateway API and Cilium integration] Cilium integration with externalAuthorization + Ory Oathkeeper in decision maker mode (e.g. OPA)  - [GEP: Gateway/HTTPRoute level authentication · Issue #1494 · kubernetes-sigs/gateway-api](https://github.com/kubernetes-sigs/gateway-api/issues/1494)
+		- Envoy Proxy + oathkeeper decision maker   vs  oathkeeper proxy mode (limited and static options with regards to upstream configuration which requires manual modifications - e.g. matching the service name with postfix/prefix addition).
+		- Cilium Gateway API + Istio (which uses Envoy internally)  + Oathkeeper
+			- "Certain advanced features, such as rate limiting and authentication at the Gateway or HTTPRoute level, are not fully implemented in the current Gateway API specification. Discussions and proposals are ongoing to introduce these capabilities in future releases."
+		- Each solution gateway or service mesh provide their own CRDs and API versions to support extended features.
+			- "Generally, the API Gateway will apply a [Coarse Grained Authorization](https://medium.com/@robert.broeckelmann/what-is-authorization-9977caacc61e)(CGA) decision and the API Provider will implement [Fine Grained Authorization](https://medium.com/@robert.broeckelmann/what-is-authorization-9977caacc61e) decisions"
+	- Hierarchical Role-Based Access Control vs RBAC (groups users by roles) vs ACL (for small number of users)
+	- Grant flow types, Oathkeeper authenticators handlers, Oathkeeper authorizers handlers
+	- Go Templating Language for Ory Oathkeeper access rules
+	- Kong Gateway [GitHub - Kong/kong: 🦍 The Cloud-Native API Gateway and AI Gateway.](https://github.com/Kong/kong) (used by Supabase)
+-
+- # resources auth:
+	- TODO [IAM roles for Kubernetes service accounts - deep dive](https://mjarosie.github.io/dev/2021/09/15/iam-roles-for-kubernetes-service-accounts-deep-dive.html)
+	- TODO [Kubernetes Authentication with OIDC: Simplifying Identity Management](https://medium.com/@extio/kubernetes-authentication-with-oidc-simplifying-identity-management-c56ede8f2dec)
+	- TODO [Secure Kubernetes clusters with OAuth2/OpenID Connect and cidaas](https://cidaas.medium.com/secure-kubernetes-clusters-with-oauth2-openid-connect-and-cidaas-ffc58b7274b7)
+	- DONE [OpenID Connect and OAuth 2 explained in under 10 minutes!](https://www.youtube.com/watch?v=nPZ8QDZXtLI)
+	  :LOGBOOK:
+	  CLOCK: [2025-07-25 Fri 09:27:57]--[2025-07-25 Fri 09:28:05] =>  00:00:08
+	  :END:
+	- TODO keycloak [Integrating OpenID Connect with Kubernetes](https://www.youtube.com/watch?v=8TW20L9bTPY)
+	- TODO [Authorization and Authentication for Kubernetes Apps](https://www.youtube.com/watch?v=jEBqsGxjDfs)
+	- DONE ~ [Keycloak Is AWESOME! Single Sign On Made Easy!](https://www.youtube.com/watch?v=6ye4lP9EA2Y)
+	- DONE ~ [Authelia | Authentication for Traefik - Ultimate Guide / Keycloak alternative](https://www.youtube.com/watch?v=upKaY6VkQqw)
+	- DONE ~~~ ~~[Simple Self-Hosted Security with Authelia](https://www.youtube.com/watch?v=-9Psb0ztMuI)
+	- TODO [Kubernetes Security | Authenticating Webhook and Authentication Proxy Explained](https://www.youtube.com/watch?v=oRsHTzak5iQ)
+	- TODO [Secure authentication for EVERYTHING! // Authentik](https://www.youtube.com/watch?v=N5unsATNpJk) general explanation
+	- DONE [KeyCloak vs Authelia - Gary' Blog](https://garymeng.com/3111.html)
+	- TODO [Secure Web Services with Authelia and Nginx Proxy Manager](https://ambientnode.uk/authelia-npm/)
+	- TODO ~ [AuthentiK vs Keycloak](https://blog.devgenius.io/authentik-vs-keycloak-2906fcf5756d)
+	- TODO [KeyCloak an Open Source for Identity and Access Management](https://medium.com/@gauravshekharster/keycloak-an-open-source-for-identity-and-access-management-0ac85b3b9eaa)
+	- TODO [Kubernetes OIDC Integration: How We Mastered K8s Authentication with Keycloak in Gardener KaaS › Cloudification - We build Clouds 🚀☁️](https://cloudification.io/cloud-blog/kubernetes-oidc-integration-how-to-master-k8s-authentication-with-keycloak-in-gardener-kaas/)
+	- TODO ~ [Introduction and Local setup [Ory Hydra, Ory Kratos]](https://www.youtube.com/watch?v=Cptnv7ZaFY8)
+	- DONE 👍 [Guardians of hell: hydra kratos oathkeeper](https://hamzabouissi.github.io/posts/guardians_of_hell/)
+		- DONE [GitHub - safizn/k8s_authorization_with_ory](https://github.com/safizn/k8s_authorization_with_ory)
+	- TODO [OpenID Connect With Kratos And Hydra Tutorial - Gitea OAuth](https://grimoire.carcano.ch/blog/openid-connect-with-kratos-and-hydra-tutorial-gitea-oauth/#Deploying_The_Solution)
+	- DONE [GitHub - ory/awesome-ory: A curated collection of examples and solutions created by the Ory Community.](https://github.com/ory/examples?tab=readme-ov-file)
+	- TODO [https://www.bomberbot.com/proxy/deploy-ory-cloud-with-nginx-for-security-performance-and-flexibility/](https://www.bomberbot.com/proxy/deploy-ory-cloud-with-nginx-for-security-performance-and-flexibility/)
+	- TODO [Integrating Ory with NestJS: A Comprehensive Guide | Tutorial](https://push-based.io/article/introduction-to-ory#integrating-ory-into-backend-and-frontend-applications)
+	- TODO [Getting Started with Ory/Hydra: Building Your Own OAuth2 Authentication Service](https://medium.com/@klcoder/getting-started-with-ory-hydra-building-your-own-oauth2-authentication-service-4d06716fbc18)
+	- DONE [GitHub - MarkusThielker/next-ory: ☄️ An easy-to-use starting point to self-host Ory Kratos with Ory Hydra and Ory Keto, Next.js authentication UI and admin dashboard (work in progress) styled with ...](https://github.com/markusthielker/next-ory)
+	- DONE [Ory Summit - SumUp's Self service OIDC for with Ory Hydra and Terraform](https://www.youtube.com/watch?v=O3mtX2cciHc)
+	- DONE [A Case Study on Separating IAM from Business Logic with Ory](https://medium.com/flock-community/a-case-study-on-separating-iam-from-business-logic-with-ory-6ecbe3626069)
+	- TODO [Practical Example of Implementing OAuth 2.0 Using ory/hydra](https://yusufs.medium.com/practical-example-of-implementing-oauth-2-0-using-ory-hydra-fbaa2765d94f)
+	- TODO [The ORY Advantage: Streamlining User Authentication and API Access Control](https://47billion.com/blog/the-ory-advantage-streamlining-user-authentication-and-api-access-control/)
+	- DONE [Ory Kratos/Hydra integration demo](https://www.youtube.com/watch?v=F6ZKrxf8LuQ)
+	- DONE ~~docs: ~~[Introduction | Ory](https://www.ory.sh/docs/ecosystem/projects)
+	- DONE 👌 [Everything You Ever Wanted to Know About OAuth and OIDC](https://www.youtube.com/watch?v=8aCyojTIW6U)
+	- DONE [An Illustrated Guide to OAuth and OpenID Connect](https://www.youtube.com/watch?v=t18YB3xDfXI)
+	- TODO [Social Login Using OpenID Connect (OIDC) | Pangea](https://pangea.cloud/securebydesign/authn-using-oidc/)
+	- TODO [OAuth 2.0 Playground](https://www.oauth.com/playground)
+	- TODO [OAuth 2.0 Playground: Debug, Visualize, and Master OAuth Flows for Free](https://authplay.io/)
+	- DONE [Ory Oathkeeper: Identity and Access Proxy Server - Developer Friendly Blog](https://developer-friendly.blog/blog/2024/06/10/ory-oathkeeper-identity-and-access-proxy-server/#play-1-anonymous-access)
+	- TODO [ory_workshop/oathkeeper at master · gen1us2k/ory_workshop](https://github.com/gen1us2k/ory_workshop/tree/master/oathkeeper)
+	- DONE [Self-service flows | Ory](https://www.ory.sh/docs/kratos/self-service)
+	- DONE [Web API Security | Basic Auth, OAuth, OpenID Connect, Scopes & Refresh Tokens](https://www.youtube.com/watch?v=x6jUDfpESmA)
+	- DONE ~~OAuth2 errors and documentation ~~[OAuth2 error and troubleshooting guide | Rabobank Developer Portal](https://developer.rabobank.nl/oauth2-error-and-troubleshooting-guide) [OAuth - PSD2 and Premium | Rabobank Developer Portal](https://developer.rabobank.nl/oauth-psd2-and-premium)
+	- DONE ~~RFC standards ~~[RFC 6749: The OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)
+	- TODO Zanzibar paper: [Zanzibar: Google’s Consistent, Global Authorization System](https://research.google/pubs/zanzibar-googles-consistent-global-authorization-system/)
+		- DONE [Zanzibar: Google’s Consistent, Global Authorization System](https://www.youtube.com/watch?v=9gvJHf9FqmM)
+		- TODO [USENIX ATC '19 - Zanzibar: Google’s Consistent, Global Authorization System](https://www.youtube.com/watch?v=mstZT431AeQ&pp=ygUWemFuemliYXIgYXV0aG9yaXphdGlvbg%253D%253D)
+		- DONE [Fine Grained Authorisation with Relationship-Based Access Control - Ben Dechrai - CPH DevFest 2024](https://www.youtube.com/watch?v=pg0nl2uM2K0)
+	- TODO [Introduction to Ory Keto Permissions | Ory](https://www.ory.sh/docs/keto)
+	- DONE [Beyond Gateway API: Introducing Envoy Gateway's Gateway API Extensions](https://www.zhaohuabing.com/post/2024-09-22-introducing-envoy-gateways-gateway-api-extensions-en/)
+	- DONE [OAuth2 authorization code flow | Ory](https://www.ory.sh/docs/oauth2-oidc/authorization-code-flow)
+	- DONE ~~example kratos settings ~~[angular-go-kratos-ui/config/kratos/kratos.yml at main · shaninalex/angular-go-kratos-ui](https://github.com/shaninalex/angular-go-kratos-ui/blob/main/config/kratos/kratos.yml)
+	- DONE ~~keto + oathkeeper ~~[Ory Keto: Authorization and Access Control as a Service - Developer Friendly Blog](https://developer-friendly.blog/blog/2024/07/01/ory-keto-authorization-and-access-control-as-a-service/#verify-the-permissions-and-access-control)
+	- TODO [https://docs.mojaloop.io/business-operations-framework-docs/guide/SecurityBC.html](https://docs.mojaloop.io/business-operations-framework-docs/guide/SecurityBC.html)
+	- DONE [Figuring out Ory Oathkeeper](https://gruchalski.com/posts/2021-05-20-figuring-out-oathkeeper/)
+	- TODO [TechConative | Authorization Woes - KETO way of solving](https://techconative.com/blog/authorization-woes-via-keto/)
+	- TODO [Top 5 Google Zanzibar open-source implementations in 2024 — WorkOS](https://workos.com/blog/top-5-google-zanzibar-open-source-implementations-in-2024)
+-
+- <!--ScriptorStartFragment-->
+- ## Resources: service mesh:
+	- TODO [Service Mesh: Moving from bare-bones Envoy to Istio](https://medium.com/hackernoon/service-mesh-moving-from-bare-bones-envoy-to-istio-e0fef88fc1e3)
+	- TODO [Integration with Istio — Cilium 1.19.0-dev documentation](https://docs.cilium.io/en/latest/network/servicemesh/istio/)
+	- DONE [https://www.reddit.com/r/devops/comments/17a0808/why_did_cilium_win_over_istio_for_number_choice/](https://www.reddit.com/r/devops/comments/17a0808/why_did_cilium_win_over_istio_for_number_choice/)
+	  :LOGBOOK:
+	  CLOCK: [2025-07-25 Fri 09:33:37]--[2025-07-25 Fri 09:33:39] =>  00:00:02
+	  :END:
+	- DONE [Running Istio with Cilium's Kube Proxy Replacement | Solo.io](https://www.solo.io/blog/istio-cilium-kube-proxy-replacement)
+	- TODO Envoy + OPA plugin/feature [Overview & Architecture | Open Policy Agent](https://www.openpolicyagent.org/docs/latest/envoy-introduction/)
+	- TODO [OIDC Authentication](https://gateway.envoyproxy.io/docs/tasks/security/oidc/)
+	- DONE ~ [Ory Oathkeeper: Identity and Access Proxy Server - Developer Friendly Blog](https://developer-friendly.blog/blog/2024/06/10/ory-oathkeeper-identity-and-access-proxy-server/#azure-ad-jwks-endpoint)
+	- TODO [Comparing Sidecar-Less Service Mesh from Cilium and Istio - Christian Posta, Solo.io](https://www.youtube.com/watch?v=91oylZSoYzM)
+	- DONE [ory-hydra/docs/oauth2.md at master · segment-boneyard/ory-hydra](https://github.com/segment-boneyard/ory-hydra/blob/master/docs/oauth2.md)
+	- TODO [Why pick Envoy Proxy and Solo.io over Kong Gateway for modernization | Solo.io](https://www.solo.io/blog/envoy-solo-over-kong-gateway-for-modernization)
+-
+- ## Conclusion:
+	- Envoy Gateway with external authorization server - Ory stack: Oathkeeper (proxy) + Kratos (authentication) + Hydra (authorization - RBAC)
+	- [TODO: future work] Ory Keto can be combined wth the basic Hydra access control to provide a fine-grained complex authorization requirements.
+	- [Plan] use Cilium with the internal Gateway API support (which creates a loadbalancer Envoy managed by cilium) + direct all traffic to another Envoy Proxy instance with custom configuration that will implement external authorization (with Oathkeeper as the decision maker for authorization).
+		- [NOTE:] this will be used until Cillium adds support for native external authorization through implementing a Gateway API feature as discussed in [cilium/cilium](https://github.com/cilium/cilium/issues/23797)  authorization policies features [Add initial draft of Auth GEP 1494 by youngnick · Pull Request #3500 · kubernetes-sigs/gateway-api](https://github.com/kubernetes-sigs/gateway-api/pull/3500)
+		- [not convenient as upstream server  /backend target urls are managed by the proxy instead of the gateway configs] use Oathkeeper as Proxy mode right behind the native Cilium Gateway API (if customization of gateway is possible - need to check this)
+	- use Authorization Code Flow with PKCE extension for SPA

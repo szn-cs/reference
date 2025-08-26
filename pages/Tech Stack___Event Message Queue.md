@@ -1,0 +1,21 @@
+- 👍 Kafka 2011 (Java; persistent messaging; dist. event streaming pub-sub model - message broker with realtime event streaming and accompanying stream api support; durable; high throughput; realtime and async consumption supported; treats messages as logs (distributed commit logs); designed for handling huge # of messages with partitioning support in horitzontal scaling; strict ordering within partition; general for large event driven systems; more features. more advanced setup & better scalability using partitions; supports event history; fault-tolerant with leader and replica brokers through Zookeeper or Raft-based; no round-robin support instead multiple partition queues and multiple consumers can be set; monolithic tightly coupled storage & compute) [GitHub - apache/kafka: Mirror of Apache Kafka](https://github.com/apache/kafka)
+	- [GitHub - fede1024/rust-rdkafka: A fully asynchronous, futures-based Kafka client library for Rust based on librdkafka](https://github.com/fede1024/rust-rdkafka)
+	- CON: even with Strimzi Kafka operator for Kubernetes, a manual partition management is required (doesn't seamlessly scale).
+	- tool [GitHub - edenhill/kcat: Generic command line non-JVM Apache Kafka producer and consumer](https://github.com/edenhill/kcat)
+- Pulsar 2016 (unlike Kafka, decouples compute from storage; less popular than Kafka; Slower than Kafka; adds support for traditional features)  has some bugs lacks maturity
+  
+  [GitHub - apache/pulsar: Apache Pulsar - distributed pub-sub messaging system](https://github.com/apache/pulsar)
+- RabbitMQ 2007 (Erland; non-persistent messaging; async queue as message broker between applications; delivers messages once and removes from queue; not designed to store long term messages; designed for low latency, reliable message delivery and routing; ordering is not guaranteed once consumed; low throughput with fast message delivery but can handle less messages at a time; single message delivery; in-memory, slightly less latency; loadbalancing behavior for multiple queues; seems not to support multi-threaded and multimode scalability; more transactional where messages once consumed are intended to be deleted)
+- ## resources:
+	- [LLM] differences between event-driven & task-oriented microservices
+	- DONE [RabbitMQ Vs. Apache Kafka! RabbitMQ and Apache Kafka Explained, Compared and Contrasted!](https://www.youtube.com/watch?v=Xax6wPmPCq4&ab_channel=TheDataGuy)
+	- DONE [Kafka vs RabbitMQ: The Best Message Queue Explained](https://www.youtube.com/watch?v=PQHf_IzmUXE&ab_channel=TheCodingGopher)
+	- DONE [Kafka Tutorial for Beginners | Everything you need to get started](https://www.youtube.com/watch?v=QkdkLdMBuL0&ab_channel=TechWorldwithNana)
+	- DONE ~~~ ~~[Kafka vs RabbitMQ Performance](https://www.youtube.com/watch?v=UPkOsXKG4ns&ab_channel=AntonPutra)
+	- DONE [Kafka vs. RabbitMQ vs. Messaging Middleware vs. Pulsar](https://www.youtube.com/watch?v=x4k1XEjNzYQ&ab_channel=ByteByteGo)
+	- TODO [Apache Pulsar or Apache Kafka? Brief intro to each](https://www.youtube.com/watch?v=HZca6_1nSIM&ab_channel=ansonisms)
+	- TODO [https://www.reddit.com/r/dataengineering/s/o9rBHTVY4T](https://www.reddit.com/r/dataengineering/s/o9rBHTVY4T)
+-
+- ## Conclusions:
+	- Kafka: loose coupling, async execution, log stored, fault-tolerant (leader+replicas) millions of requests/s, popular.
+-

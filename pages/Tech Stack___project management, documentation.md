@@ -1,0 +1,45 @@
+# Open-source versioned project management tool:  & PKM
+	- TO-do:: pick open-source locally deployed alternative to Jira, Trello, Asana, Github projects
+	- ~~focalboard~~.com - alternative to Trello but unmaintained [GitHub - mattermost-community/focalboard: Focalboard is an open source, self-hosted alternative to Trello, Notion, and Asana.](https://github.com/mattermost-community/focalboard#readme)
+	- [OpenProject - Open Source Project Management Software](https://www.openproject.org/)
+	- ~~Kanboard ~~[Kanboard](https://kanboard.org/) (classifc, kanban board; simple features)
+	- [Taiga: Your opensource agile project management software](https://taiga.io/) (fully open source - all features but no support; seems to be in the state of transition to TaigaNext - closed source? )
+		- [Taiga 30min Setup](https://community.taiga.io/t/taiga-30min-setup/170)
+	- ~~plane.so ~~[GitHub - makeplane/plane: 🔥 🔥 🔥 Open Source JIRA, Linear, Monday, and Asana Alternative. Plane helps you track your issues, epics, and cycles the easiest way on the planet.](https://github.com/makeplane/plane) [Plane - Project Management Software](https://plane.so/) (semi opensource; limited features in community edition equivalent to free tier in cloud)
+	- [Tuleap • Agile Project Management and Software Development tools](https://www.tuleap.org/) (has community version with less features)
+	- ~~Gitlab~~ platform self-hosted with project management [Getting started with GitLab: Mastering project management](https://about.gitlab.com/blog/2025/02/11/getting-started-with-gitlab-mastering-project-management/)  (limited features for free-tier self-hosted community edition)
+	- ~~Redmine~~ (classic, mature)
+	- ~~Leantime ~~(not dev focused)
+	- ~~Orangescrum~~
+	- ~~Wekan ~~(trello like)
+	- ~~Vikunja~~ (task oriented, Trello-like, modern)
+	- Obsidian for notes taking - uses markdown files with extended formats and plugins; Polished with extensive plugin ecosystem; Requires manual work for managing references between pages and for journaling; has paid aspect to it.
+	- logseq: open sources alternative to obsidian; block-based (bullets); less polished than obsidian; simple & clearly startuctured - no fluff; self-managing of journal and reference page creation;
+		- markdown vs [Org-mode](https://orgmode.org/) vs FOAM vscode plugin
+			- DONE https://www.reddit.com/r/logseq/comments/1b6ye4v/from_obsidian_to_logseq/
+	- [GitHub - siyuan-note/siyuan: A privacy-first, self-hosted, fully open source personal knowledge management software, written in typescript and golang.](https://github.com/siyuan-note/siyuan)
+	- [GitHub - TriliumNext/Trilium: Build your personal knowledge base with Trilium Notes](https://github.com/TriliumNext/Trilium)
+	- [AppFlowy](https://appflowy.com/) alternative to notion OSS
+	- https://tenzu.net/en/ followup project to deprecated OSS Taiga project.
+-
+- ## Documentation tools:
+	- create professional static-site documentation (used by many open source projects) [Nextra – Next.js Static Site Generator](https://nextra.site/)
+	- Starlight by Astro used in Tauri project [Starlight by Astro](https://www.youtube.com/watch?v=5u0Ds7wzUeI&ab_channel=Astro)
+	- ## resources:
+		- [https://www.reddit.com/r/selfhosted/comments/13z5xr4/plane_the_open_source_project_management_tool/](https://www.reddit.com/r/selfhosted/comments/13z5xr4/plane_the_open_source_project_management_tool/)
+		- [How I Use Logseq for Better Productivity and Organization at Work](https://www.youtube.com/watch?v=pS5fyFWsZT4)
+-
+- # Diagramming:
+	- Drawio with vscode extension for .drawio.svg files. More structured diagrams.
+	- Excalidraw: very good freestyle writing like rnote but can be embedded into Logseq and has vscode extension;  support for .excalidraw.svg
+	- .rnote for Linux based on GTK4 not web technologies, thus less portable.
+- # Product Requirements Document :
+	- ## Resources:
+		- [https://github.com/obre10off/cursor_prd_example](https://github.com/obre10off/cursor_prd_example)
+		- [cursor.new - Intelligent Project Scaffolding](https://www.cursor.new/blog/importance-of-prd-in-cursor-projects)
+		- [Discover the Cursor Agent Workflow Nobody Is Talking About (Yet!)](https://www.youtube.com/watch?v=U_X4erx9ISY)
+- ## conclusion:
+  status:: inconclusive
+  date:: [[May 1st, 2025]]
+  collapsed:: true
+	- [check comparison in AI LLM tools] Taiga.io (just because it is fully open-source; NOT SURE IF MAINTAINED ANY MORE)

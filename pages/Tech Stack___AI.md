@@ -1,0 +1,17 @@
+# Adopting AI:
+	- Cursor.ai
+-
+- ## rules:
+	- TODO [https://nmn.gl/blog/cursor-guide](https://nmn.gl/blog/cursor-guide)
+	- TODO [https://www.reddit.com/r/ChatGPTCoding/comments/1f4lfga/workflow_wmultiple_tools/?share_id=WgS-Ak0oJg0-cUPVyV-oG&utm_medium=ios_app&utm_name=ioscss&utm_source=share&utm_term=1](https://www.reddit.com/r/ChatGPTCoding/comments/1f4lfga/workflow_wmultiple_tools/?share_id=WgS-Ak0oJg0-cUPVyV-oG&utm_medium=ios_app&utm_name=ioscss&utm_source=share&utm_term=1)
+	- TODO [Discover the Cursor Agent Workflow Nobody Is Talking About (Yet!)](https://www.youtube.com/watch?v=U_X4erx9ISY&ab_channel=FrankNillard)
+	- TODO [How to make Cursor AI produce optimized SQL queries in data-access layers? | Rapid Dev](https://www.rapidevelopers.com/cursor-tutorial/how-to-make-cursor-ai-produce-optimized-sql-queries-in-data-access-layers)
+		-
+- ## conclusion:
+	- create a submodule AI folder for AI generated services: the AI tool would touch this service specifically and make changes that encompassing repositoyry of the submodule could use without intervening with specifically written code with picked technologies.
+- # Resources
+	- TODO {{video https://www.youtube.com/watch?v=gA6r7iVzP6M&pp=ygUHemVkIGlkZQ%3D%3D}}
+- ---
+- # Agentic AI integrations into applications:
+	-
+-

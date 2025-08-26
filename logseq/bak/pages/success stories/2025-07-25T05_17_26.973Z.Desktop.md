@@ -1,0 +1,7 @@
+- <!--ScriptorStartFragment-->Labeling data for AI companies by hiring third=world workers or experts in specific areas which provide answers to questions or mark & explain images - Alexandr Wang [The 27-Year-Old Billionaire Whose Army Does AI’s Dirty Work](https://www.wsj.com/tech/ai/alexandr-wang-scale-ai-d7c6efd7)
+-
+- # Read list:
+	- TODO <!--ScriptorStartFragment-->[https://www.reddit.com/r/incremental_games/s/LpQirVG7hy](https://www.reddit.com/r/incremental_games/s/LpQirVG7hy)
+	-
+- # Resources:
+	- <!--ScriptorStartFragment-->[https://www.starterstory.com/](https://www.starterstory.com/)

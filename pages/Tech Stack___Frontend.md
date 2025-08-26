@@ -1,0 +1,32 @@
+# Frontend
+	- [Tailwind CSS CheatSheet for Beginners and Not Only](https://www.creative-tim.com/twcomponents/cheatsheet) + Tailwind containers (style depending on containing element features).
+	- Web components issues vs React
+	- internationalization library for react i18next
+		- TODO: optimization - check how to statically generate pages instead of letting react fill the text.
+	- UIs libraries or component kits:
+		- 👍👍👍 ShadCNUI (+ Radix UI) + V0 @ Vercel
+			- Re-usable components library (not a ui library or components library) - doesn't install into node_modules but rather copies the source code into the project for complete control over the implementation.
+			- Build professionally with high standards of RadixUI's accessibility.
+		- 👍👍 [GitHub - heroui-inc/heroui: 🚀 Beautiful, fast and modern React UI library. (Previously NextUI)](https://github.com/nextui-org/nextui) beautiful animated components
+		- 👍[Aceternity UI](https://ui.aceternity.com/) + [Motion (prev Framer Motion) — Animation made simple for React, JS and Vue](https://motion.dev/)
+		- 👍[GitHub - saadeghi/daisyui: 🌼 🌼 🌼 🌼 🌼  The most popular, free and open-source Tailwind CSS component library](https://github.com/saadeghi/daisyui)
+			- popular, good looking
+		- [GitHub - htmlstreamofficial/preline: Preline UI is an open-source set of prebuilt UI components based on the utility-first Tailwind CSS framework.](https://github.com/htmlstreamofficial/preline)
+		- [GitHub - markmead/hyperui: Free Tailwind CSS v4 components for your next project, designed to enhance your web development with the latest features and styles 🚀](https://github.com/markmead/hyperui)
+		- [GitHub - shadcn-ui/ui: A set of beautifully-designed, accessible components and a code distribution platform. Works with your favorite frameworks. Open Source. Open Code.](https://github.com/shadcn-ui/ui)
+		- [MUI: The React component library you always wanted](https://mui.com/)
+		- [Headless UI](https://headlessui.com/)
+		- [Tailwind CSS Components - Tailwind Plus](https://tailwindui.com/components)
+		- [Popular Tailwind kits](https://www.tailwindawesome.com/?type=kit)
+	- Next.js features: provides combining multiple strategies of rendering (SSG, SSR, ISR - incremental static regeneration - hydration, CSR)
+		- Are there competing frameworks in Rust that provide ISR? NO.
+		- [GitHub - tuono-labs/tuono: ⚡ Modern fullstack web framework based on Rust and React](https://github.com/tuono-labs/tuono)?
+		- [GitHub - vikejs/vike: 🔨 Vike — The Modular Framework — Next.js & Nuxt alternative for unprecedented flexibility and stability.](https://github.com/vikejs/vike)
+	- State management: [GitHub - pmndrs/zustand: 🐻 Bear necessities for state management in React](https://github.com/pmndrs/zustand) ! , Reduc, Mobyx
+	- Testing stack: [Vitest – Complete Intro to React](https://react-v9.holt.courses/lessons/testing/vitest)
+-
+- ## Resources
+	- DONE [The Story of shadcn/ui](https://www.youtube.com/watch?v=yYKEvxFPy5Q)
+	- TODO [How Shadcn/ui ACTUALLY Works](https://youtu.be/AqmMx_JidGo?feature=shared)
+	- DONE ~~React complete course explanation and link resources ~~[Complete Intro to React](https://react-v9.holt.courses/)
+	- DONE ~~React+Typescript course resources: ~~[React && TypeScript — Frontend Masters](https://fem-react-typescript.vercel.app/)

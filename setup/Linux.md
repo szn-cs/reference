@@ -1,7 +1,12 @@
 - snap
 - vs codium
-- zsh & OhMyZsh shell/terminal
 - starship prompt
 - nvim & NvChad + custom font (Operator patched)
 - git & gh setup
 - gpu passthrough & VM
+-
+- # Terminal
+	- zsh & OhMyZsh shell/terminal
+	- Warp - modern terminal
+		- has scaling issue (cannot zoom UI interface!)
+	-

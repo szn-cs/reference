@@ -1,0 +1,113 @@
+# Databases
+	- [Supabase | The Postgres Development Platform.](https://supabase.com/)  (OLTP, developer platform with postgres extensions and client libraries, exposes REST/GraphQL automatically, realtime updates, OSS self-hosted, storage integration, etc.) + Postgres
+		- [GitHub - supabase-community/supabase-kubernetes: Helm 3 charts to deploy a Supabase on Kubernetes](https://github.com/supabase-community/supabase-kubernetes)
+		- Tools like pg_stat_statements and load testing with k6 can help identify performance bottlenecks
+	- OLAP Metabase
+	- postgres operators:
+		- [StackGres | Enterprise Postgres made easy. On Kubernetes.](https://stackgres.io/) (not as popular; supports supabase and supports more extensions; referenced in Supabase docs; Easier to setup; provides webui simplifying cluster management + CRDs for each aspect to control; supports official postgres image with no modification)
+			- stackGres operator [OperatorHub.io | The registry for Kubernetes Operators](https://operatorhub.io/operator/stackgres)
+			- Supabase is versioning is purposely made difficult to get and support latest postgresql versions. Also the kubernetes lacks documentation and discussions do not conclude with a straight forward approach to setup Supabase.
+		- CNPG [GitHub - cloudnative-pg/cloudnative-pg: CloudNativePG is a comprehensive platform designed to seamlessly manage PostgreSQL databases within Kubernetes environments, covering the entire operational ...](https://github.com/cloudnative-pg/cloudnative-pg) (popular and polished, most mature, production-level operator; doesn't use StatefulSets instead a custom controller which is not standard may cause some incompatibility with tools relying on Kubernetes standards; )
+			- uses for backups [Barman](https://pgbarman.org/)
+		- [GitHub - CrunchyData/postgres-operator: Production PostgreSQL for Kubernetes, from high availability Postgres clusters to full-scale database-as-a-service.](https://github.com/CrunchyData/postgres-operator)
+		- Zalando Postgres Operator [GitHub - zalando/postgres-operator: Postgres operator creates and manages PostgreSQL clusters running in Kubernetes](https://github.com/zalando/postgres-operator) (second most used operator; less content on youtube than CNPG)
+		- Bitnami’s PostgreSQL-HA chart (Avoid - has a split brain bug)
+	- postgressSQL
+	- option to connect Kubernetes to managed cloud database (e.g. using `helm upgrade pg-sqlproxy rimusz/gcloud-sqlproxy --namespace sqlproxy ...`)
+	- Neo4J, MongoDB, PosgreSQL
+	- MinIO [GitHub - minio/minio: MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license.](https://github.com/minio/minio)
+	- TablePlus SQL GUI
+		- Darling to run MacOS .dmg application on Linux [Installing software - Darling Docs](https://docs.darlinghq.org/installing-software.html)
+		- [GitHub - SxtBox/TablePlus_1x_License_Activation: TablePlus Database Client 1.x License Activation](https://github.com/SxtBox/TablePlus_1x_License_Activation)
+	- Rust PostgreSQL client:
+		- [GitHub - launchbadge/sqlx: 🧰 The Rust SQL Toolkit. An async, pure Rust SQL crate featuring compile-time checked queries without a DSL. Supports PostgreSQL, MySQL, and SQLite.](https://github.com/launchbadge/sqlx) + sqlx::Pool (tokio; raw sql + compile time sql validation when using macros; migrations support; slower - performance hit compared to rust-progres because it relies on its own connection pools and does validation; No real reason to use it if postgresql is the only target database, other than compile time validation of SQL)
+		- rust-postgres modules - native postgresql driver Rust [GitHub - sfackler/rust-postgres: Native PostgreSQL driver for the Rust programming language](https://github.com/sfackler/rust-postgres)
+			- Tokio-postgres (uses internally also postgres-types of rust-postgres) (tokio; raw sql; postgres-only; listen notify support; high performance lower-level; )
+			- +  connection pool [GitHub - djc/bb8: Full-featured async (tokio-based) postgres connection pool (like r2d2)](https://github.com/djc/bb8) bb8-postgres (manual connections management of pool) or [GitHub - deadpool-rs/deadpool: Dead simple pool implementation for rust with async-await](https://github.com/deadpool-rs/deadpool?tab=readme-ov-file) (automatic connection pool management; configurable but transparently manages connections).
+				- based on earlier [GitHub - sfackler/r2d2: A generic connection pool for Rust](https://github.com/sfackler/r2d2)
+			- Cornucopia (basedon rust-postgres modules) [GitHub - cornucopia-rs/cornucopia: Generate type-checked Rust from your PostgreSQL.](https://github.com/cornucopia-rs/cornucopia)  builds on-top of tokio-postgres to provide type-safety and validates & detect errors on compile time instead of passing tokio-postgres string SQLs.  (issues: not updated or maintained for past 2 years -> old dependencies; doesn't support custom Postgres types from extensions; just another element in the application adding limits);
+		- .ORM [GitHub - diesel-rs/diesel: A safe, extensible ORM and Query Builder for Rust](https://github.com/diesel-rs/diesel)
+	- [GitHub - graphile/crystal: 🔮 Graphile's Crystal Monorepo; home to Grafast, PostGraphile, pg-introspection, pg-sql2 and much more!](https://github.com/graphile/crystal)
+	- database chart and diagrams: drawdb vs chartdb vs ...
+		- [GitHub - chartdb/chartdb: Database diagrams editor that allows you to visualize and design your DB with a single query.](https://github.com/chartdb/chartdb)
+		- [GitHub - liam-hq/liam: Automatically generates beautiful and easy-to-read ER diagrams from your database.](https://github.com/liam-hq/liam)
+		- [https://mermaid.live](https://mermaid.live/)
+		- [azimutt/INSTALL.md at main · azimuttapp/azimutt](https://github.com/azimuttapp/azimutt/blob/main/INSTALL.md) (modern presentation; paid features require unlocking)
+	- Manage schema migrataions (versus data migrations): automate schema changes (framework for managing changes over time):
+		- info:
+			- approaches to run migraitons: on container startup (code-based) behind a feature flag of the microservice (needs to handle idempotency); Kubernetes Job; Kubernetes init container that must successfully run before the microservice application; Github actions?;
+			- keep migraitons reversable (up/down); migrations folder per service over centralized;
+			- Migration framework: structured version-controlled system for database initialization and managing incremental changes (tracking, applying, rollback, team collaboration).
+			- patterns: database-per-service; schema-per-service with shared database; centralized with dedicated migration service pattern;
+		- [sqlx/sqlx-cli at main · launchbadge/sqlx](https://github.com/launchbadge/sqlx/tree/main/sqlx-cli) use PostgreSQL migrations (e.g., via sqlx-cli or diesel_cli) to manage schema changes.
+		- refinery [GitHub - rust-db/refinery: Powerful SQL migration toolkit for Rust.](https://github.com/rust-db/refinery): used to manage changes and migrations
+			- [what does this mean ?] SQL migration tool with deadpool-postgres integration
+		- Pg-Migrator
+		- Kubernetes Jobs?
+		- [GitHub - tdcare/flyway-rs](https://github.com/tdcare/flyway-rs)
+		- custom migration framework (built in-house): run scripts & track migraitons
+	- Data migration between updates?
+-
+- ## Resources:
+	- DONE [https://www.restack.io/docs/supabase-knowledge-supabase-kubernetes-integration](https://www.restack.io/docs/supabase-knowledge-supabase-kubernetes-integration)
+	- DONE [Self-Host Supabase with Kubernetes: A Simple Guide](https://medium.com/@andersonk/self-host-supabase-with-kubernetes-a-simple-guide-438c415ebd54)
+	- DONE [https://www.reddit.com/r/Supabase/comments/1crpuko/self_hosting_on_kubernetes_database_storage/](https://www.reddit.com/r/Supabase/comments/1crpuko/self_hosting_on_kubernetes_database_storage/)
+	- DONE [https://www.reddit.com/r/Supabase/comments/1cn1nph/rant_is_it_really_opensource/](https://www.reddit.com/r/Supabase/comments/1cn1nph/rant_is_it_really_opensource/)
+	- DONE [How to set up Supabase with Kubernetes and Helm? | Bootstrapped Supabase Guides](https://bootstrapped.app/guide/how-to-set-up-supabase-with-kubernetes-and-helm)
+	- DONE [How to use Supabase with Kubernetes? | Bootstrapped Supabase Guides](https://bootstrapped.app/guide/how-to-use-supabase-with-kubernetes)
+	- DONE [Self-hosting Supabase on Ubuntu with Digital Ocean](https://www.youtube.com/watch?v=FqiQKRKsfZE)
+	- TODO [Self-Hosting | Supabase Docs](https://supabase.com/docs/guides/self-hosting)
+		- TODO [StackGres | Running Supabase on Top of StackGres](https://stackgres.io/blog/running-supabase-on-top-of-stackgres/)
+		- DONE [Self-Hosting with Docker | Supabase Docs](https://supabase.com/docs/guides/self-hosting/docker)
+		  :LOGBOOK:
+		  CLOCK: [2025-07-25 Fri 09:58:31]--[2025-07-25 Fri 09:58:33] =>  00:00:02
+		  :END:
+		- TODO [GitHub - supabase-community/supabase-kubernetes: Helm 3 charts to deploy a Supabase on Kubernetes](https://github.com/supabase-community/supabase-kubernetes)
+	- DONE [Supabase Explained](https://www.youtube.com/watch?v=T-qAtAKjqwc)
+	- DONE [Supabase: Honest review after building 3 startups](https://www.youtube.com/watch?v=SYhfdWPMcSY)
+	- TODO [Learn Supabase (Firebase Alternative) – Full Tutorial for Beginners](https://www.youtube.com/watch?v=dU7GwCOgvNY)
+	- TODO [Supabase Crash Course](https://www.youtube.com/watch?v=7uKQBl9uZ00)
+	- DONE [StackGres: Cloud-Native PostgreSQL on Kubernetes / Álvaro Hernández (OnGres)](https://www.youtube.com/watch?v=0fnJ6biCDm4)
+		- DONE [OnGres: Sharding Postgres on Kubernetes | DoK Ecosystem Day](https://www.youtube.com/watch?v=DqnXgt8R7Qg)
+	- DONE [I replaced my entire tech stack with Postgres...](https://www.youtube.com/watch?v=3JW732GrMdg)
+	- DONE [Integrating Patroni PostgreSQL with Kubernetes](https://www.youtube.com/watch?v=iw98cGVf_sI)
+	- DONE [How to run a basic PostGreSQL in Kubernetes!](https://www.youtube.com/watch?v=iYwE3h0p7Zs)
+	- TODO [Step by Step Application Deployment on LKE using Helm | Kubernetes on Cloud (2/2)](https://www.youtube.com/watch?v=JGtJj_nAA2s&t=0s)
+	- DONE [https://www.reddit.com/r/kubernetes/comments/139ahop/what_are_you_using_to_run_postgres/](https://www.reddit.com/r/kubernetes/comments/139ahop/what_are_you_using_to_run_postgres/)
+	- DONE [https://www.reddit.com/r/kubernetes/comments/1fzk9nl/best_production_grade_postgres_operator_for/](https://www.reddit.com/r/kubernetes/comments/1fzk9nl/best_production_grade_postgres_operator_for/)
+	- TODO ~ [technical debt of Supabase] [Supabase versus Magic - You win! | AINIRO.IO](https://ainiro.io/blog/supabase-versus-magic-you-win)
+	- DONE +++ [How to choose your Kubernetes Postgres Operator?](https://www.simplyblock.io/blog/choosing-a-kubernetes-postgres-operator/)
+	- DONE [CloudNativePG: Kubernetes Databases Made Simple (Full Course)](https://www.youtube.com/watch?v=g59ki9z2SO8)
+	- TODO [Should We Run Databases In Kubernetes? CloudNativePG (CNPG) PostgreSQL](https://www.youtube.com/watch?v=Ny9RxM6H6Hg&t=507s)
+	- DONE [https://www.reddit.com/r/kubernetes/comments/1g8v4bg/which_storage_solution_for_cnpg/](https://www.reddit.com/r/kubernetes/comments/1g8v4bg/which_storage_solution_for_cnpg/)
+	- DONE [High Availability Setup with CNPG PostgreSQL Operator](https://support.tools/high-availability-setup-cnpg-postgresql-operator/)
+	- TODO [Optimizing Databases on Kubernetes: Kubernetes Backup and Recovery with CNPG and ZFS Snapshots](https://www.ardanlabs.com/blog/2025/01/optimizing-databases-on-kubernetes-ep5-kubernetes-backup-and-recovery-with-cnpg-and-zfs-snapshots.html)
+	- DONE [How to Design a Database](https://www.youtube.com/watch?v=5RpUmDEsn1k&ab_channel=DatabaseStar)
+	- TODO ~ [https://www.reddit.com/r/Database/comments/1hj71u0/graph_databases_are_not_worth_it/](https://www.reddit.com/r/Database/comments/1hj71u0/graph_databases_are_not_worth_it/)
+	- DONE [Inheritance and polymorphism: where the cracks in SQL begin to show](https://typedb.com/blog/inheritance-and-polymorphism-where-the-cracks-in-sql-begin-to-show)~~ - why is polymorphic entity design in SQL not solved yet? is there a feature missing?~~
+	- DONE [Understanding Database Design with Real-World Scenarios](https://rahultiwari876.medium.com/understanding-database-design-with-real-world-scenarios-8b21516ce485)
+	- DONE [Top 11 Real-world SQL Applications: Building Real-world SQL Projects](https://kockpit.in/blogs-community/article.php?q=top-11-real-world-sql-applications:-building-real-world-sql-projects)
+	- TODO [7 Useful Database Diagram Examples](https://vertabelo.com/blog/database-diagrams-examples/)
+	- TODO [4 Real-World SQL Database Schema Examples](https://www.dragonflydb.io/databases/schema/sql)
+	- TODO [Database schema templates by DrawSQL](https://drawsql.app/templates)
+	- TODO drawing models [https://www.reddit.com/r/selfhosted/comments/1gv2p2j/chartdb_v120_opensource_database_diagram/](https://www.reddit.com/r/selfhosted/comments/1gv2p2j/chartdb_v120_opensource_database_diagram/)
+	- DONE [CloudNativePG - PostgreSQL extensions](https://www.dbi-services.com/blog/cloudnativepg-postgresql-extensions/)
+	- TODO ~ [TODO: add example scripts to project] [CloudNativePG – The kubectl plugin](https://www.dbi-services.com/blog/cloudnativepg-the-kubectl-plugin/)
+	- DONE [Creating a custom container image for CloudNativePG](https://cloudnative-pg.io/blog/creating-container-images/)
+	- DONE [The Immutable Future of PostgreSQL Extensions in Kubernetes with CloudNativePG](https://www.gabrielebartolini.it/articles/2025/03/the-immutable-future-of-postgresql-extensions-in-kubernetes-with-cloudnativepg/)
+	- TODO [The best solution I've ever seen is this Rust library https://github.com/cornuco... | Hacker News](https://news.ycombinator.com/item?id=34282120)
+	- DONE [https://www.reddit.com/r/rust/comments/10tsjam/thoughts_about_switching_from_sqlx_to_tokio/](https://www.reddit.com/r/rust/comments/10tsjam/thoughts_about_switching_from_sqlx_to_tokio/)
+	- DONE [Use Postgres with Rust - Waldeinsamkeit](https://www.city17.xyz/tokio-postgres/)
+	- TODO ~ [https://www.reddit.com/r/rust/comments/1jnd5bh/sqlx_slows_down_axum_by_30x/](https://www.reddit.com/r/rust/comments/1jnd5bh/sqlx_slows_down_axum_by_30x/)
+		- TODO ~ [https://old.reddit.com/r/rust/comments/1btdrc1/does_sqlx_really_have_more_overhead_in_rust_than/](https://old.reddit.com/r/rust/comments/1btdrc1/does_sqlx_really_have_more_overhead_in_rust_than/)
+-
+- ## Conclusions
+	- ~~StackGres + ~~**~~Suprabase~~**~~ (Postgresql + extra features)~~
+		- [awesome choice, but less straight forward to setup initially with supabase] CNPG operator to run postgres + Barman (for backup recovery)
+	- ~~StackGres + Postgresql (+extensions) ~~
+	- Postgresql (+extensions) + CNPG + Rust tokio-postgres (+ postgres-types)
+		- connection pooling: [hard to decide which crate, will choose the one with more activity downloads / github stars [GitHub - deadpool-rs/deadpool: Dead simple pool implementation for rust with async-await](https://github.com/deadpool-rs/deadpool)
+		- generate functions from SQL queries [GitHub - cornucopia-rs/cornucopia: Generate type-checked Rust from your PostgreSQL.](https://github.com/cornucopia-rs/cornucopia)
+		- ChartDB design database
+		- **GraphQL**** tools**
+		- Refinery code-based to run/manage migrations + Kubernetes InitContainer to execute the migraitons before the service.
