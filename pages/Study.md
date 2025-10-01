@@ -1,7 +1,0 @@
-- advanced project challenges to become better programmer https://codecrafters.io/
-- TODO {{video https://www.youtube.com/watch?v=D26sUZ6DHNQ}}
-- TODO {{video https://www.youtube.com/watch?v=R8udhb7m398}}
--
-- # AI agents:
-	- {{video https://www.youtube.com/watch?v=i0P56Pm1Q3U}}
--

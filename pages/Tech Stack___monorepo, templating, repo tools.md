@@ -34,7 +34,9 @@
 		- replaces dependentbot github
 	- Nix flakes  - reproducable toolchains and specific version cli commands across dev environment. {{video https://www.youtube.com/watch?v=5D3nUU1OVx8}} - reproducable environments.
 	- the Nix language is hard to learn. Is there a Rust alternative for Nix?
--
+	- ### pluggable registry crates:
+		- `linkme` is better for **modularity, multi-crate monorepos, and compile-time determinism**.
+		- `inventory` still works but is slightly older, has more runtime glue, and less portable.
 - # tools for secrets:
 	- use **Mozilla SOPS** or **git-crypt** to encrypt tokens into repo.
 	- use direnv in addition to dotenv as an automated way to load env into current folder.
@@ -98,3 +100,6 @@
 - ---
 - # Templating tool:
 	- [ask llm] is there a scaffolding, code generation, or project templating tool that allows to insert bunch of configs and files to a framework project depending on which features are enabled or what components are enabled? The tool must also work by supporting to augment existing projects.
+-
+- ---
+-

@@ -1,4 +1,194 @@
-# Adopting AI:
+# coding agents tools:
+	- info:
+		- _24 million tokens/day** —enough for 3–4 hours of uninterrupted vibe coding_ while _heavy coding workflows up to 120m tokens/day_
+	- Groq allows for quick inferences by providing many LLMs
+	- List of coding agents
+		- https://models.dev/
+		- https://huggingface.co/models
+		- https://models.litellm.ai/
+		- performance analysis https://artificialanalysis.ai/
+			- https://artificialanalysis.ai/leaderboards/models
+			- https://artificialanalysis.ai/models/capabilities/coding
+		- provides a good list of models and fileters https://deepinfra.com/models
+		- https://github.com/cheahjs/free-llm-api-resources
+	- Model providers
+		- _info:
+			- _OpenRouter, DeepSeek, Ollama, Gemini, Volcengine, and SiliconFlow, etc._
+			- _OpenAI-compatibe API is the standard for LLM provider support_
+			- _Groq, Cerebras, and SambaNova - speed demons_
+			- _Together, Fireworks, Inference, Novita, and Deepinfra;_
+			- Low-latency providers are burst providers (not for large quantity of data & repetitive calls), not bulk providers; The tradeoff is between **bulk efficiency (cost/throughput)** and **Low-latency**; In addition to flexibility (model choice);
+		- Main coding tasks competitors: Claude Sonnet 4.5; GLM; Kimi K2; Qwen3-Coder; ChatGPT5
+		  id:: 68db8148-7d49-4014-85ac-11bd9a813e84
+			- Deepseek v3.1 - cheap and great for reasoning. (check providers - maybe at groq?)
+			- chinease: Zhipu AI, DeepSeek, O1.AI, Moonshot AT
+			- Qwen3 235B Instruct or Deepseek V3.2!
+		- **Together.ai**
+			- https://www.together.ai/models
+		- Groq https://console.groq.com/dashboard - crazy speed
+			- https://community.groq.com/
+			- https://console.groq.com/docs/models
+				- Model combination system offerings https://console.groq.com/docs/models#production-systems
+			- https://groq.com/pricing
+			- Open source app generation project based on Groq provider (official project) https://appgen.groqlabs.com/  &  https://github.com/groq/groq-appgen
+		- DeepInfra (extremely cheap provider)
+			- https://deepinfra.com/pricing
+		- https://www.siliconflow.com/models
+			- https://www.siliconflow.com/pricing
+		- Qwen (Alibaba)
+		- **Kimi K2**: China Moonshot https://www.moonshot.ai/
+			- https://platform.moonshot.ai/docs/overview
+			- https://www.kimi.com/ Kimi K2: rival to Claude Code LLMs
+				- https://moonshotai.github.io/Kimi-K2/
+				- Pricing https://platform.moonshot.ai/docs/pricing/chat#product-pricing
+		- z.ai models https://z.ai/blog/glm-4.5
+			- WARNING: issue with subscription cancellation.
+			- GLM LLMs are very cheap by Zhipu AI, Beijing;
+				- cons: No deep reasoning mode; web search doesn't work;  less polished output; significant privacy trade-off;
+			- performance bench https://z.ai/blog/glm-4.5
+		- China free models https://platform.iflow.cn/en/models
+		- Gemini, Ollama, OpenAI
+		- [OpenRouter](https://openrouter.ai/)  (offers access to AI models - unifying endpoint)
+			- https://openrouter.ai/docs/features/provider-routing
+			- https://openrouter.ai/moonshotai/kimi-k2-0905
+			- usually has a 5.5% fee.
+		- [CometAPI](https://www.cometapi.com/) (offers access to multiple AI models)
+		- https://www.litellm.ai/ opensource LLM router
+			- https://docs.litellm.ai/docs/
+			- setup with claude code router https://docs.litellm.ai/docs/tutorials/claude_responses_api
+		- https://github.com/helicone/ai-gateway/ opensource rust based
+		- https://llmgateway.io/
+		- https://github.com/tensorzero/tensorzero
+		- LLAMA
+		- | Provider | Limits | Models | Link |
+		  |----------|--------|--------|------|
+		  | OpenRouter | 20 requests/min; 50 requests/day; 1000 requests/day with $10 top-up | DeepCoder 14B Preview; DeepHermes 3; DeepSeek R1; Llama 3.x; Mistral 7B; Qwen 2.5; Gemma 3; ... | https://openrouter.ai/ |
+		  | Google AI Studio | 10–30 requests/min; 500–1000 requests/day (depending on model) | Gemini 1.5/2.0 Flash; Gemini 2.5; Gemma 3; LearnLM; text-embedding | https://makersuite.google.com/ |
+		  | NVIDIA NIM | 40 requests/min | Various open models | https://developer.nvidia.com/nim |
+		  | Mistral (La Plateforme) | 1 req/sec; 500k tokens/min; 1B tokens/month | Open/proprietary Mistral models | https://la.mistral.ai/ |
+		  | Mistral (Codestral) | 30 requests/min; 2000 requests/day | Codestral | https://codestral.com/ |
+		  | HuggingFace Inference Providers | $0.10/month credits | Various open models (< 10GB) | https://huggingface.co/inference-endpoints |
+		  | Cerebras | 30 req/min; 60,000 tokens/min; 900 req/hr; 14,400 req/day | Qwen 3 32B; Llama 3.1/3.3/4 Scout; others | https://cerebras.net/ |
+		  | Groq | model-specific; e.g., 7000 req/day & 6000 tokens/min | Allam 2 7B; DeepSeek R1 Distill 70B; Whisper Large; Gemma 2; Mistral Saba 24B; Llama 3/3.1/4; Qwen QwQ 32B; ... | https://groq.com/ |
+		  | Together | 60 req/min | Llama 3.2 Vision; Llama 3.3; DeepSeek R1 Distill 70B | https://www.together.ai/ |
+		  | Cohere | 20 req/min; 1000 req/month | Command-A/R/R7B/R+; Aya Expanse 8B/32B; Aya Vision 8B/32B | https://cohere.com/ |
+		  | byokaashish | https://www.feedough.com/subscribe/ | www.linkedin.com/in/aashishpahwa/ | https://www.instagram.com/okaashish/ |
+		-
+	- ## Claude Code
+		- info :
+			- accessible through CLI or SDK.
+			- specific phrases are mapped directly to increasing levels of thinking budget in the system: "think" < "think hard" < "think harder" < "ultrathink." Each level allocates progressively more thinking budget for Claude to use.
+			- subagents allow to modify the system prompt but has shortcoming in other places.
+			- Claude API pay-as-you-go is a lot more expensive  than the subscription-based when used heavily.
+		- https://claude.com/product/claude-code
+		- https://docs.claude.com/en/api/agent-sdk/overview - Python + TS/JS
+		- https://claudelog.com/
+		- SDK agents https://docs.claude.com/en/docs/claude-code/sdk/sdk-overview
+			- API interface to access Claude Code grammatically.
+			- Some tools follow the Agent Client Protocal https://agentclientprotocol.com/overview/introduction
+		- Intercepts Claude Code cli communication and redirects to different LLMs https://github.com/musistudio/claude-code-router
+			- docs https://github.com/musistudio/claude-code-router
+			- config example https://github.com/musistudio/claude-code-router/blob/main/ui/config.example.json
+			- blog articles https://github.com/musistudio/claude-code-router/tree/main/blog/en
+		- TODO https://github.com/ericbuess/claude-code-docs
+		- TODO https://github.com/zilliztech/claude-context   or   https://github.com/ericbuess/claude-code-project-index
+		-
+	- Gemini CLI
+	- OpenAI Codex
+	- https://www.warp.dev/coding
+	- CLI opensource multi-LLM https://opencode.ai/
+	- Claude code addition as MCP which allows Claude to prompt other LLMs as part of its models execution https://github.com/BeehiveInnovations/zen-mcp-server
+	- ~~Mulimodel CLI Crush~~ https://github.com/charmbracelet/crush
+	- Kilo Code (cursor alternative but free)
+	- ### Resources:
+		- DONE [Terminal Agents: Codex vs. Crush vs. OpenCode vs. Cursor CLI vs. Claude Code ](https://www.youtube.com/watch?v=MXOP4WELkCc)
+		- find API keys on github https://gist.github.com/win3zz/0a1c70589fcbea64dba4588b93095855
+			- ```apl
+			  https://github.com/search?q=%28path%3A.xml+OR+path%3A.json+OR+path%3A.properties+OR+path%3A.sql+OR+path%3A.txt+OR+path%3A.log+OR+path%3A.tmp+OR+path%3A.backup+OR+path%3A.bak+OR+path%3A.enc+OR+path%3A.yml+OR+path%3A.yaml+OR+path%3A.toml+OR+path%3A.ini+OR+path%3A.config+OR+path%3A.conf+OR+path%3A.cfg+OR+path%3A.env+OR+path%3A.env.local+OR+path%3A.env.development+OR+path%3A.env.production+OR+path%3A.env.test+OR+path%3A.envrc+OR+path%3A.prod+OR+path%3A.secret+OR+path%3A.private+OR+path%3A*.key%29+AND+%28access_key+OR+secret_key+OR+access_token+OR+api_key+OR+apikey+OR+api_secret+OR+apiSecret+OR+app_secret+OR+application_key+OR+app_key+OR+appkey+OR+auth_token+OR+authsecret%29+AND+%2Fsk-proj-%5Ba-zA-Z0-9_-%5D%7B100%2C%7D%2F&type=code&ref=advsearch
+			  ```
+		- DONE [ Terminal Agents: Codex vs. Crush vs. OpenCode vs. Cursor CLI vs. Claude Code ](https://www.youtube.com/watch?v=MXOP4WELkCc)
+		- DONE https://www.reddit.com/r/LLMDevs/comments/1fdii62/best_llm_gateway/
+		- https://github.com/Shubhamsaboo/awesome-llm-apps - prompt engineered python apps
+		- TODO https://mlengineering.medium.com/mastering-llm-gateway-a-developers-guide-to-ai-model-interfacing-630bdd6216cc
+		  id:: 68da381a-3012-410e-a761-4323f8c600db
+		  :LOGBOOK:
+		  CLOCK: [2025-09-29 Mon 10:41:19]--[2025-09-29 Mon 12:49:24] =>  02:08:05
+		  :END:
+		- https://www.pomerium.com/blog/best-llm-gateways-in-2025
+	- ### Conclusion
+		- [[Sep 29th, 2025]] CLI comparison leads to Claude Code leading in all aspects. Use Claude Code cli + claude code router to allow additional models.
+		- [[Sep 30th, 2025]] Use a combination of ((68db8148-7d49-4014-85ac-11bd9a813e84)) models with Claude Code cli
+		- [[Oct 1st, 2025]] Hybrid approach:
+			- previum tools like Claude Code (complex reasoning) + GLM (routine coding );
+			- GLM (routine coding) + DeepSeek (reasoning) + GPT5 (additional routine & reasoning)
+				- Cost effective compared to Claude Code
+			- Combine 3 cheaper models: GLM 4.6 + Deepseek V3.1 Terminus ? + Kimi K2 Instruct 0905 ? + Qwen3 coder ???
+			- use **LLM gateway**: OpenRouter or open-source self-hosted alternative;
+				- Every single provider has reliability issues; using LLMs provider gateways prevents vendor lock-in and permits dynamically picking providers.
+			-
+	- # LLM keys panels:
+		- https://ai.google.dev/aistudio
+		- https://platform.deepseek.com/usage
+		- https://platform.moonshot.ai/console
+	- # Run models using docker
+		- [ THIS is the REAL DEAL 🤯 for local LLMs ](https://www.youtube.com/watch?v=3XCunZqvVDA)
+- # LLM calculators & pricing
+	- info:
+		- _many pricing comparisons are not provider comprehensive _
+		- _Criteria: latency, cost, reliability, or model quality_
+	- https://research.aimultiple.com/self-hosted-llm/
+	- https://llmpricecheck.com/calculator/
+	- TODO understand price comparison https://research.aimultiple.com/llm-pricing/
+	- https://llm-price.com/
+	- https://langtail.com/llm-price-comparison
+	- https://yourgpt.ai/tools/openai-and-other-llm-api-pricing-calculator
+	- https://llmprices.dev/#
+	- https://openrouter.ai/models
+		- includes provider comparison
+	- https://www.helicone.ai/llm-cost
+	- TODO [check if relevant] https://docs.swarms.world/en/latest/guides/pricing/
+	- ==ArtificialAnalysis.ai== Providers & price comparison https://artificialanalysis.ai/leaderboards/providers
+	- https://lmarena.ai/leaderboard
+	- https://aider.chat/docs/leaderboards/
+	-
+- # Context engineering
+  _plan, prompt engineer, context engineer_
+	- ~~https://github.com/bmad-code-org/BMAD-METHOD~~  - Absurdly bad & overengineered for LLMs agents. This is just to take examples from but not practical at all.
+	- https://github.com/github/spec-kit
+	- https://context7.com/
+	- TODO [  Advanced Context Engineering for Agents  ](https://www.youtube.com/watch?v=IS_y40zY-hc)
+	- DONE [ Advanced Claude Code (ft Ray Fernando and Eric Buess) - Ep 52 ](https://www.youtube.com/watch?v=JU8BwMe_BWg)
+	- TODO [ Master Claude Code: Proven Daily Workflows from 3 Technical Founders (Real Examples) ](https://www.youtube.com/watch?v=hOqgFNlbrYE)
+	  :LOGBOOK:
+	  CLOCK: [2025-09-30 Tue 00:31:13]--[2025-09-30 Tue 09:06:01] =>  08:34:48
+	  :END:
+	- DONE [ Everyone Is Using Claude Code Sub-agents Wrong ](https://www.youtube.com/watch?v=3564u77Vyqk)
+		- full example "Claude Code Builder Pack" of agents instructions https://github.com/tokyotechlab/yt-social-proof-widget/blob/main/.claude/agents/coordination/orchestrator.md
+- ### Resouces
+	- DONE [ Chinese AI Startup Zhipu Offers Migration from Anthropic -- China Wants Money US Tech Doesn't ](https://www.youtube.com/watch?v=xQk-FqOgyBo)
+	- DONE [ Hacking Claude Code to make it 15x cheaper? 👀👀👀 ](https://www.youtube.com/watch?v=8IBTqbFNI5U)
+	- DONE [3 Things Before You FINALLY Switch to Codex CLI](https://www.youtube.com/watch?v=gRXrOuFn9dE)
+	- DONE [ GLM Coding Plan V/S Claude Code & Codex: IS THIS THE BEST & CHEAPEST Plan for AI Coding! ](https://www.youtube.com/watch?v=BN8LEcEXTZE)
+	- DONE https://aisynthesizer.beehiiv.com/p/i-tested-a-6x-cheaper-claude-code-alternative
+	- DONE pricing https://eval.16x.engineer/blog/claude-vs-claude-api-vs-claude-code
+	- [+++] DONE https://medium.com/data-science-collective/how-to-choose-an-llm-inference-provider-in-2025-f079c7aac0dc
+	  :LOGBOOK:
+	  CLOCK: [2025-10-01 Wed 11:48:45]--[2025-10-01 Wed 18:31:21] =>  06:42:36
+	  :END:
+	- DONE https://www.helicone.ai/blog/llm-api-providers
+-
+- # LLM Training
+	- https://inference.net/
+	-
+- # AI stack tools for SaaS:
+	- Dev: Cursor
+	- Design: Figma
+	- Payments: Stripe
+	- Backend - Supabase
+	- Hosting - Vercel
+	- Leads - Enrichlead
+	- Support - Crisp
+- # Adopting AI:
 	- Cursor.ai
 -
 - ## rules:
@@ -10,8 +200,82 @@
 - ## conclusion:
 	- create a submodule AI folder for AI generated services: the AI tool would touch this service specifically and make changes that encompassing repositoyry of the submodule could use without intervening with specifically written code with picked technologies.
 - # Resources
-	- TODO {{video https://www.youtube.com/watch?v=gA6r7iVzP6M&pp=ygUHemVkIGlkZQ%3D%3D}}
-- ---
-- # Agentic AI integrations into applications:
+	- TODO  AWS just released its Cursor killer…  https://www.youtube.com/watch?v=gA6r7iVzP6M&pp=ygUHemVkIGlkZQ%3D%3D
+-
+- # Jupyter notebook supporting Rust
+	- https://github.com/evcxr/evcxr
+	- https://github.com/evcxr/evcxr/blob/main/evcxr_jupyter/README.md
+	- Rust Inline REPL extension vscode
+	- ### Resources:
+		- DONE [YT  Why I stopped using Jupyter Notebooks ](https://www.youtube.com/watch?v=qFvInA7DKuE)
+		- TODO https://ratulmaharaj.com/posts/interactive-rust-with-jupyter-notebooks/
+-
+- --
+- Voice AI:
+	- https://play.ai/
 	-
+- ---
+- # AI agents system design and course resources:
+  collapsed:: true
+	- # Agentic systems:
+		- ### Workflow
+			- Chaining LLMs
+			- **Orchestrated workflows**: LLM divides prompt into parallel sub-tasks.
+				- ![](https://www.anthropic.com/_next/image?url=https%3A%2F%2Fwww-cdn.anthropic.com%2Fimages%2F4zrzovbb%2Fwebsite%2F8985fc683fae4780fb34eab1365ab78c7e51bc8e-2401x1000.png&w=3840&q=75){:height 501, :width 1088}
+				- coding making complex changes to multiple files each time would benefit from orchestrator pattern where the LLM dynamically breaks down tasks, delegates to worker LLMs, and then synthesizes their results.
+		- ### Agents:
+			- **Agents using tools based on environmental feedback in a loop**: independent LLM operation + environment tools feedback in a loop (operates in many turns); with complex inputs, LLMs engage in reasoning & planning, then operating independently while using environment tools as ground truth to assess progress.
+				- ![](https://www.anthropic.com/_next/image?url=https%3A%2F%2Fwww-cdn.anthropic.com%2Fimages%2F4zrzovbb%2Fwebsite%2F58d9f10c985c4eb5d53798dea315f7bb5ab6249e-2401x1000.png&w=3840&q=75){:height 409, :width 1040}
+				- # High-level flow of a coding agent
+					- Agent design is effective for coding because they can iterate on solutions using test results as feedback (verifiable through automated tests); The problem space is well-defined and structured; Output quality can be measured objectively;
+					- ![](https://www.anthropic.com/_next/image?url=https%3A%2F%2Fwww-cdn.anthropic.com%2Fimages%2F4zrzovbb%2Fwebsite%2F4b9a1f4eb63d5962a6e1746ac26bbc857cf3474f-2400x1666.png&w=3840&q=75){:height 874, :width 1286}
+				- most value for tasks that require both conversation and action, have clear success criteria, enable feedback loops, and integrate meaningful human oversight;
+					- pay attention to creating good *agent*-computer interfaces (ACI i.e. tools documentation) to match models capabilities & limitations.
+				- Prompts:
+					- system prompt
+					- Tool definitions and specifications prompt: good tool definition often includes example usage, edge cases, input format requirements, and clear boundaries from other tools.
+						- write testing in https://console.anthropic.com/workbench
+				- 2 principles to maintain for AI agents:
+					- Share context between agents, and share full agent traces (tools called and decisions made), not just individual messages.
+					  logseq.order-list-type:: number
+					- Actions carry implicit decisions (each agent tasked fills gaps with assumptions), and conflicting decisions carry bad results.
+					  logseq.order-list-type:: number
+					- ![https://cdn.sanity.io/images/2mc9cv2v/production/836a7407ddf3dfacc0715c0502b4f3ffc7388829-1406x1230.png](https://cdn.sanity.io/images/2mc9cv2v/production/836a7407ddf3dfacc0715c0502b4f3ffc7388829-1406x1230.png){:height 807, :width 951}
+				-
+	- **Antropic articles**: https://www.anthropic.com/engineering :
+		- DONE [Antropic - Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
+		  id:: f337ad96-6dbe-41a0-ade2-0daa636ac2b8
+		  :LOGBOOK:
+		  CLOCK: [2025-09-17 Wed 14:29:35]--[2025-09-17 Wed 20:11:31] =>  05:41:56
+		  :END:
+			- TODO https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo
+			- TODO https://www.anthropic.com/engineering/swe-bench-sonnet
+		- DONE https://www.anthropic.com/engineering/claude-code-best-practices
+		  id:: 68cafaa9-c8c7-4548-8b77-6a7570a0b6ff
+		  :LOGBOOK:
+		  CLOCK: [2025-09-23 Tue 13:06:05]--[2025-09-25 Thu 09:46:29] =>  44:40:24
+		  :END:
+	- # Cognition article
+		- DONE https://cognition.ai/blog/dont-build-multi-agents#a-theory-of-building-long-running-agents
+		  :LOGBOOK:
+		  CLOCK: [2025-09-25 Thu 09:49:33]--[2025-09-25 Thu 12:26:14] =>  02:36:41
+		  :END:
+			- multiple agents
+				- [Generative Agents: Interactive Simulacra of Human Behavior](https://arxiv.org/abs/2304.03442)
+				- https://github.com/FoundationAgents/MetaGPT
+	- # OpenAI
+		- DONE https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf
+		  :LOGBOOK:
+		  CLOCK: [2025-09-25 Thu 12:27:37]--[2025-09-25 Thu 14:03:21] =>  01:35:44
+		  :END:
+	- https://www.reddit.com/r/rust/comments/1hmh1ox/q_building_ai_agents_in_rust/
+	- TODO Agentic AI integrations into applications: https://www.youtube.com/watch?v=i0P56Pm1Q3U
+- DONE [ Everything You Need To Know About AI Agents ](https://www.youtube.com/watch?v=XBuv4HHTRjI)
+- TODO AI Agent designs https://agentproject-ai.github.io/agentproject/
+- TODO [ The #1 MISTAKE with Multi-Agent Systems ](https://www.youtube.com/watch?v=JPhuAoGALsk&list=PLmZm6lCOP5MkUq-WMjfvoaho3W8BPzwe_)
+	-
+-
+-
+- # Resources Articles:
+	- https://medium.com/data-science-collectived
 -

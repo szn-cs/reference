@@ -1,3 +1,8 @@
+- Social aggregator based on person/entity
+	- lists all the social media pages/links; permits to follow a specific person across the internet with all associated sub-channels and projects.
+	- One-click follow/unfollow entity
+		- e.g. AI models labs - follow all z.ai news.
+- ---
 - In the future, companies will provide a special AI api for interacting with other AI systems to fullfill any missing information and circumvent the need to call the business by phone and speak to a human to retrieve additional infromation not provided on their website.
 - ---
 - Startup that builds react elements which integrate with AI. These elements are designed to be controlled also by an AI and engage with the user interactively. e.g. an elements that when the user searches in, can result in the AI filling in additional personalized info after getting voice assisted interaction from user. 
@@ -276,3 +281,7 @@
 -
 - ---
 - Aria AI: augmented AI desktop program built into Opera - https://www.opera.com/features/aria
+-
+- ---
+- # CLI cheatsheet / commandline snippets manager and discovery based on AI
+	- A commandline tool that reads/stores common project commands and allows to retrieve them easily.  Similar to "Navi" cargo package but with sane defaults and closer to logseq as local project cheatsheet loader. The command utility will also use AI to complete snippets.

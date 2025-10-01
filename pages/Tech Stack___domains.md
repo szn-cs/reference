@@ -1,0 +1,3 @@
+- tld-list.com check for cheapest names
+- whois.com search for whois info
+-

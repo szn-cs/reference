@@ -47,6 +47,7 @@
 		- [GitHub - tdcare/flyway-rs](https://github.com/tdcare/flyway-rs)
 		- custom migration framework (built in-house): run scripts & track migraitons
 	- Data migration between updates?
+	- [deprecated]  ~~Trunk package manager for Postgres~~
 -
 - ## Resources:
 	- DONE [https://www.restack.io/docs/supabase-knowledge-supabase-kubernetes-integration](https://www.restack.io/docs/supabase-knowledge-supabase-kubernetes-integration)

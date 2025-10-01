@@ -7,6 +7,7 @@
 		- 👍👍👍 ShadCNUI (+ Radix UI) + V0 @ Vercel
 			- Re-usable components library (not a ui library or components library) - doesn't install into node_modules but rather copies the source code into the project for complete control over the implementation.
 			- Build professionally with high standards of RadixUI's accessibility.
+				- UI admin dashboard https://github.com/satnaing/shadcn-admin
 		- 👍👍 [GitHub - heroui-inc/heroui: 🚀 Beautiful, fast and modern React UI library. (Previously NextUI)](https://github.com/nextui-org/nextui) beautiful animated components
 		- 👍[Aceternity UI](https://ui.aceternity.com/) + [Motion (prev Framer Motion) — Animation made simple for React, JS and Vue](https://motion.dev/)
 		- 👍[GitHub - saadeghi/daisyui: 🌼 🌼 🌼 🌼 🌼  The most popular, free and open-source Tailwind CSS component library](https://github.com/saadeghi/daisyui)

@@ -1,0 +1,3 @@
+- Amazon for startups
+- Azure
+- Google

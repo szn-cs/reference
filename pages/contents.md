@@ -1,6 +1,7 @@
-- [[Product ideas]]
+- [:a {:href "#/all-journals"} "JOURNALS"]
 - [[Tech Stack]]
-- [[Study]]
-- ---
 - [[course]]
 	- [[success stories]]
+	- [[download]]
+-
+- [[Product ideas]]
