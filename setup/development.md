@@ -6,6 +6,7 @@
 
 
 
+
 # Codium hide notificaitons toast 
 - disable notifications https://github.com/microsoft/vscode/issues/41767#issuecomment-1537124998
   - - https://github.com/VSCodium/vscodium/issues/247
@@ -16,3 +17,7 @@
 # development setup
 - extensions store linux: extensions gnome
 - windowing gestures linux https://www.omglinux.com/customize-gnome-touchpad-gestures/
+
+
+# Fedora
+- Install video codec support H.264 https://discussion.fedoraproject.org/t/codecs-missing-failing-to-play-h-264/104643/2

@@ -46,5 +46,5 @@ desc:: Running researching tasks (tools, options, dilemma)
 - # Random interesting projects:
 	- [GitHub - spacedriveapp/spacedrive: Spacedrive is an open source cross-platform file explorer, powered by a virtual distributed filesystem written in Rust.](https://github.com/spacedriveapp/spacedrive)
 	- [GitHub - public-apis/public-apis: A collective list of free APIs](https://github.com/public-apis/public-apis)<!--ScriptorEndFragment-->
--
+	- trending projects for developers https://zread.ai/trending
 - ---
