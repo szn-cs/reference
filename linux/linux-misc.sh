@@ -24,6 +24,9 @@ vi file.txt
 nano file.txt
 jobs
 ps -al
+ps aux
+pstree 1 # display all processes hierarchy in system
+
 kill $(jobs -p)  # remove all background jobs
 kill -l # print list of kernel -> process signal names
 kill -9 <PID>
@@ -43,6 +46,8 @@ ssh-copy-id username@euler.wacc.wisc.edu # adds ssh to remote machine
 chattr +i ~/somefile 
 ### Setup ssh key login https://unix.stackexchange.com/questions/4484/ssh-prompts-for-password-despite-ssh-copy-id
 netstat -nlt 
+ss
+systemd-analyze blame
 
 temporary_directory=$(mktemp -d) # useful for automation scripts with ephemeral files or directories. 
 

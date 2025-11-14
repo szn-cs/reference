@@ -10,7 +10,7 @@
  ;; Available options:
  ;; - :now for NOW/LATER style (default)
  ;; - :todo for TODO/DOING style
- :preferred-workflow :todo
+ :preferred-workflow :now
 
  ;; Exclude directories/files.
  ;; Example usage:
@@ -281,7 +281,7 @@
 
  ;; Configure the threshold for linked references before collapsing.
  ;; Default value: 100
- :ref/linked-references-collapsed-threshold 0
+ :ref/linked-references-collapsed-threshold 50
 
  ;; Graph view configuration.
  ;; Example usage:

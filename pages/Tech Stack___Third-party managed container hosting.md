@@ -1,0 +1,113 @@
+- Comprehensive Single Container Hosting Options with Details
+	- Criteria sought for: price, features, compatibility DB, intended scale, managed containers service
+		- #+BEGIN_QUOTE
+		  - Criteria / Trade-offs
+		  	- **Ops complexity:** PaaS < VPS < Orchestration
+		  	- **Cost:** PaaS pay-per-use is best for early stage
+		  	- **Integration:** ==Confirm DB or service compatibility== (Postgres, MySQL, Redis, etc.)
+		  	- **Performance:** Edge or regional providers (Fly.io, Scaleway, Hetzner) can reduce latency
+		  	- **Scaling path:** Kubernetes platforms support horizontal scaling and autoscaling
+		  	- **Lock-in:** Proprietary PaaS platforms trade flexibility for speed
+		  	- **Security:** Check compliance (SOC2, GDPR, HIPAA) for production workloads
+		  	- **Monitoring:** Ensure metrics, logs, and tracing support (Prometheus, Grafana, CloudWatch)
+		  	- **Cost visibility:** Always factor in storage and outbound network traffic
+		  #+END_QUOTE
+-
+- _Managed / PaaS Runtimes (minimal ops)_
+	- **Google Cloud Run**
+	- **AWS App Runner**
+	- **Azure Container Apps**
+	- **Azure Container Instances (ACI)**
+	- **Render**
+		- cheaper, flat pricing.
+	- **Fly.io**
+		- "infrastructure ownership: Fly.io runs your applications on their own hardware and infrastructure"
+		- autoscales vertically & horizontally; supports suspension (stops instance when not in use).
+	- **Railway.app**
+		- expensive
+	- **Platform.sh**
+		- expensive
+	- **Jelastic (Virtuozzo Application Platform)**
+	- **Hyve Managed Containers**
+- _Lightweight Platforms / VPS_
+	- **DigitalOcean App Platform**
+	- **Heroku (Docker Deploy)**
+	- **Cycle.io**
+	- **Linode Kubernetes Engine (LKE)**
+	- **Vultr Kubernetes Engine (VKE)**
+	- **OVHcloud Managed Kubernetes**
+	- **Scaleway Kubernetes Kapsule**
+	- **Hetzner Cloud + Docker**
+	- **Kamatera**
+	- **Portainer Cloud**
+	- **Mirantis Kubernetes Engine (formerly Docker Enterprise)**
+	- **Rancher**
+	- **Scalr**
+- _Orchestration / Full Control_
+	- **AWS ECS + Fargate**
+	- **AWS EKS**
+	- **Google Kubernetes Engine (GKE)**
+	- **Azure Kubernetes Service (AKS)**
+	- **Red Hat OpenShift**
+	- **Linode LKE**
+	- **Vultr VKE**
+	- **Scaleway Kapsule**
+	- **OVHcloud K8s**
+- _others_
+	- Hostinger
+	- SiteGround
+	- Verpex
+	- [https://kuberns.com/](vhttps://www.reddit.com/r/elixir/comments/1h8ajm2/is_flyio_ridiculously_expensive/.com/)
+	- TODO check for offshore providers
+-
+- ### comparison
+	- #+BEGIN_QUOTE
+	  	- **For simplicity:** *Google Cloud Run*, *Render*, or *Railway.app*
+	  	- **For portability:** *Fly.io*, *Hetzner Cloud*, or *Cycle.io*
+	  	- **For global latency:** *Fly.io* or *Scaleway Kapsule*
+	  	- **For scaling and enterprise features:** *AWS ECS (Fargate)*, *GKE*, *AKS*, or *OpenShift*
+	  	- **For budget-conscious teams:** *Linode LKE*, *Vultr VKE*, or *OVHcloud Managed Kubernetes*
+	  #+END_QUOTE
+	- #+BEGIN_QUOTE
+	  - **Hetzner VPS**
+	    - Type: VPS, self-managed  
+	    - Starting Cost: ~$4/month  
+	    - Best for: Full control, persistent, cost-effective  
+	  
+	  - **Google Cloud Run**
+	    - Type: Serverless Containers  
+	    - Starting Cost: Free tier + pay usage  
+	    - Best for: Event-driven, variable workloads  
+	  
+	  - **Fly.io**
+	    - Type: Edge Serverless, VPC VMs
+	    - Starting Cost: Free tier + ~$1.94/month  
+	    - Best for: Global low latency, hobby projects  
+	  
+	  - **Shuttle.rs**
+	    - Type: Rust-specific PaaS  
+	    - Starting Cost: Free tier + paid plans  
+	    - Best for: Rapid Rust app prototyping  
+	  
+	  - **Railway.app**
+	    - Type: PaaS  
+	    - Starting Cost: $5 credit initial  
+	    - Best for: Backend APIs, databases               
+	  #+END_QUOTE
+	- #+BEGIN_QUOTE
+	  if the goal is minimal operations with managed containers and the cheapest price, the order to consider is:
+	  Fly.io < DigitalOcean App Platform < Render < Google Cloud Run < AWS App Runner < Azure Container Apps
+	  #+END_QUOTE
+- # Conclusion
+  for simple fast low-cost apps
+	- The issue with Render, Railway.app services
+		- cost adds up for simple services (e.g. managed databse another 7$, ....);
+		- cold-start latency issue for lower-tiers?
+	- ==Fly.io==
+		- has more predictable pricing (seems to be cheaper than render);
+		- platform founder is transparent about cloud situation, improvement approaches and future direction.
+		- issue: does not collocation database with app region.
+		- proprietary container on firecracker VMs + managed kubernetes k3s + Postgresql
+		- Future/vision of Fly.io is to allow LLM agent behavior and stateful apps usecases to run seamlessly with low startup time.
+			- Fly.io wants to give users UX (like vercel) + great infrastructure primitives/solutions (like Amazon) for the age of AI.
+		- Charges around 100% markup on its VMs (machines).

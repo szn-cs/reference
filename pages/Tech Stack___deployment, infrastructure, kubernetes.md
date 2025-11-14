@@ -1,5 +1,7 @@
--
+id:: 68e0ccdd-f34e-4ac4-9dbe-f21a2b318f65
+
 - # Multitenant sandbox environment (platform as a service) & Kubernetes toolings to streamline provisioning/deployment
+  collapsed:: true
 	- ### projects lists & articles resources
 		- https://www.cncf.io/projects/
 			- https://www.cncf.io/sandbox-projects/
@@ -61,12 +63,17 @@
 		- **Cluster API Add-on Provider for Helm (CAAPH)**: This project extends Cluster API to manage the installation, configuration, upgrade, and deletion of cluster add-ons using standard **Helm** charts.<!----><!---->
 		- https://github.com/syself/cluster-api-provider-hetzner?tab=readme-ov-file
 		- **Rancher** provides an official integration with Cluster API through an extension/operator called **Rancher Turtles** (or SUSE Rancher Prime Cluster API Extension).
-	- **Crossplane** https://github.com/crossplane/crossplane generalized tool for external resource management — provision cloud infra (RDS, buckets, network) via Kubernetes API so infra + apps use the same control plane patterns. Helpful for consistent multi-cloud provisioning.
+	- **Crossplane** https://github.com/crossplane/crossplane 
+	  id:: 68e94ad4-bf30-450a-90fc-bc0499194752
+	  generalized tool for external resource management — provision cloud infra (RDS, buckets, network) via Kubernetes API so infra + apps use the same control plane patterns. Helpful for consistent multi-cloud provisioning.
 		- Install Crossplane if you plan to provision cloud infra via Kubernetes: Crossplane allows you to provision cloud resources declaratively (databases, object stores) as Kubernetes CRs.
 		- Crossplane is  a control plane in Kubernetes, while Terraform is a CLI tool. Crossplane moves the logic for provisioning, connection, and lifecycle management *from* your fragile external scripts and CI/CD pipeline *into* a persistent, self-healing **control plane** within Kubernetes; You define a single, canonical API (**Composite Resource Definition**), and the platform logic in the **Composition** handles all the complex, environment-specific variations, reducing the amount of raw YAML and custom patching logic for your application teams.
 		- To achieve a true end-to-end GitOps workflow, Crossplane is typically paired with a dedicated GitOps tool like **Argo CD** or **Flux CD**.
 		- To manage self-hosted resources, platform engineers use custom providers: provider-helm, provider-kubernetes (raw objects), and then Composition using the providers to instantiate the instances. The developers then request a CompositeResourceClaim.
 			- e.g. use crossplane compositions to create CNPG kubernetes resources which then the developer request instance of that the crossplane engine translates that into CNPG Cluster resource.
+		- custom control plane that allows to build custom Kubernetes resources/APIs without controller complexities (the crossplane acts as the controller for all the defined resources).
+		- Crossplane is a configurable controller which allows to extend it and build custom controller logic through a programmable interface (compositions) & yaml OpenAPI fields instead of Kubernetes controller creation approach.
+		- Composition functions with Rust https://docs.rs/crossplane-fn-sdk-unofficial/latest/crossplane_fn_sdk_unofficial/
 	- serverless stateless solutions: https://knative.dev/docs/  vs OpenFaaS https://www.openfaas.com/, Kubeless, Fission, OpenFunction;
 		- *auto-scaling*, *ephemeral*, *event-driven* container environments.
 	- **Karmada** for Kubernetes multicluster orchestration/federation employing centralized control plane for management of multiple clusters for consistent policy, workload distribution, and user provisioning at scale.
@@ -147,6 +154,8 @@
 			- **OpenKruise:** An extended component suite for Kubernetes that extends it with advanced features like in-place updates, flexible deployment strategies, and high-availability protection for large-scale application management. https://github.com/openkruise/kruise
 		- **Submariner** provides L3 connectivity across your multiple clusters (multi-cloud/hybrid).
 		- Commercial product: https://backstack.dev/intro/
+		- https://backstage.io/
+		-
 		- #+BEGIN_QUOTE
 		  Recommended open-source components (modern, actively maintained)
 		  
@@ -184,6 +193,7 @@
 				- Crossplane aligns with GitOps principles (ideal part for infrastructure using GitOps workflow) - infrastructure is defined as Kubernetes Custom Resources where crossplane constantly reconsiles them (CRs, XRDs, Compositions). Those are easily stored in Git to reflect the desired state.
 		-
 	- ### Resources:
+	  id:: 68e1b82d-6fac-40f8-a875-d1cbd0e1de18
 		- TODO https://www.coreweave.com/blog/coreweave-and-loft-labs-leverage-vcluster-in-kubernetes-at-scale
 		- TODO https://www.vcluster.com/blog/vcluster-shared-platform-stack
 		- TODO [ How to Build a Kubernetes Platform with vCluster and GitOps ](https://www.youtube.com/watch?v=7p1GdyS7kmA)
@@ -198,6 +208,15 @@
 		- TODO [ Kubernetes Platform User Journeys & SLOs ](https://www.youtube.com/watch?v=mhkIWti1iy8)
 		- TODO [ Why Kubernetes Is Inappropriate for Platforms, and How to Make It Better ](https://www.youtube.com/watch?v=7op_r9R0fCo)
 		- TODO [ How to Build Cloud-Native Platforms with Kubernetes | Piotr Zaniewski | Conf42 Platform Eng. 2024 ](https://www.youtube.com/watch?v=HQNeAZUXzbk)
+		- TODO [ Kubernetes-like Control Planes for Declarative APIs - A Practical Introduction to kcp ](https://www.youtube.com/watch?v=IN2w4ekyL7Y)
+		- TODO [ Tutorial: Exploring Multi-Tenant Kubernetes APIs and Controllers With Kcp ](https://www.youtube.com/watch?v=Fb_3dWJdY9I)
+		- TODO [ KCP: Kubernetes API on steroids (Máté Őry, Axoflow) ](https://www.youtube.com/watch?v=H4AUijb2TU4)
+		- DONE [ Next Generation of Platform Engineering Using kcp and Crossplane - Simon Bein & Lovro Sviben ](https://www.youtube.com/watch?v=JM1RnNYnuWg)
+		  :LOGBOOK:
+		  CLOCK: [2025-10-07 Tue 08:40:01]--[2025-10-07 Tue 09:33:10] =>  00:53:09
+		  :END:
+		- TODO article https://www.innoq.com/en/articles/2022/07/infrastructure-self-service-with-crossplane/?utm_source=chatgpt.com
+		- TODO article https://blog.upbound.io/scaling-kubernetes-to-thousands-of-crds?utm_source=chatgpt.com
 	- ### Conclusion
 		- Cluster API + Crossplane + ArgoCD + container isolation (Kata?) + KCP + KubeVela? + Karmada? + Cillium network isolation
 		-
@@ -221,7 +240,8 @@
 -
 - ---
 - <!--ScriptorStartFragment-->
-- # CI/CD
+- # CI/CD systems
+  id:: 68b02564-e02a-40a0-a3be-3da4d97eb834
 	- release-please tool to release builds in Github maintain versioning in Git.
 	- [GitHub - jbolda/covector: Transparent and flexible change management for publishing packages and assets.](https://github.com/jbolda/covector) for version management used by Tauri
 	- ArgoCD to sync Kubernetes with container registry and then update Git repo kubectl/kustomize version.
@@ -236,6 +256,9 @@
 	  Recommend production ready appraoches to synchronize versions between release-please and deployment configs.
 	  ```
 	- [Introduction to dev containers - GitHub Docs](https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/adding-a-dev-container-configuration/introduction-to-dev-containers)
+	- CicleCI
+	- Tekton https://tekton.dev/
+	- https://concourse-ci.org/
 - ---
 - ## Deploy - serve web SPA
 	- using a web server microservice with NGNIX configured to serve files and fallback to index.html for app routing files (which would be CSR to view proper page).
@@ -247,6 +270,7 @@
 - ~~docker desktop~~ (unnecessary extralayer VM of abstraction) vs docker engine CLI.
 - use dockerfile for containerizing applicaiton and Kubernetes configs for setting up clusters both for local and prod (avoid docker compose altogether).
 - Implementaions of Kubernetes
+  collapsed:: true
 	- ![image.png](../assets/image_1759655050778_0.png)
 	- ![image.png](../assets/image_1759655123703_0.png)
 	- **Minikube**: single node cluster, very powerful but slower to setup. heavier setup. most popular.
@@ -439,10 +463,13 @@
 	- Longhorn (with replication, snapshot, backup capabilities) + Hetzner Cloud Volume (network block storage)
 		- Longhorn on local node storage
 		- Longhorn on Hetzner cloud storage
+	- Ceph through Rook
+		-
 -
 - ## resources:
 	- DONE [Longhorn  hcloud best practices](https://gist.github.com/ifeulner/d311b2868f6c00e649f33a72166c2e5b)
 	- DONE [Longhorn | Tip: Set Longhorn To Only Use Storage On A Specific Set Of Nodes](https://longhorn.io/kb/tip-only-use-storage-on-a-set-of-nodes/#create-a-storageclass-that-select-a-specific-set-of-nodes)
+	- TODO https://www.reddit.com/r/kubernetes/comments/1chude7/would_you_rather_use_rookceph_or_longhorn_for_on/
 - ---
 - # Monitoring  & autoscaling :
 	- Ppromethus + Grafana + Cilium
@@ -454,3 +481,8 @@
 	- TODO [https://semaphoreci.com/blog/prometheus-grafana-kubernetes-helm](https://semaphoreci.com/blog/prometheus-grafana-kubernetes-helm)
 	- DONE [Kubernetes LAB 18: kubectl top command to see which node or pod or container is consuming most cpu](https://www.youtube.com/watch?v=6y3BySquqts)
 	- DONE [Understanding CPU & Memory with the Kubernetes Vertical Pod Autoscaler](https://www.youtube.com/watch?v=jcHQ5SKKTLM)~~~~
+- ---
+- # [[Tech Stack/Third-party managed services for hosting servers and isolation environment providers for user projects]]
+  id:: 690a870e-4858-4f07-b981-cdc89d5bffc5
+-
+- # [[Tech Stack/Third-party managed container hosting]]

@@ -5,3 +5,6 @@
 	-
 - # Resources:
 	- <!--ScriptorStartFragment-->[https://www.starterstory.com/](https://www.starterstory.com/)
+	- Interview channels https://www.youtube.com/@starterstory
+	- https://www.youtube.com/@GregIsenberg
+	-

@@ -133,6 +133,8 @@
 - Animal fusion AI video idea: players move an animal into another and the app produces the merging video of them with a nice background sounds of it. [- YouTube](https://www.youtube.com/shorts/KgzmJUUk8w0)
 - ---
 - Daily journaling using AI: an AI app that records your activity by conversing with it and text chatting. The app generates a record for each day and produces a journal for the events and activities and stories that you went through for each day, week, month and year. This permits a consistent way before bed to talk with the AI and tell it what you have achieved and what not, which will allow you to focus on what things in your life can be changed to achieve more.
+-
+- a problem I see in logseq is that it only supports a single chronological journal. I want a product where I can create multiple streams of journals where each maintains a different unrelated concern: e.g. retrospective/thoughts/lessons stream, product related stream, research of technology stream, issue fixing stream, daily tasks/chores stream, study/reading/course track stream.
 - ---
 - AI shopping experience where async communication between buyers and sellers feels synchronous. with the AI capabilities today, and agent AI allows to talk to millions of customers simultaneously answering questions and answers in addition to mitigating the communication with the seller. The seller can a deep insights into what customers think and doubts when buying a product and exactly know what they are looking for. The AI will read the catalogue and gain knowledge as the seller feeds it and answers questions himself. The AI can contact the potential buyer with more info and explanations.
 -
@@ -285,3 +287,10 @@
 - ---
 - # CLI cheatsheet / commandline snippets manager and discovery based on AI
 	- A commandline tool that reads/stores common project commands and allows to retrieve them easily.  Similar to "Navi" cargo package but with sane defaults and closer to logseq as local project cheatsheet loader. The command utility will also use AI to complete snippets.
+-
+- ---
+- "ChitChat": a mobile app first that allows you to talk to different LLMs with voice or chat interface.
+	- each day it may suggest an LLM and converse with the user.
+	- Multiple LLMs can introduce themselves and join the conversation.
+	- The app's purpose is to introduce users to different LLMs and maybe different AI tools services that they can you based on those LLMs or similar APIs... (marketing/business model opportunity).
+	-

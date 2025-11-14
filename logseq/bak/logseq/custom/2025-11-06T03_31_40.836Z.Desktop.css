@@ -1,0 +1,14 @@
+.block-control .control-hide:has(.rotating-arrow.collapsed) {
+  display: inline;
+}
+ :root {
+  --ls-main-content-max-width: 90%;
+  --ls-main-content-max-width-wide: 90%;
+}
+{
+/* Logseq Luma - Keep Toolbar Visible */
+.ls-logseq-luma-theme .cp__header {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+}
