@@ -1,5 +1,11 @@
-# IAM /OIDC  Kubernetes
-collapsed:: true
+# Auth third-party
+	- https://clerk.com/
+	- https://auth0.com/
+	- https://www.ory.com/
+	-
+-
+- # IAM /OIDC  Kubernetes
+  collapsed:: true
 	- implementation for OAuth2 and OpenID Connect in Kubernetes:
 		- considerations
 			- which supports 2FA ?

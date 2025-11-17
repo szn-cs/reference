@@ -1,7 +1,0 @@
-- https://soundcloud.com/insanegrowth
-- https://clarity.fm/mitch
--
--
-- advanced project challenges to become better programmer https://codecrafters.io/
-- TODO https://www.youtube.com/watch?v=D26sUZ6DHNQ
-- TODO https://www.youtube.com/watch?v=R8udhb7m398

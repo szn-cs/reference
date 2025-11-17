@@ -1,5 +1,5 @@
 - https://dl4.downloadly.ir/Files/Elearning/Udemy_CrewAI_Complete_Course_Agent_Crews_RAG_Flows_Studio_2025_2025-8.part1_Downloadly.ir.rar
-  title:: download/AI Agents
+  title:: resource/download/AI Agents
 - https://dl4.downloadly.ir/Files/Elearning/Udemy_CrewAI_Complete_Course_Agent_Crews_RAG_Flows_Studio_2025_2025-8.part2_Downloadly.ir.rar
 - https://dl4.downloadly.ir/Files/Elearning/Udemy_CrewAI_Complete_Course_Agent_Crews_RAG_Flows_Studio_2025_2025-8.part3_Downloadly.ir.rar
 - https://dl4.downloadly.ir/Files/Elearning/Udemy_CrewAI_Complete_Course_Agent_Crews_RAG_Flows_Studio_2025_2025-8.part4_Downloadly.ir.rar

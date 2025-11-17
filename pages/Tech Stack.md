@@ -1,4 +1,4 @@
-desc:: Running researching tasks (tools, options, dilemma)
+desc:: researching specific technologies options, practical tools, comparisons, and document decision dilemmas & trade-offs.
 
 -
 - React, TS, TailwindCSS, Tanstack
@@ -8,13 +8,26 @@ desc:: Running researching tasks (tools, options, dilemma)
 - C Lang
 	- object-oriented framework for C: https://docs.gtk.org/gobject/concepts.html
 -
-- SaaS application at minimum - A real-world SaaS application has, at a minimum, the following components:
-	- **User interface** (an HTML form or basic frontend) - An HTML form and a database; typically a relational database.
-		- **Server-side logic** to process requests.
-		- **Persistent storage** (usually a relational database).
-		- **User authentication** (accounts + sessions).
-	- The ability to handle media files or documents, generally using S3.
-	- A multi-user and realtime component, where changes made by one person in one location are reflected instantly in the browser of another person. (serving multiple users, sharing state, expect instant feedback).
+- # Tech Stack combinations:
+	- react-native, NextJS, firebase, mixepanel.com for analytics.
+	- https://www.appstoretracker.com/us/reference app ranking tracker
+	- Tiktok analytics https://www.shortimize.com/
+	- Vue/React, laravel.com, willowvoice.com (talk instead of type), granola.ai (meeting notes), slack.com, framer.com, v0.app prototyping.
+	- figma.com (UI design, app store screenshots, making app icon), mixpanel.com (analytics), claude code, Nextjs + typescripting.org, vercel.com, github, expo.com cross-platform build management, revenuecat.com (subscription analytics).
+	- larevel.com, adobe.com graphic design, lottiefiles.com animations, appfigures.com ASO research (appstore optimization) track performance across app stores, revenuecat.com subscription management, mixpanel.com, cloudflare.com geographic load balancing, OpenAI chatgpt.
+	- bubble.io development, seobotai.com SEO, cursor.com coding, mailtrap.io marketing, featurebase,app public roadmap, hunter.io outreach, makeugc.ai UGC creators, attio.com CRM, Stripe, tinyadz.com advertising, creatorhunter.io marketing, reddit.com marketing, agent tasks suna.so;
+	- Nodejs, apify.com http requests (https://github.com/apify/impit make request to websites as if you are a browser), Proxies (proxy servers and data scraping tools): enomi.com, decodo.com, webshare.io, joinmassive.com; Render for hosting; aws-amazon.com/lambda to host some scripts; cursor.com; supabase.com; astro.build web framework MPA + react.dev frontend;
+	- Cursor, vercel, ahrefs keyword research, stripe, custom support built with cursor, twilio.com call APIs.
+	- cursor for coding, nextjs, electronjs.org (reactjs+typescript), cloudflare.com hosting, ai-sdk.dev by vercel integrating with multiple AI models;
+	- loom.com video recording; miro.com virtual whiteboard; techsmith.com video editing;
+	- flutter.dev crossplatform app development frameworks; cursor.ai; openai; firebase for backend; revenuecat.com in-app purchasing; frill.co user feedback; onelink.com deep links; sevdesk.com accounting;
+	- nextjs, postgresql, coolify deployment, authentication authjs.dev; resend.com email marketing;
+	- nextjs.org; typescript; cursor; github; vercel; planetscale postgresql database; trigger.dev managed AI agents & workflows; resend.com emails; stripe payment processing;
+	- kotlinlang backend; nextjs frotend; brevo.com transactional email; aws.amazon.com EC2 host backend; netlify.com host frontend; stripe.com;
+	- Dev: Cursor, Design: Figma, Payments: Stripe, Backend - Supabase, Hosting - Vercel, Leads - Enrichlead, Support - Crisp;
+- # some other tools :
+	- https://www.figma.com/figjam/ brainstorm using AI to create interview questions, requirements, flow charts of app, etc. + FigmaAI for design UI
+	-
 - <!--ScriptorStartFragment-->
   
   ---
@@ -62,4 +75,4 @@ desc:: Running researching tasks (tools, options, dilemma)
 - # Fedora
 	- https://copr.fedorainfracloud.org/coprs/ provides transparent build process of user-maintained package builds.
 	-
-	-
+-

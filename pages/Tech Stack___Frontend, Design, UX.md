@@ -1,4 +1,7 @@
-# Frontend
+- https://lmarena.ai/
+-
+- # Frontend
+  collapsed:: true
 	- [Tailwind CSS CheatSheet for Beginners and Not Only](https://www.creative-tim.com/twcomponents/cheatsheet) + Tailwind containers (style depending on containing element features).
 	- Web components issues vs React
 	- internationalization library for react i18next
@@ -29,14 +32,6 @@
 		- install any component via npx shadcn
 	- https://magicui.design/ components and pages design also based on React, ShadCN
 -
-- # UI References
-	- https://mobbin.com/ provides frontedn designs and workflows from thousands of successful real applications (can be fed to LLMs to create desgins for pages easily and quickly).
-	- TODO https://medium.com/@vpznc/free-mobbin-and-appshots-alternatives-for-ui-references-990d10f9e01f
-	-
-- # Design :
-	- https://www.framer.com/
-	-
-	-
 - ## Resources
 	- DONE [The Story of shadcn/ui](https://www.youtube.com/watch?v=yYKEvxFPy5Q)
 	- TODO [How Shadcn/ui ACTUALLY Works](https://youtu.be/AqmMx_JidGo?feature=shared)
@@ -45,5 +40,60 @@
 -
 - # UI libraries:
 	- Charts https://recharts.org/en-US/examples/SimpleLineChart
+	- https://21st.dev/community/components they also have an mcp server
+	  id:: 68f150a6-6e1d-4893-aea8-4ba0f4bb6b20
+		- https://github.com/serafimcloud/21st
+		- https://21st.dev/community/screens
 -
 -
+- ### Prototyping (UI/UX Design)
+	- Figma
+		- Collaborative interface design and prototyping
+	- Adobe XD
+		- Interactive prototypes and Adobe ecosystem integration
+	- InVision Studio
+		- Functional prototypes
+	- Framer https://www.framer.com/
+		- Visual design, interactive components, exports production-ready React code
+		- + inspiration
+	- Sketch
+		- Vector-based design (macOS)
+	- Webflow
+		- Drag-and-drop web design, production-ready output
+	- Canva
+		- Quick design assets and graphics
+-
+- # Inspiration / UI references (UI design ideas/examples)
+	- https://21st.dev/community/screens/
+	- https://screensdesign.com/
+	  id:: 69198c3a-bd8f-473a-b131-4cdb81311f99
+	- **Mobbin** provides frontedn designs and workflows from thousands of successful real applications (can be fed to LLMs to create desgins for pages easily and quickly).
+		- TODO https://medium.com/@vpznc/free-mobbin-and-appshots-alternatives-for-ui-references-990d10f9e01f
+		- UI patterns from leading apps; helps with **presentation** and **interaction modeling**
+	- Dribbble
+		- Design snippets and previews
+	- Awwwards https://awwwards.com
+		- Award-winning web design examples
+	- SiteInspire
+		- Curated high-quality websites; custom showcase websites
+	- Muzli
+		- Daily curated design inspiration
+	- UI patterns https://ui-patterns.com/ concepts and explanations
+	- https://www.uxdatabase.io/product-database
+	- https://bento.me/thegoodstuff curated design patterns and example resources
+	- ### resource
+		- TODO https://designerup.co/blog/the-best-collections-of-real-ux-design-patterns/
+		- example templates https://getsiimple.com/demos/
+	-
+- # generation prodcuts
+	- meta.ai
+	- image animator https://chatgpt.com/g/g-jxPt7XKwI-image-animator/c/6905b1d2-74ec-8325-80ad-88e2d0282833
+	- https://labs.google/fx/tools/whisk/project
+	- video generation/editing https://runwayml.com/
+	- https://aistudio.google.com/prompts/new_chat?model=gemini-2.0-flash-preview-image-generation
+	- https://firefly.adobe.com/generate/image?ff_campaign=embed_generate_acom&promoid=TG8SL6TN&mv=other
+	-
+- # Designer platforms
+	- Behance
+		- Design portfolios and case studies; hire best designers of images, video, tangible products, etc.
+	-

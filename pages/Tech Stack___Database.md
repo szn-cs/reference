@@ -107,6 +107,7 @@
 	- [Tigris](https://fly.io/docs/tigris/) (S3-compatible)
 		- Distributed object store - subsequent accesses from regions other than the primary region are served locally.
 		- incrementally migrate from another object store data using https://fly.io/docs/tigris/#migrating-to-tigris-with-shadow-buckets
+		- mount read-only object store into VM using FUSE implementation https://github.com/s3fs-fuse/s3fs-fuse
 - ---
 - # Managed Relational-Database providers
 	- [Fly.io’s Managed Postgres](https://fly.io/docs/mpg/)
@@ -119,7 +120,9 @@
 	- [Digital Ocean Managed Postgres](https://www.digitalocean.com/products/managed-databases-postgresql)
 	- [Google Cloud SQL for PostgreSQL](https://cloud.google.com/sql/docs/postgres/)
 	- [Heroku Managed Data Services](https://www.heroku.com/managed-data-services)
--
+	- ### Non-relational
+		- Firebase:
+			- BAD security design (endpoint of database is exposed publicly) - many hacks reported.
 - # In-memory database for caching
 	- Redis
 	- [Upstash for Redis](https://docs.upstash.com/redis) is a fully-managed, Redis-compatible database service offering global read replicas for reduced latency in distant regions.

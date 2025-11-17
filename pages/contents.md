@@ -1,7 +1,7 @@
 - [:a {:href "#/all-journals"} "JOURNALS"]
 - [[Tech Stack]]
-- [[course]]
-	- [[success stories]]
-	- [[download]]
+- [[Architecture Patterns & UX, processes]]
+- [[resource]]
+-
 -
 - [[Product ideas]]

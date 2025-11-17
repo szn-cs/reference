@@ -1,4 +1,7 @@
-# coding agents tools:
+# Agents development SDKs
+	- https://github.com/modelcontextprotocol/rust-sdk/tree/main
+-
+- # Coding agents tools:
 	- info:
 		- _24 million tokens/day** —enough for 3–4 hours of uninterrupted vibe coding_ while _heavy coding workflows up to 120m tokens/day_
 	- Groq allows for quick inferences by providing many LLMs
@@ -95,6 +98,7 @@
 		  | byokaashish | https://www.feedough.com/subscribe/ | www.linkedin.com/in/aashishpahwa/ | https://www.instagram.com/okaashish/ |
 		-
 	- ## Claude Code
+	  id:: 68d89560-cf08-435a-acb8-1a62c224016f
 		- info :
 			- accessible through CLI or SDK.
 				- thirdparty providers may allow free tier access (Google, Amazon bedrock)
@@ -117,10 +121,25 @@
 		  #+END_QUOTE
 		- TODO https://github.com/ericbuess/claude-code-docs
 		- TODO https://github.com/zilliztech/claude-context   or   https://github.com/ericbuess/claude-code-project-index
+		- ### Plugins marketplace
+		  id:: 691a686b-a672-4b01-8c7f-651cd9c7f6f9
+			- https://github.com/wshobson/agents
+			- https://claudecodemarketplace.com/
+			- https://github.com/edmund-io/edmunds-claude-code from [youtuber](https://www.youtube.com/watch?v=Ffh9OeJ7yxw)
+		- ### MCP :
+			- https://context7.com/
+				- DONE install https://github.com/upstash/context7
+			- DONE https://github.com/21st-dev/magic-mcp create magic interfaces
+			- ### Resources
+				- https://mcpservers.org/
+				- https://github.com/modelcontextprotocol/servers
+				- https://mcpmarket.com/
+		- ### Subagents
+			- https://github.com/lst97/claude-code-sub-agents/tree/main/agents examples (from [youtuber](https://www.youtube.com/@edmundyong))
 		- ### Resources
 			- TODO [I should be charging $999 for this Claude Code Tutorial](https://www.youtube.com/watch?v=4nthc76rSl8)
-			- DONE [[course/Claude Code: A Highly Agentic Coding Assistant]]
-		-
+			- DONE [[resource/course/Claude Code: A Highly Agentic Coding Assistant]]
+			-
 	- Gemini CLI
 	- OpenAI Codex
 	- https://www.warp.dev/coding
@@ -216,14 +235,6 @@
 	- https://inference.net/
 	- LLM serving https://github.com/vllm-project/vllm  vs SGLang
 	-
-- # AI stack tools for SaaS:
-	- Dev: Cursor
-	- Design: Figma
-	- Payments: Stripe
-	- Backend - Supabase
-	- Hosting - Vercel
-	- Leads - Enrichlead
-	- Support - Crisp
 - # Adopting AI:
 	- Cursor.ai
 	- local chatgpt desktop app https://github.com/Mintplex-Labs/anything-llm works with multiple LLMs.

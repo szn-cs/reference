@@ -1,0 +1,33 @@
+desc:: cloud architecture fundamentals, design patterns, etc.
+
+-
+- SaaS application at minimum - A real-world SaaS application has, at a minimum, the following components:
+	- **User interface** (an HTML form or basic frontend) - An HTML form and a database; typically a relational database.
+		- **Server-side logic** to process requests.
+		- **Persistent storage** (usually a relational database).
+		- **User authentication** (accounts + sessions).
+	- The ability to handle media files or documents, generally using S3.
+	- A multi-user and realtime component, where changes made by one person in one location are reflected instantly in the browser of another person. (serving multiple users, sharing state, expect instant feedback).
+-
+- ### misc. notes:
+	- hosting frontend can be different than hosting backend;
+- ---
+- # system components:
+	- networking stack
+		- ### loadbalancer
+		- **BGP/closest-node anycast routing** (routing protocol): single IP address announced from multiple geographically distributed servers. Anycast is a core internet routing mechanism that connects clients to the “nearest” server advertising a block of IPs.
+		  collapsed:: true
+			- simple mechanism where global routing infrastructure chooses the most optimal server responder using internet routing network layer.
+		- DNS records
+		- CDN
+	-
+- # UX
+	- ### on boarding flow.
+	-
+- ---
+- # product process for AI builder tools:
+	- **Conduct Research:** **Find out what people need.** Ask them about their problems and look at other apps/tools that already exist.
+	- **Plan & Strategize:** **Figure out the best plan.** Based on your research, see where your idea is weak, and where you have a chance to do something better than others. Create flow charts.
+	- **Design UI:** **Make a small test version.** Build just the most important part of the app so you can test it right away and fix things quickly.
+	- **No-code the app:** **Build the final product.** Put together the look of the app, set up how the data is stored (the "brain"), and add all the features using no-code tools.
+	-

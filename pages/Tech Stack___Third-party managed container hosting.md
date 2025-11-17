@@ -59,7 +59,7 @@
 	- Verpex
 	- [https://kuberns.com/](vhttps://www.reddit.com/r/elixir/comments/1h8ajm2/is_flyio_ridiculously_expensive/.com/)
 	- TODO check for offshore providers
--
+	-
 - ### comparison
 	- #+BEGIN_QUOTE
 	  	- **For simplicity:** *Google Cloud Run*, *Render*, or *Railway.app*

@@ -267,28 +267,29 @@ id:: 68e0ccdd-f34e-4ac4-9dbe-f21a2b318f65
 	- conclusion: use web-server behind a reverse proxy (maps root domain to static SPA asset files). In Kubernetes there is support for Ingress Ngnix controller which acts a reverse-proxy to external traffic intor the cluster.
 - ---
 - ### Docker, Kubernetes:
-- ~~docker desktop~~ (unnecessary extralayer VM of abstraction) vs docker engine CLI.
-- use dockerfile for containerizing applicaiton and Kubernetes configs for setting up clusters both for local and prod (avoid docker compose altogether).
-- Implementaions of Kubernetes
-  collapsed:: true
-	- ![image.png](../assets/image_1759655050778_0.png)
-	- ![image.png](../assets/image_1759655123703_0.png)
-	- **Minikube**: single node cluster, very powerful but slower to setup. heavier setup. most popular.
-	- K3s + Rancher (by default runs nodes on docker): great CI pipelines, targeted to edge-devices production, may change local OS configuration (thus must be ran under vm or docker).
-		- vs k30
-	- [Load testing for engineering teams | Grafana k6](https://k6.io/)
-	- k9s
-	- [GitHub - ahmetb/kubectx: Faster way to switch between clusters and namespaces in kubectl](https://github.com/ahmetb/kubectx)
-	- Kind (Kubernetes in docker - i.e. runs docker Kubernetes inside another docker): more powerful multi-node cluster, Very fast, possible to run multi-node emulated cluster. harder configuration.
-	- ~~Docker Desktop~~: single node cluster, easy setup, runs in a vm (extra layer of abstraction); vs [Rancher Desktop by SUSE](https://rancherdesktop.io/)
-	- Kubernetes's Kubeadm: powerful multi-node cluster with more features,
-	- + visualizations: [Deploy and Access the Kubernetes Dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) + [Lens | The Kubernetes IDE](https://k8slens.dev/) + vscode extension
-	- Rancher: allows to manage multiple clusters of Kubernetes.
-	- Tilt for local live dev in Kubernetes cluster (works with minikube too) [First Look at Tilt](https://docs.tilt.dev/tutorial/index.html)
-		- vs. Skaffold (15k, local + remote + devops integration deployment, supports multiple configurations, file sync), Tilt (8k, Starlark config format, specifically designed for local development, immediate live application updates, file sync, reload app script, debugging inspection port forwarding, local dev only, supports single titlefile in root with .starlark modules; fine grained control over changes and what they trigger), Devspace (4.5k), and Okteto (partial open source) vs garden (free-tier plan)
-	- Kpt (too complex and documentation written academically and not for practical usage) vs kustomize vs helm
-		- check [Kpt [NEW]](https://skaffold.dev/docs/renderers/kpt/)
-	- https://kubevirt.io/ allows running virtual machines alongside containers.
+	- ~~docker desktop~~ (unnecessary extralayer VM of abstraction) vs docker engine CLI.
+	- use dockerfile for containerizing applicaiton and Kubernetes configs for setting up clusters both for local and prod (avoid docker compose altogether).
+		- Dockerfile vs ~~Buildpacks~~  to build container images
+	- Implementaions of Kubernetes
+	  collapsed:: true
+		- ![image.png](../assets/image_1759655050778_0.png)
+		- ![image.png](../assets/image_1759655123703_0.png)
+		- **Minikube**: single node cluster, very powerful but slower to setup. heavier setup. most popular.
+		- K3s + Rancher (by default runs nodes on docker): great CI pipelines, targeted to edge-devices production, may change local OS configuration (thus must be ran under vm or docker).
+			- vs k30
+		- [Load testing for engineering teams | Grafana k6](https://k6.io/)
+		- k9s
+		- [GitHub - ahmetb/kubectx: Faster way to switch between clusters and namespaces in kubectl](https://github.com/ahmetb/kubectx)
+		- Kind (Kubernetes in docker - i.e. runs docker Kubernetes inside another docker): more powerful multi-node cluster, Very fast, possible to run multi-node emulated cluster. harder configuration.
+		- ~~Docker Desktop~~: single node cluster, easy setup, runs in a vm (extra layer of abstraction); vs [Rancher Desktop by SUSE](https://rancherdesktop.io/)
+		- Kubernetes's Kubeadm: powerful multi-node cluster with more features,
+		- + visualizations: [Deploy and Access the Kubernetes Dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) + [Lens | The Kubernetes IDE](https://k8slens.dev/) + vscode extension
+		- Rancher: allows to manage multiple clusters of Kubernetes.
+		- Tilt for local live dev in Kubernetes cluster (works with minikube too) [First Look at Tilt](https://docs.tilt.dev/tutorial/index.html)
+			- vs. Skaffold (15k, local + remote + devops integration deployment, supports multiple configurations, file sync), Tilt (8k, Starlark config format, specifically designed for local development, immediate live application updates, file sync, reload app script, debugging inspection port forwarding, local dev only, supports single titlefile in root with .starlark modules; fine grained control over changes and what they trigger), Devspace (4.5k), and Okteto (partial open source) vs garden (free-tier plan)
+		- Kpt (too complex and documentation written academically and not for practical usage) vs kustomize vs helm
+			- check [Kpt [NEW]](https://skaffold.dev/docs/renderers/kpt/)
+		- https://kubevirt.io/ allows running virtual machines alongside containers.
 -
 - <!--ScriptorStartFragment-->
 - ### resources:
@@ -349,6 +350,7 @@ id:: 68e0ccdd-f34e-4ac4-9dbe-f21a2b318f65
 		- Digital Ocean
 		- [https://contabo.com/en/](https://contabo.com/en/)
 		- Bunny CDN
+		- Fastly CDN
 		- Cloudflare Tunnel (exposing application through cloudflare ip/domain).
 	- Non-manged solution (self-managed - using kops) vs manged cluster: involves setting up a cluster on nodes and install appropriate dependencies and configurations on them.
 	- shared hosting vs dedicated VM vs managed kubernetes

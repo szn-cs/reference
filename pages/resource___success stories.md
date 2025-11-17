@@ -7,4 +7,4 @@
 	- <!--ScriptorStartFragment-->[https://www.starterstory.com/](https://www.starterstory.com/)
 	- Interview channels https://www.youtube.com/@starterstory
 	- https://www.youtube.com/@GregIsenberg
-	-
+	- https://www.youtube.com/@theschoolofhardknocks/videos  summarize lessons/maxims phrases أقوال أحكام

@@ -1,0 +1,10 @@
+- https://soundcloud.com/insanegrowth
+- https://clarity.fm/mitch
+- https://fountn.design/  high quality learning resources for designs including web/UX
+- https://bento.me/thegoodstuff curated by professionals resources for product design including learning
+-
+-
+- advanced project challenges to become better programmer https://codecrafters.io/
+- TODO https://www.youtube.com/watch?v=D26sUZ6DHNQ
+- TODO https://www.youtube.com/watch?v=R8udhb7m398
+-
