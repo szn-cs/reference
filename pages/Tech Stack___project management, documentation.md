@@ -17,6 +17,7 @@
 	- logseq: open sources alternative to obsidian; block-based (bullets); less polished than obsidian; simple & clearly startuctured - no fluff; self-managing of journal and reference page creation;
 		- markdown vs [Org-mode](https://orgmode.org/) vs FOAM vscode plugin
 			- DONE https://www.reddit.com/r/logseq/comments/1b6ye4v/from_obsidian_to_logseq/
+	- https://mymind.com/ allows collecting desings in a pinterest way.
 	- [GitHub - siyuan-note/siyuan: A privacy-first, self-hosted, fully open source personal knowledge management software, written in typescript and golang.](https://github.com/siyuan-note/siyuan)
 	- [GitHub - TriliumNext/Trilium: Build your personal knowledge base with Trilium Notes](https://github.com/TriliumNext/Trilium)
 	- [AppFlowy](https://appflowy.com/) alternative to notion OSS

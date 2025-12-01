@@ -1,7 +1,6 @@
 - https://lmarena.ai/
 -
-- # Frontend
-  collapsed:: true
+- # Frontend framework library
 	- [Tailwind CSS CheatSheet for Beginners and Not Only](https://www.creative-tim.com/twcomponents/cheatsheet) + Tailwind containers (style depending on containing element features).
 	- Web components issues vs React
 	- internationalization library for react i18next
@@ -26,11 +25,12 @@
 		- Are there competing frameworks in Rust that provide ISR? NO.
 		- [GitHub - tuono-labs/tuono: ⚡ Modern fullstack web framework based on Rust and React](https://github.com/tuono-labs/tuono)?
 		- [GitHub - vikejs/vike: 🔨 Vike — The Modular Framework — Next.js & Nuxt alternative for unprecedented flexibility and stability.](https://github.com/vikejs/vike)
-	- State management: [GitHub - pmndrs/zustand: 🐻 Bear necessities for state management in React](https://github.com/pmndrs/zustand) ! , Reduc, Mobyx
 	- Testing stack: [Vitest – Complete Intro to React](https://react-v9.holt.courses/lessons/testing/vitest)
 	- https://21st.dev/community/components open source registry polished modern UI interfaces with Tailwind CSS and Radix UI
 		- install any component via npx shadcn
 	- https://magicui.design/ components and pages design also based on React, ShadCN
+	- https://animate-ui.com/
+	-
 -
 - ## Resources
 	- DONE [The Story of shadcn/ui](https://www.youtube.com/watch?v=yYKEvxFPy5Q)
@@ -38,13 +38,40 @@
 	- DONE ~~React complete course explanation and link resources ~~[Complete Intro to React](https://react-v9.holt.courses/)
 	- DONE ~~React+Typescript course resources: ~~[React && TypeScript — Frontend Masters](https://fem-react-typescript.vercel.app/)
 -
+- # Frontend tools
+	- ### state management
+		- ==[Zustand](https://github.com/pmndrs/zustand)== as popular as Redux
+			- Tool is powerful and performant, more modern than redux.
+		- Mobyx
+		- **Redux**
+		- **Redux-toolkit** a wrapper around redux to reduce boilerplate of actions and reducers defintions.
+	- ### terminal display
+		- xterm.js to render/display logs stream from server
+	- RTL support
+		- https://www.npmjs.com/package/react-with-direction
+		- i18n library supports also direction setup; it is responsible for handling static translation strings of UI (not content translations fetched from API)
+			- ==**react-i18next**==
+	- frontend visual testing https://storybook.js.org/
+	- React compiler for memoization of react vDOM components https://react.dev/learn/react-compiler
+	- ### **WYSIWYG** editors
+	  id:: 692af03b-f0f6-4308-a6ff-92d6c9ee37c9
+	  generally it means better UX for the content teams editing the text, not necessarily strict visual correspondence with actual published site.
+		- wordpress Gutenberg block editor.
+		- TinyMCE
+	-
+-
+-
+-
+-
 - # UI libraries:
 	- Charts https://recharts.org/en-US/examples/SimpleLineChart
 	- https://21st.dev/community/components they also have an mcp server
 	  id:: 68f150a6-6e1d-4893-aea8-4ba0f4bb6b20
 		- https://github.com/serafimcloud/21st
 		- https://21st.dev/community/screens
--
+	- Fonts resources https://fonts.google.com/
+	- webgl components effects and assets https://www.unicorn.studio/
+	-
 -
 - ### Prototyping (UI/UX Design)
 	- Figma
@@ -62,7 +89,7 @@
 		- Drag-and-drop web design, production-ready output
 	- Canva
 		- Quick design assets and graphics
--
+	-
 - # Inspiration / UI references (UI design ideas/examples)
 	- https://21st.dev/community/screens/
 	- https://screensdesign.com/
@@ -81,10 +108,15 @@
 	- UI patterns https://ui-patterns.com/ concepts and explanations
 	- https://www.uxdatabase.io/product-database
 	- https://bento.me/thegoodstuff curated design patterns and example resources
+	- https://usepanda.com/ shows designs and collects other sources links
+	- [uiverse](https://uiverse.io/) open source ui library.
+	- https://colorhunt.co/ colors palettes
+	- https://coolors.co/ colors palettes
 	- ### resource
 		- TODO https://designerup.co/blog/the-best-collections-of-real-ux-design-patterns/
 		- example templates https://getsiimple.com/demos/
-	-
+		- https://moge.ai/
+		- https://tailwindcss.com/showcase
 - # generation prodcuts
 	- meta.ai
 	- image animator https://chatgpt.com/g/g-jxPt7XKwI-image-animator/c/6905b1d2-74ec-8325-80ad-88e2d0282833
@@ -92,7 +124,7 @@
 	- video generation/editing https://runwayml.com/
 	- https://aistudio.google.com/prompts/new_chat?model=gemini-2.0-flash-preview-image-generation
 	- https://firefly.adobe.com/generate/image?ff_campaign=embed_generate_acom&promoid=TG8SL6TN&mv=other
-	-
+	- https://www.aura.build/ AI generation and remixing designs of apps/websites with fine controls specifically for styles. This tools is build for web designers with lots of css fine controls.
 - # Designer platforms
 	- Behance
 		- Design portfolios and case studies; hire best designers of images, video, tangible products, etc.

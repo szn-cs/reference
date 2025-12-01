@@ -1,4 +1,7 @@
-- Social aggregator based on person/entity
+- MCP for expertly tailored commands and subagents
+	- opinionated, chosen by tech stack, remove choice fatigue and provides enterprise grade implementation to any coding tool.
+- ---
+	- Social aggregator based on person/entity
 	- lists all the social media pages/links; permits to follow a specific person across the internet with all associated sub-channels and projects.
 	- One-click follow/unfollow entity
 		- e.g. AI models labs - follow all z.ai news.
@@ -28,6 +31,8 @@
 - The AI programmer tool would be able to store a concept of a goal to achieve and another concept of the process to achieve it, and then the different representation targets or reflection targets to implement it. e.g. concept of a graphql API in a specific modular structure, then a process is setup to (encoded in as prompt file or config) move each schema, type binding model, data access function, and graphql resolver; through which the process of developing new endpoints and data tables or relations can be repeatedly developed through LLMs in a consistent manner and flexible.
 	- This workflow (which has an element of stochastic programming in it) can then be compiled into a deterministic pattern and program - e.g. a watcher server that implements each of the steps when a model is changed).
 - "behemoth", "Bahema": production-grade cross-layer cross-platform massive AI assisted apps.
+-
+- feature idea: Platform to create apps in the fashion of appsheet.com/templates that integrates with Google sheets and other services.
 - ---
 - project portal which references entire local projects links docs, files, drawings, graph knowledge, etc. similar to logseq tool which allows for backlinks and creating structured content with links to files and allows to focus on specific portion or ascpect of vscode project.
 - control panel: a single place where GUI is generated to run and execute development IDEs or dependent tools (workspace for the entire project can be spawn with single button), and it can also run commands for testing or checking if local machine dependencies are installed or if any extensions are missing. This is an internal tool that is run alongside vscode - it is lightweight and can be triggered with a shortcut command, once overlay is open, the GUI will permit accessibility to entire project as the authors intended it to be used. It can install local required dependencies, run and spin up applicaiton and tools, and make catching up with the project development workflow easier even under frequent additions and changes. Can fit under the category of CI/CD project control panel tool - project management dashboard that integrates with common tools and patterns and automatically generates control dashboard. Additionally it can be extended to become a KPI for managing project data.
@@ -61,8 +66,13 @@
 - Provide new AI command tools that will allow to improve system, such as do manual tasks automatically through the AI agent. e.g. update manually installed rpm packages (lookup online and compare versions without the source repository installed).
 - WASM is greate for creating scripting tools and small script programs. The AI could take a request and produce a script that uses the underlying OS to create a complex script and customizable. The WASM could be sent to a marketplace which could serve as an additional repository for the AI to use. Thus the AI will learn from the requests of users and produce WASM programs to share with others.
 - Cheatsheet like interface for different tools such as tailwind [Tailwind CSS CheatSheet for Beginners and Not Only](https://www.creative-tim.com/twcomponents/cheatsheet)
-  
-  ---
+- ---
+- OS AI controller:
+	- a software that lives on the OS and uses AI agent to download packages and find software.
+		- e.g. The user asks it to install Anydesk, it will popup and proceed to autonomously download and install the package or check if it is already exist.
+	- other features for controlling OS and devices in general.
+-
+- ---
 - product management AI platform:
 - A notes taking app with AI assistant that guides the PM through the entire workflow, from user stories creation/examples to setting requirements etc.
 - The will create user stories and the PM will pick and categories the stories to extract requirements and ideas. 
@@ -293,4 +303,8 @@
 	- each day it may suggest an LLM and converse with the user.
 	- Multiple LLMs can introduce themselves and join the conversation.
 	- The app's purpose is to introduce users to different LLMs and maybe different AI tools services that they can you based on those LLMs or similar APIs... (marketing/business model opportunity).
-	-
+-
+- ---
+- Wordpress plugins that utilize AI to design webpages or to manage wordpress stuff.
+- ---
+-

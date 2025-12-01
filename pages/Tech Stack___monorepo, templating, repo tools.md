@@ -100,6 +100,9 @@
 - ---
 - # Templating tool:
 	- [ask llm] is there a scaffolding, code generation, or project templating tool that allows to insert bunch of configs and files to a framework project depending on which features are enabled or what components are enabled? The tool must also work by supporting to augment existing projects.
--
+	- https://www.npmjs.com/package/@tanstack/create-start supports many setups including MCP, React compiler, etc.
+	  id:: 68cb90f3-0383-4d61-9762-64a12a10dfe9
+		- `pnpx create-start-app@latest --ui` has a toggle based plugin setup for the project.
+		- including provider and deployment setups, thirdparty integrations, etc.
 - ---
 -

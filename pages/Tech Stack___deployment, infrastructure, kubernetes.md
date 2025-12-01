@@ -484,7 +484,5 @@ id:: 68e0ccdd-f34e-4ac4-9dbe-f21a2b318f65
 	- DONE [Kubernetes LAB 18: kubectl top command to see which node or pod or container is consuming most cpu](https://www.youtube.com/watch?v=6y3BySquqts)
 	- DONE [Understanding CPU & Memory with the Kubernetes Vertical Pod Autoscaler](https://www.youtube.com/watch?v=jcHQ5SKKTLM)~~~~
 - ---
-- # [[Tech Stack/Third-party managed services for hosting servers and isolation environment providers for user projects]]
-  id:: 690a870e-4858-4f07-b981-cdc89d5bffc5
 -
-- # [[Tech Stack/Third-party managed container hosting]]
+- # [[Tech Stack/Managed Sever Hosting - container hosting, sandboxing enviornments, AI agent sandboxes]]

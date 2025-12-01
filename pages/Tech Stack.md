@@ -25,9 +25,10 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 	- nextjs.org; typescript; cursor; github; vercel; planetscale postgresql database; trigger.dev managed AI agents & workflows; resend.com emails; stripe payment processing;
 	- kotlinlang backend; nextjs frotend; brevo.com transactional email; aws.amazon.com EC2 host backend; netlify.com host frontend; stripe.com;
 	- Dev: Cursor, Design: Figma, Payments: Stripe, Backend - Supabase, Hosting - Vercel, Leads - Enrichlead, Support - Crisp;
+	- v0, next.js, vercel, shadcn, tailwind, cursor
 - # some other tools :
 	- https://www.figma.com/figjam/ brainstorm using AI to create interview questions, requirements, flow charts of app, etc. + FigmaAI for design UI
-	-
+	- erasor.ai technical system design diagrams and technical design docs.
 - <!--ScriptorStartFragment-->
   
   ---
@@ -49,7 +50,7 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 		- ### conclusion:
 			- navi seemed to be most promising but it has weired default ! and hard configuration; it executes by default and doesn't read local files, which defeats the purpose of project specific cheatsheet.
 		- TODO find history cli tool
-		-
+	-
 -
 	-
 - # Terminals
@@ -63,7 +64,7 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 	- ClamAV
 		- https://docs.clamav.net/manual/Installing.html
 		- https://docs.clamav.net/manual/Installing/Packages.html
-	-
+-
 - ---
 - # Random interesting projects:
 	- [GitHub - spacedriveapp/spacedrive: Spacedrive is an open source cross-platform file explorer, powered by a virtual distributed filesystem written in Rust.](https://github.com/spacedriveapp/spacedrive)
@@ -71,6 +72,7 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 	- trending projects for developers https://zread.ai/trending
 	- awesome articles for tech development by a founder - https://vadimkravcenko.com/newsletter/
 	  id:: 68fa5adc-6890-4728-ba8c-e387b1aa1c2a
+	- https://daily.dev/ projects and tools trending in dev space.
 - ---
 - # Fedora
 	- https://copr.fedorainfracloud.org/coprs/ provides transparent build process of user-maintained package builds.

@@ -1,8 +1,4 @@
-- Tools:
-	- Postman alternative https://github.com/mountain-loop/yaak
-	-
-- ---
-- # API  model &  Endpoints:
+# API  model &  Endpoints:
 	- [frontend] REST + OpenAPI spec (Swagger) , vs. GraphQl vs. websockets
 	- + [backend-to-backend] gRPC
 		- [GitHub - google/tarpc: An RPC framework for Rust with a focus on ease of use.](https://github.com/google/tarpc)
@@ -67,117 +63,258 @@
 	- [lru - Rust](https://docs.rs/lru/latest/lru/)
 	- **Schema CI**, and **Visualization** tools (GraphQL Inspector, Voyager) for end-to-end type-safety and visibility
 -
-- # Authorization
-	- info:
-		- permissions are based on user, session, context.
-		- approaches: database level ACL (e.g. postgresql extensions); Middleware/Resolvers level ACL; Gateway-level ACL;
-	- [GitHub - maticzav/graphql-shield: 🛡 A GraphQL tool to ease the creation of permission layer.](https://github.com/maticzav/graphql-shield)
-	- PostgreSQL’s RLS
-	- Yates authorization tool
-	- [Open Policy Agent](https://www.openpolicyagent.org/)
-	- Middleware/Resolver-level authorization
-		- guard field feature in async_graphql (executes authorization before the field resolver or query resolver - a rust-native mechanism not using Graphql schema directives feature)
-	- Gateway endpoint-level authorization (currently for each endpoint is either ALLOW ALL or DENY ALL)
-		- Ory Aothkeeper doesn't support GraphQL query analysis [Add GraphQL support · Issue #470 · ory/oathkeeper](https://github.com/ory/oathkeeper/issues/470)
+	- # Authorization
+	  collapsed:: true
+		- info:
+			- permissions are based on user, session, context.
+			- approaches: database level ACL (e.g. postgresql extensions); Middleware/Resolvers level ACL; Gateway-level ACL;
+		- [GitHub - maticzav/graphql-shield: 🛡 A GraphQL tool to ease the creation of permission layer.](https://github.com/maticzav/graphql-shield)
+		- PostgreSQL’s RLS
+		- Yates authorization tool
+		- [Open Policy Agent](https://www.openpolicyagent.org/)
+		- Middleware/Resolver-level authorization
+			- guard field feature in async_graphql (executes authorization before the field resolver or query resolver - a rust-native mechanism not using Graphql schema directives feature)
+		- Gateway endpoint-level authorization (currently for each endpoint is either ALLOW ALL or DENY ALL)
+			- Ory Aothkeeper doesn't support GraphQL query analysis [Add GraphQL support · Issue #470 · ory/oathkeeper](https://github.com/ory/oathkeeper/issues/470)
 -
-- # Frontend GraphQL Clients
-	- desc:
-		- Graphql root-level objects can have resolvers with parameters, while custom objects do have explicit resolvers for complex fields like arrays.
-		- GraphQL root-level objects' fields can be guarded using async_graphql.
-		- Graphql support subscriptions with WebSocket implementation.
-	- GraphQL frontend clients: most have similar syntax, support caching, and client-side+SSR support; Codegeneration dictates which client to use. [Cloud Security Alliance Star Level One Badge](https://the-guild.dev/graphql/codegen/docs/guides/react-vue#appendix-ii-compatibility)
-		- Apollo client [GitHub - apollographql/apollo-client: The industry-leading GraphQL client for TypeScript, JavaScript, React, Vue, Angular, and more. Apollo Client delivers powerful caching, intuitive APIs, and com...](https://github.com/apollographql/apollo-client) (comprehensive, popular; not very extensible; large bundle size;   popular; integrates with React; advanced caching and many features - realtime data updates, error handling, pagination; straight-foward setup compared to Rely)
-			- codegen libs: @graphql-codegen/typescript, @graphql-codegen/typescript-operations, @graphql-codegen/typescript-react-apollo; generates React hooks
-		- Rely [GitHub - facebook/relay: Relay is a JavaScript framework for building data-driven React applications.](https://github.com/facebook/relay) (declarative-style, tailored for performance using Meta's Relay specification; support managing graphq colocated fragments: declares data dependencies using compiler to fragment query and store it in a datastore through which components use - without having to propagate data through React props; tightly integrates with react);
-			- codegen using Relay compiler (requires the SDL + scans client for gql`...` tags)
-			- IMPORTANT! [GitHub - oscartbeaumont/async-graphql-relay: Relay support for async-graphql](https://github.com/oscartbeaumont/async-graphql-relay) required for server-side compliance with Relay spec (globally unique IDs). [GraphQL Server Specification | Relay](https://relay.dev/docs/guides/graphql-server-specification/)
-				- NOT production ready! the repo is unmaintained for over 2 years; No Rust graphql relay alternative.
-		- React Query tanstack tool (Most popular in stars and download number; Tanstack has other great tools; Comparison with other tools extensive in their website...)
-		- urlq (great for bundle size priorities; simple out-of-box but very customizable with many plugins/exchanges to choose from; simpler caching layer)
-		- GraphQL Hooks (lightweight, simple, small-bundle size).
-		- graphql-request (minimal client tool - wraps fetch api; basic features that take care of json serialization/deserialization and other small tasks; Similar to having no client with convenience features;).
-	- Codegen SDK (client-side): requirements to support React & Typescript
-		- GraphQL codegen for frontend based on schema (former approach used Apollo codegen) [GitHub - dotansimha/graphql-code-generator: A tool for generating code based on a GraphQL schema and GraphQL operations (query/mutation/subscription), with flexible support for custom plugins.](https://github.com/dotansimha/graphql-code-generator)[GitHub](https://the-guild.dev/graphql/codegen) part of [The Guild](https://github.com/the-guild-org)  tooling list: (generates code artifacts from graphql SDL schema and usage graphql queries in the frontend.
-		- [GitHub - graphql-hive/SOFA: The best way to create REST APIs - Generate RESTful APIs from your GraphQL Server](https://github.com/graphql-hive/SOFA)
-	- Runtime schema parsing  & validation of JSON: while Typescript provides a compile time type checking, it does not parse or validate the values on runtime when dealing with external API sources. [Cloud Security Alliance Star Level One Badge](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-validation-schema) [GitHub - standard-schema/standard-schema: A standard interface for TypeScript schema validation libraries](https://github.com/standard-schema/standard-schema?tab=readme-ov-file) (standard-schema intended for inter-schema translation)
-		- zod [GitHub - colinhacks/zod: TypeScript-first schema validation with static type inference](https://github.com/colinhacks/zod) (popular; Typescipt first; comprehensive; supported well with codegen
-		- yup [GitHub - jquense/yup: Dead simple Object schema validation](https://github.com/jquense/yup?tab=readme-ov-file)
-		- [myzod](https://github.com/davidmdm/myzod) (not popular at all)
-		- [valibot](https://valibot.dev/)
-		- Arktype isn't supported by codegen plugin validation.
+	- # Frontend GraphQL Clients
+	  collapsed:: true
+		- desc:
+			- Graphql root-level objects can have resolvers with parameters, while custom objects do have explicit resolvers for complex fields like arrays.
+			- GraphQL root-level objects' fields can be guarded using async_graphql.
+			- Graphql support subscriptions with WebSocket implementation.
+		- GraphQL frontend clients: most have similar syntax, support caching, and client-side+SSR support; Codegeneration dictates which client to use. [Cloud Security Alliance Star Level One Badge](https://the-guild.dev/graphql/codegen/docs/guides/react-vue#appendix-ii-compatibility)
+			- Apollo client [GitHub - apollographql/apollo-client: The industry-leading GraphQL client for TypeScript, JavaScript, React, Vue, Angular, and more. Apollo Client delivers powerful caching, intuitive APIs, and com...](https://github.com/apollographql/apollo-client) (comprehensive, popular; not very extensible; large bundle size;   popular; integrates with React; advanced caching and many features - realtime data updates, error handling, pagination; straight-foward setup compared to Rely)
+				- codegen libs: @graphql-codegen/typescript, @graphql-codegen/typescript-operations, @graphql-codegen/typescript-react-apollo; generates React hooks
+			- Rely [GitHub - facebook/relay: Relay is a JavaScript framework for building data-driven React applications.](https://github.com/facebook/relay) (declarative-style, tailored for performance using Meta's Relay specification; support managing graphq colocated fragments: declares data dependencies using compiler to fragment query and store it in a datastore through which components use - without having to propagate data through React props; tightly integrates with react);
+				- codegen using Relay compiler (requires the SDL + scans client for gql`...` tags)
+				- IMPORTANT! [GitHub - oscartbeaumont/async-graphql-relay: Relay support for async-graphql](https://github.com/oscartbeaumont/async-graphql-relay) required for server-side compliance with Relay spec (globally unique IDs). [GraphQL Server Specification | Relay](https://relay.dev/docs/guides/graphql-server-specification/)
+					- NOT production ready! the repo is unmaintained for over 2 years; No Rust graphql relay alternative.
+			- React Query tanstack tool (Most popular in stars and download number; Tanstack has other great tools; Comparison with other tools extensive in their website...)
+			- urlq (great for bundle size priorities; simple out-of-box but very customizable with many plugins/exchanges to choose from; simpler caching layer)
+			- GraphQL Hooks (lightweight, simple, small-bundle size).
+			- graphql-request (minimal client tool - wraps fetch api; basic features that take care of json serialization/deserialization and other small tasks; Similar to having no client with convenience features;).
+		- Codegen SDK (client-side): requirements to support React & Typescript
+			- GraphQL codegen for frontend based on schema (former approach used Apollo codegen) [GitHub - dotansimha/graphql-code-generator: A tool for generating code based on a GraphQL schema and GraphQL operations (query/mutation/subscription), with flexible support for custom plugins.](https://github.com/dotansimha/graphql-code-generator)[GitHub](https://the-guild.dev/graphql/codegen) part of [The Guild](https://github.com/the-guild-org)  tooling list: (generates code artifacts from graphql SDL schema and usage graphql queries in the frontend.
+			- [GitHub - graphql-hive/SOFA: The best way to create REST APIs - Generate RESTful APIs from your GraphQL Server](https://github.com/graphql-hive/SOFA)
+		- Runtime schema parsing  & validation of JSON: while Typescript provides a compile time type checking, it does not parse or validate the values on runtime when dealing with external API sources. [Cloud Security Alliance Star Level One Badge](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-validation-schema) [GitHub - standard-schema/standard-schema: A standard interface for TypeScript schema validation libraries](https://github.com/standard-schema/standard-schema?tab=readme-ov-file) (standard-schema intended for inter-schema translation)
+			- zod [GitHub - colinhacks/zod: TypeScript-first schema validation with static type inference](https://github.com/colinhacks/zod) (popular; Typescipt first; comprehensive; supported well with codegen
+			- yup [GitHub - jquense/yup: Dead simple Object schema validation](https://github.com/jquense/yup?tab=readme-ov-file)
+			- [myzod](https://github.com/davidmdm/myzod) (not popular at all)
+			- [valibot](https://valibot.dev/)
+			- Arktype isn't supported by codegen plugin validation.
 -
-- ## Resources :
-	- DONE [https://news.ycombinator.com/item?id=40521518](https://news.ycombinator.com/item?id=40521518) [Why, after 6 years, I’m over GraphQL](https://bessey.dev/blog/2024/05/24/why-im-over-graphql/?ref=apisyouwonthate.com) [GraphQL Is Dead](https://apisyouwonthate.com/newsletter/graphql-is-dead/)
-	- DONE [Understanding gRPC, OpenAPI and REST and when to use them in API design (2020) | Hacker News](https://news.ycombinator.com/item?id=42799245)[gRPC vs REST: Understanding gRPC, OpenAPI and REST and when to use them in API design | Google Cloud Blog](https://cloud.google.com/blog/products/api-management/understanding-grpc-openapi-and-rest-and-when-to-use-them)
-	- DONE [gRPC vs REST vs GraphQL: Comparison & Performance](https://www.youtube.com/watch?v=uH0SxYdsjv4&ab_channel=AntonPutra)
-	- TODO [A detailed comparison of REST and gRPC | Hacker News](https://news.ycombinator.com/item?id=35711196)
-	- TODO [GraphQL vs. REST APIs: a complete guide | Hacker News](https://news.ycombinator.com/item?id=35014395)
-	  :LOGBOOK:
-	  CLOCK: [2025-07-25 Fri 10:19:45]--[2025-07-25 Fri 10:19:46] =>  00:00:01
-	  CLOCK: [2025-07-25 Fri 10:19:48]--[2025-07-25 Fri 10:19:49] =>  00:00:01
-	  CLOCK: [2025-07-25 Fri 10:19:51]--[2025-07-25 Fri 10:19:52] =>  00:00:01
-	  :END:
-	- DONE [I Reviewed 1,000s of GraphQL vs. REST perspectives](https://konfigthis.com/blog/graphql-vs-rest/)
-	- DONE [https://www.reddit.com/r/graphql/comments/1fko6cx/confused_by_graphql_vs_rest_comparison/](https://www.reddit.com/r/graphql/comments/1fko6cx/confused_by_graphql_vs_rest_comparison/)
-	- TODO [GraphQL vs REST APIs: Key Differences, Pros & Cons Explained](https://www.getambassador.io/blog/graphql-vs-rest)
-	- TODO [How REST API and GraphQL Can Work Together? A Comprehensive Guide](https://mobilelive.medium.com/how-rest-api-and-graphql-can-work-together-a-comprehensive-guide-754cf707f146)
-	- TODO [GraphQL vs. REST APIs: What’s the difference between them](https://dev.to/logrocket/graphql-vs-rest-apis-whats-the-difference-between-them-3005)
-	- TODO [Automatically Generate REST and GraphQL APIs From Your Database | Zuplo Blog](https://zuplo.com/blog/2024/12/04/generate-api-from-database)
-	- DONE [Is tRPC The End Of REST/GraphQL?](https://www.youtube.com/watch?v=lxnPMB0Jc7E&ab_channel=WebDevSimplified)
-	- DONE [https://www.reddit.com/r/reactjs/comments/z3xot5/should_i_ditch_graphql_in_favor_of_trpc/](https://www.reddit.com/r/reactjs/comments/z3xot5/should_i_ditch_graphql_in_favor_of_trpc/)
-	- DONE [What is OpenAPI? An In-Depth Exploration of API Development | Konfig](https://konfigthis.com/blog/openapi/#openapi-tools-and-ecosystem)
-	- DONE [Understand OpenAPI in 5 Minutes With Examples](https://www.youtube.com/watch?v=PenvYHJ9Koc&ab_channel=api-first)
-	- DONE [https://www.reddit.com/r/rust/comments/1ffm29t/which_library_to_use_with_axum_for_openapi/](https://www.reddit.com/r/rust/comments/1ffm29t/which_library_to_use_with_axum_for_openapi/)
-	- TODO ~[Working with OpenAPI using Rust | Shuttle](https://www.shuttle.dev/blog/2024/04/04/using-openapi-rust)
-	- TODO [https://tembo.io/docs/development/cli/try-extensions-locally](https://tembo.io/docs/development/cli/try-extensions-locally)
-	- DONE [https://www.reddit.com/r/graphql/comments/r07y6y/postgraphile_or_hasura_for_a_new_project/](https://www.reddit.com/r/graphql/comments/r07y6y/postgraphile_or_hasura_for_a_new_project/)
-	- DONE [After trying Hasura, Prisma, and PostGraphile, my conclusion is that PostGraphil... | Hacker News](https://news.ycombinator.com/item?id=22433478)
-	- TODO [How I Made PostGraphile Faster Than Prisma GraphQL Server In 8 Hours](https://medium.com/graphile/how-i-made-postgraphile-faster-than-prisma-graphql-server-in-8-hours-e66b4c511160)
-	- TODO [https://www.reddit.com/r/graphql/comments/1ghtyxs/hasura_vs_supabase/](https://www.reddit.com/r/graphql/comments/1ghtyxs/hasura_vs_supabase/)
-	- TODO Hasura v3 is not opensource [https://www.reddit.com/r/Hasura/comments/1k1rzd8/hasura_v3_is_not_open_source_and_worse_the_build/](https://www.reddit.com/r/Hasura/comments/1k1rzd8/hasura_v3_is_not_open_source_and_worse_the_build/)
-	- TODO [Lessons from Scaling GraphQL to Half a Billion Requests per Minute](https://www.youtube.com/watch?v=RVBxFi88H1o)
-	- DONE [ROY DERKS - The State of GraphQL Clients in 2023](https://www.youtube.com/watch?v=dU3UURhRAbs&ab_channel=ReactAlicante)
-	- TODO [https://www.reddit.com/r/reactjs/comments/19d2c0y/graphql_benefits_why_you_should_adopt_it_in_2024/](https://www.reddit.com/r/reactjs/comments/19d2c0y/graphql_benefits_why_you_should_adopt_it_in_2024/)
-	- DONE [GraphQL Clients 2025](https://db-views.com/graphql-clients/)
-	- DONE [Four GraphQL Clients Compared](https://www.youtube.com/watch?v=zJvB2hnsXr0&ab_channel=JackHerrington)
-	- DONE [Deep dive on Relay GraphQL client for React](https://www.youtube.com/watch?v=xnvzz7Z658I&ab_channel=Hasura)
-	- DONE [Tom Harding - GraphQL without Relay is not worth it](https://www.youtube.com/watch?v=0wWMXJ4F07A&ab_channel=GraphQLFoundationWorkingGroups)
-	- TODO [GraphQL's Top Benefits Explained](https://hypermode.com/blog/advantages-of-graphql)
-	- DONE [https://www.reddit.com/r/reactjs/comments/1fs58pl/best_graphql_library_today/](https://www.reddit.com/r/reactjs/comments/1fs58pl/best_graphql_library_today/)
-	- TODO [Exploring GraphQL Clients: Apollo Client vs Relay vs URQL](https://hasura.io/blog/exploring-graphql-clients-apollo-client-vs-relay-vs-urql)
-	- TODO [Comparing GraphQL Clients: Apollo vs Relay](https://hemaks.org/posts/comparing-graphql-clients-apollo-vs-relay/)
-	- TODO ~ [Authorization with GraphQL Shield](https://www.youtube.com/watch?v=DvjRCnrYFcg&ab_channel=JamieBarton)
-	- TODO ~ [GraphQL Authorization with Open Policy Agent - Mike Cohen](https://www.youtube.com/watch?v=-4sR0wvtSyw&ab_channel=ApolloGraphQL)
-	- DONE [Authorization Patterns in GraphQL](https://www.osohq.com/post/graphql-authorization)
-	- DONE [Authorization | GraphQL](https://graphql.org/learn/authorization/)
-	- DONE [Field guard - Async-graphql Book](https://async-graphql.github.io/async-graphql/en/field_guard.html)
-	- DONE [Authorization: Checking permissions](https://www.apollographql.com/tutorials/side-quest-auth/03-authorization-checking-permissions#overview)
-		- TODO Authorization collection of articles [Oso - Authorization Academy](https://www.osohq.com/academy)
-	- TODO Authorization in microservices [Best Practices for Authorization in Microservices](https://www.osohq.com/post/microservices-authorization-patterns)
-	- DONE [Why the docs recommend react-query over alternatives · dotansimha graphql-code-generator · Discussion #9482](https://github.com/dotansimha/graphql-code-generator/discussions/9482)
-	- TODO [I Switched From Apollo To Urql (And It Was Worth It)](https://javascript.plainenglish.io/how-i-switched-from-apollo-to-urql-in-my-next-js-site-and-why-it-was-worth-it-9c7394ec150d)
-	- DONE [https://www.reddit.com/r/reactjs/comments/m6mftl/urql_or_reactquery/](https://www.reddit.com/r/reactjs/comments/m6mftl/urql_or_reactquery/)
-	- DONE [Comparison | React Query vs SWR vs Apollo vs RTK Query vs React Router | TanStack Query React Docs](https://tanstack.com/query/latest/docs/framework/react/comparison?from=reactQueryV3)
-	- TODO [Is GraphQL Still Relevant in an HTTP2 World?](https://medium.com/@xuorig/is-graphql-still-relevant-in-an-http2-world-64964f207b8)
-	- TODO parsing & validation:
-		- TODO [Comparing schema validation libraries: Zod vs. Yup - LogRocket Blog](https://blog.logrocket.com/comparing-schema-validation-libraries-zod-vs-yup/)
-		- TODO [Yup vs. Zod vs. Joi: A Comprehensive Comparison of JavaScript Validation Libraries](https://dev.to/gimnathperera/yup-vs-zod-vs-joi-a-comprehensive-comparison-of-javascript-validation-libraries-4mhi)
-		- DONE [https://www.reddit.com/r/reactjs/comments/z739b9/yup_vs_zod_what_do_you_prefer_and_why/](https://www.reddit.com/r/reactjs/comments/z739b9/yup_vs_zod_what_do_you_prefer_and_why/)
-		- DONE [https://www.reddit.com/r/react/comments/1iu00tm/why_use_zod_or_yup_when_you_have_typescript/](https://www.reddit.com/r/react/comments/1iu00tm/why_use_zod_or_yup_when_you_have_typescript/)
-		- TODO [The Ultimate Showdown: Zod vs Yup](https://www.dhiwise.com/post/comparing-zod-and-yup-the-ultimate-showdown)
-		- DONE [Zod finally has competition (...created by Zod?)](https://www.youtube.com/watch?v=V1vMaNVwTaI&ab_channel=Theo-t3%25E2%2580%25A4gg)
-		- TODO ~[https://www.reddit.com/r/typescript/comments/1jevsc3/why_are_there_so_many_validating_libraries/](https://www.reddit.com/r/typescript/comments/1jevsc3/why_are_there_so_many_validating_libraries/)
-		- DONE [Zod Makes TypeScript Even Better](https://www.youtube.com/watch?v=9UVPk0Ulm6U&ab_channel=WebDevSimplified)
-		- TODO ~ [https://news.ycombinator.com/item?id=41764163](https://news.ycombinator.com/item?id=41764163)
-		- TODO [Zod vs. Valibot: Which Validation Library is Right for Your TypeScript Project?](https://dev.to/sheraz4194/zod-vs-valibot-which-validation-library-is-right-for-your-typescript-project-303d)
-	- DONE [Codegen: The good, the bad and the ugly](https://www.youtube.com/watch?v=5weFyMoBGN4&ab_channel=MattPocock)
+	- ## Tools:
+		- Postman alternative https://github.com/mountain-loop/yaak
+		-
+	- ## Resources :
+	  collapsed:: true
+		- DONE [https://news.ycombinator.com/item?id=40521518](https://news.ycombinator.com/item?id=40521518) [Why, after 6 years, I’m over GraphQL](https://bessey.dev/blog/2024/05/24/why-im-over-graphql/?ref=apisyouwonthate.com) [GraphQL Is Dead](https://apisyouwonthate.com/newsletter/graphql-is-dead/)
+		- DONE [Understanding gRPC, OpenAPI and REST and when to use them in API design (2020) | Hacker News](https://news.ycombinator.com/item?id=42799245)[gRPC vs REST: Understanding gRPC, OpenAPI and REST and when to use them in API design | Google Cloud Blog](https://cloud.google.com/blog/products/api-management/understanding-grpc-openapi-and-rest-and-when-to-use-them)
+		- DONE [gRPC vs REST vs GraphQL: Comparison & Performance](https://www.youtube.com/watch?v=uH0SxYdsjv4&ab_channel=AntonPutra)
+		- TODO [A detailed comparison of REST and gRPC | Hacker News](https://news.ycombinator.com/item?id=35711196)
+		- TODO [GraphQL vs. REST APIs: a complete guide | Hacker News](https://news.ycombinator.com/item?id=35014395)
+		  :LOGBOOK:
+		  CLOCK: [2025-07-25 Fri 10:19:45]--[2025-07-25 Fri 10:19:46] =>  00:00:01
+		  CLOCK: [2025-07-25 Fri 10:19:48]--[2025-07-25 Fri 10:19:49] =>  00:00:01
+		  CLOCK: [2025-07-25 Fri 10:19:51]--[2025-07-25 Fri 10:19:52] =>  00:00:01
+		  :END:
+		- DONE [I Reviewed 1,000s of GraphQL vs. REST perspectives](https://konfigthis.com/blog/graphql-vs-rest/)
+		- DONE [https://www.reddit.com/r/graphql/comments/1fko6cx/confused_by_graphql_vs_rest_comparison/](https://www.reddit.com/r/graphql/comments/1fko6cx/confused_by_graphql_vs_rest_comparison/)
+		- TODO [GraphQL vs REST APIs: Key Differences, Pros & Cons Explained](https://www.getambassador.io/blog/graphql-vs-rest)
+		- TODO [How REST API and GraphQL Can Work Together? A Comprehensive Guide](https://mobilelive.medium.com/how-rest-api-and-graphql-can-work-together-a-comprehensive-guide-754cf707f146)
+		- TODO [GraphQL vs. REST APIs: What’s the difference between them](https://dev.to/logrocket/graphql-vs-rest-apis-whats-the-difference-between-them-3005)
+		- TODO [Automatically Generate REST and GraphQL APIs From Your Database | Zuplo Blog](https://zuplo.com/blog/2024/12/04/generate-api-from-database)
+		- DONE [Is tRPC The End Of REST/GraphQL?](https://www.youtube.com/watch?v=lxnPMB0Jc7E&ab_channel=WebDevSimplified)
+		- DONE [https://www.reddit.com/r/reactjs/comments/z3xot5/should_i_ditch_graphql_in_favor_of_trpc/](https://www.reddit.com/r/reactjs/comments/z3xot5/should_i_ditch_graphql_in_favor_of_trpc/)
+		- DONE [What is OpenAPI? An In-Depth Exploration of API Development | Konfig](https://konfigthis.com/blog/openapi/#openapi-tools-and-ecosystem)
+		- DONE [Understand OpenAPI in 5 Minutes With Examples](https://www.youtube.com/watch?v=PenvYHJ9Koc&ab_channel=api-first)
+		- DONE [https://www.reddit.com/r/rust/comments/1ffm29t/which_library_to_use_with_axum_for_openapi/](https://www.reddit.com/r/rust/comments/1ffm29t/which_library_to_use_with_axum_for_openapi/)
+		- TODO ~[Working with OpenAPI using Rust | Shuttle](https://www.shuttle.dev/blog/2024/04/04/using-openapi-rust)
+		- TODO [https://tembo.io/docs/development/cli/try-extensions-locally](https://tembo.io/docs/development/cli/try-extensions-locally)
+		- DONE [https://www.reddit.com/r/graphql/comments/r07y6y/postgraphile_or_hasura_for_a_new_project/](https://www.reddit.com/r/graphql/comments/r07y6y/postgraphile_or_hasura_for_a_new_project/)
+		- DONE [After trying Hasura, Prisma, and PostGraphile, my conclusion is that PostGraphil... | Hacker News](https://news.ycombinator.com/item?id=22433478)
+		- TODO [How I Made PostGraphile Faster Than Prisma GraphQL Server In 8 Hours](https://medium.com/graphile/how-i-made-postgraphile-faster-than-prisma-graphql-server-in-8-hours-e66b4c511160)
+		- TODO [https://www.reddit.com/r/graphql/comments/1ghtyxs/hasura_vs_supabase/](https://www.reddit.com/r/graphql/comments/1ghtyxs/hasura_vs_supabase/)
+		- TODO Hasura v3 is not opensource [https://www.reddit.com/r/Hasura/comments/1k1rzd8/hasura_v3_is_not_open_source_and_worse_the_build/](https://www.reddit.com/r/Hasura/comments/1k1rzd8/hasura_v3_is_not_open_source_and_worse_the_build/)
+		- TODO [Lessons from Scaling GraphQL to Half a Billion Requests per Minute](https://www.youtube.com/watch?v=RVBxFi88H1o)
+		- DONE [ROY DERKS - The State of GraphQL Clients in 2023](https://www.youtube.com/watch?v=dU3UURhRAbs&ab_channel=ReactAlicante)
+		- TODO [https://www.reddit.com/r/reactjs/comments/19d2c0y/graphql_benefits_why_you_should_adopt_it_in_2024/](https://www.reddit.com/r/reactjs/comments/19d2c0y/graphql_benefits_why_you_should_adopt_it_in_2024/)
+		- DONE [GraphQL Clients 2025](https://db-views.com/graphql-clients/)
+		- DONE [Four GraphQL Clients Compared](https://www.youtube.com/watch?v=zJvB2hnsXr0&ab_channel=JackHerrington)
+		- DONE [Deep dive on Relay GraphQL client for React](https://www.youtube.com/watch?v=xnvzz7Z658I&ab_channel=Hasura)
+		- DONE [Tom Harding - GraphQL without Relay is not worth it](https://www.youtube.com/watch?v=0wWMXJ4F07A&ab_channel=GraphQLFoundationWorkingGroups)
+		- TODO [GraphQL's Top Benefits Explained](https://hypermode.com/blog/advantages-of-graphql)
+		- DONE [https://www.reddit.com/r/reactjs/comments/1fs58pl/best_graphql_library_today/](https://www.reddit.com/r/reactjs/comments/1fs58pl/best_graphql_library_today/)
+		- TODO [Exploring GraphQL Clients: Apollo Client vs Relay vs URQL](https://hasura.io/blog/exploring-graphql-clients-apollo-client-vs-relay-vs-urql)
+		- TODO [Comparing GraphQL Clients: Apollo vs Relay](https://hemaks.org/posts/comparing-graphql-clients-apollo-vs-relay/)
+		- TODO ~ [Authorization with GraphQL Shield](https://www.youtube.com/watch?v=DvjRCnrYFcg&ab_channel=JamieBarton)
+		- TODO ~ [GraphQL Authorization with Open Policy Agent - Mike Cohen](https://www.youtube.com/watch?v=-4sR0wvtSyw&ab_channel=ApolloGraphQL)
+		- DONE [Authorization Patterns in GraphQL](https://www.osohq.com/post/graphql-authorization)
+		- DONE [Authorization | GraphQL](https://graphql.org/learn/authorization/)
+		- DONE [Field guard - Async-graphql Book](https://async-graphql.github.io/async-graphql/en/field_guard.html)
+		- DONE [Authorization: Checking permissions](https://www.apollographql.com/tutorials/side-quest-auth/03-authorization-checking-permissions#overview)
+			- TODO Authorization collection of articles [Oso - Authorization Academy](https://www.osohq.com/academy)
+		- TODO Authorization in microservices [Best Practices for Authorization in Microservices](https://www.osohq.com/post/microservices-authorization-patterns)
+		- DONE [Why the docs recommend react-query over alternatives · dotansimha graphql-code-generator · Discussion #9482](https://github.com/dotansimha/graphql-code-generator/discussions/9482)
+		- TODO [I Switched From Apollo To Urql (And It Was Worth It)](https://javascript.plainenglish.io/how-i-switched-from-apollo-to-urql-in-my-next-js-site-and-why-it-was-worth-it-9c7394ec150d)
+		- DONE [https://www.reddit.com/r/reactjs/comments/m6mftl/urql_or_reactquery/](https://www.reddit.com/r/reactjs/comments/m6mftl/urql_or_reactquery/)
+		- DONE [Comparison | React Query vs SWR vs Apollo vs RTK Query vs React Router | TanStack Query React Docs](https://tanstack.com/query/latest/docs/framework/react/comparison?from=reactQueryV3)
+		- TODO [Is GraphQL Still Relevant in an HTTP2 World?](https://medium.com/@xuorig/is-graphql-still-relevant-in-an-http2-world-64964f207b8)
+		- TODO parsing & validation:
+			- TODO [Comparing schema validation libraries: Zod vs. Yup - LogRocket Blog](https://blog.logrocket.com/comparing-schema-validation-libraries-zod-vs-yup/)
+			- TODO [Yup vs. Zod vs. Joi: A Comprehensive Comparison of JavaScript Validation Libraries](https://dev.to/gimnathperera/yup-vs-zod-vs-joi-a-comprehensive-comparison-of-javascript-validation-libraries-4mhi)
+			- DONE [https://www.reddit.com/r/reactjs/comments/z739b9/yup_vs_zod_what_do_you_prefer_and_why/](https://www.reddit.com/r/reactjs/comments/z739b9/yup_vs_zod_what_do_you_prefer_and_why/)
+			- DONE [https://www.reddit.com/r/react/comments/1iu00tm/why_use_zod_or_yup_when_you_have_typescript/](https://www.reddit.com/r/react/comments/1iu00tm/why_use_zod_or_yup_when_you_have_typescript/)
+			- TODO [The Ultimate Showdown: Zod vs Yup](https://www.dhiwise.com/post/comparing-zod-and-yup-the-ultimate-showdown)
+			- DONE [Zod finally has competition (...created by Zod?)](https://www.youtube.com/watch?v=V1vMaNVwTaI&ab_channel=Theo-t3%25E2%2580%25A4gg)
+			- TODO ~[https://www.reddit.com/r/typescript/comments/1jevsc3/why_are_there_so_many_validating_libraries/](https://www.reddit.com/r/typescript/comments/1jevsc3/why_are_there_so_many_validating_libraries/)
+			- DONE [Zod Makes TypeScript Even Better](https://www.youtube.com/watch?v=9UVPk0Ulm6U&ab_channel=WebDevSimplified)
+			- TODO ~ [https://news.ycombinator.com/item?id=41764163](https://news.ycombinator.com/item?id=41764163)
+			- TODO [Zod vs. Valibot: Which Validation Library is Right for Your TypeScript Project?](https://dev.to/sheraz4194/zod-vs-valibot-which-validation-library-is-right-for-your-typescript-project-303d)
+		- DONE [Codegen: The good, the bad and the ugly](https://www.youtube.com/watch?v=5weFyMoBGN4&ab_channel=MattPocock)
 -
-- ## Conclusions:
-	- ==Async-GraphQL== (async-first, production-ready features, realtime subscription updates, etc.)
-		- + async-graphql library (has also cli) to generate schema
-		- + async_graphql::dataloader::DataLoader [TODO:]
-		- Authorization in resolvers with Ory Keto batch checks; async-graphql guards; + Graphql directives as marker metadata only (provide information for client schema users, not enforcing implementation).
-	- frontend requirements: automated workflow with code generation capabilities, robust featureful (caching), React integration, production-ready performant.
-		- Tanstack React Query (React & TS) + GraphQL codegen (to produce typescript functions and react hooks); + graphql-request (fetch API wrapper) + Zod (for parsing + validation; codegen integration)
-		- [need testing to pick complementary tooling] autogenerated Rest API (OpenAPI tools) possibly using graphql existing API or database directly.
+	- ## Conclusions:
+	  collapsed:: true
+		- ==Async-GraphQL== (async-first, production-ready features, realtime subscription updates, etc.)
+			- + async-graphql library (has also cli) to generate schema
+			- + async_graphql::dataloader::DataLoader [TODO:]
+			- Authorization in resolvers with Ory Keto batch checks; async-graphql guards; + Graphql directives as marker metadata only (provide information for client schema users, not enforcing implementation).
+		- frontend requirements: automated workflow with code generation capabilities, robust featureful (caching), React integration, production-ready performant.
+			- Tanstack React Query (React & TS) + GraphQL codegen (to produce typescript functions and react hooks); + graphql-request (fetch API wrapper) + Zod (for parsing + validation; codegen integration)
+			- [need testing to pick complementary tooling] autogenerated Rest API (OpenAPI tools) possibly using graphql existing API or database directly.
+- ---
+- # CMS
+  id:: 692951ee-6ee1-4d8e-bb38-628ef464a5d7
+	- characteristics:
+		- CMS brings structure to cotent but users many times want unstructured editing. This is where tools like Sanity Canvas automatically maps unstructured content to structured schema fields. (imagine copying over article content from another source and then the editor maps the elements to quotes, title, subtitle, image, etc)
+		- CMS data exposed via API and management through admin panel (usually through forms html tags or advanced **WYSIWYG** visual editor - some are block based).
+		- CMS requires data strategy with data structure upfront that tends to be strict.
+		- free OSS tends to lead to heavy maintenance, fragility, security issues, plugin sprawl to extend the core, custom code, etc.
+		- Pure CMS (content-only, no visual block system): Most CMS platforms in the market mixup concepts and try to achieve content management with app page builder features (such as block-based editor). A pure CMS would have a clear separation between presentation and content through api.
+	- https://nocodb.com/ OSS alternative to Airtable
+	- contentful
+		- API-first, multi-environment (designed for developers to connect content to apps)
+		- Content modeling focus (helps plan and structure content before creating it)
+	- Sanity
+		- GROQ (graph-based) queries.
+	- prismic
+	- ghost
+	- [strapi](https://strapi.io/) OSS alternative to Sanity
+		- GUI-first plugin-based approach; Node.js based, plugin ecosystem (built with modern tech, easily expandable with add-ons)
+		- popular large community
+		- support SSO providers authentication
+		- no hard feature paywalls but faces practical constraints like high resource usage, limited TypeScript support out-of-box, lack of built-in versioning/previews (plugin-dependent), and scalability challenges for high-traffic apps without custom work.
+			- Some features require enterprise license even in self-hosting:
+				- Single Sign-On (SSO) for admin access.
+				- Audit logs for compliance tracking.
+				- Extended RBAC with field-level conditionals (beyond basic permissions).[enterprise plans](https://strapi.io/blog/announcing-changes-to-the-strapi-enterprise-plans)
+		- Traditional CMS feel (similar to familiar website content management tools)
+	- payloadcms.com OSS headless CMS: got aquited by Figma
+		- Typescript code-first configuration; Node.js, database-backed, headless (built with modern tech, separates content from design)
+		- fully open-source with no feature restrictions.
+		- Structured content, custom fields (customizable content management, designed for flexibility)
+	- directus:
+		- SQL database wrapper, REST/GraphQL (organizes data in tables, easy to access for apps)
+		- Relational data management (handle connected and organized data like a spreadsheet)
+	- Builder.io: Component-driven, visual editing (drag-and-drop editing, no coding needed)
+		- Visual page building (build pages visually by dragging and dropping elements)
+	- Convex, Appwrite, Supabase, Pocketbase, [instant](https://www.instantdb.com/) alterntives to Firebase.
+	- wordpress vs ghost (nodejs-based)
+		- Wordpress Elementor - a webflow like website builder and editor for wordpress.
+	- webflow (includes integrated CMS + lots of site builder features); wix; squarespace;
+		- specialty CMS platforms: shopify. IMS
+	- terms: digital experience platform, web experience platform category for app builder with lots of features integrated.
+	- #+BEGIN_QUOTE
+	  **Summary of Discussion**
+	  
+	  **1. Editor Categories**
+	  
+	  * **Block-based editors**: Content composed as discrete blocks (WordPress Gutenberg).
+	  * **Structured visual editors**: Content edited visually, stored as structured JSON, then serialized to HTML (Medium).
+	  * **WYSIWYG editors**: Direct manipulation of HTML through visual editing (Quill, TinyMCE).
+	  * **Schema-driven editors**: Editors built on an abstract document model (ProseMirror, Slate, Tiptap).
+	  * **Headless CMS workflows**: Backend stores structured content; frontend fully decoupled (Sanity, Contentful, Directus).
+	  * **Markdown-based workflows**: Content in Markdown, compiled to HTML by SSGs (Hugo, Jekyll).
+	  
+	  **2. Workflow (Medium-style)**
+	  
+	  * **Editing:** Browser uses contentEditable / ProseMirror-style architecture to maintain a document state.
+	  * **Data model:** Internal representation stored as JSON.
+	  * **Draft management:** State kept locally in memory; optionally synced via REST/GraphQL.
+	  * **Serialization:** JSON → HTML mapping on save/publish.
+	  * **Storage:** HTML + metadata persisted in a database (PostgreSQL possible).
+	  * **Delivery:** SSR output + CDN distribution.
+	  * **Rendering:** Client loads static HTML; dynamic features layered via JS.
+	  
+	  **3. Modern / Evolving Approaches**
+	  
+	  * Realtime collaborative structured editors (Tiptap + CRDTs, ProseMirror-based stacks).
+	  * Fully headless CMS with live content APIs (Sanity, Contentful, Strapi, Directus).
+	  * Hybrid/static rendering frameworks (Next.js, Gatsby) with incremental regeneration.
+	  * Abstract document schemas with pluggable behaviors (Slate, ProseMirror).
+	  
+	  ---
+	  
+	  **Technologies Referenced**
+	  
+	  **Editing Libraries**
+	  
+	  * **Draft.js**: React-based rich text editor framework; structured document state.
+	  * **Quill**: Lightweight WYSIWYG editor; delta-based document model.
+	  * **ProseMirror**: Schema-driven editor with deep control over document structure.
+	  * **Slate**: Customizable, plugin-driven rich text framework for React.
+	  * **Tiptap**: Modern, flexible ProseMirror wrapper with presets and extensions.
+	  
+	  **CMS / Headless CMS**
+	  
+	  * **WordPress Gutenberg**: Block-based editor using a block JSON format.
+	  * **Ghost**: Full-stack Node.js CMS; clean editor; SSR output.
+	  * **Directus**: Headless CMS exposing structured data via REST/GraphQL.
+	  * **Sanity**: Real-time headless CMS with GROQ queries and structured content.
+	  * **Contentful**: API-first content platform for structured content.
+	  * **Strapi**: Node.js headless CMS with customizable content models.
+	  
+	  **Rendering / Frameworks**
+	  
+	  * **Next.js**: React framework with SSR, SSG, ISR.
+	  * **Gatsby**: Static site generator with GraphQL content pipelines.
+	  * **Hugo**: Fast static site generator with Markdown content.
+	  * **Jekyll**: Markdown-to-HTML static site generator.
+	  
+	  **Backend / Data**
+	  
+	  * **REST APIs**: Standard HTTP endpoint approach for editor–backend communication.
+	  * **GraphQL**: Flexible querying and mutation for drafts and structured content.
+	  * **PostgreSQL**: Relational DB storing HTML, JSON, metadata.
+	  
+	  **Other Components**
+	  
+	  * **contentEditable**: Native browser API enabling inline rich-text editing.
+	  * **CDNs**: Edge delivery of final rendered content.
+	  * **SSR**: Server-side HTML generation for speed and SEO.
+	  
+	  ---
+	  
+	  **Concise Conclusion**
+	  Modern article editors fall into structured or block-based categories. Medium uses a structured JSON model with serialization to HTML, while WordPress uses modular blocks. New ecosystems emphasize schema-driven editing, realtime collaboration, headless CMS workflows, and hybrid rendering frameworks. This stack defines the dominant architecture for modern content creation and delivery.
+	  
+	  #+END_QUOTE
+	- ((692af03b-f0f6-4308-a6ff-92d6c9ee37c9))
+	- ### Conclusion
+	  [[Nov 29th, 2025]]
+		- OSS developer oriented: Directus, Strapi, Payload
+-
+- # CRM
+	- ERPNext alternative to Salesforce
+	-
+- # Collaboration
+	- AppFlowy alternative to Notion
+	- mattermost alternative to Slack
+	- Jitsi alternative to Zoom
+	- Plane alternative to Jira
+- # Site hosting
+	- Coolify alternative to Vercel
+	- Dokku alternative Heroku
+-
 -
