@@ -139,6 +139,7 @@ collapsed:: true
 	- _Lightweight Platforms / VPS_
 		- **DigitalOcean App Platform**
 		- **Heroku (Docker Deploy)**
+		- https://dokku.com/ open source Heroku alternative
 		- **Cycle.io**
 		- **Linode Kubernetes Engine (LKE)**
 		- **Vultr Kubernetes Engine (VKE)**
@@ -219,29 +220,43 @@ collapsed:: true
 				- Fly.io wants to give users UX (like vercel) + great infrastructure primitives/solutions (like Amazon) for the age of AI.
 			- Charges around 100% markup on its VMs (machines).
 - ---
-- # AI agent sandbox infrastructure providers for no-code platform
+- # AI agent sandbox multitenant infrastructure providers for no-code platform
   id:: 691e7a58-3222-45a0-aca0-c74e5fae627d
-  collapsed:: true
 	- characteristics: ephemeral, instant startup, long term storage, scalable, secure/isolated execution environments for executing untrusted user code or for executing AI agent logic;
-	- ==[E2B](https://e2b.dev/)==: disposable cloud sandboxes Firecracker (OSS) microVM sandboxes that can run servers, execute terminal commands, and expose ports publicly with hosted SaaS (use E2B's managed cloud) or bring-your-own-cloud. Characterized by openness and management flexibility;
+		- AI agents compared to standard software should not be assumed predictable application behavior, rather the agents execute arbitrary untrusted code generated during runtime.
+		- Sandboxing technology:
+			- **Containers** — Shared kernel; trusting the **host kernel**
+			- **gVisor** — Userspace kernel; trusting the **userspace kernel implementation**
+			- Kata container is VM-backed container runtime - supporting firecracker VM, by default QEMU.
+			- **MicroVMs** — Guest kernel; trusting the **guest kernel + VMM**
+			- **Wasm** — No syscall ABI; trusting the **runtime + embedder**
+			- OS-provided sandboxing tools - Landlock Linux (Searbelt Apple, AppContainer Windows): allow to limit process access, used to protect user data on local machine.
+	- ==[E2B](https://e2b.dev/)==: disposable cloud sandboxes Firecracker (OSS) microVM sandboxes that can run servers, execute terminal commands, and expose ports publicly with hosted SaaS (use E2B's managed cloud) or bring-your-own-cloud. Characterized by openness and management flexibility; https://github.com/e2b-dev/E2B
 		- SDKs: Python, JavaScript, Bash, R, Java; open-source with SDKs for flexible microVM sandbox control.
-	- **Modal** Sandboxes: gVisor-based, Python SDK orchestration, high concurrency. for advanced/ML-heavy workloads;
+		- Pioneered the concept of running AI generated code in a secure isolated sandbox;
+		- https://lobehub.com/mcp/griffinwork40-e2b-mcp MCP to the E2B SDK
+	- **Modal** Sandboxes: gVisor-based, Python SDK orchestration, high concurrency. for advanced/ML-heavy workloads; Container-based sandbox with GPU support, fast startup, serverless ML compute.
 	- **Fly.io** Firecracker microVMs, limited sandbox orchestration;
 		- Not primarily built for AI agent sandboxing: Many no-code platforms at early stage used it but migrated away due to scalability issues.
 		- SDKs: CLI and REST API primarily; limited native SDKs for programming languages.
 	- other legacy considerations: AWS Firecracker, gVisor stacks
 	- **Daytona**: fast Docker/Kata sandboxes
-	  collapsed:: true
 		- SDK: Python SDK, Docker-based devcontainer support; focused on fast container startup for AI workloads.
+		- Secure container sandboxes, very low latency, early-stage agent runtime. Runs on kubernetes
 	- **Render**: sandboxes for serverless containerized applications
 		- Lack of scaling and lack of granular control.
 		- SDK: REST/CLI interfaces; no advanced sandbox-specific SDKs, focuses on app hosting.
-	- Northflank: Alternative to Modal with support for any OCI container, robust multi-tenant isolation; gaining traction for production-scale agent work.
-	- **Cloudflare Workers/Vercel Sandbox:** Isolated JavaScript/V8 sandboxes—less common for untrusted AI, more for edge-only or webhook-type code.
-	- Google Agent Sandbox
+	- Northflank: Alternative to Modal with support for any OCI container, robust multi-tenant isolation; gaining traction for production-scale agent work; MicroVM/container platform, enterprise isolation;
+	- **Cloudflare Workers/Vercel Sandbox:** Isolated JavaScript/V8 sandboxes—less common for untrusted AI, more for edge-only or webhook-type code; Edge execution, low latency, JS/WASM agent code.
+	- Google Agent Sandbox https://cloud.google.com/blog/products/containers-kubernetes/agentic-ai-on-kubernetes-and-gke
+		- https://github.com/kubernetes-sigs/agent-sandbox
 	- DifySandbox
 	- CodeSandbox SDK
-	- Daytona SDK
+	- **Blaxel** – MicroVM sandbox, ultra-fast resume, scale-to-zero, SDKs for agents. perpetual sandbox platform (maintain state indefinitely).
+	- **Together Code Sandbox** – Persistent VM-style environments, heavy workloads, versioned storage.
+	- **Novita AI Sandbox** – Fast, isolated execution for parallel agent tasks.
+	- **Koyeb Sandboxes** – Ephemeral containers, scalable execution, general AI code sandboxing.
+	- **Docker + MCP Gateway** – Containerized workloads, integrates with orchestration.
 	- alternative/complimentary approach as used by some AI no-code platforms which rely on mixed approach and provide additional options to users:
 		- running lighter-weight workflows in browser via WebAssembly-based WebContainers.
 		- Proprietary Replit Sandboxed Runtime (hybrid Firecracker/gVisor environments, orchestration closely coupled to their cloud platform - Google Cloud, built for massive scale).
@@ -253,6 +268,13 @@ collapsed:: true
 			  - **Stack**: **Rust-based SDK** (crates.io), provides interfaces for executing **Python** and **JavaScript** code, powered by the **libkrun** virtualization library.
 			  #+END_QUOTE
 		- reference implementation to minimize risks when using claude --dangerously-skip-permissions https://github.com/anthropics/claude-code/tree/main/.devcontainer in a container without internet access.
+	- https://runloop.ai/ simpler platforms achieving AI agent sandboxing
+	- AWS Bedrock AgentCore
+	- [#C] Beam
+	- Microsandbox opensource alternative to E2B sandboxing solution (no rich features)
+	- DifySandbox opensource sandboxing solution (no rich features)
+	- https://vercel.com/solutions/multi-tenant-saas
+	-
 	- ### Adoption by AI-native platforms
 		- > | Platform     | Current Provider(s)    | Previously Used            |
 		  | ------------ | ---------------------- | -------------------------- |
@@ -280,7 +302,8 @@ collapsed:: true
 		- Modal, E2B, and container/microVM orchestrators dominating the market for secure, untrusted code execution at scale;
 			- E2B & Modal have mature SDKs and greater isolation.
 		- Other no-code platforms often started with generic public cloud containers (AWS Lambda, Vercel, Render) before moving to stricter sandboxing as customer code execution matured.
-	-
-	-
+	- ### perpetual resource
+		- https://github.com/restyler/awesome-sandbox
+		  id:: 69748501-a5fe-4510-a7e1-c257de31cf54
 - ---
 -

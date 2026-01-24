@@ -77,4 +77,11 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 - # Fedora
 	- https://copr.fedorainfracloud.org/coprs/ provides transparent build process of user-maintained package builds.
 	-
--
+- ----
+- # Shopping
+	- Shopify
+	- Odoo
+	- Salla
+	- Zid
+	- ExpandCart
+	- https://app.wuilt.com/

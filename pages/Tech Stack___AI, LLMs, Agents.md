@@ -17,16 +17,19 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- TypeScript
 		- used by **Bolt.new**, **Lovable.dev**
 	- **OpenAI SDK**
+		- **Codex** agent — Context-friendly and powerful, Rust core (but no Rust SDK)
+			- uses kernel-enforced sandboxing (Linux Landlock)
 	- ==**Claude Code Agent SDK**==
 	  id:: 6924424c-ea4e-4196-b016-fff6ac070055
 		- gives the LLM direct, native control over a local terminal and file system; optimized for the **Claude 3.5 Sonnet feedback loop** (Think → Act → Observer → Repeat).
 		- The agent SDK allows to take claude code and create a highly specialized agent system for your particular usecase.
+		- **Claude Code** agent — User-friendly and simple
 		- #+BEGIN_QUOTE
 		  - Function & Key Features: Anthropic's Native SDK. The underlying engine for the "Claude Code" CLI. It provides an Agent primitive that natively understands file systems, bash commands, and git
 		  - **Stack**: **TypeScript/Python SDKs**, built on **Claude** models, utilizes a secure **Code Execution Tool** (sandbox), and integrates native **terminal/bash** access.
 		  #+END_QUOTE
 		- cons: developer hands over control to the library implementation of event loop and function calling, as opposed to building from scratch.
-		- RUST SDK ?
+		- RUST SDK ? No
 			- https://github.com/yafatek/rust-deep-agents-sdk
 			- https://github.com/Wally869/claude_agent_sdk_rust
 			- https://github.com/modelcontextprotocol/rust-sdk/tree/main
@@ -40,12 +43,20 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		  - **Stack**: **Python** (3.10+) and **.NET/C#**, supports **Azure OpenAI/OpenAI**, built on **Graph-based orchestration** (Workflows) and concepts from AutoGen.
 		  #+END_QUOTE
 	- **Factory.ai SDK**
-	  collapsed:: true
 		- #+BEGIN_QUOTE
 		  - Function & Key Features: "Droids" Automation. Focuses on "Agent-Native Software Development." Allows building "Droids" that integrate directly into **CI/CD pipelines** and treats coding tasks as autonomous background jobs.
 		  - **Stack**: **API-first** architecture, **Model-agnostic** agent design (Opus, GPT-5, etc.), delivered via a **CLI** and specialized agent personas (Droids).
 		  #+END_QUOTE
-	- https://google.github.io/adk-docs/
+		- **Factory agent** — Multiple specialized Droid agents
+	- stands agent sdk
+	- Crew AI
+	- **Cursor** agent — IDE, model-agnostic, fast models
+		- uses Cursor's Composer agent model - model training using reinforcement learning on their code data; Very fast model
+	- Devin
+		- **Cognition** agent — End-to-end autonomy and self-reflection
+	- SourceGraph
+		- **Amp** agent — Free, model-agnostic (switches models automatically - no option to select), UX sugar for users
+	- Google ADK https://google.github.io/adk-docs/
 	  collapsed:: true
 		- gemini support https://developers.googleblog.com/building-ai-agents-with-google-gemini-3-and-open-source-frameworks/
 	- ### Auxiliary SDKs augmenting AI agent with capabilities and MCPs - Deep Research & Web Browsing SDKs for AI Agents:
@@ -88,8 +99,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- ==Claude Code Agent SDK== handles the event loop and tool calling including built-in features. Permits creating coding agents as well as general purpose agent systems.
 		- Q: is Vercel SDK needed for streaming responses in browser?
 -
-- # Coding agents tools:
-  collapsed:: true
+- # Coding agents tools & models:
 	- info:
 		- _24 million tokens/day** —enough for 3–4 hours of uninterrupted vibe coding_ while _heavy coding workflows up to 120m tokens/day_
 	- Groq allows for quick inferences by providing many LLMs
@@ -148,10 +158,21 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 			- DONE https://docs.firecrawl.dev/mcp-server mcp
 			  id:: 691b2a3c-da7e-4369-a995-5bbac0d380b3
 			- TODO https://help.figma.com/hc/en-us/articles/32132100833559-Guide-to-the-Figma-MCP-server
+			- **Vercel AI SDK** in npm acts as a client implementation for MCP servers. https://vercel.com/blog/ai-sdk-4-2
+			- Vercel's access browser agent CLI tool for claude code and similar agents https://github.com/vercel-labs/agent-browser
+			- https://browser-use.com/
+			- **supergateway** adaptation layer wraps a stdio MCP server and exposes it over HTTP using Server-Sent Events (SSE). Translates communication from stdio ↔ HTTP/SSE
 			- ### Resources
 				- https://mcpservers.org/
 				- https://github.com/modelcontextprotocol/servers
 				- https://mcpmarket.com/
+				- https://github.com/modelcontextprotocol/servers list
+				- MCP containerized servers https://hub.docker.com/mcp
+		- ### Skills & Prompts
+			- official calude code skills https://github.com/anthropics/claude-code/tree/main/plugins/frontend-design
+			- **System prompts of claude** - Claude's production prompt architecture extracted prompts completely as in production as of Dec 15 2025 https://github.com/Piebald-AI/claude-code-system-prompts 
+			  id:: 697225c6-3c47-4663-b972-953379d7719f
+			- system prompts of many agents https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools/tree/main
 		- ### Subagents
 			- https://github.com/lst97/claude-code-sub-agents/tree/main/agents examples (from [youtuber](https://www.youtube.com/@edmundyong))
 		- ### Resources
@@ -162,7 +183,9 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	- OpenAI Codex
 	- https://www.warp.dev/coding
 	- https://github.com/sst/opencode CLI opensource multi-LLM https://opencode.ai/
-	-
+	- xAI
+	- Meta Llama
+	- Mistral
 	- Claude code addition as MCP which allows Claude to prompt other LLMs as part of its models execution https://github.com/BeehiveInnovations/zen-mcp-server
 	- ~~Mulimodel CLI Crush~~ https://github.com/charmbracelet/crush
 	- Kilo Code (cursor alternative but free)
@@ -203,7 +226,6 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- [ THIS is the REAL DEAL 🤯 for local LLMs ](https://www.youtube.com/watch?v=3XCunZqvVDA)
 - ---
 - # Model providers
-  collapsed:: true
 	- _info:
 		- _OpenRouter, DeepSeek, Ollama, Gemini, Volcengine, and SiliconFlow, etc._
 		- _OpenAI-compatibe API is the standard for LLM provider support_
@@ -329,6 +351,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- Datadog
 		- Grafana Cloud
 		- Honeycomb
+	- https://agents.md/ open standard for coding agent instructions.
 -
 - ## rules:
 	- TODO [https://nmn.gl/blog/cursor-guide](https://nmn.gl/blog/cursor-guide)
@@ -359,3 +382,8 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	- https://medium.com/data-science-collectived
 	- https://news.smol.ai/
 	-
+-
+-
+-
+-
+-

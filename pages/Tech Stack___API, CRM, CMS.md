@@ -225,85 +225,79 @@
 	- webflow (includes integrated CMS + lots of site builder features); wix; squarespace;
 		- specialty CMS platforms: shopify. IMS
 	- terms: digital experience platform, web experience platform category for app builder with lots of features integrated.
-	- #+BEGIN_QUOTE
-	  **Summary of Discussion**
-	  
-	  **1. Editor Categories**
-	  
-	  * **Block-based editors**: Content composed as discrete blocks (WordPress Gutenberg).
-	  * **Structured visual editors**: Content edited visually, stored as structured JSON, then serialized to HTML (Medium).
-	  * **WYSIWYG editors**: Direct manipulation of HTML through visual editing (Quill, TinyMCE).
-	  * **Schema-driven editors**: Editors built on an abstract document model (ProseMirror, Slate, Tiptap).
-	  * **Headless CMS workflows**: Backend stores structured content; frontend fully decoupled (Sanity, Contentful, Directus).
-	  * **Markdown-based workflows**: Content in Markdown, compiled to HTML by SSGs (Hugo, Jekyll).
-	  
-	  **2. Workflow (Medium-style)**
-	  
-	  * **Editing:** Browser uses contentEditable / ProseMirror-style architecture to maintain a document state.
-	  * **Data model:** Internal representation stored as JSON.
-	  * **Draft management:** State kept locally in memory; optionally synced via REST/GraphQL.
-	  * **Serialization:** JSON → HTML mapping on save/publish.
-	  * **Storage:** HTML + metadata persisted in a database (PostgreSQL possible).
-	  * **Delivery:** SSR output + CDN distribution.
-	  * **Rendering:** Client loads static HTML; dynamic features layered via JS.
-	  
-	  **3. Modern / Evolving Approaches**
-	  
-	  * Realtime collaborative structured editors (Tiptap + CRDTs, ProseMirror-based stacks).
-	  * Fully headless CMS with live content APIs (Sanity, Contentful, Strapi, Directus).
-	  * Hybrid/static rendering frameworks (Next.js, Gatsby) with incremental regeneration.
-	  * Abstract document schemas with pluggable behaviors (Slate, ProseMirror).
-	  
-	  ---
-	  
-	  **Technologies Referenced**
-	  
-	  **Editing Libraries**
-	  
-	  * **Draft.js**: React-based rich text editor framework; structured document state.
-	  * **Quill**: Lightweight WYSIWYG editor; delta-based document model.
-	  * **ProseMirror**: Schema-driven editor with deep control over document structure.
-	  * **Slate**: Customizable, plugin-driven rich text framework for React.
-	  * **Tiptap**: Modern, flexible ProseMirror wrapper with presets and extensions.
-	  
-	  **CMS / Headless CMS**
-	  
-	  * **WordPress Gutenberg**: Block-based editor using a block JSON format.
-	  * **Ghost**: Full-stack Node.js CMS; clean editor; SSR output.
-	  * **Directus**: Headless CMS exposing structured data via REST/GraphQL.
-	  * **Sanity**: Real-time headless CMS with GROQ queries and structured content.
-	  * **Contentful**: API-first content platform for structured content.
-	  * **Strapi**: Node.js headless CMS with customizable content models.
-	  
-	  **Rendering / Frameworks**
-	  
-	  * **Next.js**: React framework with SSR, SSG, ISR.
-	  * **Gatsby**: Static site generator with GraphQL content pipelines.
-	  * **Hugo**: Fast static site generator with Markdown content.
-	  * **Jekyll**: Markdown-to-HTML static site generator.
-	  
-	  **Backend / Data**
-	  
-	  * **REST APIs**: Standard HTTP endpoint approach for editor–backend communication.
-	  * **GraphQL**: Flexible querying and mutation for drafts and structured content.
-	  * **PostgreSQL**: Relational DB storing HTML, JSON, metadata.
-	  
-	  **Other Components**
-	  
-	  * **contentEditable**: Native browser API enabling inline rich-text editing.
-	  * **CDNs**: Edge delivery of final rendered content.
-	  * **SSR**: Server-side HTML generation for speed and SEO.
-	  
-	  ---
-	  
-	  **Concise Conclusion**
-	  Modern article editors fall into structured or block-based categories. Medium uses a structured JSON model with serialization to HTML, while WordPress uses modular blocks. New ecosystems emphasize schema-driven editing, realtime collaboration, headless CMS workflows, and hybrid rendering frameworks. This stack defines the dominant architecture for modern content creation and delivery.
-	  
-	  #+END_QUOTE
+	- ### approaches & tools 
+	  id:: 692df9db-3940-4bdf-bb1a-b475b00dd7bc
+		- #+BEGIN_QUOTE
+		  **1. Editor Categories**
+		  
+		  * **Block-based editors**: Content composed as discrete blocks (WordPress Gutenberg).
+		  * **Structured visual editors**: Content edited visually, stored as structured JSON, then serialized to HTML (Medium).
+		  * **WYSIWYG editors**: Direct manipulation of HTML through visual editing (Quill, TinyMCE).
+		  * **Schema-driven editors**: Editors built on an abstract document model (ProseMirror, Slate, Tiptap).
+		  * **Headless CMS workflows**: Backend stores structured content; frontend fully decoupled (Sanity, Contentful, Directus).
+		  * **Markdown-based workflows**: Content in Markdown, compiled to HTML by SSGs (Hugo, Jekyll).
+		  
+		  **2. Workflow (Medium-style)**
+		  
+		  * **Editing:** Browser uses contentEditable / ProseMirror-style architecture to maintain a document state.
+		  * **Data model:** Internal representation stored as JSON.
+		  * **Draft management:** State kept locally in memory; optionally synced via REST/GraphQL.
+		  * **Serialization:** JSON → HTML mapping on save/publish.
+		  * **Storage:** HTML + metadata persisted in a database (PostgreSQL possible).
+		  * **Delivery:** SSR output + CDN distribution.
+		  * **Rendering:** Client loads static HTML; dynamic features layered via JS.
+		  
+		  **3. Modern / Evolving Approaches**
+		  
+		  * Realtime collaborative structured editors (Tiptap + CRDTs, ProseMirror-based stacks).
+		  * Fully headless CMS with live content APIs (Sanity, Contentful, Strapi, Directus).
+		  * Hybrid/static rendering frameworks (Next.js, Gatsby) with incremental regeneration.
+		  * Abstract document schemas with pluggable behaviors (Slate, ProseMirror).
+		  
+		  ---
+		  
+		  **Technologies Referenced**
+		  
+		  
+		  **CMS / Headless CMS**
+		  
+		  * **WordPress Gutenberg**: Block-based editor using a block JSON format.
+		  * **Ghost**: Full-stack Node.js CMS; clean editor; SSR output.
+		  * **Directus**: Headless CMS exposing structured data via REST/GraphQL.
+		  * **Sanity**: Real-time headless CMS with GROQ queries and structured content.
+		  * **Contentful**: API-first content platform for structured content.
+		  * **Strapi**: Node.js headless CMS with customizable content models.
+		  
+		  **Rendering / Frameworks**
+		  
+		  * **Next.js**: React framework with SSR, SSG, ISR.
+		  * **Gatsby**: Static site generator with GraphQL content pipelines.
+		  * **Hugo**: Fast static site generator with Markdown content.
+		  * **Jekyll**: Markdown-to-HTML static site generator.
+		  
+		  **Backend / Data**
+		  
+		  * **REST APIs**: Standard HTTP endpoint approach for editor–backend communication.
+		  * **GraphQL**: Flexible querying and mutation for drafts and structured content.
+		  * **PostgreSQL**: Relational DB storing HTML, JSON, metadata.
+		  
+		  **Other Components**
+		  
+		  * **contentEditable**: Native browser API enabling inline rich-text editing.
+		  * **CDNs**: Edge delivery of final rendered content.
+		  * **SSR**: Server-side HTML generation for speed and SEO.
+		  
+		  ---
+		  
+		  **Concise Conclusion**
+		  Modern article editors fall into structured or block-based categories. Medium uses a structured JSON model with serialization to HTML, while WordPress uses modular blocks. New ecosystems emphasize schema-driven editing, realtime collaboration, headless CMS workflows, and hybrid rendering frameworks. This stack defines the dominant architecture for modern content creation and delivery.
+		  
+		  #+END_QUOTE
 	- ((692af03b-f0f6-4308-a6ff-92d6c9ee37c9))
 	- ### Conclusion
 	  [[Nov 29th, 2025]]
 		- OSS developer oriented: Directus, Strapi, Payload
+		- Editor frontend library: Tiptap vs lexical.js ?
 -
 - # CRM
 	- ERPNext alternative to Salesforce
