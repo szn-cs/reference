@@ -50,6 +50,7 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 		- ### conclusion:
 			- navi seemed to be most promising but it has weired default ! and hard configuration; it executes by default and doesn't read local files, which defeats the purpose of project specific cheatsheet.
 		- TODO find history cli tool
+	- https://deepwiki.com/<github_uri> will produce a complete documentation with diagrams and AI assistant
 	-
 -
 	-

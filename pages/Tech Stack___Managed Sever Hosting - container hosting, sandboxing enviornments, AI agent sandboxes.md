@@ -231,6 +231,17 @@ collapsed:: true
 			- **MicroVMs** — Guest kernel; trusting the **guest kernel + VMM**
 			- **Wasm** — No syscall ABI; trusting the **runtime + embedder**
 			- OS-provided sandboxing tools - Landlock Linux (Searbelt Apple, AppContainer Windows): allow to limit process access, used to protect user data on local machine.
+		- #+BEGIN_QUOTE
+		  general features of sandbox provider:
+		  - Real-time Terminal: Persistent terminals via WebSockets for interactive work.
+		  - Filesystem Control: Full file CRUD with real-time change notifications.
+		  - Programmatic API: TypeScript-first API with strong error handling.
+		  - Process Control: Start, stop, and monitor processes with port forwarding.
+		  - JWT Security: Token-based authentication for secure execution.
+		  - One-off Commands: Run commands instantly without persistent sessions.
+		  - WebSocket I/O: Low-latency, bidirectional communication.
+		  - Health Checks: Built-in status and health monitoring.
+		  #+END_QUOTE
 	- ==[E2B](https://e2b.dev/)==: disposable cloud sandboxes Firecracker (OSS) microVM sandboxes that can run servers, execute terminal commands, and expose ports publicly with hosted SaaS (use E2B's managed cloud) or bring-your-own-cloud. Characterized by openness and management flexibility; https://github.com/e2b-dev/E2B
 		- SDKs: Python, JavaScript, Bash, R, Java; open-source with SDKs for flexible microVM sandbox control.
 		- Pioneered the concept of running AI generated code in a secure isolated sandbox;
@@ -268,13 +279,16 @@ collapsed:: true
 			  - **Stack**: **Rust-based SDK** (crates.io), provides interfaces for executing **Python** and **JavaScript** code, powered by the **libkrun** virtualization library.
 			  #+END_QUOTE
 		- reference implementation to minimize risks when using claude --dangerously-skip-permissions https://github.com/anthropics/claude-code/tree/main/.devcontainer in a container without internet access.
+		- other tailored for coding environments CDEs like Gitpod and Coder.
 	- https://runloop.ai/ simpler platforms achieving AI agent sandboxing
 	- AWS Bedrock AgentCore
 	- [#C] Beam
 	- Microsandbox opensource alternative to E2B sandboxing solution (no rich features)
 	- DifySandbox opensource sandboxing solution (no rich features)
 	- https://vercel.com/solutions/multi-tenant-saas
-	-
+	- https://railway.com/
+	- CodeSandbox
+	- ComputeSDK sandboxing: Multi-provider Support: Use E2B, Vercel, Daytona, Modal, CodeSandbox, and others with no code changes.
 	- ### Adoption by AI-native platforms
 		- > | Platform     | Current Provider(s)    | Previously Used            |
 		  | ------------ | ---------------------- | -------------------------- |
@@ -306,4 +320,7 @@ collapsed:: true
 		- https://github.com/restyler/awesome-sandbox
 		  id:: 69748501-a5fe-4510-a7e1-c257de31cf54
 - ---
--
+- observability / capture tracing / telemtery framework for AI agents & LLM actions
+	- OpenTelemetry-based for ditributed cloud tracing and telemetry
+	- ?
+	-

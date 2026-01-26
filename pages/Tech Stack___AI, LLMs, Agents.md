@@ -57,7 +57,6 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	- SourceGraph
 		- **Amp** agent — Free, model-agnostic (switches models automatically - no option to select), UX sugar for users
 	- Google ADK https://google.github.io/adk-docs/
-	  collapsed:: true
 		- gemini support https://developers.googleblog.com/building-ai-agents-with-google-gemini-3-and-open-source-frameworks/
 	- ### Auxiliary SDKs augmenting AI agent with capabilities and MCPs - Deep Research & Web Browsing SDKs for AI Agents:
 		- Overview: Tools that empower agents to interact with the live internet for data gathering and report generation.
@@ -102,7 +101,6 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 - # Coding agents tools & models:
 	- info:
 		- _24 million tokens/day** —enough for 3–4 hours of uninterrupted vibe coding_ while _heavy coding workflows up to 120m tokens/day_
-	- Groq allows for quick inferences by providing many LLMs
 	- List of coding agents
 		- https://models.dev/
 		- https://huggingface.co/models
@@ -113,6 +111,13 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- provides a good list of models and fileters https://deepinfra.com/models
 		- https://github.com/cheahjs/free-llm-api-resources
 		- China opensource community https://modelscope.cn/home
+		- OpenAI Custom GPTs
+		- Bolt.new
+		- Dust.tt - internal AI tools/workflows
+		- Flowise - LLM workflows on LangChain
+		- Cognosys - autonomous-agent for planning and execution.
+		- Bubble - web apps
+		- Glide data-driven apps (spreadsheet/databases).
 -
 	- ## Claude Code
 	  id:: 68d89560-cf08-435a-acb8-1a62c224016f
@@ -173,6 +178,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 			- **System prompts of claude** - Claude's production prompt architecture extracted prompts completely as in production as of Dec 15 2025 https://github.com/Piebald-AI/claude-code-system-prompts 
 			  id:: 697225c6-3c47-4663-b972-953379d7719f
 			- system prompts of many agents https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools/tree/main
+			- https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools/
 		- ### Subagents
 			- https://github.com/lst97/claude-code-sub-agents/tree/main/agents examples (from [youtuber](https://www.youtube.com/@edmundyong))
 		- ### Resources
@@ -245,7 +251,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- Qwen3 235B Instruct or Deepseek V3.2!
 	- **Together.ai**
 		- https://www.together.ai/models
-	- Groq https://console.groq.com/dashboard - crazy speed
+	- Groq https://console.groq.com/dashboard - crazy speed, Groq allows for quick inferences by providing many LLMs
 		- https://community.groq.com/
 		- https://console.groq.com/docs/models
 			- Model combination system offerings https://console.groq.com/docs/models#production-systems

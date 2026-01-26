@@ -8,3 +8,6 @@
 	- Interview channels https://www.youtube.com/@starterstory
 	- https://www.youtube.com/@GregIsenberg
 	- https://www.youtube.com/@theschoolofhardknocks/videos  summarize lessons/maxims phrases أقوال أحكام
+	- https://www.youtube.com/@DeepDivewithAliAbdaal/videos
+	- https://open.spotify.com/show/7vC4mEgUTKe7BJNzdHBvPo?si=UQxYsrpPS5i5k-H9xuLHyg&nd=1&dlsi=37146287f8b440b1
+	-
