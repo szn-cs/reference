@@ -57,6 +57,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	- SourceGraph
 		- **Amp** agent — Free, model-agnostic (switches models automatically - no option to select), UX sugar for users
 	- Google ADK https://google.github.io/adk-docs/
+	  collapsed:: true
 		- gemini support https://developers.googleblog.com/building-ai-agents-with-google-gemini-3-and-open-source-frameworks/
 	- ### Auxiliary SDKs augmenting AI agent with capabilities and MCPs - Deep Research & Web Browsing SDKs for AI Agents:
 		- Overview: Tools that empower agents to interact with the live internet for data gathering and report generation.
@@ -195,6 +196,11 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	- Claude code addition as MCP which allows Claude to prompt other LLMs as part of its models execution https://github.com/BeehiveInnovations/zen-mcp-server
 	- ~~Mulimodel CLI Crush~~ https://github.com/charmbracelet/crush
 	- Kilo Code (cursor alternative but free)
+	- ### codegen tools:
+		- [Morph](https://www.morphllm.com/) or [Relace](https://www.relace.ai/) tools which are used in codegen AI for fast edits (using diffs instead of entire rewrite) and adds a layer of code/syntax validation.
+			- code replacement and AST modification tools - wrap LLMs like Claude to apply code edits more safely or ergonomically.
+				- Note: it seems Claude Agent SDK already has sufficient diff-based editting instead of entire file edits.
+			- > **MorphLLM and Relace.ai are commercial platforms that implement generative code editing workflows — MorphLLM focusing on structural AST transformations and Relace.ai on replacement/diff-centric generation — while the underlying strategies they use can be (and often are) built with open-source tooling as well.
 	- ### Resources:
 		- DONE [Terminal Agents: Codex vs. Crush vs. OpenCode vs. Cursor CLI vs. Claude Code ](https://www.youtube.com/watch?v=MXOP4WELkCc)
 		- find API keys on github https://gist.github.com/win3zz/0a1c70589fcbea64dba4588b93095855

@@ -25,9 +25,14 @@
 	- [AppFlowy](https://appflowy.com/) alternative to notion OSS
 	- https://tenzu.net/en/ followup project to deprecated OSS Taiga project.
 -
-- ## Documentation tools:
+- ## Product Documentation tools/frameworks:
+  for creating platform documentation pages
 	- create professional static-site documentation (used by many open source projects) [Nextra – Next.js Static Site Generator](https://nextra.site/)
 	- Starlight by Astro used in Tauri project [Starlight by Astro](https://www.youtube.com/watch?v=5u0Ds7wzUeI&ab_channel=Astro)
+	- [#A] https://www.mintlify.com
+		- Creates pages & exposes documentation also to AI agents.
+		- used by Blaxel.ai
+		-
 	- ## resources:
 		- [https://www.reddit.com/r/selfhosted/comments/13z5xr4/plane_the_open_source_project_management_tool/](https://www.reddit.com/r/selfhosted/comments/13z5xr4/plane_the_open_source_project_management_tool/)
 		- [How I Use Logseq for Better Productivity and Organization at Work](https://www.youtube.com/watch?v=pS5fyFWsZT4)

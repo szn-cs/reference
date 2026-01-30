@@ -220,7 +220,7 @@ collapsed:: true
 				- Fly.io wants to give users UX (like vercel) + great infrastructure primitives/solutions (like Amazon) for the age of AI.
 			- Charges around 100% markup on its VMs (machines).
 - ---
-- # AI agent sandbox multitenant infrastructure providers for no-code platform
+- # AI agent sandbox multitenant infrastructure providers for no-code platformhttps://e2b.dev/
   id:: 691e7a58-3222-45a0-aca0-c74e5fae627d
 	- characteristics: ephemeral, instant startup, long term storage, scalable, secure/isolated execution environments for executing untrusted user code or for executing AI agent logic;
 		- AI agents compared to standard software should not be assumed predictable application behavior, rather the agents execute arbitrary untrusted code generated during runtime.
@@ -231,6 +231,7 @@ collapsed:: true
 			- **MicroVMs** — Guest kernel; trusting the **guest kernel + VMM**
 			- **Wasm** — No syscall ABI; trusting the **runtime + embedder**
 			- OS-provided sandboxing tools - Landlock Linux (Searbelt Apple, AppContainer Windows): allow to limit process access, used to protect user data on local machine.
+			- ~~Rust-based https://github.com/abshkbh/arrakis~~
 		- #+BEGIN_QUOTE
 		  general features of sandbox provider:
 		  - Real-time Terminal: Persistent terminals via WebSockets for interactive work.
@@ -246,6 +247,7 @@ collapsed:: true
 		- SDKs: Python, JavaScript, Bash, R, Java; open-source with SDKs for flexible microVM sandbox control.
 		- Pioneered the concept of running AI generated code in a secure isolated sandbox;
 		- https://lobehub.com/mcp/griffinwork40-e2b-mcp MCP to the E2B SDK
+	- **[Runloop](https://www.runloop.ai/)**
 	- **Modal** Sandboxes: gVisor-based, Python SDK orchestration, high concurrency. for advanced/ML-heavy workloads; Container-based sandbox with GPU support, fast startup, serverless ML compute.
 	- **Fly.io** Firecracker microVMs, limited sandbox orchestration;
 		- Not primarily built for AI agent sandboxing: Many no-code platforms at early stage used it but migrated away due to scalability issues.

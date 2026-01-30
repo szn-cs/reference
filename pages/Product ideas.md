@@ -145,6 +145,8 @@
 - Daily journaling using AI: an AI app that records your activity by conversing with it and text chatting. The app generates a record for each day and produces a journal for the events and activities and stories that you went through for each day, week, month and year. This permits a consistent way before bed to talk with the AI and tell it what you have achieved and what not, which will allow you to focus on what things in your life can be changed to achieve more.
 -
 - a problem I see in logseq is that it only supports a single chronological journal. I want a product where I can create multiple streams of journals where each maintains a different unrelated concern: e.g. retrospective/thoughts/lessons stream, product related stream, research of technology stream, issue fixing stream, daily tasks/chores stream, study/reading/course track stream.
+-
+- Journal-based project management: a new opened task with title can expand multiple journal days. When task is viewed all journal days and nested blocks will be visible. This allows to write notes tided to journal days and join them in a single view.
 - ---
 - AI shopping experience where async communication between buyers and sellers feels synchronous. with the AI capabilities today, and agent AI allows to talk to millions of customers simultaneously answering questions and answers in addition to mitigating the communication with the seller. The seller can a deep insights into what customers think and doubts when buying a product and exactly know what they are looking for. The AI will read the catalogue and gain knowledge as the seller feeds it and answers questions himself. The AI can contact the potential buyer with more info and explanations.
 -
