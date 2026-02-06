@@ -1,4 +1,5 @@
 # Third-party managed services for hosting servers and isolation environment providers for user projects
+id:: 691e7a6b-c3c7-4878-b986-db185539694a
 collapsed:: true
 	- #+BEGIN_QUOTE
 	  - **E2B**
@@ -101,6 +102,7 @@ collapsed:: true
 	      - Auto-deprovisioning after inactivity
 	    - CONSIDERATIONS: Focused on deployment/testing, not tool sandboxes
 	  #+END_QUOTE
+	-
 - ---
 - # Third-party managed container hosting
   id:: 691e7abd-2e8b-40bc-8c1c-d60324bde359
@@ -224,6 +226,7 @@ collapsed:: true
   id:: 691e7a58-3222-45a0-aca0-c74e5fae627d
 	- characteristics: ephemeral, instant startup, long term storage, scalable, secure/isolated execution environments for executing untrusted user code or for executing AI agent logic;
 		- AI agents compared to standard software should not be assumed predictable application behavior, rather the agents execute arbitrary untrusted code generated during runtime.
+		- > Agents Hosting is a serverless computing service that allows you to host any application without having to manage infrastructure. It gives you full observability and tracing out of the box.
 		- Sandboxing technology:
 			- **Containers** — Shared kernel; trusting the **host kernel**
 			- **gVisor** — Userspace kernel; trusting the **userspace kernel implementation**
@@ -249,16 +252,21 @@ collapsed:: true
 		- https://lobehub.com/mcp/griffinwork40-e2b-mcp MCP to the E2B SDK
 	- **[Runloop](https://www.runloop.ai/)**
 	- **Modal** Sandboxes: gVisor-based, Python SDK orchestration, high concurrency. for advanced/ML-heavy workloads; Container-based sandbox with GPU support, fast startup, serverless ML compute.
-	- **Fly.io** Firecracker microVMs, limited sandbox orchestration;
-		- Not primarily built for AI agent sandboxing: Many no-code platforms at early stage used it but migrated away due to scalability issues.
-		- SDKs: CLI and REST API primarily; limited native SDKs for programming languages.
+	- https://sprites.dev/ ephemeral sandboxing with persistence by Fly.io
 	- other legacy considerations: AWS Firecracker, gVisor stacks
 	- **Daytona**: fast Docker/Kata sandboxes
 		- SDK: Python SDK, Docker-based devcontainer support; focused on fast container startup for AI workloads.
 		- Secure container sandboxes, very low latency, early-stage agent runtime. Runs on kubernetes
-	- **Render**: sandboxes for serverless containerized applications
-		- Lack of scaling and lack of granular control.
-		- SDK: REST/CLI interfaces; no advanced sandbox-specific SDKs, focuses on app hosting.
+	- App hosting PaaS
+		- **Render**: ~sandboxes for serverless containerized applications~; app hosting, this is more of a cloud for containerized applications
+			- Awesome PaaS with full featured for production ready applications.
+			- Lack of scaling and lack of granular control for sandboxes;
+			- SDK: REST/CLI interfaces; no advanced sandbox-specific SDKs, focuses on app hosting.
+		- https://kuberns.com/about - app hosting
+		- > Heroku    Render     Railway     NorthFlank    Fly   DigitalOcean
+		- **Fly.io** Firecracker microVMs, limited sandbox orchestration;
+			- Not primarily built for AI agent sandboxing: Many no-code platforms at early stage used it but migrated away due to scalability issues.
+			- SDKs: CLI and REST API primarily; limited native SDKs for programming languages.
 	- Northflank: Alternative to Modal with support for any OCI container, robust multi-tenant isolation; gaining traction for production-scale agent work; MicroVM/container platform, enterprise isolation;
 	- **Cloudflare Workers/Vercel Sandbox:** Isolated JavaScript/V8 sandboxes—less common for untrusted AI, more for edge-only or webhook-type code; Edge execution, low latency, JS/WASM agent code.
 	- Google Agent Sandbox https://cloud.google.com/blog/products/containers-kubernetes/agentic-ai-on-kubernetes-and-gke

@@ -11,6 +11,8 @@ desc:: cloud architecture fundamentals, design patterns, etc.
 -
 - ### misc. notes:
 	- hosting frontend can be different than hosting backend;
+	- jamstack.org static-first decoupled web architecture where prebuilt files are served from a CDN and dynamic behavior is provided via client-side JavaScript calling APIs.
+		- e.g. SPA
 - ---
 - # system components:
 	- networking stack

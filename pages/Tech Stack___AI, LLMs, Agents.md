@@ -1,20 +1,20 @@
-# AI Coding Agent Framework SDKs / AI Agent Development Frameworks
+## [[Tech Stack/AI, LLMs, Agents/Agent Framework]]
 id:: 691a7628-a564-457c-887f-95fd18109e74
-tools, APIs, and abstractions to build, orchestrate, and deploy intelligent autonomous AI agents and applications. Abstractions over LLMs, multi-agent orchestration, sandboxed execution (some SDK often also have infrastructure capability), extensibility. These SDKs provide the logic, state management, and orchestration for agents that write code (reasoning loop, memory, and decision-making).
+	- tools, APIs, and abstractions to build, orchestrate, and deploy intelligent autonomous AI agents and applications. Abstractions over LLMs, multi-agent orchestration, sandboxed execution (some SDK often also have infrastructure capability), extensibility. These SDKs provide the logic, state management, and orchestration for agents that write code (reasoning loop, memory, and decision-making).
 	- description
-	  collapsed:: true
 		- features include: multi-model orchestration, tool integrations, dynamic workflow control, real-time streaming, sandboxed execution, and extensible agent behaviors.
 		- SDKs provide complex usecases and save development time.
 		- No-code platforms rely on combination of a **Control Plane** (Brain), a **Sandboxing Layer** (Computer), and **Tooling Protocols** (Hands).
+		- > An AI agent is any application that leverages generative AI models to take autonomous actions in the real world. These agents often require computing power to execute their interactions.
 	- **Langchain**
 	  collapsed:: true
 		- allows developers to define **loops** (Write → Error → Fix → Retry) cyclical flows explicitly as a graph, rather than a straight chain;
 		- Python/JS
 		- used by **Replit's** "Breakout Agents" architecture.
 	- LangGraph
-	- **Vercel AI SDK**
-		- **"Streaming UI."** It allows the agent to stream code directly into a React component as it is being written, preventing the "spinner of death" while the user waits for a full file to generate.
-		- TypeScript
+	- **Vercel AI SDK** https://ai-sdk.dev/
+		- building AI-powered applications with React, Next.js, and other JavaScript frameworks; **"Streaming UI."** It allows the agent to stream code directly into a React component as it is being written, preventing the "spinner of death" while the user waits for a full file to generate.
+		- TypeScript SDK
 		- used by **Bolt.new**, **Lovable.dev**
 	- **OpenAI SDK**
 		- **Codex** agent — Context-friendly and powerful, Rust core (but no Rust SDK)
@@ -22,19 +22,23 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	- ==**Claude Code Agent SDK**==
 	  id:: 6924424c-ea4e-4196-b016-fff6ac070055
 		- gives the LLM direct, native control over a local terminal and file system; optimized for the **Claude 3.5 Sonnet feedback loop** (Think → Act → Observer → Repeat).
-		- The agent SDK allows to take claude code and create a highly specialized agent system for your particular usecase.
+		- The **Claude Agent SDK** allows to take claude code and create a highly specialized agent system for your particular usecase.
+			- https://platform.claude.com/docs/en/agent-sdk/typescript-v2-preview
 		- **Claude Code** agent — User-friendly and simple
 		- #+BEGIN_QUOTE
 		  - Function & Key Features: Anthropic's Native SDK. The underlying engine for the "Claude Code" CLI. It provides an Agent primitive that natively understands file systems, bash commands, and git
 		  - **Stack**: **TypeScript/Python SDKs**, built on **Claude** models, utilizes a secure **Code Execution Tool** (sandbox), and integrates native **terminal/bash** access.
 		  #+END_QUOTE
 		- cons: developer hands over control to the library implementation of event loop and function calling, as opposed to building from scratch.
-		- RUST SDK ? No
-			- https://github.com/yafatek/rust-deep-agents-sdk
-			- https://github.com/Wally869/claude_agent_sdk_rust
+		- RUST SDK ? No official sdk for rust
+			- ~~https://github.com/yafatek/rust-deep-agents-sdk~~
+			- ~~https://github.com/Wally869/claude_agent_sdk_rust~~
 			- https://github.com/modelcontextprotocol/rust-sdk/tree/main
 			- Write rust functions and compile them for nodejs modules
 				- Q: How slow is the communication layer between rust and javascript runtime compared to pure javascript implementation?
+			- https://github.com/tyrchen/claude-agent-sdk-rs - Full feature parity (claims full feature parity with the python sdk of Claude Agent SDK). marked as production ready (community project)
+				- [being resolved] AskUserQuestion tool not supported https://github.com/tyrchen/claude-agent-sdk-rs/issues/11
+				- covers all https://github.com/anthropics/claude-agent-sdk-python features
 	- Multi-agent AI system SDK [https://github.com/strands-agents/sdk-python](https://github.com/strands-agents/sdk-python)
 	- **Microsoft Agent Framework** (AutoGen)
 		- Enterprise internal tools (.NET/Azure ecosystems).
@@ -59,6 +63,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	- Google ADK https://google.github.io/adk-docs/
 	  collapsed:: true
 		- gemini support https://developers.googleblog.com/building-ai-agents-with-google-gemini-3-and-open-source-frameworks/
+	- https://mastra.ai/agents
 	- ### Auxiliary SDKs augmenting AI agent with capabilities and MCPs - Deep Research & Web Browsing SDKs for AI Agents:
 		- Overview: Tools that empower agents to interact with the live internet for data gathering and report generation.
 		- **MCP Rust SDK**
@@ -94,7 +99,10 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		      - **Stack**: **REST API**, official SDKs in **Python** and **Node.js**, designed for direct RAG pipelines and **LangChain** integration.
 		  #+END_QUOTE
 	- infrastructure ((691e7a58-3222-45a0-aca0-c74e5fae627d))
-	-
+	- common frameworks
+		- > Blaxel supports the following agent frameworks: LangChain, CrewAI, LlamaIndex, Vercel AI SDK, Mastra, OpenAI Agents SDK, PydanticAI, and Google Agent Development Kit (ADK).Blaxel supports the following agent frameworks: LangChain, CrewAI, LlamaIndex, Vercel AI SDK, Mastra, OpenAI Agents SDK, PydanticAI, and Google Agent Development Kit (ADK).
+	- ### Rust-based agent frameworks
+	  id:: 69857a1a-f2a6-4eb2-a187-e81f3ece81fd
 	- ### Conclusion
 		- ==Claude Code Agent SDK== handles the event loop and tool calling including built-in features. Permits creating coding agents as well as general purpose agent systems.
 		- Q: is Vercel SDK needed for streaming responses in browser?
@@ -119,7 +127,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- Cognosys - autonomous-agent for planning and execution.
 		- Bubble - web apps
 		- Glide data-driven apps (spreadsheet/databases).
--
+	-
 	- ## Claude Code
 	  id:: 68d89560-cf08-435a-acb8-1a62c224016f
 		- info :
@@ -180,62 +188,64 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 			  id:: 697225c6-3c47-4663-b972-953379d7719f
 			- system prompts of many agents https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools/tree/main
 			- https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools/
-		- ### Subagents
-			- https://github.com/lst97/claude-code-sub-agents/tree/main/agents examples (from [youtuber](https://www.youtube.com/@edmundyong))
+			- https://github.com/anthropics/claude-code/tree/main/plugins combines subagents, mcps, & skills.
+			- subagents examples https://github.com/lst97/claude-code-sub-agents/tree/main/agents examples (from [youtuber](https://www.youtube.com/@edmundyong))
 		- ### Resources
 			- TODO [I should be charging $999 for this Claude Code Tutorial](https://www.youtube.com/watch?v=4nthc76rSl8)
 			- DONE [[resource/course/Claude Code: A Highly Agentic Coding Assistant]]
 			-
-	- Gemini CLI
-	- OpenAI Codex
-	- https://www.warp.dev/coding
-	- https://github.com/sst/opencode CLI opensource multi-LLM https://opencode.ai/
-	- xAI
-	- Meta Llama
-	- Mistral
-	- Claude code addition as MCP which allows Claude to prompt other LLMs as part of its models execution https://github.com/BeehiveInnovations/zen-mcp-server
-	- ~~Mulimodel CLI Crush~~ https://github.com/charmbracelet/crush
-	- Kilo Code (cursor alternative but free)
-	- ### codegen tools:
-		- [Morph](https://www.morphllm.com/) or [Relace](https://www.relace.ai/) tools which are used in codegen AI for fast edits (using diffs instead of entire rewrite) and adds a layer of code/syntax validation.
-			- code replacement and AST modification tools - wrap LLMs like Claude to apply code edits more safely or ergonomically.
-				- Note: it seems Claude Agent SDK already has sufficient diff-based editting instead of entire file edits.
-			- > **MorphLLM and Relace.ai are commercial platforms that implement generative code editing workflows — MorphLLM focusing on structural AST transformations and Relace.ai on replacement/diff-centric generation — while the underlying strategies they use can be (and often are) built with open-source tooling as well.
-	- ### Resources:
-		- DONE [Terminal Agents: Codex vs. Crush vs. OpenCode vs. Cursor CLI vs. Claude Code ](https://www.youtube.com/watch?v=MXOP4WELkCc)
-		- find API keys on github https://gist.github.com/win3zz/0a1c70589fcbea64dba4588b93095855
-			- ```apl
-			  https://github.com/search?q=%28path%3A.xml+OR+path%3A.json+OR+path%3A.properties+OR+path%3A.sql+OR+path%3A.txt+OR+path%3A.log+OR+path%3A.tmp+OR+path%3A.backup+OR+path%3A.bak+OR+path%3A.enc+OR+path%3A.yml+OR+path%3A.yaml+OR+path%3A.toml+OR+path%3A.ini+OR+path%3A.config+OR+path%3A.conf+OR+path%3A.cfg+OR+path%3A.env+OR+path%3A.env.local+OR+path%3A.env.development+OR+path%3A.env.production+OR+path%3A.env.test+OR+path%3A.envrc+OR+path%3A.prod+OR+path%3A.secret+OR+path%3A.private+OR+path%3A*.key%29+AND+%28access_key+OR+secret_key+OR+access_token+OR+api_key+OR+apikey+OR+api_secret+OR+apiSecret+OR+app_secret+OR+application_key+OR+app_key+OR+appkey+OR+auth_token+OR+authsecret%29+AND+%2Fsk-proj-%5Ba-zA-Z0-9_-%5D%7B100%2C%7D%2F&type=code&ref=advsearch
-			  ```
-		- DONE [ Terminal Agents: Codex vs. Crush vs. OpenCode vs. Cursor CLI vs. Claude Code ](https://www.youtube.com/watch?v=MXOP4WELkCc)
-		- DONE https://www.reddit.com/r/LLMDevs/comments/1fdii62/best_llm_gateway/
-		- https://github.com/Shubhamsaboo/awesome-llm-apps - prompt engineered python apps
-		- TODO https://mlengineering.medium.com/mastering-llm-gateway-a-developers-guide-to-ai-model-interfacing-630bdd6216cc
-		  id:: 68da381a-3012-410e-a761-4323f8c600db
-		  :LOGBOOK:
-		  CLOCK: [2025-09-29 Mon 10:41:19]--[2025-09-29 Mon 12:49:24] =>  02:08:05
-		  :END:
-		- https://www.pomerium.com/blog/best-llm-gateways-in-2025
-		- DONE [How I’m Using GLM-4.5 with Claude Code (The Power Combo Set Up)](https://archive.md/8SYy5)
-		- TODO https://archive.md/U8Odh
-	- ### Conclusion
-		- [[Sep 29th, 2025]] CLI comparison leads to Claude Code leading in all aspects. Use Claude Code cli + claude code router to allow additional models.
-		- [[Sep 30th, 2025]] Use a combination of ((68db8148-7d49-4014-85ac-11bd9a813e84)) models with Claude Code cli
-		- [[Oct 1st, 2025]] Hybrid approach:
-			- previum tools like Claude Code (complex reasoning) + GLM (routine coding );
-			- GLM (routine coding) + DeepSeek (reasoning) + GPT5 (additional routine & reasoning)
-				- Cost effective compared to Claude Code
-			- Combine 3 cheaper models: GLM 4.6 + Deepseek V3.1 Terminus ? + Kimi K2 Instruct 0905 ? + Qwen3 coder ???
-			- use **LLM gateway** for user exposed interaction: OpenRouter or open-source self-hosted alternative;
-				- Every single provider has reliability issues; using LLMs provider gateways prevents vendor lock-in and permits dynamically picking providers.
-		- [[Oct 3rd, 2025]] Openrouter has a lot to offer. Ability to switch & test LLMs, protect billing from LLM provider (like chinease not allowing unsubscribe), unified billing, etc.
-			-
-	- # LLM keys panels:
-		- https://ai.google.dev/aistudio
-		- https://platform.deepseek.com/usage
-		- https://platform.moonshot.ai/console
-	- # Run models using docker
-		- [ THIS is the REAL DEAL 🤯 for local LLMs ](https://www.youtube.com/watch?v=3XCunZqvVDA)
+		- Gemini CLI
+		- OpenAI Codex
+		- https://www.warp.dev/coding
+		- https://github.com/sst/opencode CLI opensource multi-LLM https://opencode.ai/
+		- xAI
+		- Meta Llama
+		- LlamaIndex
+		- Mistral
+		- Mistra
+		- Claude code addition as MCP which allows Claude to prompt other LLMs as part of its models execution https://github.com/BeehiveInnovations/zen-mcp-server
+		- ~~Mulimodel CLI Crush~~ https://github.com/charmbracelet/crush
+		- Kilo Code (cursor alternative but free)
+		- ### codegen tools:
+			- [Morph](https://www.morphllm.com/) or [Relace](https://www.relace.ai/) tools which are used in codegen AI for fast edits (using diffs instead of entire rewrite) and adds a layer of code/syntax validation.
+				- code replacement and AST modification tools - wrap LLMs like Claude to apply code edits more safely or ergonomically.
+					- Note: it seems Claude Agent SDK already has sufficient diff-based editting instead of entire file edits.
+				- > **MorphLLM and Relace.ai are commercial platforms that implement generative code editing workflows — MorphLLM focusing on structural AST transformations and Relace.ai on replacement/diff-centric generation — while the underlying strategies they use can be (and often are) built with open-source tooling as well.
+		- ### Resources:
+			- DONE [Terminal Agents: Codex vs. Crush vs. OpenCode vs. Cursor CLI vs. Claude Code ](https://www.youtube.com/watch?v=MXOP4WELkCc)
+			- find API keys on github https://gist.github.com/win3zz/0a1c70589fcbea64dba4588b93095855
+				- ```apl
+				  https://github.com/search?q=%28path%3A.xml+OR+path%3A.json+OR+path%3A.properties+OR+path%3A.sql+OR+path%3A.txt+OR+path%3A.log+OR+path%3A.tmp+OR+path%3A.backup+OR+path%3A.bak+OR+path%3A.enc+OR+path%3A.yml+OR+path%3A.yaml+OR+path%3A.toml+OR+path%3A.ini+OR+path%3A.config+OR+path%3A.conf+OR+path%3A.cfg+OR+path%3A.env+OR+path%3A.env.local+OR+path%3A.env.development+OR+path%3A.env.production+OR+path%3A.env.test+OR+path%3A.envrc+OR+path%3A.prod+OR+path%3A.secret+OR+path%3A.private+OR+path%3A*.key%29+AND+%28access_key+OR+secret_key+OR+access_token+OR+api_key+OR+apikey+OR+api_secret+OR+apiSecret+OR+app_secret+OR+application_key+OR+app_key+OR+appkey+OR+auth_token+OR+authsecret%29+AND+%2Fsk-proj-%5Ba-zA-Z0-9_-%5D%7B100%2C%7D%2F&type=code&ref=advsearch
+				  ```
+			- DONE [ Terminal Agents: Codex vs. Crush vs. OpenCode vs. Cursor CLI vs. Claude Code ](https://www.youtube.com/watch?v=MXOP4WELkCc)
+			- DONE https://www.reddit.com/r/LLMDevs/comments/1fdii62/best_llm_gateway/
+			- https://github.com/Shubhamsaboo/awesome-llm-apps - prompt engineered python apps
+			- TODO https://mlengineering.medium.com/mastering-llm-gateway-a-developers-guide-to-ai-model-interfacing-630bdd6216cc
+			  id:: 68da381a-3012-410e-a761-4323f8c600db
+			  :LOGBOOK:
+			  CLOCK: [2025-09-29 Mon 10:41:19]--[2025-09-29 Mon 12:49:24] =>  02:08:05
+			  :END:
+			- https://www.pomerium.com/blog/best-llm-gateways-in-2025
+			- DONE [How I’m Using GLM-4.5 with Claude Code (The Power Combo Set Up)](https://archive.md/8SYy5)
+			- TODO https://archive.md/U8Odh
+		- ### Conclusion
+			- [[Sep 29th, 2025]] CLI comparison leads to Claude Code leading in all aspects. Use Claude Code cli + claude code router to allow additional models.
+			- [[Sep 30th, 2025]] Use a combination of ((68db8148-7d49-4014-85ac-11bd9a813e84)) models with Claude Code cli
+			- [[Oct 1st, 2025]] Hybrid approach:
+				- previum tools like Claude Code (complex reasoning) + GLM (routine coding );
+				- GLM (routine coding) + DeepSeek (reasoning) + GPT5 (additional routine & reasoning)
+					- Cost effective compared to Claude Code
+				- Combine 3 cheaper models: GLM 4.6 + Deepseek V3.1 Terminus ? + Kimi K2 Instruct 0905 ? + Qwen3 coder ???
+				- use **LLM gateway** for user exposed interaction: OpenRouter or open-source self-hosted alternative;
+					- Every single provider has reliability issues; using LLMs provider gateways prevents vendor lock-in and permits dynamically picking providers.
+			- [[Oct 3rd, 2025]] Openrouter has a lot to offer. Ability to switch & test LLMs, protect billing from LLM provider (like chinease not allowing unsubscribe), unified billing, etc.
+				-
+		- # LLM keys panels:
+			- https://ai.google.dev/aistudio
+			- https://platform.deepseek.com/usage
+			- https://platform.moonshot.ai/console
+		- # Run models using docker
+			- [ THIS is the REAL DEAL 🤯 for local LLMs ](https://www.youtube.com/watch?v=3XCunZqvVDA)
 - ---
 - # Model providers
 	- _info:
@@ -281,7 +291,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- https://docs.z.ai/scenario-example/develop-tools/claude#step-3%3A-quick-start-with-claude-code
 		- https://open.bigmodel.cn/dev/api/normal-model/glm-4
 	- China free models https://platform.iflow.cn/en/models
-	- Gemini, Ollama, OpenAI
+	- Gemini, Ollama, OpenAI, Anthropic
 	- https://aihubmix.com/ chinease competitor to OpenRouter
 	- [OpenRouter](https://openrouter.ai/)  (offers access to AI models - unifying endpoint)
 		- **Unified Billing** and access to **Multiple LLM Providers** through a **Single API**
@@ -304,6 +314,16 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	- https://github.com/maximhq/bifrost
 	- https://github.com/tensorzero/tensorzero
 	- LLAMA
+	- > MiniMax, Synthetic, Venice AI, OpenRouter, Vercel AI Gateway, Moonshot AI, Z.AI (GLM 4.7), OpenCode Zen.
+	- ### Claude Code LLM models providers
+	  id:: 6925cb7c-2834-41f5-8c71-96eab78df80b
+	  Proprietary models such as Claude Code models can be provided by thirdparty cloud providers like Amazon, Google, Azure etc.
+		- Antropic AI provider (owner of Claude Code)
+		- Google Vertex AI
+			- provides Claude Code models
+		- Amazon AWS Bedrock
+			- providers Claude Code models
+		- **Microsoft Foundry** https://azure.microsoft.com/en-us/blog/introducing-claude-opus-4-5-in-microsoft-foundry/
 	- | Provider | Limits | Models | Link |
 	  |----------|--------|--------|------|
 	  | OpenRouter | 20 requests/min; 50 requests/day; 1000 requests/day with $10 top-up | DeepCoder 14B Preview; DeepHermes 3; DeepSeek R1; Llama 3.x; Mistral 7B; Qwen 2.5; Gemma 3; ... | https://openrouter.ai/ |
@@ -317,15 +337,6 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 	  | Together | 60 req/min | Llama 3.2 Vision; Llama 3.3; DeepSeek R1 Distill 70B | https://www.together.ai/ |
 	  | Cohere | 20 req/min; 1000 req/month | Command-A/R/R7B/R+; Aya Expanse 8B/32B; Aya Vision 8B/32B | https://cohere.com/ |
 	  | byokaashish | https://www.feedough.com/subscribe/ | www.linkedin.com/in/aashishpahwa/ | https://www.instagram.com/okaashish/ |
-	- ### Claude Code LLM models providers
-	  id:: 6925cb7c-2834-41f5-8c71-96eab78df80b
-	  Proprietary models such as Claude Code models can be provided by thirdparty cloud providers like Amazon, Google, Azure etc.
-		- Antropic AI provider (owner of Claude Code)
-		- Google Vertex AI
-			- provides Claude Code models
-		- Amazon AWS Bedrock
-			- providers Claude Code models
-		- https://azure.microsoft.com/en-us/blog/introducing-claude-opus-4-5-in-microsoft-foundry/
 - ---
 - # LLM calculators & pricing
   collapsed:: true
@@ -363,6 +374,7 @@ tools, APIs, and abstractions to build, orchestrate, and deploy intelligent auto
 		- Datadog
 		- Grafana Cloud
 		- Honeycomb
+		- https://pydantic.dev/logfire - what base44 uses.
 	- https://agents.md/ open standard for coding agent instructions.
 -
 - ## rules:

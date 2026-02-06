@@ -60,7 +60,9 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 	- + https://github.com/wavetermdev/waveterm
 	- + https://github.com/ghostty-org/ghostty
 	- kitty
+	- Ghostty fast terminal with GPU rendering.
 	- build vivid charming terminal user interfaces https://thenewstack.io/terminal-user-interfaces-review-of-crush-ex-opencode-al/
+	-
 - # Antivirus
 	- ClamAV
 		- https://docs.clamav.net/manual/Installing.html
@@ -74,6 +76,7 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 	- awesome articles for tech development by a founder - https://vadimkravcenko.com/newsletter/
 	  id:: 68fa5adc-6890-4728-ba8c-e387b1aa1c2a
 	- https://daily.dev/ projects and tools trending in dev space.
+	- https://www.shodan.io/ constrantly indexes public internet urls.
 - ---
 - # Fedora
 	- https://copr.fedorainfracloud.org/coprs/ provides transparent build process of user-maintained package builds.
