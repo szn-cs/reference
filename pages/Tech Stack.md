@@ -29,6 +29,8 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 - # some other tools :
 	- https://www.figma.com/figjam/ brainstorm using AI to create interview questions, requirements, flow charts of app, etc. + FigmaAI for design UI
 	- erasor.ai technical system design diagrams and technical design docs.
+	- https://www.g2.com/ reviews of services and providers.
+	- diagramming tool for system design https://www.eraser.io/
 - <!--ScriptorStartFragment-->
   
   ---
@@ -77,6 +79,9 @@ desc:: researching specific technologies options, practical tools, comparisons, 
 	  id:: 68fa5adc-6890-4728-ba8c-e387b1aa1c2a
 	- https://daily.dev/ projects and tools trending in dev space.
 	- https://www.shodan.io/ constrantly indexes public internet urls.
+	- Gitlab has a great example of documentations for their startup processes (which they openly shared) https://docs.gitlab.com/development/migration_style_guide/
+	- https://appflowy.com/
+	-
 - ---
 - # Fedora
 	- https://copr.fedorainfracloud.org/coprs/ provides transparent build process of user-maintained package builds.

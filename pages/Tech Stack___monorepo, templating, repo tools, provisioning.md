@@ -2,6 +2,7 @@
 	- considerations:
 		- ***m***anagement, ***o***rganization, ***o***rchestration
 		- task runner; Monorepo management tool
+		-
 	- unmaintained [GitHub - DanielKeep/cargo-script: Cargo script subcommand](https://github.com/DanielKeep/cargo-script)
 	- [GitHub - igor-petruk/scriptisto: A language-agnostic "shebang interpreter" that enables you to write scripts in compiled languages.](https://github.com/igor-petruk/scriptisto?tab=readme-ov-file)
 	- library [GitHub - matklad/xshell](https://github.com/matklad/xshell)
@@ -29,21 +30,31 @@
 			- I don't see that any monorepo manager is worth the effort. Non have complete sensible support to skaffold without requiring large config and changes;
 		- Use rust scripts in each monorepo component's "script" folder, with main.rs as a REPL -like (scratchpad binary) to execute the requested commands.
 -
-- # Tools for repo management:
-	- TODO renovate https://docs.renovatebot.com/ - updated dependencies across languages & microservices.
-		- replaces dependentbot github
-	- Nix flakes  - reproducable toolchains and specific version cli commands across dev environment. {{video https://www.youtube.com/watch?v=5D3nUU1OVx8}} - reproducable environments.
-	- the Nix language is hard to learn. Is there a Rust alternative for Nix?
-	- ### pluggable registry crates:
-		- `linkme` is better for **modularity, multi-crate monorepos, and compile-time determinism**.
-		- `inventory` still works but is slightly older, has more runtime glue, and less portable.
+- # Developer CLI tool: System Provisioning Tools / dependency installation + Task Runner + Environment variable sets
+  id:: 69a45d04-5b66-44f5-ac93-bdf20eb00769
+	- ==Mise== https://mise.jdx.dev/demo.html
+		- tool version manager, successor project of asdf
+		- > Mise is primarily focused on provisioning environments (whether cloud or local) with dependencies and tools, using package manager configuration
+		- tools/packages list https://mise-versions.jdx.dev/
+	- [asdf](https://asdf-vm.com)
+	- [nvm](https://github.com/nvm-sh/nvm)
+	- [pyenv](https://github.com/pyenv/pyenv) but for any language
+	- Nix flakes  - reproducable toolchains and specific version cli commands across dev environment; reproducable environments.
+		- the Nix language is hard to learn. Is there a Rust alternative for Nix?
+	- [Stack] Nix, Docker, Make
+	- DevBox
 - # tools for secrets:
 	- use **Mozilla SOPS** or **git-crypt** to encrypt tokens into repo.
 	- use direnv in addition to dotenv as an automated way to load env into current folder.
 	-
 - # misc tools:
 	- REPL for Rust https://github.com/evcxr/evcxr/tree/main/evcxr_repl
--
+	- Plugins for Gitgub Actions
+		- renovate https://docs.renovatebot.com/ - updated dependencies across languages & microservices.
+			- replaces dependentbot github
+	- ### pluggable registry crates:
+		- `linkme` is better for **modularity, multi-crate monorepos, and compile-time determinism**.
+		- `inventory` still works but is slightly older, has more runtime glue, and less portable.
 -
 -
 	- Categories of tools:

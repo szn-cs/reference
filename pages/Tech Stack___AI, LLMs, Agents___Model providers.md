@@ -1,0 +1,6 @@
+- **Cerebras**
+- Ollama cloud https://ollama.com/search?c=cloud&page=2 support many open source models
+- Alibaba cloud https://www.alibabacloud.com/help/en/model-studio/coding-plan coding plan
+-
+-
+-

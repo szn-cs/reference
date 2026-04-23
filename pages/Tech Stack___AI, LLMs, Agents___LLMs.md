@@ -1,0 +1,14 @@
+- **Zhipu z.ai GLM 4.7**
+- **Alibaba Qwen Coder**
+- **Deepseek**
+- **Moonshot Kimi K2**
+- **Minimax M2.1**
+- **Google Gemini 3 Pro**
+- ChatGPT5
+-
+- ### Compatible with Claude Code
+	- GLM
+	- Anthropic Claude Code
+	-
+-
+-

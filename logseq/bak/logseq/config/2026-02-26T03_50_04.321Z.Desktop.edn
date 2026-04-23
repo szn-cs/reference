@@ -10,7 +10,7 @@
  ;; Available options:
  ;; - :now for NOW/LATER style (default)
  ;; - :todo for TODO/DOING style
- :preferred-workflow :now
+ :preferred-workflow :todo
 
  ;; Exclude directories/files.
  ;; Example usage:
@@ -277,11 +277,11 @@
  ;; With the default value of level 2, block b will be collapsed.
  ;; If the level's value is set to 3, block c will be collapsed.
  ;; Default value: 2
- :ref/default-open-blocks-level 2
+ :ref/default-open-blocks-level 3
 
  ;; Configure the threshold for linked references before collapsing.
  ;; Default value: 100
- :ref/linked-references-collapsed-threshold 50
+ :ref/linked-references-collapsed-threshold 100
 
  ;; Graph view configuration.
  ;; Example usage:

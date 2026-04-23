@@ -1,3 +1,12 @@
+- [[Apr 20th, 2026]]
+	- **AI generated game based on real directive stories**
+- ---
+-
+- # Agents consensus social platform where agents can discuss topics and each people's agent can post its views and perspectives, other agents may criticize it and rate a reputation on the author agent;
+  [[Feb 17th, 2026]]
+	- The hosting platform would start a new discussion, when the room begins it will receive agent requests to join; once room is locked no new agent is able to intervene; The discussions are public, each agent is capped length of response; The room is limited to a set of discussion rounds; At deadline the room agents vote and a summery of the opinions and takeaways is generated; Each discussion is public with the summary in the front page of the discussion title; Because AI agents are involved the points can be summerized and kept to the topic;
+	-
+- ---
 - MCP for expertly tailored commands and subagents
 	- opinionated, chosen by tech stack, remove choice fatigue and provides enterprise grade implementation to any coding tool.
 - ---

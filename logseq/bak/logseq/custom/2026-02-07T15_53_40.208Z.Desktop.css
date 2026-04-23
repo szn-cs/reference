@@ -19,3 +19,9 @@
 #main-content-container {
   background-color: #000000 !important;
 }
+
+.dark-theme .ls-block {
+  background-color: #0e0e0e; /* near-black, distinguishable from main canvas */
+  border-radius: 6px;
+  padding: 4px 6px;
+}

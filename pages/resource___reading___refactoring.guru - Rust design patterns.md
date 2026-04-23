@@ -1,0 +1,5 @@
+- [refactoring.guru](https://refactoring.guru)
+-
+- [[Apr 13th, 2026]]
+	- https://refactoring.guru/design-patterns
+-

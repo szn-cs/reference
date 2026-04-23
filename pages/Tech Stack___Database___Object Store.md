@@ -1,0 +1,11 @@
+- [AWS S3](https://aws.amazon.com/s3/)
+- [Tigris](https://fly.io/docs/tigris/) (S3-compatible) - Tigris Data
+	- Distributed object store - subsequent accesses from regions other than the primary region are served locally.
+	- incrementally migrate from another object store data using https://fly.io/docs/tigris/#migrating-to-tigris-with-shadow-buckets
+	- mount read-only object store into VM using FUSE implementation https://github.com/s3fs-fuse/s3fs-fuse
+- Azure Blob Storage
+- Backblaze B2
+- Cloudflare R2
+- Cloudinary
+- ImageKit
+- Uploadcare

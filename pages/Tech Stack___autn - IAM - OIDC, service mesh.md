@@ -1,8 +1,10 @@
-# Auth third-party
+- [[Tech Stack/autn - IAM - OIDC, service mesh/journal]]
+- # Auth third-party
 	- https://clerk.com/
 	- https://auth0.com/
 	- https://www.ory.com/
-	-
+	- Auth.js
+	- Okta
 -
 - # IAM /OIDC  Kubernetes
   collapsed:: true

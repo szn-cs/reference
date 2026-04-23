@@ -23,3 +23,4 @@
 - Install video codec support H.264 https://discussion.fedoraproject.org/t/codecs-missing-failing-to-play-h-264/104643/2
 - bind mouse forward/backwards keys https://github.com/sezanzeb/input-remapper
 - TODO: extract the Fedora extensions installed for workspace management and productivity.
+- firefox toolbars bottom https://github.com/jonhoo/configs/blob/master/gui/.mozilla/firefox/chrome/userChrome.css

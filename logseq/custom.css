@@ -12,10 +12,15 @@
   --ls-primary-background-color: #000000 !important;
 
   /* Secondary Background (e.g., sidebar, settings panels) */
-  --ls-secondary-background-color: #000000 !important;
+  --ls-secondary-background-color: #121212 !important;
 }
 
 /* Target the main container directly for maximum override power */
 #main-content-container {
   background-color: #000000 !important;
+}
+
+html[data-theme="dark"][data-color="logseq"] 
+.references-blocks-item { 
+  --ls-secondary-background-color: #121212 !important;
 }
