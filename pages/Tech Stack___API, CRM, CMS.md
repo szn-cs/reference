@@ -293,7 +293,7 @@
 		  Modern article editors fall into structured or block-based categories. Medium uses a structured JSON model with serialization to HTML, while WordPress uses modular blocks. New ecosystems emphasize schema-driven editing, realtime collaboration, headless CMS workflows, and hybrid rendering frameworks. This stack defines the dominant architecture for modern content creation and delivery.
 		  
 		  #+END_QUOTE
-	- ((692af03b-f0f6-4308-a6ff-92d6c9ee37c9))
+	- ### **WYSIWYG** editors, rich text editors, editing libraries
 	- ### Conclusion
 	  [[Nov 29th, 2025]]
 		- OSS developer oriented: Directus, Strapi, Payload

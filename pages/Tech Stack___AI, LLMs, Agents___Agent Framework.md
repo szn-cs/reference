@@ -38,7 +38,8 @@
 			- [being resolved] AskUserQuestion tool not supported https://github.com/tyrchen/claude-agent-sdk-rs/issues/11
 			- covers all https://github.com/anthropics/claude-agent-sdk-python features
 	- reduce tokens usage https://github.com/JuliusBrussee/caveman
-	- OpenAI plugin for claude code https://community.openai.com/t/introducing-codex-plugin-for-claude-code/1378186
+	- OpenAI plugin for claude code https://community.openai.com/t/introducing-codex-plugin-for-claude-code/1378186 https://github.com/openai/codex-plugin-cc
+	  id:: 69ee453a-4f9e-4ca1-abc3-aaafaa8a20e9
 - Multi-agent AI system SDK [https://github.com/strands-agents/sdk-python](https://github.com/strands-agents/sdk-python)
 - **Microsoft Agent Framework** (AutoGen)
 	- Enterprise internal tools (.NET/Azure ecosystems).
@@ -68,13 +69,6 @@
 	- Overview: Tools that empower agents to interact with the live internet for data gathering and report generation.
 	- **MCP Rust SDK**
 	- MCP tools for connecting to postgresql or linear
-	- **Restate SDK**
-	  collapsed:: true
-		- provides durable execution allowing to resume on another instance while retaining all variable state (memory)
-		- #+BEGIN_QUOTE
-		  - Function & Key Features: Durable Execution. **Crucial for production agents.** Ensures the AI agent resumes exactly where it left off without losing variable state if it crashes or times out. It wraps Vercel AI SDK or OpenAI agents.
-		  - **Stack**: SDKs available in **TypeScript/Node.js**, **Java/Kotlin**, and **Python**. The core is a resilient, **Durable Execution** runtime.
-		  #+END_QUOTE
 	- https://www.agentops.ai/
 	- #+BEGIN_QUOTE
 	    - **GPT Researcher**
@@ -104,4 +98,4 @@
 - ### Rig
   id:: 69857a1a-f2a6-4eb2-a187-e81f3ece81fd
 	- https://rig.rs/
--
+	- low level framework for building coding agent https://github.com/pacifio/cersei

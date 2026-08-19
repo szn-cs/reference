@@ -1,5 +1,6 @@
 ## [[Feb 6th, 2026]] TODO reserach Rust agents
 	- ### RIG
+	  id:: 69ee453a-3683-4266-949c-c420c473d86f
 		- https://github.com/0xPlaygrounds/rig?tab=readme-ov-file
 		- https://docs.rig.rs/
 	- https://github.com/zavora-ai/adk-rust?tab=readme-ov-file

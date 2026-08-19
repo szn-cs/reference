@@ -1,9 +1,10 @@
 ## [[Tech Stack/AI, LLMs, Agents/Agent Framework]]
 id:: 691a7628-a564-457c-887f-95fd18109e74
 - ## [[Tech Stack/AI, LLMs, Agents/LLMs]]
-- ## [[Tech Stack/AI, LLMs, Agents/Model providers]]
+- ## [[Tech Stack/AI, LLMs, Agents/Model providers & inference]]
 -
 - # Coding agents tools & models:
+  id:: 69ee453a-c672-4295-8096-89681cb3ebaa
 	- info:
 		- _24 million tokens/day** —enough for 3–4 hours of uninterrupted vibe coding_ while _heavy coding workflows up to 120m tokens/day_
 	- List of coding agents
@@ -13,6 +14,8 @@ id:: 691a7628-a564-457c-887f-95fd18109e74
 		- performance analysis https://artificialanalysis.ai/
 			- https://artificialanalysis.ai/leaderboards/models
 			- https://artificialanalysis.ai/models/capabilities/coding
+			- https://onyx.app/llm-leaderboard
+			- https://zenmux.ai/models?sort=newest
 		- provides a good list of models and fileters https://deepinfra.com/models
 		- https://github.com/cheahjs/free-llm-api-resources
 		- China opensource community https://modelscope.cn/home
@@ -26,6 +29,7 @@ id:: 691a7628-a564-457c-887f-95fd18109e74
 	-
 	- ## Claude Code
 	  id:: 68d89560-cf08-435a-acb8-1a62c224016f
+	  collapsed:: true
 		- info :
 			- accessible through CLI or SDK.
 				- thirdparty providers may allow free tier access (Google, Amazon bedrock)
@@ -164,10 +168,10 @@ id:: 691a7628-a564-457c-887f-95fd18109e74
 	- https://aider.chat/docs/leaderboards/
 	- https://airank.dev/
 	- https://clockbench.ai/
-	-
+	- https://arena.ai/leaderboard/code/webdev
+	- Models by usage popularity https://openrouter.ai/rankings#top-models
 -
 - # LLM Training & Serving
-  collapsed:: true
 	- https://inference.net/
 	- LLM serving https://github.com/vllm-project/vllm  vs SGLang
 	-
