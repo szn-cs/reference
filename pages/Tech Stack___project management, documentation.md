@@ -33,6 +33,8 @@
 		- Creates pages & exposes documentation also to AI agents.
 		- used by Blaxel.ai
 		-
+	- https://vitepress.dev/guide/what-is-vitepress static site generator used for documentation generation;
+		-
 	- ## resources:
 		- [https://www.reddit.com/r/selfhosted/comments/13z5xr4/plane_the_open_source_project_management_tool/](https://www.reddit.com/r/selfhosted/comments/13z5xr4/plane_the_open_source_project_management_tool/)
 		- [How I Use Logseq for Better Productivity and Organization at Work](https://www.youtube.com/watch?v=pS5fyFWsZT4)
