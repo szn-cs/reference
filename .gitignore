@@ -9,3 +9,6 @@
 # RUST
 target/ 
 tmp
+
+logseq/bak/
+logseq/.recycle/ 

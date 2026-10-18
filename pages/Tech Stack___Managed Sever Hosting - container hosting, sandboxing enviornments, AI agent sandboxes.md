@@ -334,3 +334,4 @@ collapsed:: true
 	- OpenTelemetry-based for ditributed cloud tracing and telemetry
 	- ?
 	-
+- → moved 2026-09-24: sandbox-provider landscape + Runloop fit now at wrk-wosoom doc-spec/feature/ai-sandbox.md

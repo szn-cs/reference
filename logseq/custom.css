@@ -4,6 +4,7 @@
  :root {
   --ls-main-content-max-width: 90%;
   --ls-main-content-max-width-wide: 90%;
+  --ls-font-family: "Fira Code", monospace;
 }
 
 /* Force Logseq Main Background to Pitch Black */
@@ -23,4 +24,8 @@
 html[data-theme="dark"][data-color="logseq"] 
 .references-blocks-item { 
   --ls-secondary-background-color: #121212 !important;
+}
+
+body {
+    font-family: "Fira Code", monospace !important;
 }

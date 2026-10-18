@@ -1,32 +1,5 @@
-# Open-source versioned project management tool:  & PKM
-	- TO-do:: pick open-source locally deployed alternative to Jira, Trello, Asana, Github projects
-	- ~~focalboard~~.com - alternative to Trello but unmaintained [GitHub - mattermost-community/focalboard: Focalboard is an open source, self-hosted alternative to Trello, Notion, and Asana.](https://github.com/mattermost-community/focalboard#readme)
-	- [OpenProject - Open Source Project Management Software](https://www.openproject.org/)
-	- ~~Kanboard ~~[Kanboard](https://kanboard.org/) (classifc, kanban board; simple features)
-	- [Taiga: Your opensource agile project management software](https://taiga.io/) (fully open source - all features but no support; seems to be in the state of transition to TaigaNext - closed source? )
-		- [Taiga 30min Setup](https://community.taiga.io/t/taiga-30min-setup/170)
-	- ~~plane.so ~~[GitHub - makeplane/plane: 🔥 🔥 🔥 Open Source JIRA, Linear, Monday, and Asana Alternative. Plane helps you track your issues, epics, and cycles the easiest way on the planet.](https://github.com/makeplane/plane) [Plane - Project Management Software](https://plane.so/) (semi opensource; limited features in community edition equivalent to free tier in cloud)
-	- [Tuleap • Agile Project Management and Software Development tools](https://www.tuleap.org/) (has community version with less features)
-	- ~~Gitlab~~ platform self-hosted with project management [Getting started with GitLab: Mastering project management](https://about.gitlab.com/blog/2025/02/11/getting-started-with-gitlab-mastering-project-management/)  (limited features for free-tier self-hosted community edition)
-	- ~~Redmine~~ (classic, mature)
-	- ~~Leantime ~~(not dev focused)
-	- ~~Orangescrum~~
-	- ~~Wekan ~~(trello like)
-	- ~~Vikunja~~ (task oriented, Trello-like, modern)
-	- Obsidian for notes taking - uses markdown files with extended formats and plugins; Polished with extensive plugin ecosystem; Requires manual work for managing references between pages and for journaling; has paid aspect to it.
-	- logseq: open sources alternative to obsidian; block-based (bullets); less polished than obsidian; simple & clearly startuctured - no fluff; self-managing of journal and reference page creation;
-		- markdown vs [Org-mode](https://orgmode.org/) vs FOAM vscode plugin
-			- DONE https://www.reddit.com/r/logseq/comments/1b6ye4v/from_obsidian_to_logseq/
-		- in EMACS providing full Org-mode support  https://www.orgroam.com/ & https://github.com/org-roam/org-roam
-		- https://github.com/syl20bnr/spacemacs
-	- https://mymind.com/ allows collecting desings in a pinterest way.
-	- [GitHub - siyuan-note/siyuan: A privacy-first, self-hosted, fully open source personal knowledge management software, written in typescript and golang.](https://github.com/siyuan-note/siyuan)
-	- [GitHub - TriliumNext/Trilium: Build your personal knowledge base with Trilium Notes](https://github.com/TriliumNext/Trilium)
-	- [AppFlowy](https://appflowy.com/) alternative to notion OSS
-	- https://tenzu.net/en/ followup project to deprecated OSS Taiga project.
--
-- ## Product Documentation tools/frameworks:
-  for creating platform documentation pages
+## Product Documentation tools/frameworks:
+for creating platform documentation pages
 	- create professional static-site documentation (used by many open source projects) [Nextra – Next.js Static Site Generator](https://nextra.site/)
 	- Starlight by Astro used in Tauri project [Starlight by Astro](https://www.youtube.com/watch?v=5u0Ds7wzUeI&ab_channel=Astro)
 	- [#A] https://www.mintlify.com
@@ -34,7 +7,7 @@
 		- used by Blaxel.ai
 		-
 	- https://vitepress.dev/guide/what-is-vitepress static site generator used for documentation generation;
-		-
+	- https://www.mkdocs.org/user-guide/choosing-your-theme/
 	- ## resources:
 		- [https://www.reddit.com/r/selfhosted/comments/13z5xr4/plane_the_open_source_project_management_tool/](https://www.reddit.com/r/selfhosted/comments/13z5xr4/plane_the_open_source_project_management_tool/)
 		- [How I Use Logseq for Better Productivity and Organization at Work](https://www.youtube.com/watch?v=pS5fyFWsZT4)
