@@ -1,0 +1,18 @@
+{
+  "debounceTimeout": 300,
+  "ignoreOpenFiles": false,
+  "ignoreForceViewAll": false,
+  "folders": [
+    {
+      "folder": "doc-work/journal/",
+      "viewMode": "obsidianEditingMode: live"
+    }
+  ],
+  "files": [
+    {
+      "filePattern": "",
+      "viewMode": ""
+    }
+  ],
+  "folder": "doc-work/journal"
+}

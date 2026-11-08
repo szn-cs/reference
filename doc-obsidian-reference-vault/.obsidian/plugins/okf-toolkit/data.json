@@ -1,0 +1,63 @@
+{
+  "settingsVersion": 2,
+  "pageChrome": {
+    "enabled": true,
+    "titleFromFrontmatter": true,
+    "hueProperties": true,
+    "assetPanel": true,
+    "taskMeta": true,
+    "ctrlHoverPreview": true
+  },
+  "linkBadges": {
+    "enabled": true,
+    "sectionMark": true
+  },
+  "navigator": {
+    "enabled": true,
+    "explorerBadges": true,
+    "dailyCalendar": true
+  },
+  "styles": {
+    "embeddedBacklinksFade": true,
+    "bottomActivityToolbar": true,
+    "taskStatusBadges": true,
+    "noteGeometry": true,
+    "okfPropertyBadges": true,
+    "vividUiContrast": true
+  },
+  "journalStreamEditor": {
+    "hideFrontmatter": true,
+    "hideBacklinks": true,
+    "openOnStartup": false,
+    "readerMode": true,
+    "useArrowUpOrDownToNavigate": false,
+    "journalSources": [
+      {
+        "folder": "doc-spec/ideation",
+        "form": "journal"
+      },
+      {
+        "folder": "doc-product/retrospective",
+        "form": "journal"
+      },
+      {
+        "folder": "doc-spec",
+        "form": "document"
+      },
+      {
+        "folder": "doc-product",
+        "form": "document"
+      },
+      {
+        "folder": "doc-work/session",
+        "form": "document"
+      },
+      {
+        "folder": "doc-work/reference",
+        "form": "document"
+      }
+    ],
+    "preset": [],
+    "enabled": true
+  }
+}

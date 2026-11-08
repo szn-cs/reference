@@ -1,0 +1,5 @@
+- [:a {:href "#/all-journals"} "JOURNALS"] ^a-href-all-journals-journals
+- [[Tech Stack]]
+- [[Architecture Patterns & UX, processes]]
+- [[resource]]
+- [[Product ideas]]

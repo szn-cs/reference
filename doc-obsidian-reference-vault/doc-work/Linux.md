@@ -1,0 +1,14 @@
+- snap
+- vs codium
+- starship prompt
+- nvim & NvChad + custom font (Operator patched)
+- git & gh setup
+- gpu passthrough & VM
+- fedora speedup [https://www.youtube.com/shorts/1AnfDNGpjhQ](https://www.youtube.com/shorts/1AnfDNGpjhQ)
+- [https://developer.gnome.org/documentation/tools/sysprof.html](https://developer.gnome.org/documentation/tools/sysprof.html)
+
+# Terminal
+
+- zsh & OhMyZsh shell/terminal
+- Warp - modern terminal
+    - has scaling issue (cannot zoom UI interface!)

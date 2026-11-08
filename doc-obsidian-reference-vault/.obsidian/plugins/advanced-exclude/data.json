@@ -1,0 +1,7 @@
+{
+  "excludeMode": "Full",
+  "obsidianIgnoreContent": "*\n!*/\n!doc-*/\n!doc-*/**\ndoc-work/logseq/\n",
+  "shouldHideEmptyFolders": false,
+  "shouldIgnoreExcludedFiles": true,
+  "shouldIncludeGitIgnorePatterns": true
+}

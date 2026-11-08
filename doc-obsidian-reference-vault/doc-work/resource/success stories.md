@@ -1,0 +1,11 @@
+- <!--ScriptorStartFragment-->Labeling data for AI companies by hiring third=world workers or experts in specific areas which provide answers to questions or mark & explain images - Alexandr Wang [The 27-Year-Old Billionaire Whose Army Does AI’s Dirty Work](https://www.wsj.com/tech/ai/alexandr-wang-scale-ai-d7c6efd7)
+
+# Read list:
+
+- [ ] <!--ScriptorStartFragment-->[https://www.reddit.com/r/incremental_games/s/LpQirVG7hy](https://www.reddit.com/r/incremental_games/s/LpQirVG7hy)
+
+# Resources:
+
+- [https://www.youtube.com/@theschoolofhardknocks/videos](https://www.youtube.com/@theschoolofhardknocks/videos)  summarize lessons/maxims phrases أقوال أحكام
+- [https://www.youtube.com/@DeepDivewithAliAbdaal/videos](https://www.youtube.com/@DeepDivewithAliAbdaal/videos)
+- [https://open.spotify.com/show/7vC4mEgUTKe7BJNzdHBvPo?si=UQxYsrpPS5i5k-H9xuLHyg&nd=1&dlsi=37146287f8b440b1](https://open.spotify.com/show/7vC4mEgUTKe7BJNzdHBvPo?si=UQxYsrpPS5i5k-H9xuLHyg&nd=1&dlsi=37146287f8b440b1)

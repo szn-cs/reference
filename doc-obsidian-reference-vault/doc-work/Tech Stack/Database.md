@@ -1,0 +1,57 @@
+# Databases
+
+- [Supabase | The Postgres Development Platform.](https://supabase.com/)  (OLTP, developer platform with postgres extensions and client libraries, exposes REST/GraphQL automatically, realtime updates, OSS self-hosted, storage integration, etc.) + Postgres
+    - [GitHub - supabase-community/supabase-kubernetes: Helm 3 charts to deploy a Supabase on Kubernetes](https://github.com/supabase-community/supabase-kubernetes)
+    - Tools like pg_stat_statements and load testing with k6 can help identify performance bottlenecks
+- OLAP Metabase
+- postgres operators:
+    - [StackGres | Enterprise Postgres made easy. On Kubernetes.](https://stackgres.io/) (not as popular; supports supabase and supports more extensions; referenced in Supabase docs; Easier to setup; provides webui simplifying cluster management + CRDs for each aspect to control; supports official postgres image with no modification)
+        - stackGres operator [OperatorHub.io | The registry for Kubernetes Operators](https://operatorhub.io/operator/stackgres)
+        - Supabase is versioning is purposely made difficult to get and support latest postgresql versions. Also the kubernetes lacks documentation and discussions do not conclude with a straight forward approach to setup Supabase.
+    - CNPG [GitHub - cloudnative-pg/cloudnative-pg: CloudNativePG is a comprehensive platform designed to seamlessly manage PostgreSQL databases within Kubernetes environments, covering the entire operational ...](https://github.com/cloudnative-pg/cloudnative-pg) (popular and polished, most mature, production-level operator; doesn't use StatefulSets instead a custom controller which is not standard may cause some incompatibility with tools relying on Kubernetes standards; )
+        - uses for backups [Barman](https://pgbarman.org/)
+    - [GitHub - CrunchyData/postgres-operator: Production PostgreSQL for Kubernetes, from high availability Postgres clusters to full-scale database-as-a-service.](https://github.com/CrunchyData/postgres-operator)
+    - Zalando Postgres Operator [GitHub - zalando/postgres-operator: Postgres operator creates and manages PostgreSQL clusters running in Kubernetes](https://github.com/zalando/postgres-operator) (second most used operator; less content on youtube than CNPG)
+    - Bitnami’s PostgreSQL-HA chart (Avoid - has a split brain bug)
+- postgressSQL
+- option to connect Kubernetes to managed cloud database (e.g. using `helm upgrade pg-sqlproxy rimusz/gcloud-sqlproxy --namespace sqlproxy ...`)
+- Neo4J, MongoDB, PosgreSQL
+- MinIO [GitHub - minio/minio: MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license.](https://github.com/minio/minio)
+- TablePlus SQL GUI
+    - Darling to run MacOS .dmg application on Linux [Installing software - Darling Docs](https://docs.darlinghq.org/installing-software.html)
+    - [GitHub - SxtBox/TablePlus_1x_License_Activation: TablePlus Database Client 1.x License Activation](https://github.com/SxtBox/TablePlus_1x_License_Activation)
+- **PgBouncer** proxy - connection pooling in front of postgres instance
+    - > PgBouncer solves global database connection scalability by multiplexing thousands of client connections across many app instances into a small, shared pool of actual PostgreSQL backend connections — something an in-process pool like deadpool cannot do because it only manages connections within a single application process.
+- **Rust pgfdb** (experimental) with FoundationDB as storage engine: Projects like pgfdb (and its professional cousins like **Neon**, **AlloyDB**, and **PolarDB**) treat Postgres as a "SQL Translator" (Compute) and offload the actual "Data Durability" to a distributed layer (Storage).
+- observability:
+    - pganalyze - query insights & index recommendations;
+    - datadog
+- [GitHub - graphile/crystal: 🔮 Graphile's Crystal Monorepo; home to Grafast, PostGraphile, pg-introspection, pg-sql2 and much more!](https://github.com/graphile/crystal)
+- database chart and diagrams: drawdb vs chartdb vs ...
+    - [GitHub - chartdb/chartdb: Database diagrams editor that allows you to visualize and design your DB with a single query.](https://github.com/chartdb/chartdb)
+    - [GitHub - liam-hq/liam: Automatically generates beautiful and easy-to-read ER diagrams from your database.](https://github.com/liam-hq/liam)
+    - [https://mermaid.live](https://mermaid.live/)
+    - [azimutt/INSTALL.md at main · azimuttapp/azimutt](https://github.com/azimuttapp/azimutt/blob/main/INSTALL.md) (modern presentation; paid features require unlocking)
+- [deprecated]  ~~Trunk package manager for Postgres~~
+- [commercial product] KubeDB - production-ready kubernetes database supports multiple database types.
+- **SQLite**: single-file data storage relational DBMS; can be bundled entirely into the binary;
+- **db navigation tools**
+    - [https://github.com/CodePhiliaX/Chat2DB](https://github.com/CodePhiliaX/Chat2DB)
+- **Conclusions**
+    - ~~StackGres + ~~**~~Suprabase~~**~~ (Postgresql + extra features)~~
+        - [awesome choice, but less straight forward to setup initially with supabase] CNPG operator to run postgres + Barman (for backup recovery)
+    - ~~StackGres + Postgresql (+extensions) ~~
+    - Postgresql (+extensions) + CNPG + Rust tokio-postgres (+ postgres-types)
+        - connection pooling: [hard to decide which crate, will choose the one with more activity downloads / github stars [GitHub - deadpool-rs/deadpool: Dead simple pool implementation for rust with async-await](https://github.com/deadpool-rs/deadpool)
+        - generate functions from SQL queries [GitHub - cornucopia-rs/cornucopia: Generate type-checked Rust from your PostgreSQL.](https://github.com/cornucopia-rs/cornucopia)
+        - ChartDB design database
+        - **GraphQL**** tools**
+        - Refinery code-based to run/manage migrations + Kubernetes InitContainer to execute the migraitons before the service.
+
+---
+# In-memory database for caching
+
+- Redis
+- [Upstash for Redis](https://docs.upstash.com/redis) is a fully-managed, Redis-compatible database service offering global read replicas for reduced latency in distant regions.
+
+---

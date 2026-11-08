@@ -1,0 +1,1 @@
+/home/unixuser/code/lib-tool/plugin-okf-toolkit/artifact/main.js

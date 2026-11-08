@@ -1,2 +1,0 @@
-- Smile simulation - AI generates post-treatment simulations for orthodontics, cosmetic operatirve dentistry, facial dermal injections.
--

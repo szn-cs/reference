@@ -1,0 +1,8 @@
+- Linux VirtManager unattended installation:
+    - **Pressed/Autoinstall with ISO**
+      conslution:: for simple ubuntu server setup, manual installation and cloning is easier.
+- Ubuntu server download [https://ubuntu.com/download/server/thank-you?version=24.04.3&architecture=amd64](https://ubuntu.com/download/server/thank-you?version=24.04.3&architecture=amd64)<s=true
+
+# Resources:
+
+- Guide for windows 11 in virtual manager on linux [https://gist.github.com/mag37/7be87af23a75eb7e6c6193ca93812d26](https://gist.github.com/mag37/7be87af23a75eb7e6c6193ca93812d26)

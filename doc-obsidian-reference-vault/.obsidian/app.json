@@ -1,0 +1,18 @@
+{
+  "readableLineLength": false,
+  "userIgnoreFilters": [
+    "/^(?!(?:doc-[^/]+|\\.obsidian|templates)(?:\\/|$)).+\\//",
+    "/^doc-work\\/logseq\\//"
+  ],
+  "useMarkdownLinks": true,
+  "defaultViewMode": "source",
+  "strictLineBreaks": false,
+  "propertiesInDocument": "visible",
+  "foldHeading": true,
+  "showLineNumber": false,
+  "newLinkFormat": "relative",
+  "showUnsupportedFiles": true,
+  "livePreview": true,
+  "attachmentFolderPath": "doc-work/asset",
+  "reduceMotion": true
+}

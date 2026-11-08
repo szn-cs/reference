@@ -1,0 +1,760 @@
+{
+  "spaces": [
+    {
+      "id": "muxcup0xviubt6c235b",
+      "name": "Enable auto-save",
+      "timestamp": 1791547636750,
+      "windowState": {
+        "size": {
+          "width": 4819,
+          "height": 2711
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "workspace": {
+        "layout": {
+          "id": "7a0359bb1bfd2587",
+          "type": "window",
+          "children": [
+            {
+              "id": "08854a45bd591338",
+              "type": "tabs",
+              "dimension": 85.80570098894707,
+              "children": [
+                {
+                  "id": "4ff0a11eb91ee20d",
+                  "type": "leaf",
+                  "pinned": true,
+                  "state": {
+                    "type": "markdown",
+                    "state": {
+                      "file": "doc-work/session/2026-10-07-floating-toolbar-feature.md",
+                      "mode": "preview",
+                      "source": false,
+                      "backlinks": true,
+                      "backlinkOpts": {
+                        "collapseAll": false,
+                        "extraContext": false,
+                        "sortOrder": "alphabetical",
+                        "showSearch": false,
+                        "searchQuery": "",
+                        "backlinkCollapsed": false,
+                        "unlinkedCollapsed": true
+                      }
+                    },
+                    "pinned": true,
+                    "icon": "lucide-file",
+                    "title": "2026-10-07-floating-toolbar-feature"
+                  }
+                },
+                {
+                  "id": "b62a1790eae2155c",
+                  "type": "leaf",
+                  "state": {
+                    "type": "markdown",
+                    "state": {
+                      "file": "doc-spec/feature/floating-toolbar.md",
+                      "mode": "preview",
+                      "source": false,
+                      "backlinks": true,
+                      "backlinkOpts": {
+                        "collapseAll": false,
+                        "extraContext": false,
+                        "sortOrder": "alphabetical",
+                        "showSearch": false,
+                        "searchQuery": "",
+                        "backlinkCollapsed": false,
+                        "unlinkedCollapsed": true
+                      }
+                    },
+                    "icon": "lucide-file",
+                    "title": "floating-toolbar"
+                  }
+                }
+              ]
+            }
+          ],
+          "direction": "vertical",
+          "x": 16,
+          "y": 10,
+          "width": 1026,
+          "height": 802,
+          "maximize": false,
+          "zoom": 2
+        },
+        "activeFile": "doc-work/session/2026-09-29-implement-product-spec.md",
+        "leaves": [
+          {
+            "id": "4ff0a11eb91ee20d",
+            "type": "markdown",
+            "state": {
+              "file": "doc-work/session/2026-10-07-floating-toolbar-feature.md",
+              "mode": "preview",
+              "source": false,
+              "backlinks": true,
+              "backlinkOpts": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            },
+            "pinned": true
+          },
+          {
+            "id": "b62a1790eae2155c",
+            "type": "markdown",
+            "state": {
+              "file": "doc-spec/feature/floating-toolbar.md",
+              "mode": "preview",
+              "source": false,
+              "backlinks": true,
+              "backlinkOpts": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            },
+            "pinned": false
+          },
+          {
+            "id": "c61f0bb3ea3d729b",
+            "type": "outline",
+            "state": {
+              "file": "doc-work/session/2026-10-07-floating-toolbar-feature.md",
+              "followCursor": false,
+              "showSearch": false,
+              "searchQuery": ""
+            },
+            "pinned": false
+          },
+          {
+            "id": "ae7bb24fefcfc529",
+            "type": "markdown",
+            "state": {
+              "file": "doc-work/index.md",
+              "mode": "preview",
+              "source": false
+            }
+          },
+          {
+            "id": "25d03cf8bb4f67c5",
+            "type": "markdown",
+            "state": {
+              "file": "doc-work/session/2026-09-29-implement-product-spec.md",
+              "mode": "preview",
+              "source": false,
+              "backlinks": true,
+              "backlinkOpts": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "3a5e339d5bc82be2",
+            "type": "markdown",
+            "state": {
+              "file": "doc-spec/index.md",
+              "mode": "preview",
+              "source": false
+            }
+          },
+          {
+            "id": "fb2eeac873773f51",
+            "type": "file-explorer",
+            "state": {
+              "sortOrder": "alphabetical",
+              "autoReveal": false,
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          },
+          {
+            "id": "a4adb2d134ac0f1b",
+            "type": "search",
+            "state": {
+              "query": "",
+              "matchingCase": false,
+              "explainSearch": false,
+              "collapseAll": false,
+              "extraContext": false,
+              "sortOrder": "alphabetical"
+            }
+          },
+          {
+            "id": "27cbeb6daedb283c",
+            "type": "bookmarks",
+            "state": {
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          },
+          {
+            "id": "0877f61e19ccc905",
+            "type": "folder-spaces-explorer",
+            "state": {
+              "sortOrder": "alphabetical",
+              "autoReveal": false,
+              "showSearch": false,
+              "searchQuery": "",
+              "folderPath": "doc-work",
+              "viewMode": "tree",
+              "depthMode": "all-level",
+              "contentMode": "all",
+              "panelId": "d2abf4e8-b2eb-4f86-8047-e29b4b9af32b",
+              "parentPanelId": "native:fb2eeac873773f51",
+              "followParent": true
+            }
+          },
+          {
+            "id": "d1b53a4caffe8f24",
+            "type": "folder-spaces-explorer",
+            "state": {
+              "sortOrder": "alphabetical",
+              "autoReveal": false,
+              "showSearch": false,
+              "searchQuery": "",
+              "folderPath": "doc-spec",
+              "viewMode": "tree",
+              "depthMode": "one-level",
+              "contentMode": "all",
+              "panelId": "91980b94-6433-48a1-b657-ad9c81d9cf54",
+              "parentPanelId": null,
+              "followParent": true
+            }
+          },
+          {
+            "id": "eccfc718726b241e",
+            "type": "backlink",
+            "state": {
+              "file": "doc-work/session/2026-09-29-implement-product-spec.md",
+              "collapseAll": false,
+              "extraContext": false,
+              "sortOrder": "alphabetical",
+              "showSearch": false,
+              "searchQuery": "",
+              "backlinkCollapsed": false,
+              "unlinkedCollapsed": true
+            }
+          },
+          {
+            "id": "5e21c37bb0ff2a74",
+            "type": "outgoing-link",
+            "state": {
+              "file": "doc-work/session/2026-09-29-implement-product-spec.md",
+              "linksCollapsed": false,
+              "unlinkedCollapsed": true
+            }
+          },
+          {
+            "id": "47db978fd076d77f",
+            "type": "tag",
+            "state": {
+              "sortOrder": "frequency",
+              "useHierarchy": true,
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          },
+          {
+            "id": "55e1cabe676396fd",
+            "type": "all-properties",
+            "state": {
+              "sortOrder": "frequency",
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          },
+          {
+            "id": "81c959fd5c04fe58",
+            "type": "outline",
+            "state": {
+              "file": "doc-work/session/2026-09-29-implement-product-spec.md",
+              "followCursor": false,
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          },
+          {
+            "id": "4eab76868eb30ec5",
+            "type": "footnotes",
+            "state": {
+              "file": "doc-work/session/2026-09-29-implement-product-spec.md"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "fileCount": 10,
+        "tabCount": 17,
+        "splitCount": 0,
+        "createdAt": "2026-10-09T12:07:16.750Z",
+        "obsidianVersion": "unknown",
+        "pluginVersion": "1.2.9"
+      },
+      "windowInfo": {
+        "firstLeafId": "4ff0a11eb91ee20d"
+      },
+      "hidden": {},
+      "sidebarWidths": {
+        "left": 1859,
+        "right": 267
+      },
+      "createdAt": 1791332051506,
+      "updatedAt": 1791547636750,
+      "leafIdMarker": [
+        "4ff0a11eb91ee20d",
+        "b62a1790eae2155c",
+        "c61f0bb3ea3d729b"
+      ]
+    },
+    {
+      "id": "mvb1z2sl4epg2cmm1tu",
+      "name": "ai-native-collaborative-infinite-workspace, interfac...",
+      "timestamp": 1792160436610,
+      "windowState": {
+        "size": {
+          "width": 2711,
+          "height": 4819
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "workspace": {
+        "layout": {
+          "id": "1aab56639f680c9b",
+          "type": "window",
+          "children": [
+            {
+              "id": "93b97de4c192cdb9",
+              "type": "split",
+              "children": [
+                {
+                  "id": "64ca130092f06540",
+                  "type": "tabs",
+                  "children": [
+                    {
+                      "id": "c1acaf6c1bca090c",
+                      "type": "leaf",
+                      "state": {
+                        "type": "markdown",
+                        "state": {
+                          "file": "doc-spec/feature/ai-native-collaborative-infinite-workspace.md",
+                          "mode": "preview",
+                          "source": false,
+                          "backlinks": true,
+                          "backlinkOpts": {
+                            "collapseAll": true,
+                            "extraContext": false,
+                            "sortOrder": "alphabetical",
+                            "showSearch": false,
+                            "searchQuery": "",
+                            "backlinkCollapsed": false,
+                            "unlinkedCollapsed": true
+                          }
+                        },
+                        "icon": "lucide-file",
+                        "title": "ai-native-collaborative-infinite-workspace"
+                      }
+                    },
+                    {
+                      "id": "767aa2419aef4cd7",
+                      "type": "leaf",
+                      "state": {
+                        "type": "markdown",
+                        "state": {
+                          "file": "doc-work/assets/2026-10-11-workspace-editor-design-workflow/interfaces-inspiration.md",
+                          "mode": "preview",
+                          "source": false,
+                          "backlinks": true,
+                          "backlinkOpts": {
+                            "collapseAll": false,
+                            "extraContext": false,
+                            "sortOrder": "alphabetical",
+                            "showSearch": false,
+                            "searchQuery": "",
+                            "backlinkCollapsed": false,
+                            "unlinkedCollapsed": true
+                          }
+                        },
+                        "icon": "lucide-file",
+                        "title": "interfaces-inspiration"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "a01b9a11963cfbcc",
+                  "type": "tabs",
+                  "children": [
+                    {
+                      "id": "310aa796b7c33826",
+                      "type": "leaf",
+                      "state": {
+                        "type": "markdown",
+                        "state": {
+                          "file": "doc-work/session/2026-10-11-workspace-editor-design-workflow.md",
+                          "mode": "preview",
+                          "source": false,
+                          "backlinks": true,
+                          "backlinkOpts": {
+                            "collapseAll": false,
+                            "extraContext": false,
+                            "sortOrder": "alphabetical",
+                            "showSearch": false,
+                            "searchQuery": "",
+                            "backlinkCollapsed": false,
+                            "unlinkedCollapsed": true
+                          }
+                        },
+                        "icon": "lucide-file",
+                        "title": "2026-10-11-workspace-editor-design-workflow"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "direction": "horizontal"
+            }
+          ],
+          "direction": "vertical",
+          "x": 16,
+          "y": 10,
+          "width": 2161,
+          "height": 3841,
+          "maximize": false,
+          "zoom": 1.5
+        },
+        "leaves": [
+          {
+            "id": "c1acaf6c1bca090c",
+            "type": "markdown",
+            "state": {
+              "file": "doc-spec/feature/ai-native-collaborative-infinite-workspace.md",
+              "mode": "preview",
+              "source": false,
+              "backlinks": true,
+              "backlinkOpts": {
+                "collapseAll": true,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "767aa2419aef4cd7",
+            "type": "markdown",
+            "state": {
+              "file": "doc-work/assets/2026-10-11-workspace-editor-design-workflow/interfaces-inspiration.md",
+              "mode": "preview",
+              "source": false,
+              "backlinks": true,
+              "backlinkOpts": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "310aa796b7c33826",
+            "type": "markdown",
+            "state": {
+              "file": "doc-work/session/2026-10-11-workspace-editor-design-workflow.md",
+              "mode": "preview",
+              "source": false,
+              "backlinks": true,
+              "backlinkOpts": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "9fc95374d1bf6303",
+            "type": "file-explorer",
+            "state": {
+              "sortOrder": "alphabetical",
+              "autoReveal": false,
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          },
+          {
+            "id": "99359d7e2671a83e",
+            "type": "outline",
+            "state": {
+              "file": "doc-spec/feature/ai-native-collaborative-infinite-workspace.md",
+              "followCursor": false,
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          },
+          {
+            "id": "1ee7cae587518c06",
+            "type": "backlink",
+            "state": {
+              "file": "doc-spec/feature/ai-native-collaborative-infinite-workspace.md",
+              "collapseAll": false,
+              "extraContext": false,
+              "sortOrder": "alphabetical",
+              "showSearch": false,
+              "searchQuery": "",
+              "backlinkCollapsed": false,
+              "unlinkedCollapsed": true
+            }
+          },
+          {
+            "id": "1c3fc945b5cabbe7",
+            "type": "outgoing-link",
+            "state": {
+              "file": "doc-spec/feature/ai-native-collaborative-infinite-workspace.md",
+              "linksCollapsed": false,
+              "unlinkedCollapsed": true
+            }
+          },
+          {
+            "id": "a9722ff5f0a05fcd",
+            "type": "tag",
+            "state": {
+              "sortOrder": "frequency",
+              "useHierarchy": true,
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          },
+          {
+            "id": "af4433bc64be02d6",
+            "type": "all-properties",
+            "state": {
+              "sortOrder": "frequency",
+              "showSearch": false,
+              "searchQuery": ""
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "fileCount": 6,
+        "tabCount": 9,
+        "splitCount": 0,
+        "createdAt": "2026-10-16T14:20:05.813Z",
+        "obsidianVersion": "unknown",
+        "pluginVersion": "1.2.9"
+      },
+      "windowInfo": {
+        "firstLeafId": "c1acaf6c1bca090c"
+      },
+      "includeGeometry": true,
+      "activityBars": {
+        "left": {
+          "show": true,
+          "items": [
+            {
+              "viewType": "file-explorer",
+              "label": "File explorer",
+              "icon": "folder-closed",
+              "side": "left"
+            },
+            {
+              "viewType": "search",
+              "label": "Search",
+              "icon": "search",
+              "side": "left"
+            },
+            {
+              "viewType": "bookmarks",
+              "label": "Bookmarks",
+              "icon": "bookmark",
+              "side": "left"
+            },
+            {
+              "viewType": "window-spaces-layouts",
+              "label": "Window Spaces",
+              "icon": "layout",
+              "side": "left"
+            }
+          ]
+        },
+        "right": {
+          "show": true,
+          "items": [
+            {
+              "viewType": "outline",
+              "label": "Outline",
+              "icon": "list",
+              "side": "right"
+            },
+            {
+              "viewType": "all-properties",
+              "label": "Properties",
+              "icon": "archive",
+              "side": "right"
+            },
+            {
+              "viewType": "tag",
+              "label": "Tags",
+              "icon": "tags",
+              "side": "right"
+            },
+            {
+              "viewType": "backlink",
+              "label": "Backlinks",
+              "icon": "links-coming-in",
+              "side": "right"
+            }
+          ]
+        }
+      },
+      "hidden": {
+        "leftSidebar": false,
+        "rightSidebar": true,
+        "sidebarFlex": {
+          "left": 1,
+          "center": [
+            1
+          ],
+          "right": 1
+        }
+      },
+      "sidebarWidths": {
+        "left": 180,
+        "right": 180
+      },
+      "autoSave": false,
+      "sections": [],
+      "archived": false,
+      "createdAt": 1792160343164,
+      "updatedAt": 1792160436610,
+      "leafIdMarker": [
+        "676a8fa110176eda",
+        "6a37b727f6dd5d19",
+        "64aecfebcdf64bea",
+        "981f17477a1c0bec",
+        "99359d7e2671a83e",
+        "1ee7cae587518c06",
+        "1c3fc945b5cabbe7",
+        "a9722ff5f0a05fcd",
+        "af4433bc64be02d6"
+      ]
+    }
+  ],
+  "autoSave": true,
+  "showNotifications": false,
+  "version": "1.0.0",
+  "showLayoutStatusBar": true,
+  "layoutStatusBarDefaultApplied": true,
+  "showWindowLayoutsRibbonIcon": true,
+  "sortBy": "updated-desc",
+  "sectionsOrder": [],
+  "groupBySection": true,
+  "showArchived": false,
+  "defaultIcon": "square",
+  "colorPresets": [
+    "#3b82f6",
+    "#8b5cf6",
+    "#10b981",
+    "#f59e0b",
+    "#f43f5e",
+    "#06b6d4",
+    "#6366f1"
+  ],
+  "defaultBorderInset": 1,
+  "visualDefaultsVersion": 1,
+  "defaultShowFoldedCorner": true,
+  "activityBars": {
+    "left": [
+      {
+        "viewType": "file-explorer",
+        "label": "File explorer",
+        "icon": "folder-closed",
+        "side": "left"
+      },
+      {
+        "viewType": "search",
+        "label": "Search",
+        "icon": "search",
+        "side": "left"
+      },
+      {
+        "viewType": "bookmarks",
+        "label": "Bookmarks",
+        "icon": "bookmark",
+        "side": "left"
+      },
+      {
+        "viewType": "window-spaces-layouts",
+        "side": "left",
+        "icon": "layout",
+        "label": "Window Spaces"
+      }
+    ],
+    "right": [
+      {
+        "viewType": "outline",
+        "label": "Outline",
+        "icon": "list",
+        "side": "right"
+      },
+      {
+        "viewType": "all-properties",
+        "label": "Properties",
+        "icon": "archive",
+        "side": "right"
+      },
+      {
+        "viewType": "tag",
+        "label": "Tags",
+        "icon": "tags",
+        "side": "right"
+      },
+      {
+        "viewType": "backlink",
+        "label": "Backlinks",
+        "icon": "links-coming-in",
+        "side": "right"
+      }
+    ]
+  },
+  "activityBarDefaults": {
+    "left": false,
+    "right": false
+  },
+  "popoutAccents": {
+    "enabled": true,
+    "splitter": true,
+    "activityBar": true
+  },
+  "workspaceInterceptorEnabled": false
+}

@@ -1,0 +1,2175 @@
+/* Window Spaces Plugin Styles */
+
+/* Modal Styles */
+.window-spaces-modal {
+  width: 100%;
+  max-width: none;
+}
+
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-shrink: 0 !important;
+  min-height: 32px;
+}
+
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-toolbar input {
+  min-width: 0;
+  flex: 1;
+  height: 32px;
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  flex-shrink: 0 !important;
+  box-sizing: border-box;
+}
+
+.window-layouts-sort-select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller, 12px);
+  cursor: pointer;
+}
+
+.window-layouts-list {
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.layout-item {
+  padding: 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.layout-item:last-child {
+  border-bottom: none;
+}
+
+.layout-name {
+  font-weight: var(--font-semibold);
+  font-size: var(--font-ui-medium);
+  margin-bottom: 4px;
+  color: var(--text-normal);
+}
+
+.layout-details {
+  display: flex;
+  gap: 8px;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.layout-date,
+.layout-files,
+.layout-size {
+  background: var(--background-modifier-border);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: var(--font-ui-smaller);
+}
+
+/* Status Bar Styles */
+.status-bar-item.window-spaces {
+  cursor: pointer;
+  padding: 0 8px;
+  transition: background-color 0.2s;
+}
+
+.status-bar-item.window-spaces:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+/* Popout layout status-style label */
+.window-spaces-layout-status {
+  position: fixed;
+  z-index: var(--layer-popover, 100);
+  max-width: min(420px, 60vw);
+  overflow: hidden;
+  padding: 3px 10px;
+  background: color-mix(in srgb, var(--background-secondary) 92%, transparent);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.window-spaces-layout-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--interactive-accent);
+}
+
+.window-spaces-layout-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.window-spaces-layout-status {
+  bottom: 0;
+  left: 0;
+  border-top: 1px solid var(--background-modifier-border);
+  border-right: 1px solid var(--background-modifier-border);
+  border-top-right-radius: 6px;
+  text-align: left;
+}
+
+/* 當 Popout 視窗的左側 Activity Bar 展開且未隱藏時，Toolbar 自動向右避讓。
+   +1px 是讓 sidebar 的 rose-mix border-left（44-44.89）完整露出、與 activity bar
+   的 border-right 連續；left activity bar 隱藏時此規則不命中，回到基礎 left: 0。 */
+body.is-popout-window.window-spaces-has-left-activity:not(.window-spaces-left-activity-hidden)
+  .window-spaces-layout-status {
+  left: calc(var(--window-spaces-activity-bar-width, 44px) + 1px);
+  border-left: none;
+  border-top-left-radius: 0;
+}
+
+.window-spaces-layout-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 仿主視窗 vault switcher：space name 可點擊區域（含上下切換鈕） */
+.window-spaces-layout-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  margin-left: -6px;
+  border-radius: var(--radius-s, 4px);
+  cursor: pointer;
+  min-width: 0;
+  flex: 0 1 auto;
+  user-select: none;
+}
+.window-spaces-layout-name-wrap:hover {
+  background-color: var(--background-modifier-hover);
+}
+.window-spaces-layout-name-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: var(--text-muted);
+}
+.window-spaces-layout-name-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* toolbar space 選單：固定 icon 容器寬度，讓 emoji 與 lucide icon 的 title 起始位置對齊
+   （Obsidian 預設容器隨內容寬度（svg 16px / emoji ~17.9px），導致 title 位移） */
+.menu.window-spaces-space-menu .menu-item-icon {
+  width: 18px;
+  flex: 0 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 2026-08 Folder Spaces 協作需求：space 選單視覺增強（純裝飾）
+   1. per-space accent color：icon 與 title 套用該色
+   2. 左上角折角（與視窗 has-window-space-folded-corner 一致；大小約 item 高度 1/3）
+   3. active space 的 ✓ 由 title 文字提供（window-spaces-menu-active class 供樣式延伸） */
+.menu.window-spaces-space-menu .menu-item {
+  position: relative;
+}
+.menu.window-spaces-space-menu .menu-item.window-spaces-space-accent,
+.menu.window-spaces-space-menu .menu-item.window-spaces-space-accent .menu-item-icon {
+  color: var(--menu-item-accent, var(--text-muted));
+}
+.menu.window-spaces-space-menu .menu-item.has-space-menu-fold::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(
+    to bottom right,
+    var(--fold-color, var(--text-muted)) 50%,
+    transparent 50.5%
+  );
+  pointer-events: none;
+}
+
+/* active space 打勾：右對齊（menu item 為 flex，::after margin-left:auto 推至最右） */
+.menu.window-spaces-space-menu .menu-item.window-spaces-menu-active::after {
+  content: "✓";
+  margin-left: auto;
+  padding-left: 8px;
+  color: var(--text-normal);
+}
+
+.window-spaces-layout-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.window-spaces-layout-action {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 2px;
+  border: 0;
+  border-radius: 4px;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.window-spaces-layout-action:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.window-spaces-layout-action:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+.window-spaces-layout-action svg {
+  width: var(--icon-s, 16px);
+  height: var(--icon-s, 16px);
+}
+
+@media (max-width: 520px) {
+  .window-spaces-layout-status {
+    max-width: 70vw;
+  }
+}
+
+/* Setting Tab Styles */
+.layout-management-item {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: var(--background-secondary);
+}
+
+.layout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.layout-info {
+  display: flex;
+  gap: 12px;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.layout-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.layout-actions button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  transition: background-color 0.2s;
+}
+
+.layout-actions button:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+button.mod-warning.mod-warning,
+button.mod-destructive.mod-destructive,
+.layout-actions button.mod-warning.mod-warning {
+  background-color: var(--background-modifier-error, var(--color-red));
+  color: var(--text-on-accent, #ffffff);
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+button.mod-warning.mod-warning:hover,
+button.mod-destructive.mod-destructive:hover,
+.layout-actions button.mod-warning.mod-warning:hover {
+  background-color: var(--background-modifier-error-hover, var(--color-red-hover, #dc2626));
+  color: var(--text-on-accent, #ffffff);
+  border-color: transparent;
+}
+
+/* Layout Stats */
+.layout-stats {
+  background: var(--background-secondary);
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border-left: 4px solid var(--interactive-accent);
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .layout-details {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .layout-actions {
+    flex-direction: column;
+  }
+  
+  .layout-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Animation */
+.layout-item {
+  transition: background-color 0.2s;
+}
+
+.layout-item:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+/* Focus Styles */
+.layout-actions button:focus {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* Unified Window Layouts modal */
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(680px, calc(100vw - 40px));
+  max-width: none;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding-bottom: 2px !important;
+}
+
+/* The shared content root sits inside the Modal host. Do not let its
+   desktop width exceed the actual popout dialog width. */
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-modal .window-layouts-modal {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding-bottom: 0 !important;
+}
+
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-modal .modal-content {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 6px 0 0 !important;
+  margin-bottom: 0 !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.window-layouts-description {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+}
+
+.window-layouts-modal .window-layouts-toolbar {
+  margin-bottom: 4px;
+  padding: 0 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-modal .window-layouts-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0 !important;
+  min-height: 32px;
+}
+
+.window-layouts-modal .window-layouts-search-container input[type="search"] {
+  width: 100%;
+  box-sizing: border-box;
+  height: var(--input-height);
+  min-height: 0;
+  padding: var(--input-padding);
+  padding-left: calc(var(--search-icon-size) * 2 - 2px);
+  padding-right: 36px;
+  border-radius: var(--search-input-radius);
+  background: var(--background-modifier-form-field);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+}
+
+.window-layouts-modal .window-layouts-search-clear {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  inset-inline-end: 2px;
+  margin: auto;
+  width: 28px;
+  height: var(--input-height);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: var(--cursor);
+  color: var(--search-clear-button-color, var(--text-muted));
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  line-height: 0;
+  text-align: center;
+  transition: color var(--anim-duration-fast, 140ms) ease-in-out;
+  z-index: 2;
+}
+
+.window-layouts-modal .window-layouts-search-clear::after {
+  content: "";
+  display: block;
+  width: var(--search-clear-button-size, 13px);
+  height: var(--search-clear-button-size, 13px);
+  background-color: currentcolor;
+  -webkit-mask-image: url("data:image/svg+xml,<svg viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' clip-rule='evenodd' d='M6 12C9.31371 12 12 9.31371 12 6C12 2.68629 9.31371 0 6 0C2.68629 0 0 2.68629 0 6C0 9.31371 2.68629 12 6 12ZM3.8705 3.09766L6.00003 5.22718L8.12955 3.09766L8.9024 3.8705L6.77287 6.00003L8.9024 8.12955L8.12955 8.9024L6.00003 6.77287L3.8705 8.9024L3.09766 8.12955L5.22718 6.00003L3.09766 3.8705L3.8705 3.09766Z' fill='currentColor'/></svg>");
+  mask-image: url("data:image/svg+xml,<svg viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' clip-rule='evenodd' d='M6 12C9.31371 12 12 9.31371 12 6C12 2.68629 9.31371 0 6 0C2.68629 0 0 2.68629 0 6C0 9.31371 2.68629 12 6 12ZM3.8705 3.09766L6.00003 5.22718L8.12955 3.09766L8.9024 3.8705L6.77287 6.00003L8.9024 8.12955L8.12955 8.9024L6.00003 6.77287L3.8705 8.9024L3.09766 8.12955L5.22718 6.00003L3.09766 3.8705L3.8705 3.09766Z' fill='currentColor'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.window-layouts-modal .window-layouts-search-clear:hover {
+  color: var(--text-normal);
+}
+
+.window-layouts-modal .suggestion-flair {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-ui-smaller, 11px);
+  padding: 2px 6px;
+  border-radius: var(--tag-radius, var(--radius-s, 4px));
+  background-color: var(--tag-background, var(--background-modifier-accent-subtle, var(--background-modifier-border)));
+  color: var(--tag-color, var(--text-accent));
+  font-weight: var(--font-semibold, 500);
+  white-space: nowrap;
+}
+
+/* Persistent ItemView version of the layouts picker */
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-panel {
+  height: 100%;
+  box-sizing: border-box;
+  /* File Explorer starts its nav-header at the top of the leaf. Keep the
+     same top edge so the toolbar buttons have the same vertical padding. */
+  padding: 0 8px 6px 8px !important;
+  margin-top: 0 !important;
+  overflow: hidden;
+}
+
+/* The ItemView is also the content component's root. Keep its width fluid;
+   the Modal host supplies its own constrained width. */
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-panel.window-layouts-modal {
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  padding-bottom: 4px !important;
+}
+
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-panel .window-layouts-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 0 !important;
+  flex-shrink: 0 !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.window-layouts-header-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.window-layouts-panel .window-layouts-panel-header h2 {
+  margin: 0;
+  padding: 0;
+  font-size: var(--font-ui-medium, 14px);
+  line-height: 1.2;
+}
+
+/* Both locations receive the same native nav-header/nav-buttons-container
+   DOM, so Obsidian governs their height and border identically. */
+.window-layouts-panel .window-layouts-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-left: 0;
+  gap: var(--size-2-1, 2px);
+}
+
+.window-layouts-panel .window-layouts-toolbar {
+  margin-bottom: var(--size-4-1, 4px);
+}
+
+/* Hide standard view-header for Window Spaces leaves in both tab and sidebar, matching File Explorer */
+.workspace-leaf.mod-window-spaces-leaf .view-header,
+.workspace-leaf-content[data-type="window-spaces-layouts"] ~ .view-header,
+.workspace-leaf-content[data-type="window-spaces-layouts"] .view-header {
+  display: none !important;
+}
+
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-panel .window-layouts-toolbar {
+  flex-wrap: nowrap;
+  max-width: 100%;
+  box-sizing: border-box;
+  /* overflow-x: clip keeps horizontal clipping without forcing the Y axis to
+     auto (which would clip the focused input's focus ring on the top edge). */
+  overflow-x: clip;
+  flex-shrink: 0 !important;
+  min-height: 32px;
+}
+
+.window-layouts-panel .window-layouts-list {
+  max-height: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.window-layouts-panel .prompt-instructions {
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+  flex-shrink: 0;
+  gap: 4px 10px;
+  margin-top: 4px;
+}
+
+/* Footer keyboard hints in the persistent panel are hidden by default and
+   only appear while the mouse hovers the panel or the panel leaf is active.
+   The 3-class selector outranks .window-layouts-modal .prompt-instructions. */
+.window-layouts-panel.window-layouts-modal .prompt-instructions {
+  display: none;
+}
+.window-layouts-panel.window-layouts-modal:hover .prompt-instructions,
+.workspace-leaf.mod-active .window-layouts-panel.window-layouts-modal .prompt-instructions {
+  display: flex;
+}
+
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-panel .window-layouts-toolbar .qsp-action-btn {
+  flex: 0 0 auto;
+  height: 32px;
+  min-height: 32px;
+  padding-left: 10px;
+  padding-right: 10px;
+  white-space: nowrap;
+  flex-shrink: 0 !important;
+  box-sizing: border-box;
+}
+
+.window-layouts-panel .suggestion-aux.qsp-aux.layout-actions {
+  gap: 4px;
+}
+
+.window-layouts-panel .layout-actions button {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+/* Simplified list items matching native Obsidian workspace layout modal */
+.window-layouts-modal .window-layouts-list {
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  gap: 3px;
+}
+
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY)
+   EXCEPTION: cursor 依 2026-08-13 使用者要求改為預設指標（不再手型）。 */
+.window-layouts-modal .suggestion-item.window-layout-item {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-s, 4px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden !important;
+  cursor: default;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0 !important;
+  min-height: 44px;
+}
+
+.window-layouts-modal .suggestion-item.window-layout-item:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.window-layouts-modal .suggestion-item.window-layout-item.is-selected {
+  background-color: var(--background-modifier-hover);
+  box-shadow: none;
+}
+
+.window-layouts-modal .suggestion-content.qsp-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden !important;
+  margin-right: 0;
+}
+
+.window-layouts-modal .suggestion-title.qsp-title {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+  font-size: var(--font-ui-medium, 14px);
+  color: var(--text-normal);
+  line-height: 1.3;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Match the Space identity in the switcher with the popout corner treatment. */
+.window-space-title-visual {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin-right: 6px;
+}
+
+/* The accent belongs to the whole Space panel, not to the icon/name row. */
+.window-layouts-modal .suggestion-item.window-layout-item.has-window-space-accent-fold::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 12px;
+  height: 12px;
+  z-index: 0;
+  background: linear-gradient(
+    to bottom right,
+    var(--window-space-color) 50%,
+    transparent 50.5%
+  );
+  pointer-events: none;
+}
+
+/* Space with an accent color: tint the panel icon with that color
+   (svg icons follow currentColor; emoji keep their own colors).
+   has-window-space-accent = 有 accent color（icon 上色）；
+   has-window-space-accent-fold = color + Show fold corner（左上角折疊標示）。 */
+.window-layouts-modal .suggestion-item.window-layout-item.has-window-space-accent .window-space-item-icon {
+  color: var(--window-space-color);
+}
+
+.window-layouts-modal .suggestion-item.window-layout-item > * {
+  position: relative;
+  z-index: 1;
+}
+
+.window-layouts-modal .suggestion-note.qsp-note {
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden !important;
+  line-height: var(--line-height-tight, 1.3);
+}
+
+.window-layouts-modal .qsp-path {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden !important;
+  /* 避讓 icon 寬度，使剩餘文字開頭與 Space name 文字對齊
+     (10px item padding + 18px icon + 6px gap) */
+  padding: 0 0 0 24px;
+  margin: 0;
+}
+
+.window-layouts-modal .layout-date,
+.window-layouts-modal .layout-files {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.window-layouts-modal .layout-open-status {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-success, #2ea44f);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.window-layouts-modal .suggestion-aux.qsp-aux.layout-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.window-layouts-modal .layout-actions button {
+  padding: 4px 12px;
+  border-radius: var(--radius-s, 4px);
+  border: 1px solid var(--background-modifier-border);
+  background-color: var(--interactive-normal);
+  color: var(--text-normal);
+  cursor: pointer;
+  font-size: var(--font-ui-small, 13px);
+  line-height: var(--line-height-normal, 1.4);
+  box-shadow: var(--input-shadow);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.window-layouts-modal .layout-actions button:hover {
+  background-color: var(--interactive-hover);
+  border-color: var(--background-modifier-border-hover);
+}
+
+.window-layouts-modal .layout-actions .layout-restore-btn {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent, #ffffff);
+  border: 1px solid var(--interactive-accent);
+  font-weight: var(--font-medium, 500);
+}
+
+.window-layouts-modal .layout-actions .layout-more-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--clickable-icon-size);
+  min-width: var(--clickable-icon-size);
+  height: var(--clickable-icon-size);
+  padding: var(--size-2-2);
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent, #ffffff);
+  border: 1px solid var(--interactive-accent);
+  font-weight: var(--font-medium, 500);
+}
+
+.window-layouts-modal .layout-actions .layout-more-btn.layout-more-btn svg {
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.window-layouts-modal .layout-actions .layout-restore-btn:hover,
+.window-layouts-modal .layout-actions .layout-more-btn.layout-more-btn:hover,
+.window-layouts-modal .layout-actions .layout-more-btn.layout-more-btn:focus-visible {
+  background-color: var(--interactive-accent-hover, var(--interactive-accent));
+  border-color: var(--interactive-accent-hover, var(--interactive-accent));
+  color: var(--text-on-accent, #ffffff);
+  opacity: 0.92;
+}
+
+.window-layouts-modal .layout-actions .layout-more-btn.layout-more-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.window-layouts-modal .layout-actions .layout-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  box-shadow: none;
+  cursor: pointer;
+  border-radius: var(--radius-s, 4px);
+}
+
+.window-layouts-modal .layout-actions .layout-delete-btn:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* Floating layout actions: keep the list visually clean until the user
+   points at an item (or reaches its controls with the keyboard). */
+.window-layouts-modal .suggestion-item.window-layout-item .layout-actions {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: 8px;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-s, 4px);
+  background: transparent;
+  box-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(8px, -50%, 0);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.window-layouts-modal .suggestion-item.window-layout-item:hover .layout-actions,
+.window-layouts-modal .suggestion-item.window-layout-item:focus-within .layout-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, -50%, 0);
+}
+/* Footer prompt instructions matching native Obsidian suggestion modals */
+/* CRITICAL: user 驗證過，不要動到!! (Verified by user, DO NOT MODIFY) */
+.window-layouts-modal .prompt-instructions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 12px;
+  padding: 0;
+  margin: 4px 0 2px 0 !important;
+  border-top: none;
+  background-color: transparent;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller, 11px);
+  line-height: var(--line-height-tight, 1.15);
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+  flex-shrink: 0;
+}
+
+.window-layouts-modal .prompt-instruction {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.15;
+}
+
+.window-layouts-modal .prompt-instruction-command {
+  font-weight: var(--font-semibold, 600);
+  color: var(--text-muted);
+  line-height: 1.15;
+}
+
+/* Loading State */
+.layout-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: var(--text-muted);
+}
+
+.layout-loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--background-modifier-border);
+  border-top: 2px solid var(--interactive-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  color: var(--text-normal);
+}
+
+.empty-state p {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* Success/Error States */
+.success-message {
+  color: var(--text-success);
+  background: var(--background-success);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.error-message {
+  color: var(--text-error);
+  background: var(--background-error);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+/* Full width input layout for Rename and Save modals */
+.window-spaces-setting-full-width.window-spaces-setting-full-width {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: none;
+  padding: 8px 0 16px 0;
+}
+
+.window-spaces-setting-full-width.window-spaces-setting-full-width .setting-item-info {
+  flex: 0 0 auto;
+  margin-right: 8px;
+  min-width: 60px;
+}
+
+.window-spaces-setting-full-width.window-spaces-setting-full-width .setting-item-control {
+  flex: 1 1 auto;
+  width: 100%;
+  justify-content: stretch;
+}
+
+.window-spaces-setting-full-width.window-spaces-setting-full-width .setting-item-control input[type="text"] {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Tooltip text alignment (start-aligned for LTR/RTL multi-language support) */
+.tooltip.tooltip {
+  text-align: start;
+  white-space: pre-line;
+}
+
+.layout-auto-save-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  color: var(--interactive-accent);
+  vertical-align: middle;
+}
+
+.layout-auto-save-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.layout-auto-save-btn.is-active.is-active,
+.window-spaces-layout-action.is-active.is-active {
+  color: var(--interactive-accent);
+  opacity: 1;
+}
+
+/* ===== Dialog action rows (shared across modals) ===== */
+.ws-dialog-actions {
+  text-align: right;
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+.ws-dialog-actions button + button {
+  margin-left: 10px;
+}
+
+/* ===== WindowLayoutsModal title row ===== */
+.window-layouts-modal .modal-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Reserve the native close-button zone when header actions are present so
+   the panel menu button never sits underneath the X in popup windows. */
+.window-layouts-modal .modal-title.has-header-actions {
+  padding-right: 32px;
+}
+
+/* Keep the native close X and the Window Spaces actions as separate controls. */
+.window-layouts-popout-modal .modal-title.has-header-actions {
+  padding-right: 0;
+}
+
+/* Popup-only toolbar treatment. Keep the native X outside this panel so the
+   two controls read as separate UI elements even when the X is present. */
+.window-layouts-popout-modal .modal-title .window-layouts-header-actions {
+  flex: 0 0 auto;
+  margin-left: 1em;
+  margin-right: 1em;
+  padding: 2px 4px;
+  gap: 2px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m, 8px);
+  background-color: var(--background-secondary);
+  box-shadow: var(--shadow-s);
+  box-sizing: border-box;
+}
+
+/* ===== Section list headers ===== */
+/* Cursor matches the Option page's Activity Bar view items (grab/grabbing)
+   so section bars read as draggable. The Space items inside a section keep
+   their own (default) cursor. Left padding is 0 so the drag indicator can
+   sit at the very edge; the indicator's negative right margin keeps the
+   section title text aligned with the Space items' icon column (10px). */
+.space-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 6px 0;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  background: transparent;
+  border-bottom: 1px solid var(--background-modifier-border);
+  user-select: none;
+  cursor: grab;
+}
+.space-section-header:active {
+  cursor: grabbing;
+}
+.space-section-header.is-dragging {
+  opacity: 0.5;
+}
+.space-section-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+/* 前方拖曳指示圖示：grip 表示可拖曳排序；is-static（Uncategorized）為低調
+   占位，表示不可移動（不支援拖曳排序）。margin-right 4px 讓 title 文字從
+   icon 右緣之後開始（CDP 實測：icon 16px，負 margin 曾造成 6px 重疊），
+   同時仍不超過 space name 文字位置。 */
+.space-section-drag-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  color: var(--text-muted);
+  opacity: 0.55;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.space-section-drag-indicator svg {
+  width: 13px;
+  height: 13px;
+}
+.space-section-drag-indicator.is-static {
+  opacity: 0.3;
+}
+/* Uncategorized 等不可排序的 section bar：滑鼠指標用預設指標（不可拖曳） */
+.space-section-header.is-static,
+.space-section-header.is-static:active {
+  cursor: default;
+}
+.space-section-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-normal);
+}
+.space-section-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.8;
+  margin-left: 6px;
+}
+.space-section-rename-input {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 1px 4px;
+  max-width: 150px;
+}
+.space-section-header-right {
+  display: flex;
+  align-items: center;
+}
+.space-section-arrow {
+  color: var(--text-muted);
+  padding: 2px;
+}
+
+/* ===== Archived layout items ===== */
+.suggestion-item.window-layout-item.is-archived {
+  opacity: 0.55;
+  color: var(--text-muted);
+}
+.layout-archived-badge {
+  margin-left: 6px;
+  opacity: 0.75;
+}
+
+/* ===== Save modal ===== */
+.save-overwrite-notice {
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-accent, #70a7ff);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.ws-info-title {
+  margin-bottom: 4px;
+}
+.space-sections-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.window-spaces-modal-top-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: -4px;
+  margin-bottom: 12px;
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-muted);
+}
+
+.window-layouts-modal .setting-item-heading,
+.window-layouts-modal .setting-group-heading {
+  margin-top: 18px !important;
+  margin-bottom: 8px !important;
+}
+.window-spaces-stat-item {
+  display: inline-flex;
+  align-items: center;
+}
+.space-section-pill {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  padding: 2px 8px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.space-section-pill:hover {
+  background: var(--interactive-accent-hover);
+}
+.space-section-pill-unselected {
+  background: transparent;
+  color: var(--text-normal);
+  padding: 2px 8px;
+  border: 1px solid var(--interactive-accent);
+  border-radius: 12px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.space-section-pill-unselected:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent-hover);
+}
+
+/* ===== Popout Activity Bars ===== */
+/* Activity Bar 尺寸以 Obsidian 原生變數為準（不硬編碼），讓不同解析度 /
+   縮放 / 使用者主題調整 ribbon 時自動跟隨：
+   - --ribbon-width：ribbon 寬（原生 44px，可被主題/設定覆寫）
+   - --ribbon-padding：ribbon 內距（原生 8px 4px 12px）
+   - --icon-l：按鈕 icon 尺寸（原生 18px）
+   --window-spaces-activity-bar-width 同時被 body margin 避讓與 tab header
+   padding 引用，統一在此定義。 */
+:root {
+  --window-spaces-activity-bar-width: var(--ribbon-width, 44px);
+}
+
+/* CRITICAL: 與左右側欄 padding 連動，修改時需同時檢視 body class 規則 */
+.window-spaces-activity-bar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: var(--window-spaces-activity-bar-width, var(--ribbon-width, 44px));
+  z-index: var(--layer-side-dock, 10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 對齊主視窗 ribbon：按鈕間距用 --size-2-3（6px），與 .side-dock-actions
+     的 gap 一致（實測 ribbon 的 action 包在 side-dock-actions 容器內，
+     gap 為 6px，非 ribbon 容器的 4px）；水平/底部 padding 沿用 ribbon 變數
+     （--size-4-1 = 4px、--ribbon-padding = 8px 4px 12px）。
+     左側 bar 的 top padding 由 drag 區接管（0），右側 bar 因有 border-top
+     保留 6px top padding。 */
+  gap: var(--size-2-3, 6px);
+  padding: 0 var(--size-4-1, 4px) var(--size-4-3, 12px) var(--size-4-1, 4px);
+  box-sizing: border-box;
+  /* 對齊 sidebar 區與 editor tab area tabbar 的 non-active 底色 */
+  background-color: var(--ribbon-background, var(--background-secondary));
+  user-select: none;
+}
+.window-spaces-activity-left {
+  left: 0;
+  top: 0;
+  border-right: var(--divider-width, var(--tab-outline-width, 1px)) solid var(--divider-color, var(--tab-outline-color, var(--background-modifier-border)));
+  /* Drag 區接管 titlebar 全高：移除頂部 padding，讓 drag 區從視窗頂開始。
+     其餘 padding（4px 水平 / 12px 底部）繼承基礎規則，與 ribbon 一致。 */
+  padding: 0 var(--size-4-1, 4px) var(--size-4-3, 12px) var(--size-4-1, 4px);
+}
+.window-spaces-activity-right {
+  right: 0;
+  /* Titlebar（z-index 30）會覆蓋 top 0 到 header-height 的區域；讓 bar
+     自身從相同的 header 起點開始，避免以固定 top 減去宣告 border 寬度。
+     在異質 DPI 下，1px border 的實際 rasterized 寬度可能是 0.8px，
+     因此不能用 `header-height - tab-outline-width` 來定位另一條線。 */
+  top: 0;
+  border-left: var(--divider-width, var(--tab-outline-width, 1px)) solid var(--divider-color, var(--tab-outline-color, var(--background-modifier-border)));
+  padding: 0 var(--size-4-1, 4px) var(--size-4-3, 12px) var(--size-4-1, 4px);
+}
+
+/* 右側 bar 的上方區域與左側 .window-spaces-activity-drag、以及原生
+   .workspace-tab-header-container 共用同一個 header box 定義。Pseudo element
+   不會蓋住右上角原生控制鈕（titlebar z-index 較高），但能讓其下方的 border
+   由同一個 height + border-bottom 組合產生，跨 DPI 仍落在同一個 raster row。 */
+.window-spaces-activity-right::before {
+  content: "";
+  flex: 0 0 auto;
+  width: calc(100% + 2 * var(--size-4-1, 4px));
+  margin: 0 calc(-1 * var(--size-4-1, 4px));
+  height: var(--header-height, 40px);
+  border-bottom: var(--tab-outline-width, 1px) solid var(--tab-outline-color, var(--background-modifier-border));
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* 右側 Activity Bar 顯示時，最右邊 column 的 tab header 以負 margin 延伸至視窗右緣：
+   mod-root 的 margin-right 只避讓 view-content（不被 Activity Bar 覆蓋），
+   tab header 則回填 titlebar 區域（系統按鈕左側），避免右上角出現與 Activity
+   Bar 等寬的色差區塊。系統按鈕 z-index 較高仍可正常點擊，tab header 延伸區
+   同時是拖曳區（-webkit-app-region: drag），與左側 Activity Bar 全高覆蓋對稱。 */
+body.is-popout-window.window-spaces-has-right-activity
+  .workspace-split.mod-root > :last-child .workspace-tab-header-container {
+  margin-right: calc(-1 * var(--window-spaces-activity-bar-width, 44px));
+}
+
+/* Popout 視窗右上角系統按鈕（最小化、最大化、關閉）：
+   確保按鈕容器及內部所有子節點（svg, rect, path 等）皆具備明確的 no-drag 與 pointer-events，
+   防止底層 workspace-tab-header-container 的 -webkit-app-region: drag 穿透導致 mouseover 與 click 失效。 */
+body.is-popout-window .titlebar-button-container.mod-right,
+body.is-popout-window .titlebar-button-container.mod-right *,
+body.is-popout-window .titlebar-button,
+body.is-popout-window .titlebar-button * {
+  -webkit-app-region: no-drag !important;
+  pointer-events: auto !important;
+}
+body.is-popout-window .titlebar-button-container.mod-right {
+  z-index: var(--layer-popover, 100) !important;
+}
+
+/* 讓 popout 內容避開左右固定列 */
+body.is-popout-window.window-spaces-has-left-activity .workspace-split.mod-root {
+  margin-left: var(--window-spaces-activity-bar-width, 44px);
+}
+body.is-popout-window.window-spaces-has-right-activity .workspace-split.mod-root {
+  margin-right: var(--window-spaces-activity-bar-width, 44px);
+}
+
+/* 每個 Activity Bar 頂端（標題列高度）的拖曳區：拖曳移動整個視窗 */
+.window-spaces-activity-drag {
+  flex: 0 0 auto;
+  /* 負 margin 抵消 bar 的水平 padding（--size-4-1），讓拖曳區保持 bar 全寬、
+     邊緣也能拖曳視窗；margin 不影響後續按鈕的 gap 排版 */
+  width: calc(100% + 2 * var(--size-4-1, 4px));
+  margin: 0 calc(-1 * var(--size-4-1, 4px));
+  /* 高度 = header-height，讓 border-bottom 與 tab header 的 border-bottom
+     在同一水平（0→header-height，border 底緣對齊）；使用與
+     .workspace-tab-header-container 相同的 --tab-outline-* 變數，避免跨螢幕/DPI 1px 偏差 */
+  height: var(--header-height, 40px);
+  -webkit-app-region: drag;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--icon-m, 16px);
+  user-select: none;
+  border-bottom: var(--tab-outline-width, 1px) solid var(--tab-outline-color, var(--background-modifier-border));
+  box-sizing: border-box;
+}
+.window-spaces-activity-left .window-spaces-activity-drag + .window-spaces-activity-btn,
+.window-spaces-activity-left .window-spaces-activity-btn:first-of-type {
+  /* 與 ribbon 相對齊：toggle 緊貼拖曳區（ribbon 首按鈕為貼齊頂部），
+     間距由容器 gap 控制，不額外加 margin。 */
+  margin-top: 0;
+}
+.window-spaces-activity-drag svg {
+  width: var(--icon-m, 16px);
+  height: var(--icon-m, 16px);
+  color: var(--window-space-color, var(--text-muted));
+}
+.window-spaces-activity-drag .window-spaces-drag-emoji {
+  line-height: 1;
+  font-size: var(--icon-m, 16px);
+}
+
+/* Keep the Space icon visible even when the left Activity Bar is hidden. */
+.window-spaces-space-identity {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--window-spaces-activity-bar-width, 44px);
+  height: var(--header-height, 40px);
+  z-index: 102;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--window-space-color, var(--text-muted));
+  pointer-events: auto;
+  cursor: default;
+  user-select: none;
+  /* The identity is also the fallback drag region when the left Activity Bar
+     is hidden. Keep it draggable in both states so the icon never becomes an
+     unreliable dead spot at the top-left corner. */
+  -webkit-app-region: drag;
+}
+.window-spaces-space-identity .window-spaces-space-icon {
+  position: absolute;
+  /* 對齊 tab header icon：尺寸用 --icon-l（與 tab icon 相同變數），
+     並以變數計算置中於 area，主題調整 ribbon 寬 / header 高 / icon 大小時
+     自動跟隨，垂直中心與 tab icon 一致 */
+  top: calc((var(--header-height, 40px) - var(--icon-l, 18px)) / 2);
+  left: calc((var(--window-spaces-activity-bar-width, 44px) - var(--icon-l, 18px)) / 2);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-l, 18px);
+  height: var(--icon-l, 18px);
+  line-height: 1;
+  font-size: var(--icon-l, 18px);
+  pointer-events: auto;
+  -webkit-app-region: drag;
+}
+.window-spaces-space-identity .window-spaces-space-icon svg {
+  width: var(--icon-l, 18px);
+  height: var(--icon-l, 18px);
+  color: var(--window-space-color, var(--text-muted));
+}
+
+/* When the left Activity Bar is present it owns its own drag strip. Let the
+   identity remain visible above the fold, while remaining interactive for context menu and dragging. */
+body.is-popout-window.window-spaces-has-left-activity:not(.window-spaces-left-activity-hidden)
+  .window-spaces-space-identity {
+  left: 0;
+  width: var(--window-spaces-activity-bar-width, 44px);
+  height: var(--header-height, 40px);
+  top: 0;
+  pointer-events: auto;
+  -webkit-app-region: drag;
+}
+
+body.is-popout-window.window-spaces-has-left-activity:not(.window-spaces-left-activity-hidden)
+  .window-spaces-space-identity .window-spaces-space-icon {
+  /* 與基礎規則一致：對齊 tab header icon（--icon-l、置中於 area） */
+  top: calc((var(--header-height, 40px) - var(--icon-l, 18px)) / 2);
+  left: calc((var(--window-spaces-activity-bar-width, 44px) - var(--icon-l, 18px)) / 2);
+  width: var(--icon-l, 18px);
+  height: var(--icon-l, 18px);
+  pointer-events: auto;
+  -webkit-app-region: drag;
+}
+
+/* Explicit state class for the fallback drag region. The important flags keep
+   this usable even when Obsidian's titlebar rules or a stale Activity Bar
+   state briefly win the cascade during a sidebar toggle. */
+.window-spaces-space-identity.window-spaces-space-identity-drag-region {
+  left: 0 !important;
+  width: var(--window-spaces-activity-bar-width, 44px) !important;
+  height: var(--header-height, 40px) !important;
+  top: 0 !important;
+  background-color: var(--background-secondary) !important;
+  border-right: var(--divider-width, var(--tab-outline-width, 1px)) solid var(--divider-color, var(--tab-outline-color, var(--background-modifier-border))) !important;
+  border-bottom: var(--tab-outline-width, 1px) solid var(--tab-outline-color, var(--background-modifier-border)) !important;
+  border-radius: 0 !important;
+  pointer-events: auto !important;
+  -webkit-app-region: drag !important;
+}
+
+.window-spaces-space-identity.window-spaces-space-identity-drag-region
+  .window-spaces-space-icon {
+  pointer-events: auto !important;
+  -webkit-app-region: drag !important;
+}
+
+/* The Popout accent belongs to the whole window outer edge. Keep it as a
+   bottom layer for the frame, but the folded corner must stay above the
+   Space identity (z 102) so it stays visible even when the left Activity Bar
+   is hidden and identity becomes an opaque drag-region. */
+body.is-popout-window.has-window-space-folded-corner::before {
+  content: "";
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 18px;
+  height: 18px;
+  /* Above the colored Activity Bar background and the Space identity (102). */
+  z-index: 103;
+  background: linear-gradient(
+    to bottom right,
+    var(--window-space-color) 50%,
+    transparent 50.5%
+  );
+  pointer-events: none;
+}
+
+.workspace-tab-header-container.window-spaces-space-identity-tab-header {
+  padding-left: calc(var(--window-spaces-activity-bar-width, 44px) + var(--tab-container-padding-left, 8px)) !important;
+}
+
+
+/* Popout 視窗 4 邊全方向自訂主題顏色邊框 (使用 fixed ::after 頂層覆蓋，動態適應各 OS/主題之視窗圓角) */
+body.is-popout-window.has-window-space-border::after {
+  content: "";
+  position: fixed;
+  inset: 0 !important;
+  box-sizing: border-box !important;
+  border: var(--window-space-border-inset, var(--border-width, 1px)) solid var(--window-space-color) !important;
+  pointer-events: none !important;
+  z-index: 999999 !important;
+  /* 視窗本身由 OS（Windows 11 DWM 等）套用圓角，預設繼承 Obsidian 原生視窗/選單圓角 --radius-m (8px)，支援自訂覆寫 */
+  border-radius: var(--window-space-corner-radius, var(--radius-m, 8px)) !important;
+  box-shadow: none !important;
+}
+
+/* Windows 11/10 DWM Frameless 外框補償：
+   1. 僅在 Windows 無邊框且一般（非最大化、非全螢幕）狀態下生效，避免污染 macOS / Linux。
+   2. Windows DWM 於視窗外緣繪製 1 個物理像素的系統焦點外框，且 Chromium 視口右/下因次像素捨入產生裁切。
+   3. 透過 Obsidian 原生 --border-width 與 --zoom-factor 進行動態除法計算：
+      左/上內縮 1 個邊框單位、右/下內縮 2 個邊框單位，並除以 --zoom-factor 確保使用者調整視圖縮放時物理位移不變。 */
+body.mod-windows.is-frameless.is-popout-window:not(.is-maximized, .is-fullscreen).has-window-space-border::after {
+  top: calc(var(--border-width, 1px) / var(--zoom-factor, 1)) !important;
+  left: calc(var(--border-width, 1px) / var(--zoom-factor, 1)) !important;
+  right: calc(calc(var(--border-width, 1px) * 2) / var(--zoom-factor, 1)) !important;
+  bottom: calc(calc(var(--border-width, 1px) * 2) / var(--zoom-factor, 1)) !important;
+}
+
+/* 當視窗最大化或全螢幕時：
+   Windows 系統會將 sizing frame 移至工作區外並停用 DWM 外框，客戶區完全對齊螢幕。
+   四邊必須完整還原貼齊邊界（inset: 0），並取消圓角，避免露底或產生不對稱內縮空隙。 */
+body.is-popout-window.is-maximized.has-window-space-border::after,
+body.is-popout-window.is-fullscreen.has-window-space-border::after {
+  inset: 0 !important;
+  border-radius: 0 !important;
+}
+
+body.is-popout-window.has-window-space-border .window-spaces-activity-left {
+  border-left: none;
+}
+
+/* ==========================================================================
+   Popout Space Theme Accents (Tab Header, Splitter, Panel Focus, Activity Bar)
+   Controlled by global settings & scoped under body.has-space-accents-*
+   ========================================================================== */
+
+/* 1. Tab Header: Active Tab 頂部細線、柔和底色與分頁欄底線 */
+body.is-popout-window.has-window-space-color.has-space-accents-tab {
+  --tab-background-active: color-mix(
+    in srgb,
+    var(--window-space-color) 12%,
+    var(--background-primary)
+  );
+  --tab-outline-color: color-mix(
+    in srgb,
+    var(--window-space-color) 35%,
+    var(--background-modifier-border)
+  );
+  --tab-divider-color: color-mix(
+    in srgb,
+    var(--tab-outline-color) 40%,
+    transparent
+  );
+}
+
+body.is-popout-window.has-window-space-color.has-space-accents-tab
+  .workspace-tab-header.is-active
+  .workspace-tab-header-inner::before {
+  /* 2026-02 反饋：最前面的 tab 不需要特別的 top border highlight，禁用色條 */
+  display: none !important;
+}
+
+body.is-popout-window.has-window-space-color.has-space-accents-tab
+  .workspace-tab-header-container {
+  border-bottom: var(--tab-outline-width, 1px) solid var(--tab-outline-color) !important;
+}
+
+/* 2026-02 反饋：Obsidian 的 container-inner 有 margin-bottom: -1px 且背景不透明，
+   會向下延伸蓋住 container 的 accent border-bottom（non-active tab 與 "+" 鍵左下方
+   的 border 因此消失）。背景透明後露出完整 border；active tab 維持自身 box-shadow。 */
+body.is-popout-window.has-window-space-color.has-space-accents-tab
+  .workspace-tab-header-container-inner {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* tab 之間的 1px 垂直分隔線（inner::after）套用更透明的 accent 色 */
+body.is-popout-window.has-window-space-color.has-space-accents-tab
+  .workspace-tab-header-inner::after {
+  background-color: color-mix(
+    in srgb,
+    var(--tab-outline-color) 40%,
+    transparent
+  ) !important;
+}
+
+/* tab 的 pin 圖示（pip button）套用 accent color */
+body.is-popout-window.has-window-space-color
+  .workspace-tab-header-status-icon.mod-pinned {
+  color: var(--window-space-color) !important;
+}
+
+/* 2. Splitters: 窗格調整分隔線 — 常態與一般 border 相同（divider 色、divider 寬、透明背景），
+   僅 Hover / 拖曳時以 space color 高亮；背景填滿整個 handle（原生尺寸為 --divider-width-hover）
+   因此 hover 時自然變粗。 */
+/* 當欄位（包含左側欄、右側欄或編輯區）為上下分割（mod-horizontal）時，其內部各 tab 之間的 handle
+   必須為橫向分隔線（row-resize），覆蓋 Obsidian 原生 .mod-right-split 將其誤設為縱向 col-resize 的問題。 */
+body.is-popout-window .workspace-split.mod-horizontal > * > .workspace-leaf-resize-handle {
+  bottom: 0 !important;
+  top: unset !important;
+  inset-inline-start: 0 !important;
+  inset-inline-end: 0 !important;
+  width: 100% !important;
+  height: var(--divider-width-hover) !important;
+  cursor: row-resize !important;
+  border-bottom-style: solid !important;
+  border-bottom-width: var(--divider-width) !important;
+  border-inline-start-style: none !important;
+  border-inline-end-style: none !important;
+  border-top-style: none !important;
+}
+
+/* 縱向欄位間的分隔線（左側欄與編輯區、編輯區與右側欄）由前一欄的 right-edge handle 負責；
+   隱藏 mod-root 最後一欄自身頂層的 handle（> :last-child > .workspace-leaf-resize-handle），
+   避免右側欄左緣產生重複 handle 且拖曳時誤位移右側邊框（此規則不影響最後一欄內部的子 split）；
+   若右側欄收合隱藏（.window-spaces-column-hidden），則前一欄右側 handle 自動隱藏。 */
+body.is-popout-window .workspace-split.mod-root > :last-child > .workspace-leaf-resize-handle {
+  display: none !important;
+}
+
+body.is-popout-window .workspace-split.mod-root > .window-spaces-has-hidden-next > .workspace-leaf-resize-handle {
+  display: none !important;
+}
+
+body.is-popout-window.has-window-space-color.has-space-accents-splitter
+  .workspace-leaf-resize-handle {
+  background-color: transparent !important;
+  border-color: var(--divider-color) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+body.is-popout-window.has-window-space-color.has-space-accents-splitter
+  .workspace-leaf-resize-handle:hover,
+body.is-popout-window.has-window-space-color.has-space-accents-splitter
+  .workspace-leaf-resize-handle:active {
+  background-color: var(--window-space-color) !important;
+  border-color: var(--window-space-color) !important;
+  box-shadow: 0 0 8px
+    color-mix(in srgb, var(--window-space-color) 70%, transparent) !important;
+}
+
+/* 3. Panel Border & Focus Outline: 窗格邊框與焦點指示
+   .workspace-tabs 的 top border 若直接套在 layout box 上，會把原生
+   .workspace-tab-header-container 往下推；在非整數 DPR 時，該 layout border
+   與 activity bar / tab header 的 border 會落在不同的 raster row。保留左右與
+   底部 border 作為 panel frame，只有 top edge 改用 overlay，避免改變 flex/split
+   的版面尺寸。 */
+body.is-popout-window.has-window-space-color.has-space-accents-panel
+  .workspace-tabs {
+  position: relative;
+  border-top: 0 !important;
+  border-right: var(--tab-outline-width, 1px) solid var(--tab-outline-color) !important;
+  border-bottom: var(--tab-outline-width, 1px) solid var(--tab-outline-color) !important;
+  border-left: var(--tab-outline-width, 1px) solid var(--tab-outline-color) !important;
+}
+
+/* Overlay the panel's top edge in the same coordinate space as the native tab
+   header. A zero-height pseudo element paints the border without consuming
+   layout space, so it stays aligned when the window moves between displays. */
+body.is-popout-window.has-window-space-color.has-space-accents-panel
+  .workspace-tabs::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: var(--tab-outline-width, 1px) solid var(--tab-outline-color) !important;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 3a. Maximized windows with zero outer frame inset
+   `has-window-space-border` is enabled only when the saved frame inset is
+   greater than zero. When it is absent in a maximized window, the root panel
+   perimeter touches the viewport edge; suppress only those top/bottom panel
+   edges so they are not mistaken for the outer frame. Borders at an internal
+   split remain intact. The selectors follow Obsidian's root layout structure
+   and do not depend on a platform-specific window size or pixel offset. */
+body.is-popout-window.is-maximized.has-window-space-color.has-space-accents-panel:not(.has-window-space-border)
+  .workspace-split.mod-root > .workspace-tabs::after,
+body.is-popout-window.is-maximized.has-window-space-color.has-space-accents-panel:not(.has-window-space-border)
+  .workspace-split.mod-root > .workspace-split > .workspace-tabs:first-of-type::after {
+  content: none !important;
+}
+
+body.is-popout-window.is-maximized.has-window-space-color.has-space-accents-panel:not(.has-window-space-border)
+  .workspace-split.mod-root > .workspace-tabs,
+body.is-popout-window.is-maximized.has-window-space-color.has-space-accents-panel:not(.has-window-space-border)
+  .workspace-split.mod-root > .workspace-split > .workspace-tabs:last-of-type {
+  border-bottom: 0 !important;
+}
+
+body.is-popout-window.has-window-space-color.has-space-accents-panel
+  .workspace-tabs:focus-within {
+  /* 2026-02 反饋：active content window 不需要在 border 特別高亮，移除 focus outline */
+  outline: none !important;
+  outline-offset: -1px !important;
+}
+
+/* 4. Activity Bars: 左右活動列、左上角空間識別區與左下角 Toolbar 注入柔和空間底色 */
+body.is-popout-window.has-window-space-color.has-space-accents-activity-bar
+  .window-spaces-activity-left,
+body.is-popout-window.has-window-space-color.has-space-accents-activity-bar
+  .window-spaces-activity-right,
+body.is-popout-window.has-window-space-color.has-space-accents-activity-bar
+  .window-spaces-space-identity.window-spaces-space-identity-drag-region,
+body.is-popout-window.has-window-space-color.has-space-accents-activity-bar
+  .window-spaces-layout-status {
+  background-color: color-mix(
+    in srgb,
+    var(--window-space-color) 12%,
+    var(--background-secondary)
+  ) !important;
+}
+
+/* 2026-02 反饋：activity bar 的 border（含 drag 區 border-bottom）統一 35% rose，
+   與 tab header 的 accent border 同色，解決灰 border 在 rose-tint 背景上對比度不足 */
+body.is-popout-window.has-window-space-color.has-space-accents-activity-bar
+  .window-spaces-activity-bar,
+body.is-popout-window.has-window-space-color.has-space-accents-activity-bar
+  .window-spaces-activity-drag,
+body.is-popout-window.has-window-space-color.has-space-accents-activity-bar
+  .window-spaces-space-identity.window-spaces-space-identity-drag-region {
+  border-color: color-mix(
+    in srgb,
+    var(--window-space-color) 35%,
+    var(--background-modifier-border)
+  ) !important;
+}
+
+/* 左下角 toolbar 的 border-top / border-right（含右上角圓角）套用相同 accent 色 */
+body.is-popout-window.has-window-space-color.has-space-accents-activity-bar
+  .window-spaces-layout-status {
+  border-top-color: color-mix(
+    in srgb,
+    var(--window-space-color) 35%,
+    var(--background-modifier-border)
+  ) !important;
+  border-right-color: color-mix(
+    in srgb,
+    var(--window-space-color) 35%,
+    var(--background-modifier-border)
+  ) !important;
+}
+
+/* 2026-02 反饋：activity bar 的「上方 border」（drag 區 border-bottom / 右側 pseudo
+   header border-bottom）
+   顏色須與「其他方向」的視覺邊界一致。當 panel accent 作用時，activity bar 的垂直
+   邊界由相鄰 sidebar 的亮線主導；因此上方 border 也套用相同亮色，避免上方灰線與
+   垂直亮線不一致（Activity Bar tint 本身仍由 has-space-accents-activity-bar 控制）。 */
+body.is-popout-window.has-window-space-color.has-space-accents-panel
+  .window-spaces-activity-left .window-spaces-activity-drag {
+  border-bottom-color: color-mix(
+    in srgb,
+    var(--window-space-color) 35%,
+    var(--background-modifier-border)
+  ) !important;
+}
+body.is-popout-window.has-window-space-color.has-space-accents-panel
+  .window-spaces-activity-right::before {
+  border-bottom-color: color-mix(
+    in srgb,
+    var(--window-space-color) 35%,
+    var(--background-modifier-border)
+  ) !important;
+}
+
+.window-spaces-activity-hidden {
+  display: none !important;
+}
+
+/* A hidden Popout sidebar must release its split allocation as well as hide
+   its contents. Split proportions now use Obsidian's native flex-grow weight
+   semantics, so `display: none` alone removes the column from flex layout and
+   the remaining columns automatically redistribute by weight. The explicit
+   `flex-grow: 0` is kept as a belt-and-suspenders guard in case Obsidian
+   reapplies an inline flex-grow during a layout update. */
+.window-spaces-column-hidden {
+  display: none !important;
+  flex-grow: 0 !important;
+  width: 0 !important;
+  min-width: 0 !important;
+}
+
+/* 統一 Activity Bar、左上角拖曳區、以及所有 Tab Header Container 區域之背景色 */
+body.is-popout-window,
+body.is-popout-window .workspace-tabs,
+body.is-popout-window .workspace-tabs:not(.mod-sidedock) {
+  --tab-container-background: var(--background-secondary) !important;
+}
+
+body.is-popout-window .window-spaces-activity-bar,
+body.is-popout-window .workspace-tabs .workspace-tab-header-container,
+body.is-popout-window .workspace-tabs:not(.mod-sidedock) .workspace-tab-header-container,
+body.is-popout-window .workspace-tab-header-container-inner,
+body.is-popout-window .workspace-tab-header-tab-list,
+body.is-popout-window .workspace-tab-header-spacer {
+  background-color: var(--background-secondary) !important;
+  background: var(--background-secondary) !important;
+}
+
+/* Activity Bar 頂部的拖曳區域使用透明底色，自然呈現 Activity Bar 的底色 */
+.window-spaces-activity-drag {
+  background: transparent !important;
+}
+
+.window-spaces-activity-btn {
+  flex: 0 0 auto;
+  /* 對齊 ribbon action button：尺寸由變數計算，主題調整 --icon-l 或
+     --size-* 時自動跟隨（原生 ribbon action 同為 icon-l + size-2 padding）。
+     寬 = icon-l + 2×size-2-3（18+6×2=30）、高 = icon-l + 2×size-2-2（18+4×2=26） */
+  width: calc(var(--icon-l, 18px) + 2 * var(--size-2-3, 6px));
+  height: calc(var(--icon-l, 18px) + 2 * var(--size-2-2, 4px));
+  padding: var(--size-2-2, 4px) var(--size-2-3, 6px);
+  border: none;
+  border-radius: var(--clickable-icon-radius, var(--radius-s, 4px));
+  background: transparent;
+  color: var(--icon-color, var(--text-muted));
+  cursor: var(--cursor, pointer);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.window-spaces-activity-btn:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--icon-color-hover, var(--text-normal));
+}
+.window-spaces-activity-btn.is-active {
+  color: var(--tab-text-color-active, var(--text-normal));
+  background-color: var(--background-modifier-hover);
+  border: none !important;
+  box-shadow: none !important;
+}
+.window-spaces-activity-btn.is-disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.window-spaces-activity-btn.is-disabled:hover {
+  background-color: transparent;
+  color: var(--text-muted);
+}
+.window-spaces-activity-btn svg {
+  /* icon 尺寸對齊 ribbon（--icon-l） */
+  width: var(--icon-l, 18px);
+  height: var(--icon-l, 18px);
+}
+
+/* Popout Activity Bar Native Sidebar Toggle Button Styling。
+   Toggle 鈕的 layout（尺寸 / padding / 間距）一律繼承 .window-spaces-activity-btn
+   基礎樣式，與其他按鈕一致；此處只保留 icon 圖形的特別樣式。 */
+/* 收合狀態由 is-collapsed / is-open class 控制（JS 僅同步 class，不寫 inline style）。 */
+.window-spaces-sidebar-toggle-btn .sidebar-toggle-icon-inner {
+  stroke: none;
+  transition: width 0.15s ease;
+}
+
+.window-spaces-sidebar-toggle-btn.is-collapsed .sidebar-toggle-icon-inner {
+  width: var(--sidebar-left-toggle-inner-width, 8.33%);
+}
+
+.window-spaces-sidebar-toggle-btn.is-open .sidebar-toggle-icon-inner {
+  width: var(--sidebar-left-toggle-inner-width-open, 24%);
+}
+
+.window-spaces-sidebar-toggle-btn.mod-right svg {
+  transform: scale(-1, 1);
+}
+
+.window-spaces-sidebar-toggle-btn.mod-right .sidebar-toggle-icon-inner {
+  width: var(--sidebar-right-toggle-inner-width, 8.33%);
+}
+
+.window-spaces-sidebar-toggle-btn.mod-right.is-open .sidebar-toggle-icon-inner {
+  width: var(--sidebar-right-toggle-inner-width-open, 24%);
+}
+
+/* 側欄欄位（被判定為 sidebar 的頂層欄）：底色與邊距對齊主視窗 sidebar */
+.window-spaces-sidebar-column,
+.window-spaces-sidebar-column .workspace-tabs,
+.window-spaces-sidebar-column .workspace-leaf-content {
+  background-color: var(--background-secondary);
+}
+
+/* Popout 的整個 root 是 `.workspace-split.mod-root`，Obsidian 的
+   `.workspace-split.mod-root .view-content { background: var(--background-primary) }`
+   會把側欄內 view 的 content area 也套成編輯區底色。主視窗側欄是獨立的
+   `.mod-left-split` 不受此規則影響，因此這裡要將側欄 view-content 改為透明，
+   讓其上層的 `--background-secondary` 透出，與主視窗側欄一致。 */
+.window-spaces-sidebar-column .workspace-leaf-content .view-content {
+  background-color: transparent;
+}
+
+/* 隱藏側欄 view 的標準標題列（黑色 View 名稱列）。主視窗側欄是獨立的
+   `.workspace-split.mod-left-split/mod-right-split`，Obsidian 用
+   `.workspace-split.mod-left-split .view-header { display: none }` 隱藏；
+   popout 的側欄欄位可能是 `.workspace-tabs`（非 split），該規則不命中，
+   因此這裡統一以 `.window-spaces-sidebar-column` 為錨點隱藏。 */
+.window-spaces-sidebar-column .view-header {
+  display: none !important;
+}
+
+/* 側欄視圖內容容器：防止 Popout 側欄（all properties, tags, file explorer, outline 等）出現不必要的橫向捲軸 */
+.window-spaces-sidebar-column .view-content,
+.window-spaces-sidebar-column .tag-container,
+.window-spaces-sidebar-column .search-result-container,
+.window-spaces-sidebar-column .outgoing-link-pane,
+.window-spaces-sidebar-column .backlink-pane,
+.window-spaces-sidebar-column .workspace-leaf-content,
+.window-spaces-sidebar-column .workspace-tab-header-container-inner {
+  overflow-x: hidden !important;
+}
+
+
+
+/* Popout 視窗頂層側欄固定寬度：不隨視窗縮放、最大化或分頁開關而等比例伸展，由中央內容欄位彈性吸收所有寬度變化 */
+body.is-popout-window .workspace-split.mod-root > .window-spaces-sidebar-column:not(.window-spaces-column-hidden) {
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  flex-basis: auto !important;
+  width: var(--sidebar-width, 260px);
+  min-width: 180px;
+  max-width: 80vw;
+}
+
+/* 頂層中央內容區域彈性填滿其餘空間 */
+body.is-popout-window .workspace-split.mod-root > :not(.window-spaces-sidebar-column) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* 頂層欄位是巢狀 split（如側欄被分割成上下兩個 tab group）時，Obsidian 的
+   `.workspace-split.mod-left-split/mod-right-split { flex: 0 0 auto }` 會把容器壓扁成
+   width 0（sidebar 消失）。這裡用非 important 的 `flex: 1 1 0` 蓋過該規則
+   （相同 specificity、plugin 的 stylesheet 較晚載入 → 勝出）。 */
+.window-spaces-sidebar-column.workspace-split {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* 側欄欄位內部還會由 Obsidian 包一層「側欄 dock」的 workspace-split（帶
+   mod-left-split / mod-sidedock）。Obsidian 的 `.workspace-split.mod-left-split`
+   同樣設 `flex: 0 0 auto`，會把這層內層 split 壓扁成高度 0 → 其下所有 view
+   （尤其第三方 view）的 client area 高度為 0、內容 collapse（導致第三方 view
+   開不出、判斷窗太窄等）。此處一併覆蓋，讓側欄欄位內的所有子 split 都能
+   伸展（flex:1 1 0），修復 view 高度為 0。 */
+.window-spaces-sidebar-column .workspace-split {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* 側欄頂部頁籤列容器：重置邊距，消除頂部巨大空隙 */
+.window-spaces-sidebar-column .workspace-tab-header-container {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* 側欄欄位（被判定為 sidebar 的頂層欄）的 tab 只顯示 icon、隱藏文字標籤 */
+.window-spaces-sidebar-column .workspace-tab-header-inner-title {
+  display: none !important;
+}
+
+/* 側欄 tab 尺寸與對齊（對齊主視窗 sidebar tab：icon 18px + 內距 8px → 寬 34px，
+   height 由 flex stretch 依 container-inner 的 padding 自然得出 ~25px），去除 tab 間的直線與邊框 */
+.window-spaces-sidebar-column .workspace-tab-header {
+  width: var(--sidebar-tab-width, 34px) !important;
+  height: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 0 0 var(--sidebar-tab-width, 34px) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+.window-spaces-sidebar-column .workspace-tab-header::before,
+.window-spaces-sidebar-column .workspace-tab-header::after {
+  display: none !important;
+  border: none !important;
+  background: none !important;
+}
+/* Obsidian core 的 tab 分隔線是畫在 inner 的 ::after（非 header 本身），需另外隱藏 */
+.window-spaces-sidebar-column .workspace-tab-header-inner::after {
+  display: none !important;
+}
+.window-spaces-sidebar-column .workspace-tab-header-inner {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 8px !important;
+  margin: 0 !important;
+  border: none !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+/* 強制確保側欄 tab 的 icon 容器及其 svg 顯示 (修正檔案 tab 無 icon 問題) */
+.window-spaces-sidebar-column .workspace-tab-header-inner-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: 0 0 auto !important;
+}
+.window-spaces-sidebar-column .workspace-tab-header-inner-icon svg {
+  display: block !important;
+  width: var(--icon-size, 18px) !important;
+  height: var(--icon-size, 18px) !important;
+}
+
+/* 側欄 tab 不顯示關閉 (X) 按鈕，不顯示新增 tab (+)，也不顯示下拉選單箭頭 (tab-list) */
+.window-spaces-sidebar-column .workspace-tab-header-inner-close-button,
+.window-spaces-sidebar-column .workspace-tab-header-close-button {
+  display: none !important;
+}
+.window-spaces-sidebar-column .workspace-tab-header-new-tab,
+.window-spaces-sidebar-column .workspace-tab-header-tab-list {
+  display: none !important;
+}
+
+/* 設定頁：Activity Bar view 項目拖曳排序 */
+/* View item rows in the Option page and the Space Settings dialog.
+   2026-08-13 反饋：上下 padding 改為 10px（Obsidian 標準 20px 太高）；
+   按鈕採用標準高度（不壓縮）。group 內需同級 selector 覆蓋 Obsidian 的
+   .setting-group .setting-item:not(.setting-item-heading)（specificity 0,3,0）。 */
+.setting-item[data-window-spaces-activity-item] {
+  cursor: grab;
+  position: relative;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.setting-group .setting-item:not(.setting-item-heading)[data-window-spaces-activity-item] {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.setting-item[data-window-spaces-activity-item]:active {
+  cursor: grabbing;
+}
+.setting-item[data-window-spaces-activity-item] .setting-item-info {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.setting-item[data-window-spaces-activity-item] .setting-item-name {
+  line-height: 1.25;
+}
+.setting-item[data-window-spaces-activity-item] .setting-item-description {
+  line-height: 1.25;
+  margin-top: 0;
+}
+.window-spaces-activity-drag-handle {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  margin-right: 6px;
+  opacity: 0.4;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.window-spaces-activity-drag-handle:hover {
+  opacity: 0.8;
+}
+.window-spaces-activity-drag-handle svg {
+  width: 16px;
+  height: 16px;
+}
+.setting-item.drag-source {
+  opacity: 0.35;
+}
+.setting-item.drag-over-top {
+  border-top: 2px solid var(--interactive-accent) !important;
+}
+.setting-item.drag-over-bottom {
+  border-bottom: 2px solid var(--interactive-accent) !important;
+}
+
+/* Icon 選擇器：多欄 + 垂直捲軸 */
+.window-spaces-icon-picker {
+  width: min(520px, 88vw);
+  max-width: 100%;
+}
+.window-spaces-icon-picker h3 {
+  margin: 0 0 8px 0;
+}
+.window-spaces-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 4px;
+  max-height: 60vh;
+  max-width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m, 8px);
+  box-sizing: border-box;
+}
+.window-spaces-icon-grid .clickable-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-s, 4px);
+}
+.window-spaces-icon-grid .clickable-icon:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+/* Color Swatches & Picker in Save/Edit Modal */
+.window-space-color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.window-space-color-swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.window-space-color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  box-sizing: border-box;
+}
+.window-space-color-swatch:hover {
+  transform: scale(1.2);
+}
+.window-space-color-swatch.is-selected {
+  border-color: var(--text-normal);
+  box-shadow: 0 0 0 2px var(--background-primary);
+  transform: scale(1.15);
+}
+.window-space-icon-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  margin-right: 8px;
+}
+.window-space-icon-preview svg {
+  width: 18px;
+  height: 18px;
+}
+.window-space-color-badge {
+  display: none;
+}
+.window-space-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  margin-right: 0;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.window-space-item-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.window-space-icon-setting-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+

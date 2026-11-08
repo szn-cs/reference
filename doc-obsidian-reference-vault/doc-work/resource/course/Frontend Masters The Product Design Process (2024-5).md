@@ -1,0 +1,32 @@
+- [x] ├── 01. What is Product Design.mp4
+- [x] ├── 02. Why Product Design.mp4
+- [x] ├── 03. Market & Customer Awareness.mp4
+- [x] ├── 04. Process & Technical Feasibility.mp4
+- [x] ├── 05. Usability & Accessibility.mp4
+- [x] ├── 06. Minimum Viable Product.mp4
+- [x] ├── 07. Planning & Launching the MVP.mp4
+- [x] ├── 08. Iterating on the MVP.mp4
+- [x] ├── 09. Common Mistakes.mp4
+- [x] ├── 10. Future Vision.mp4
+- [x] ├── 11. Identifying Customers.mp4
+- [x] ├── 12. Top Tasks.mp4
+- [x] ├── 13. Organizing Top Tasks.mp4
+- [x] ├── 14. Tree Testing & Conclusion.mp4
+- [x] ├── 15. Prototyping in Product Design.mp4
+- [x] ├── 16. Planning Your Prototype.mp4
+- [x] ├── 17. Low Fidelity Prototyping.mp4
+- [x] ├── 18. High Fidelity Prototyping.mp4
+- [x] ├── 19. Interface Design Fundamentals.mp4
+- [x] ├── 20. Building Prototypes for Development.mp4
+- [x] ├── 21. Testing Your Prototype.mp4
+- [x] ├── 22. Testing Initial Wireframes.mp4
+- [x] ├── 23. Testing Mockups.mp4
+- [x] ├── 24. Testing Prototypes and beta Builds.mp4
+- [x] ├── 25. Testing Live Apps.mp4
+- [x] ├── 26. Building a Design System.mp4
+- [x] ├── 27. Planning Your Design System.mp4
+- [x] ├── 28. Objectives, Scope, and Groundwork.mp4
+- [x] ├── 29. Creating Your Design System.mp4
+- [x] ├── 30. Implementing and Evolving.mp4
+- [x] ├── 31. Taking Your Design System to the Next Level.mp4
+- [x] ├── 32. Wrapping Up.mp4

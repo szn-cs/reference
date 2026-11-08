@@ -1,0 +1,3 @@
+- cheatsheet [https://rustcurious.com/elements/](https://rustcurious.com/elements/) ^cheatsheet-https-rustcurious-com-elements
+- Resources:
+    - [ ] [https://shinglyu.com/web/2025/09/16/rust-serverless-on-the-big-three-clouds-aws-azure-and-gcp-compared.html](https://shinglyu.com/web/2025/09/16/rust-serverless-on-the-big-three-clouds-aws-azure-and-gcp-compared.html) ^https-shinglyu-com-web-2025-09-16-rust-serverless-on-the-big

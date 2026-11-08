@@ -1,0 +1,97 @@
+- AI Coding Agent Framework SDKs / AI Agent Development Frameworks;
+- tools, APIs, and abstractions to build, orchestrate, and deploy intelligent autonomous AI agents and applications. Abstractions over LLMs, multi-agent orchestration, sandboxed execution (some SDK often also have infrastructure capability), extensibility. These SDKs provide the logic, state management, and orchestration for agents that write code (reasoning loop, memory, and decision-making).
+- description
+    - features include: multi-model orchestration, tool integrations, dynamic workflow control, real-time streaming, sandboxed execution, and extensible agent behaviors.
+    - SDKs provide complex usecases and save development time.
+    - No-code platforms rely on combination of a **Control Plane** (Brain), a **Sandboxing Layer** (Computer), and **Tooling Protocols** (Hands).
+    - > An AI agent is any application that leverages generative AI models to take autonomous actions in the real world. These agents often require computing power to execute their interactions.
+- **Langchain**
+    - allows developers to define **loops** (Write → Error → Fix → Retry) cyclical flows explicitly as a graph, rather than a straight chain;
+    - Python/JS
+    - used by **Replit's** "Breakout Agents" architecture.
+- LangGraph
+- **Vercel AI SDK** [https://ai-sdk.dev/](https://ai-sdk.dev/)
+    - building AI-powered applications with React, Next.js, and other JavaScript frameworks; **"Streaming UI."** It allows the agent to stream code directly into a React component as it is being written, preventing the "spinner of death" while the user waits for a full file to generate.
+    - TypeScript SDK
+    - used by **Bolt.new**, **Lovable.dev**
+- **OpenAI SDK**
+    - **Codex** agent — Context-friendly and powerful, Rust core (but no Rust SDK)
+        - uses kernel-enforced sandboxing (Linux Landlock)
+- ==**Claude Code Agent SDK**==
+    - gives the LLM direct, native control over a local terminal and file system; optimized for the **Claude 3.5 Sonnet feedback loop** (Think → Act → Observer → Repeat).
+    - The **Claude Agent SDK** allows to take claude code and create a highly specialized agent system for your particular usecase.
+        - [https://platform.claude.com/docs/en/agent-sdk/typescript-v2-preview](https://platform.claude.com/docs/en/agent-sdk/typescript-v2-preview)
+    - **Claude Code** agent — User-friendly and simple
+    - 
+        - Function & Key Features: Anthropic's Native SDK. The underlying engine for the "Claude Code" CLI. It provides an Agent primitive that natively understands file systems, bash commands, and git
+        - **Stack**: **TypeScript/Python SDKs**, built on **Claude** models, utilizes a secure **Code Execution Tool** (sandbox), and integrates native **terminal/bash** access.
+    - cons: developer hands over control to the library implementation of event loop and function calling, as opposed to building from scratch.
+    - RUST SDK ? No official sdk for rust
+        - ~~[https://github.com/yafatek/rust-deep-agents-sdk~~](https://github.com/yafatek/rust-deep-agents-sdk~~)
+        - ~~[https://github.com/Wally869/claude_agent_sdk_rust~~](https://github.com/Wally869/claude_agent_sdk_rust~~)
+        - [https://github.com/modelcontextprotocol/rust-sdk/tree/main](https://github.com/modelcontextprotocol/rust-sdk/tree/main)
+        - Write rust functions and compile them for nodejs modules
+            - Q: How slow is the communication layer between rust and javascript runtime compared to pure javascript implementation?
+        - [https://github.com/tyrchen/claude-agent-sdk-rs](https://github.com/tyrchen/claude-agent-sdk-rs) - Full feature parity (claims full feature parity with the python sdk of Claude Agent SDK). marked as production ready (community project)
+            - [being resolved] AskUserQuestion tool not supported [https://github.com/tyrchen/claude-agent-sdk-rs/issues/11](https://github.com/tyrchen/claude-agent-sdk-rs/issues/11)
+            - covers all [https://github.com/anthropics/claude-agent-sdk-python](https://github.com/anthropics/claude-agent-sdk-python) features
+    - reduce tokens usage [https://github.com/JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
+    - OpenAI plugin for claude code [https://community.openai.com/t/introducing-codex-plugin-for-claude-code/1378186](https://community.openai.com/t/introducing-codex-plugin-for-claude-code/1378186) [https://github.com/openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) ^openai-plugin-for-claude-code-https-community-openai-com-t
+- Multi-agent AI system SDK [https://github.com/strands-agents/sdk-python](https://github.com/strands-agents/sdk-python)
+- **Microsoft Agent Framework** (AutoGen)
+    - Enterprise internal tools (.NET/Azure ecosystems).
+    - 
+        - Function & Key Features: Enterprise Orchestration. Microsoft's evolving standard for building agents that work within the .NET/Python ecosystem. It excels at **multi-agent delegation** (e.g., a "Coder" agent handing off to a "Reviewer" agent).
+        - **Stack**: **Python** (3.10+) and **.NET/C#**, supports **Azure OpenAI/OpenAI**, built on **Graph-based orchestration** (Workflows) and concepts from AutoGen.
+- **Factory.ai SDK**
+    - 
+        - Function & Key Features: "Droids" Automation. Focuses on "Agent-Native Software Development." Allows building "Droids" that integrate directly into **CI/CD pipelines** and treats coding tasks as autonomous background jobs.
+        - **Stack**: **API-first** architecture, **Model-agnostic** agent design (Opus, GPT-5, etc.), delivered via a **CLI** and specialized agent personas (Droids).
+    - **Factory agent** — Multiple specialized Droid agents
+- stands agent sdk
+- Crew AI
+- **Cursor** agent — IDE, model-agnostic, fast models
+    - uses Cursor's Composer agent model - model training using reinforcement learning on their code data; Very fast model
+- Devin
+    - **Cognition** agent — End-to-end autonomy and self-reflection
+- SourceGraph
+    - **Amp** agent — Free, model-agnostic (switches models automatically - no option to select), UX sugar for users
+- Google ADK [https://google.github.io/adk-docs/](https://google.github.io/adk-docs/)
+    - gemini support [https://developers.googleblog.com/building-ai-agents-with-google-gemini-3-and-open-source-frameworks/](https://developers.googleblog.com/building-ai-agents-with-google-gemini-3-and-open-source-frameworks/)
+- [https://mastra.ai/agents](https://mastra.ai/agents)
+
+### Auxiliary SDKs augmenting AI agent with capabilities and MCPs - Deep Research & Web Browsing SDKs for AI Agents:
+
+- Overview: Tools that empower agents to interact with the live internet for data gathering and report generation.
+- **MCP Rust SDK**
+- MCP tools for connecting to postgresql or linear
+- [https://www.agentops.ai/](https://www.agentops.ai/)
+- 
+        - **GPT Researcher**
+            - Category: Agent Framework
+            - Function: Best for Automated Research Reports, synthesizing a final, cited report using a Planner and Execution agent model.
+            - **Stack**: **Python**, **LangChain/LangGraph** (for orchestration), **Tavily API** (default search), leverages multi-agent collaboration.
+        - **Browser-Use**
+            - Category: Browser Control
+            - Function: Excels at Human-like Web Interaction by connecting the LLM directly to the browser's Accessibility Tree to "see" elements and perform native actions.
+            - **Stack**: **Python** (>=3.11), relies on **Chrome DevTools Protocol (CDP)**, integrates with multiple LLM clients (OpenAI, Anthropic, etc.).
+        - **Browserbase**
+            - Category: Headless Infrastructure
+            - Function: Best for High-Volume and Reliable Scraping, providing secure, cloud-hosted browser environments with anti-detection features.
+            - **Stack**: **Node.js/Python SDKs**, **Serverless Chromium** (Cloud), compatible with **Playwright**, **Puppeteer**, and **Stagehand** SDK.
+        - **Firecrawl**
+            - Category: Data Preparation
+            - Function: Essential for Converting Web to LLM Text (RAG); crawls sites and converts messy HTML/PDFs into clean, structured Markdown.
+            - **Stack**: **API-first** service, official SDKs in **Python** and **Node.js**, integrates with **LangChain**, **Llama Index**, and **CrewAI**.
+        - **Tavily**
+            - Category: Search API
+            - Function: Ideal for Focused Search Results as it is an AI-optimized search engine that returns only the relevant text snippets (context) directly to the agent.
+            - **Stack**: **REST API**, official SDKs in **Python** and **Node.js**, designed for direct RAG pipelines and **LangChain** integration.
+- infrastructure [[Tech Stack/Managed Sever Hosting - container hosting, sandboxing enviornments, AI agent sandboxes#^ai-agent-sandbox-multitenant-infrastructure-providers-for-no]]
+- common frameworks
+    - > Blaxel supports the following agent frameworks: LangChain, CrewAI, LlamaIndex, Vercel AI SDK, Mastra, OpenAI Agents SDK, PydanticAI, and Google Agent Development Kit (ADK).Blaxel supports the following agent frameworks: LangChain, CrewAI, LlamaIndex, Vercel AI SDK, Mastra, OpenAI Agents SDK, PydanticAI, and Google Agent Development Kit (ADK).
+
+### Rig ^rig
+
+- [https://rig.rs/](https://rig.rs/)
+- low level framework for building coding agent [https://github.com/pacifio/cersei](https://github.com/pacifio/cersei)

@@ -1,0 +1,7 @@
+- [https://soundcloud.com/insanegrowth](https://soundcloud.com/insanegrowth)
+- [https://clarity.fm/mitch](https://clarity.fm/mitch)
+- [https://fountn.design/](https://fountn.design/)  high quality learning resources for designs including web/UX
+- [https://bento.me/thegoodstuff](https://bento.me/thegoodstuff) curated by professionals resources for product design including learning
+- advanced project challenges to become better programmer [https://codecrafters.io/](https://codecrafters.io/)
+- [ ] [https://www.youtube.com/watch?v=D26sUZ6DHNQ](https://www.youtube.com/watch?v=D26sUZ6DHNQ)
+- [ ] [https://www.youtube.com/watch?v=R8udhb7m398](https://www.youtube.com/watch?v=R8udhb7m398)
