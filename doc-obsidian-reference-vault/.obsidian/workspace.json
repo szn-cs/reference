@@ -30,8 +30,50 @@
               "icon": "lucide-file",
               "title": "documentation"
             }
+          },
+          {
+            "id": "2f35294c44491af6",
+            "type": "leaf",
+            "state": {
+              "type": "daily-note-editor-view",
+              "state": {
+                "selectionMode": "stream",
+                "target": "",
+                "timeField": "mtime",
+                "selectedRange": "all",
+                "customRange": null,
+                "hiddenJournals": []
+              },
+              "icon": "history",
+              "title": "Project Journal"
+            }
+          },
+          {
+            "id": "98ce3d4b7d103c80",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "doc-work/journal/2026-11-08.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "2026-11-08"
+            }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -183,8 +225,8 @@
             "state": {
               "type": "journal-view:b9f3a1c2-0d4e-4f6a-8b1c-2d3e4f5a6b7c",
               "state": {},
-              "icon": "calendar-days",
-              "title": "Calendar"
+              "icon": "lucide-ghost",
+              "title": "journal-view:b9f3a1c2-0d4e-4f6a-8b1c-2d3e4f5a6b7c"
             }
           }
         ]
@@ -211,9 +253,12 @@
       "window-spaces:Open Window Spaces switcher": false
     }
   },
-  "active": "25cd8f920e78cc34",
+  "active": "98ce3d4b7d103c80",
   "lastOpenFiles": [
+    "doc-work/journal/2026-10-30.md.tmp.269507.45f82d53635e",
+    "doc-work/journal/2025-10-15.md",
     "doc-work/documentation.md",
+    "doc-work/journal/2026-10-30.md.tmp.269507.2bc5d6167447",
     "doc-work/Different design parrerns.md",
     "doc-work/excalidraw-library-items-storage.md",
     "doc-work/fix-windows-efi-boot.md",
@@ -243,12 +288,9 @@
     "doc-work/2026-04-18-gnome-extensions.md",
     "doc-work/2026-04-18-gnome-extensions.md.tmp.269507.8b9e8b9b0791",
     "doc-work/Different design parrerns.md.tmp.269507.ad8fcf0641c3",
-    "doc-work/cliAndApi.md",
     "doc-work/cliAndApi.md.tmp.269507.744a22e07dfc",
     "doc-work/installationInstructions.md.tmp.269507.77b51f71207f",
-    "doc-work/instructions.md",
     "doc-work/instructions.md.tmp.269507.653952b05bb8",
-    "doc-work/python.md.tmp.269507.b34826aaeeb0",
     "doc-work/asset/836a7407ddf3dfacc0715c0502b4f3ffc7388829-1406x1230.png",
     "doc-work/asset/58d9f10c985c4eb5d53798dea315f7bb5ab6249e-2401x1000.webp",
     "doc-work/asset/4b9a1f4eb63d5962a6e1746ac26bbc857cf3474f-2400x1666.webp",
